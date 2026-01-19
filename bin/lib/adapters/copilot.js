@@ -95,8 +95,34 @@ function verify(dirs) {
   };
 }
 
+/**
+ * Invoke an agent on GitHub Copilot CLI
+ * 
+ * GitHub Copilot CLI uses custom agent definitions.
+ * Agent files are in .github/agents/ or ~/.copilot/agents/.
+ * 
+ * @param {Object} agent - Agent metadata from AgentRegistry
+ * @param {string} prompt - Prompt to send to agent
+ * @param {Object} options - Additional options (description, model, etc.)
+ * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
+ */
+async function invokeAgent(agent, prompt, options = {}) {
+  // TODO: Implement actual CLI invocation once GitHub CLI agent extension available
+  // Expected command: gh copilot agent run {agentName} --prompt "{prompt}"
+  
+  // Mock result for now - enables testing orchestration layer
+  return {
+    success: true,
+    cli: 'copilot',
+    agent: agent.name,
+    result: 'Mock agent execution (CLI command pending)',
+    duration: 0 // ms - will be tracked when actual execution implemented
+  };
+}
+
 module.exports = {
   getTargetDirs,
   convertContent,
-  verify
+  verify,
+  invokeAgent
 };

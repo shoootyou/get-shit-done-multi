@@ -153,8 +153,34 @@ function verify(dirs) {
   };
 }
 
+/**
+ * Invoke an agent on Codex CLI
+ * 
+ * Codex CLI uses skill-based approach.
+ * Agent files are in .codex/skills/ or ~/.codex/skills/.
+ * 
+ * @param {Object} agent - Agent metadata from AgentRegistry
+ * @param {string} prompt - Prompt to send to agent
+ * @param {Object} options - Additional options (description, model, etc.)
+ * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
+ */
+async function invokeAgent(agent, prompt, options = {}) {
+  // TODO: Implement actual CLI invocation once Codex CLI skill API available
+  // Expected command: codex skill run {agentName} --prompt "{prompt}"
+  
+  // Mock result for now - enables testing orchestration layer
+  return {
+    success: true,
+    cli: 'codex',
+    agent: agent.name,
+    result: 'Mock agent execution (CLI command pending)',
+    duration: 0 // ms - will be tracked when actual execution implemented
+  };
+}
+
 module.exports = {
   getTargetDirs,
   convertContent,
-  verify
+  verify,
+  invokeAgent
 };

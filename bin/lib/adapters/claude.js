@@ -100,8 +100,34 @@ function verify(dirs) {
   };
 }
 
+/**
+ * Invoke an agent on Claude Code CLI
+ * 
+ * Claude Code supports native .agent.md format with agent invocation.
+ * Agent files are in global config or project directories.
+ * 
+ * @param {Object} agent - Agent metadata from AgentRegistry
+ * @param {string} prompt - Prompt to send to agent
+ * @param {Object} options - Additional options (description, model, etc.)
+ * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
+ */
+async function invokeAgent(agent, prompt, options = {}) {
+  // TODO: Implement actual CLI invocation once Claude Code SDK available
+  // Expected command: claude-code agent invoke {agentName} --prompt "{prompt}"
+  
+  // Mock result for now - enables testing orchestration layer
+  return {
+    success: true,
+    cli: 'claude',
+    agent: agent.name,
+    result: 'Mock agent execution (CLI command pending)',
+    duration: 0 // ms - will be tracked when actual execution implemented
+  };
+}
+
 module.exports = {
   getTargetDirs,
   convertContent,
-  verify
+  verify,
+  invokeAgent
 };
