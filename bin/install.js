@@ -370,8 +370,8 @@ function install(isGlobal) {
   const dirs = claudeAdapter.getTargetDirs(isGlobal);
   
   // Determine base directory (for display and settings)
-  const { globalConfigPath, localConfigPath } = getConfigPaths('claude');
-  const claudeDir = isGlobal ? globalConfigPath : localConfigPath;
+  const { global, local } = getConfigPaths('claude');
+  const claudeDir = isGlobal ? global : local;
 
   const locationLabel = isGlobal
     ? claudeDir.replace(os.homedir(), '~')
@@ -692,8 +692,8 @@ function installCodex(isGlobal) {
   // Get target directories from adapter
   const dirs = codexAdapter.getTargetDirs(isGlobal);
   
-  const { globalConfigPath, localConfigPath } = getConfigPaths('codex');
-  const codexDir = isGlobal ? globalConfigPath : localConfigPath;
+  const { global, local } = getConfigPaths('codex');
+  const codexDir = isGlobal ? global : local;
   
   const locationLabel = isGlobal
     ? codexDir.replace(os.homedir(), '~')
