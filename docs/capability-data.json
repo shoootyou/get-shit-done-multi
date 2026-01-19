@@ -1,0 +1,178 @@
+{
+  "_meta": {
+    "generated": "2026-01-19T23:37:58.431Z",
+    "version": "1.0.0",
+    "source": "bin/lib/orchestration/capability-matrix.js",
+    "generator": "bin/doc-generator/generate-matrix.js"
+  },
+  "capabilities": [
+    {
+      "feature": "gsd-executor",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-planner",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-verifier",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-debugger",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-phase-researcher",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-plan-checker",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-codebase-mapper",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-project-researcher",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-research-synthesizer",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-roadmapper",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "gsd-integration-checker",
+      "category": "agents",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Real CLI execution via claude-code command (requires Claude CLI installed)",
+        "copilot": "Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)",
+        "codex": "Real CLI execution via codex skill command (requires Codex CLI installed)"
+      }
+    },
+    {
+      "feature": "slash_commands",
+      "category": "commands",
+      "claude": "full",
+      "copilot": "unsupported",
+      "codex": "unsupported",
+      "notes": {
+        "claude": "Full /gsd:* command support via native slash command system",
+        "copilot": "Use skills with $get-shit-done instead of /gsd:* commands",
+        "codex": "Use skills with $get-shit-done instead of /gsd:* commands"
+      }
+    },
+    {
+      "feature": "custom_agents",
+      "category": "state",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "Native .agent.md format in .agent/ directories",
+        "copilot": "Custom agent definitions in .github/agents/",
+        "codex": "Skill-based approach in .codex/skills/"
+      }
+    },
+    {
+      "feature": "parallel_agents",
+      "category": "state",
+      "claude": "full",
+      "copilot": "full",
+      "codex": "full",
+      "notes": {
+        "claude": "No limitations on concurrent agent invocation",
+        "copilot": "No limitations on concurrent agent invocation",
+        "codex": "No limitations on concurrent agent invocation"
+      }
+    }
+  ]
+}
