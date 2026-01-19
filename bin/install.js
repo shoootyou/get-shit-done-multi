@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const readline = require('readline');
+const { detectInstalledCLIs, getDetectedCLIsMessage } = require('./lib/detect');
+const { getConfigPaths } = require('./lib/paths');
 
 // Colors
 const cyan = '\x1b[36m';
@@ -33,6 +35,8 @@ const args = process.argv.slice(2);
 const hasGlobal = args.includes('--global') || args.includes('-g');
 const hasLocal = args.includes('--local') || args.includes('-l');
 const hasCopilot = args.includes('--copilot') || args.includes('--github-copilot') || args.includes('--copilot-cli');
+const hasCodex = args.includes('--codex') || args.includes('--codex-cli');
+const hasCodexGlobal = args.includes('--codex-global');
 
 // Parse --config-dir argument
 function parseConfigDirArg() {
@@ -68,6 +72,8 @@ if (hasHelp) {
     ${cyan}-l, --local${reset}               Install Claude locally (to ./.claude in current directory)
     ${cyan}-c, --config-dir <path>${reset}   Specify custom Claude config directory
     ${cyan}--copilot${reset}                 Install GitHub Copilot CLI assets locally (to ./.github)
+    ${cyan}--codex${reset}                   Install Codex CLI assets locally (to ./.codex)
+    ${cyan}--codex-global${reset}            Install Codex CLI assets globally (to ~/.codex)
     ${cyan}-h, --help${reset}                Show this help message
     ${cyan}--force-statusline${reset}        Replace existing statusline config
 
@@ -87,6 +93,12 @@ if (hasHelp) {
     ${dim}# Install GitHub Copilot CLI assets to this repository${reset}
     npx get-shit-done-cc --copilot
 
+    ${dim}# Install Codex CLI assets to current project${reset}
+    npx get-shit-done-cc --codex
+
+    ${dim}# Install Codex CLI assets globally${reset}
+    npx get-shit-done-cc --codex-global
+
   ${yellow}Notes:${reset}
     The --config-dir option is useful when you have multiple Claude Code
     configurations (e.g., for different subscriptions). It takes priority
@@ -94,6 +106,11 @@ if (hasHelp) {
 `);
   process.exit(0);
 }
+
+// Display detected CLIs
+const detected = detectInstalledCLIs();
+const detectionMsg = getDetectedCLIsMessage(detected);
+console.log(`  ${dim}${detectionMsg}${reset}\n`);
 
 /**
  * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
@@ -650,6 +667,87 @@ function installCopilot() {
 }
 
 /**
+ * Install to Codex CLI directories
+ */
+function installCodex(isGlobal) {
+  const src = path.join(__dirname, '..');
+  const { global: globalPath, local: localPath } = getConfigPaths('codex');
+  const codexDir = isGlobal ? globalPath : localPath;
+  const skillsDir = path.join(codexDir, 'skills');
+  const skillDir = path.join(skillsDir, 'get-shit-done');
+  
+  const locationLabel = isGlobal
+    ? codexDir.replace(os.homedir(), '~')
+    : codexDir.replace(process.cwd(), '.');
+  
+  const pathPrefix = isGlobal
+    ? '~/.codex/skills/get-shit-done/'
+    : './.codex/skills/get-shit-done/';
+
+  console.log(`  Installing Codex CLI assets to ${cyan}${locationLabel}${reset}\n`);
+
+  const failures = [];
+
+  // Copy core GSD resources into the skill directory
+  const skillSrc = path.join(src, 'get-shit-done');
+  copyWithPathReplacement(skillSrc, skillDir, pathPrefix, true);
+  if (verifyInstalled(skillDir, 'skills/get-shit-done')) {
+    console.log(`  ${green}✓${reset} Installed skill resources`);
+  } else {
+    failures.push('skills/get-shit-done');
+  }
+
+  // Copy commands into the skill directory
+  const commandsSrc = path.join(src, 'commands', 'gsd');
+  const commandsDest = path.join(skillDir, 'commands', 'gsd');
+  copyWithPathReplacement(commandsSrc, commandsDest, pathPrefix, true);
+  if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
+    console.log(`  ${green}✓${reset} Installed command definitions`);
+  } else {
+    failures.push('skills/get-shit-done/commands/gsd');
+  }
+
+  // Copy CHANGELOG.md and VERSION
+  const changelogSrc = path.join(src, 'CHANGELOG.md');
+  const changelogDest = path.join(skillDir, 'CHANGELOG.md');
+  if (fs.existsSync(changelogSrc)) {
+    fs.copyFileSync(changelogSrc, changelogDest);
+    if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
+      console.log(`  ${green}✓${reset} Installed CHANGELOG.md`);
+    } else {
+      failures.push('skills/get-shit-done/CHANGELOG.md');
+    }
+  }
+
+  const versionDest = path.join(skillDir, 'VERSION');
+  fs.writeFileSync(versionDest, pkg.version);
+  if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
+    console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
+  } else {
+    failures.push('skills/get-shit-done/VERSION');
+  }
+
+  // Install GitHub issue templates for local installs only
+  if (!isGlobal) {
+    const projectDir = process.cwd();
+    if (installIssueTemplates(projectDir)) {
+      console.log(`  ${green}✓${reset} Installed GitHub issue templates`);
+    } else {
+      failures.push('issue templates');
+    }
+  }
+
+  if (failures.length > 0) {
+    console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
+    process.exit(1);
+  }
+
+  console.log(`
+  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}/gsd:help${reset} for guidance.
+`);
+}
+
+/**
  * Apply statusline config, then print completion message
  */
 function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline) {
@@ -769,6 +867,8 @@ function promptLocation() {
   ${cyan}1${reset}) Cloud Global ${dim}(${globalLabel})${reset} - Claude, all projects
   ${cyan}2${reset}) Cloude Local ${dim}(./.claude)${reset} - Claude, this project only
   ${cyan}3${reset}) GitHub Copilot CLI ${dim}(./.github)${reset} - skills + agents for this repo
+  ${cyan}4${reset}) Codex CLI Local ${dim}(./.codex)${reset} - Codex, this project only
+  ${cyan}5${reset}) Codex CLI Global ${dim}(~/.codex)${reset} - Codex, all projects
 `);
 
   rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
@@ -777,6 +877,14 @@ function promptLocation() {
     const choice = answer.trim() || '1';
     if (choice === '3') {
       installCopilot();
+      return;
+    }
+    if (choice === '4') {
+      installCodex(false);
+      return;
+    }
+    if (choice === '5') {
+      installCodex(true);
       return;
     }
     const isGlobal = choice !== '2';
@@ -791,17 +899,33 @@ function promptLocation() {
 if (hasGlobal && hasLocal) {
   console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
   process.exit(1);
+} else if (hasCodex && hasCodexGlobal) {
+  console.error(`  ${yellow}Cannot specify both --codex and --codex-global${reset}`);
+  process.exit(1);
 } else if (hasCopilot && (hasGlobal || hasLocal)) {
   console.error(`  ${yellow}Cannot combine --copilot with --global or --local${reset}`);
   process.exit(1);
+} else if ((hasCodex || hasCodexGlobal) && (hasGlobal || hasLocal)) {
+  console.error(`  ${yellow}Cannot combine --codex flags with --global or --local${reset}`);
+  process.exit(1);
+} else if ((hasCodex || hasCodexGlobal) && hasCopilot) {
+  console.error(`  ${yellow}Cannot combine --codex with --copilot${reset}`);
+  process.exit(1);
 } else if (hasCopilot && explicitConfigDir) {
   console.error(`  ${yellow}Cannot use --config-dir with --copilot${reset}`);
+  process.exit(1);
+} else if ((hasCodex || hasCodexGlobal) && explicitConfigDir) {
+  console.error(`  ${yellow}Cannot use --config-dir with --codex flags${reset}`);
   process.exit(1);
 } else if (explicitConfigDir && hasLocal) {
   console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
   process.exit(1);
 } else if (hasCopilot) {
   installCopilot();
+} else if (hasCodex) {
+  installCodex(false);
+} else if (hasCodexGlobal) {
+  installCodex(true);
 } else if (hasGlobal) {
   const { settingsPath, settings, statuslineCommand } = install(true);
   // Non-interactive - respect flags
