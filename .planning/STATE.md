@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 6 of 6 (Documentation & Verification)  
-**Plan:** 3 of 6 (In progress)  
+**Plan:** 4 of 6 (Complete)  
 **Status:** Phase 6 in progress  
-**Progress:** `██████████████████████████░░░` 86% (25 of 29 total plans complete)
+**Progress:** `███████████████████████████░░` 90% (26 of 29 total plans complete)
 
-**Last activity:** 2026-01-20 - Completed 06-01-PLAN.md (Documentation Generation Infrastructure)
+**Last activity:** 2026-01-20 - Completed 06-04-PLAN.md (User Documentation)
 
-**Next Action:** Continue Phase 6 - Plan 04 (Automated Integration Testing)
+**Next Action:** Continue Phase 6 - Plan 05 (End-user Documentation)
 
 ---
 
@@ -158,6 +158,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 06 | 01 | Support levels with visual icons (✓/⚠/✗) | Visual scanning for quick capability assessment |
 | 06 | 01 | Include generation timestamps in docs | Users know documentation freshness, helpful for debugging |
 | 06 | 01 | Separate categories (agents/commands/state) in JSON | Enable filtering/grouping in interactive UI |
+| 06 | 04 | Symptom-based troubleshooting navigation | Users know symptoms, not categories; quick navigation table maps symptoms to solutions |
+| 06 | 04 | Consistent setup guide structure | Same structure across all CLIs reduces cognitive load when switching |
+| 06 | 04 | Diagnosis → Solution → Root Cause → Prevention pattern | Teaches users to prevent issues, not just fix them |
+| 06 | 04 | Backup-first migration approach | Always provide rollback path for state corruption during migration |
+| 06 | 04 | CLI-specific sections in all guides | Each CLI has unique gotchas, generic docs miss important details |
+| 06 | 04 | Real commands with expected outputs | Users can verify they're doing it right, reduces support questions |
+| 06 | 04 | Extensive cross-referencing | Documentation is interconnected, users navigate between guides easily |
 
 
 ### Technical Discoveries
@@ -286,41 +293,35 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 **Context:** Phase 5 (State Management) complete. Phase 6 (Documentation & Verification) in progress.
 
-**Starting Point:** Phase 6 in progress. Completed 06-01 (Documentation Generation Infrastructure).
+**Starting Point:** Phase 6 in progress. Completed 06-04 (User Documentation).
 
 **Key Context:**
-- **Phase 6 Plan 01 Complete:** Documentation generation infrastructure production-ready
-  - **06-01 Complete:** Automated documentation generation system
-    - extractDocComments() extracts JSDoc via regex patterns
-    - generate-comparison.js creates CLI comparison table
-    - generate-matrix.js generates capability-data.json
-    - docs/cli-comparison.md shows 11 agents across 3 CLIs
-    - docs/capability-data.json provides structured data for UI
-    - Zero npm dependencies maintained
-    - DOCS-01 and DOCS-06 requirements satisfied
-- **Phase 6 Plan 02 Complete:** Diagnostic test framework production-ready
-  - Installation verification system with doctor pattern
-  - CLI detection, command verification, agent capability tests
-  - /gsd:verify-installation command with fix suggestions
+- **Phase 6 Plan 04 Complete:** User documentation production-ready
+  - **06-04 Complete:** Comprehensive user documentation
+    - docs/implementation-differences.md explains CLI architectural variations
+    - Three setup guides (Claude Code, Copilot CLI, Codex CLI) with consistent structure
+    - docs/troubleshooting.md with symptom-based navigation and diagnosis/solution/prevention pattern
+    - docs/migration-guide.md enables single-CLI to multi-CLI transitions
+    - All guides cross-reference each other for easy navigation
+    - Real commands with expected outputs throughout
+    - DOCS-02, DOCS-03, DOCS-04, DOCS-05 requirements satisfied
 - **Phase 6 Plan 03 Complete:** CLI recommendation engine production-ready
-  - getRecommendations() analyzes installed CLIs and platform
-  - Status display with visual indicators (✓ installed, ○ available)
-  - Platform-specific notes for Windows/Mac/Linux
-  - Multi-CLI setup benefits explained
-  - Integrated into installer with recommendations display
-  - INSTALL-09 requirement satisfied
+- **Phase 6 Plan 02 Complete:** Diagnostic test framework production-ready
+- **Phase 6 Plan 01 Complete:** Documentation generation infrastructure production-ready
 - **Phase 5 Complete:** State management fully production-ready
 - **Phase 4 Complete:** Agent translation layer ready
-- **All Verification and Installation Components Working:**
-  - CLI recommendation engine guides users on CLI selection
-  - Doctor pattern enables modular diagnostic tests
-  - Installer shows CLI status and recommendations
-  - Platform-specific guidance for all OSes
+- **All Documentation Components Complete:**
+  - CLI comparison matrix (auto-generated)
+  - Implementation differences guide
+  - Three CLI-specific setup guides
+  - Troubleshooting guide organized by symptom
+  - Migration guide with backup procedures
+  - Verification and recommendation systems
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 6 Plan 04 (Automated Integration Testing)
+- **Next:** Phase 6 Plan 05 (End-user Documentation)
 
-**Last Session:** 2026-01-20 00:35-00:40 CET
-**Stopped at:** Completed 06-01-PLAN.md (Documentation Generation Infrastructure)
+**Last Session:** 2026-01-20 00:47-00:55 CET
+**Stopped at:** Completed 06-04-PLAN.md (User Documentation)
 **Resume file:** None
 
 ---
