@@ -12,7 +12,8 @@
     "agents",
     "hooks",
     "lib-ghcc",
-    "docs"
+    "docs",
+    "github"
   ],
   "keywords": [
     "claude",
