@@ -11,27 +11,29 @@ Extend GSD from single-CLI to multi-CLI support (Claude Code, GitHub Copilot CLI
 
 ## Phases
 
-### Phase 1: Foundation — Installation Infrastructure
+### Phase 1: Foundation — Installation Infrastructure ✓
 
 **Goal:** Developers can install GSD to any target CLI with cross-platform reliability and version safety
+
+**Status:** Complete (4 plans executed, all requirements satisfied)
 
 **Dependencies:** None (foundational)
 
 **Requirements:**
-- INSTALL-01: Install locally to `.codex/skills/get-shit-done/`
-- INSTALL-02: Install globally to `~/.codex/skills/get-shit-done/`
-- INSTALL-03: Auto-detect installed CLIs
-- INSTALL-05: Preserve existing customizations and state
-- INSTALL-06: Handle version upgrades without data loss
-- INSTALL-07: Cross-platform path handling (Mac, Windows, Linux)
-- INSTALL-10: Clear success/failure messaging and next steps
+- INSTALL-01: Install locally to `.codex/skills/get-shit-done/` ✓
+- INSTALL-02: Install globally to `~/.codex/skills/get-shit-done/` ✓
+- INSTALL-03: Auto-detect installed CLIs ✓
+- INSTALL-05: Preserve existing customizations and state ✓
+- INSTALL-06: Handle version upgrades without data loss ✓
+- INSTALL-07: Cross-platform path handling (Mac, Windows, Linux) ✓
+- INSTALL-10: Clear success/failure messaging and next steps ✓
 
 **Success Criteria:**
-1. User runs `npx get-shit-done-cc --codex` and GSD installs to `.codex/skills/get-shit-done/` without errors on Mac, Windows, and Linux
-2. User runs `npx get-shit-done-cc --codex-global` and GSD installs to `~/.codex/skills/get-shit-done/` with correct home directory resolution across platforms
-3. Installer detects existing GSD installations (Claude Code, GitHub Copilot CLI, Codex CLI) and displays which CLIs are available for installation
-4. User upgrades from previous GSD version and all files in `.planning/` remain intact with no data loss
-5. Installation completes with clear messaging showing which CLI(s) were configured and what commands are now available
+1. User runs `npx get-shit-done-cc --codex` and GSD installs to `.codex/skills/get-shit-done/` without errors on Mac, Windows, and Linux ✓
+2. User runs `npx get-shit-done-cc --codex-global` and GSD installs to `~/.codex/skills/get-shit-done/` with correct home directory resolution across platforms ✓
+3. Installer detects existing GSD installations (Claude Code, GitHub Copilot CLI, Codex CLI) and displays which CLIs are available for installation ✓
+4. User upgrades from previous GSD version and all files in `.planning/` remain intact with no data loss ✓
+5. Installation completes with clear messaging showing which CLI(s) were configured and what commands are now available ✓
 
 **Plans:** 4 plans
 
