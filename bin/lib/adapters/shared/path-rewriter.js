@@ -68,8 +68,8 @@ function replaceClaudePaths(content, targetPrefix, options = {}) {
     if (targetPrefix.includes('.codex/skills/')) {
       updated = updated.replace(/\.github\/skills\/get-shit-done\//g, targetPrefix);
       updated = updated.replace(/\.github\/skills\/get-shit-done\b/g, prefixNoSlash);
-      updated = updated.replace(/`\.github\/agents`/g, '`.codex/skills/get-shit-done/agents`');
-      updated = updated.replace(/\.github\/agents\//g, `${targetPrefix}agents/`);
+      // Replace .github/agents in all contexts (with or without backticks)
+      updated = updated.replace(/\.github\/agents/g, '.codex/skills/get-shit-done/agents');
     }
 
     return updated;
