@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 5 of 6 (State Management)  
-**Plan:** 3 of 5  
+**Plan:** 4 of 5  
 **Status:** In progress  
-**Progress:** `████████████████████████` 91% (21 of 23 total plans complete)
+**Progress:** `█████████████████████████` 96% (22 of 23 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 05-03-PLAN.md (Session persistence and state validation)
+**Last activity:** 2026-01-19 - Completed 05-04-PLAN.md (CLI resilience and cost tracking)
 
-**Next Action:** Continue Phase 5 Plan 4
+**Next Action:** Continue Phase 5 Plan 5
 
 ---
 
@@ -134,6 +134,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 05 | 03 | repair() requires explicit autoFix flag | Prevents accidental data changes, user must explicitly enable repairs |
 | 05 | 03 | Backup unparseable files | Rather than deleting, move to .backup/ for data recovery option |
 | 05 | 03 | detectConcurrentModifications tracking | Tracks which CLI last modified state via .meta.json for race condition debugging |
+| 05 | 04 | Configurable fallback order via .planning/config.json | Gives users control over which CLIs to try and in what order based on preferences |
+| 05 | 04 | Bounded event storage (last 1000) | Prevents unbounded disk growth while maintaining sufficient data for analysis |
+| 05 | 04 | Per-CLI cost breakdown in summary | Enables users to identify which CLI is most cost-effective for their usage patterns |
+| 05 | 04 | Export to CSV format | Enables integration with external analysis tools for advanced cost analysis |
 
 
 ### Technical Discoveries
@@ -188,6 +192,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Session Persistence Pattern:** SessionManager with saveSession/loadSession/switchCLI/restoreSession for CLI-agnostic session tracking
 - **24-hour Session Expiry:** Sessions expire after 24 hours to prevent stale state (maxAge = 24 * 60 * 60 * 1000)
 - **Session Structure:** {cli, timestamp, currentPhase, currentPlan, context, _version} for complete session state
+- **CLI Fallback Pattern:** Configurable retry order with skipCLIs filter and aggregated error messages for debugging
+- **Usage Tracking Pattern:** Event-based tracking with bounded storage (last 1000) and per-CLI summary statistics
+- **Bounded Event Storage:** Keep last N events to prevent disk exhaustion while maintaining adequate history for analysis
+- **CSV Export Format:** timestamp,cli,command,agent,duration,tokens_input,tokens_output,cost enables external tool integration
 - **State Validation Pattern:** validate() checks without modifying, repair() requires autoFix flag for safety
 - **Repair with Backup:** Move unparseable files to .backup/ with timestamp before deletion for data recovery
 - **Concurrent Modification Detection:** Track lastCLI in .meta.json to detect race conditions across CLIs
@@ -226,6 +234,7 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Complete Phase 5 Plan 01 (Atomic file I/O and directory locking)
 - [x] Complete Phase 5 Plan 02 (State management core)
 - [x] Complete Phase 5 Plan 03 (Session persistence and state validation)
+- [x] Complete Phase 5 Plan 04 (CLI resilience and cost tracking)
 - [ ] Continue Phase 5 remaining plans
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
@@ -236,23 +245,27 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 5 (State Management) in progress. Session persistence and state validation complete.
+**Context:** Phase 5 (State Management) in progress. CLI resilience and cost tracking complete.
 
-**Starting Point:** Phase 5 Plan 3 complete. Ready for Phase 5 Plan 4.
+**Starting Point:** Phase 5 Plan 4 complete. Ready for Phase 5 Plan 5.
 
 **Key Context:**
+- **Phase 5 Plan 04 Complete:** CLI resilience and cost tracking
+  - **cli-fallback.js:** CLIFallback class with smart retry logic, configurable fallback order
+  - **usage-tracker.js:** UsageTracker class with per-CLI cost breakdown, bounded event storage
+  - Automatic recovery from CLI failures with traceability
+  - Export to JSON/CSV for external analysis
+  - All verification tests pass (2 min execution)
 - **Phase 5 Plan 03 Complete:** Session persistence and state validation
   - **session-manager.js:** SessionManager class with saveSession/loadSession/switchCLI/restoreSession
   - **state-validator.js:** StateValidator class with validate/repair/ensureConsistency
   - DirectoryLock integration for concurrent CLI safety
   - 24-hour session expiry, concurrent modification detection
   - Auto-repair with backup-before-delete for corrupted files
-  - All verification tests pass (2 min execution)
 - **Phase 5 Plan 02 Complete:** State management core with versioning and migration
   - **state-manager.js:** StateManager class with readState/writeState/updateState, config management
   - **state-migrations.js:** Migration framework with migrateState, validateState, CURRENT_STATE_VERSION
   - Version tracking via _version field, config merge with defaults
-  - Bug fix: Migration backup uses temp directory to avoid fs.cp subdirectory error
 - **Phase 5 Plan 01 Complete:** Atomic file I/O and directory locking
   - **state-io.js:** atomicWriteJSON/atomicReadJSON with write-then-rename pattern
   - **directory-lock.js:** DirectoryLock class with acquire/release/withLock methods
@@ -260,10 +273,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
   - 11 GSD agents registered with CLI-agnostic invocation
   - Performance tracking, capability matrix, result validation
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 5 Plan 4 (Multi-process state coordination)
+- **Next:** Phase 5 Plan 5 (final plan in Phase 5)
 
-**Last Session:** 2026-01-19 22:21-22:24 UTC
-**Stopped at:** Completed 05-03-PLAN.md (Session persistence and state validation)
+**Last Session:** 2026-01-19 22:27-22:29 UTC
+**Stopped at:** Completed 05-04-PLAN.md (CLI resilience and cost tracking)
 **Resume file:** None
 
 ---
