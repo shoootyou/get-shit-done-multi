@@ -810,7 +810,7 @@ function installCodex(isGlobal) {
   }
 
   console.log(`
-  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}/gsd/help${reset} for guidance.
+  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}$get-shit-done help${reset} for guidance.
 `);
 }
 
@@ -955,6 +955,10 @@ function installAll() {
   
   const successCount = results.filter(r => r.success).length;
   console.log(`\n  ${green}✓${reset} Installed to ${successCount}/${results.length} CLI(s)\n`);
+  console.log(`  Invoke commands with your CLI's syntax:`);
+  console.log(`    • Claude Code:       ${cyan}/gsd:help${reset}`);
+  console.log(`    • GitHub Copilot:    ${cyan}gsd:help${reset}`);
+  console.log(`    • Codex CLI:         ${cyan}$get-shit-done help${reset}\n`);
 }
 
 /**
