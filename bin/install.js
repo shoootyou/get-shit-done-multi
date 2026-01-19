@@ -734,15 +734,9 @@ function installCodex(isGlobal) {
     failures.push('skills/get-shit-done/commands/gsd');
   }
 
-  // For global Codex, also copy to prompts directory
-  if (dirs.commands !== null) {
-    copyWithPathReplacement(commandsSrc, dirs.commands, codexAdapter, 'command');
-    if (verifyInstalled(dirs.commands, 'prompts/gsd')) {
-      console.log(`  ${green}✓${reset} Installed prompts/gsd`);
-    } else {
-      failures.push('prompts/gsd');
-    }
-  }
+  // For global Codex, commands are embedded in skills (not separate prompts)
+  // Codex invokes the skill with: $get-shit-done command
+  // No need to copy to separate prompts directory
 
   // Copy CHANGELOG.md and VERSION
   const changelogSrc = path.join(src, 'CHANGELOG.md');

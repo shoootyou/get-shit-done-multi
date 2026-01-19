@@ -35,7 +35,7 @@ function getTargetDirs(isGlobal) {
   return {
     skills: skillsPath,
     agents: path.join(skillsPath, 'agents'), // Agents nested in skills for Codex
-    commands: isGlobal ? path.join(os.homedir(), '.codex', 'prompts', 'gsd') : null // Only global per research
+    commands: null // Commands embedded in skills, invoked with $get-shit-done
   };
 }
 
