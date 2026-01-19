@@ -30,17 +30,17 @@
 
 ### Agent/Subagent System
 
-- [ ] **AGENT-01**: All 11 GSD agents (executor, planner, roadmapper, debugger, verifier, etc.) function in Codex CLI
+- [x] **AGENT-01**: All 11 GSD agents (executor, planner, roadmapper, debugger, verifier, etc.) function in Codex CLI
 - [x] **AGENT-02**: GitHub Copilot CLI agents continue working with custom agent definitions in `.github/agents/`
 - [x] **AGENT-03**: Codex CLI agents work as skills since Codex lacks native custom agent support
-- [ ] **AGENT-04**: Agent functionality is equivalent across CLIs (same inputs produce same outputs)
-- [ ] **AGENT-05**: Agent invocation is transparent to user (they don't need to know implementation differs)
-- [ ] **AGENT-06**: Documentation clearly explains which agent features work differently per CLI
-- [ ] **AGENT-07**: Unified agent registry shows which agents are available in each CLI
-- [ ] **AGENT-08**: Agent results can be passed between CLIs when switching mid-project
-- [ ] **AGENT-09**: Performance benchmarking shows execution time per agent per CLI
+- [x] **AGENT-04**: Agent functionality is equivalent across CLIs (same inputs produce same outputs)
+- [x] **AGENT-05**: Agent invocation is transparent to user (they don't need to know implementation differs)
+- [x] **AGENT-06**: Documentation clearly explains which agent features work differently per CLI
+- [x] **AGENT-07**: Unified agent registry shows which agents are available in each CLI
+- [x] **AGENT-08**: Agent results can be passed between CLIs when switching mid-project
+- [x] **AGENT-09**: Performance benchmarking shows execution time per agent per CLI
 - [ ] **AGENT-10**: Agent failures trigger smart retry logic (try different CLI if available)
-- [ ] **AGENT-11**: All agents write to same `.planning/` directory structure regardless of CLI
+- [x] **AGENT-11**: All agents write to same `.planning/` directory structure regardless of CLI
 
 ### State Management
 
@@ -121,17 +121,17 @@
 | CMD-08 | Phase 3 | Complete |
 | CMD-09 | Phase 3 | Complete |
 | CMD-10 | Phase 2 | Complete |
-| AGENT-01 | Phase 4 | Pending |
+| AGENT-01 | Phase 4 | Complete |
 | AGENT-02 | Phase 2 | Complete |
 | AGENT-03 | Phase 2 | Complete |
-| AGENT-04 | Phase 4 | Pending |
-| AGENT-05 | Phase 4 | Pending |
-| AGENT-06 | Phase 4 | Pending |
-| AGENT-07 | Phase 4 | Pending |
-| AGENT-08 | Phase 4 | Pending |
-| AGENT-09 | Phase 4 | Pending |
+| AGENT-04 | Phase 4 | Complete |
+| AGENT-05 | Phase 4 | Complete |
+| AGENT-06 | Phase 4 | Complete |
+| AGENT-07 | Phase 4 | Complete |
+| AGENT-08 | Phase 4 | Complete |
+| AGENT-09 | Phase 4 | Complete |
 | AGENT-10 | Phase 5 | Pending |
-| AGENT-11 | Phase 4 | Pending |
+| AGENT-11 | Phase 4 | Complete |
 | STATE-01 | Phase 5 | Pending |
 | STATE-02 | Phase 5 | Pending |
 | STATE-03 | Phase 5 | Pending |

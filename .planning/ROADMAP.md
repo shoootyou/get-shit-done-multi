@@ -110,32 +110,43 @@ Plans:
 
 ---
 
-### Phase 4: Agent Translation — Orchestration Adaptation
+### Phase 4: Agent Translation — Orchestration Adaptation ✓
 
 **Goal:** GSD's 11 specialized agents function across all CLIs with documented capability differences
+
+**Status:** Complete (7 plans executed: 4 initial + 3 gap closure, all requirements satisfied)
 
 **Dependencies:** Phase 3 (requires commands functional)
 
 **Requirements:**
-- AGENT-01: All 11 GSD agents function in Codex CLI
-- AGENT-04: Agent functionality equivalent across CLIs
-- AGENT-05: Agent invocation transparent to user
-- AGENT-06: Documentation explains agent feature differences per CLI
-- AGENT-07: Unified agent registry shows availability per CLI
-- AGENT-08: Agent results pass between CLIs when switching mid-project
-- AGENT-09: Performance benchmarking per agent per CLI
-- AGENT-11: All agents write to same `.planning/` directory structure
+- AGENT-01: All 11 GSD agents function in Codex CLI ✓
+- AGENT-04: Agent functionality equivalent across CLIs ✓
+- AGENT-05: Agent invocation transparent to user ✓
+- AGENT-06: Documentation explains agent feature differences per CLI ✓
+- AGENT-07: Unified agent registry shows availability per CLI ✓
+- AGENT-08: Agent results pass between CLIs when switching mid-project ✓
+- AGENT-09: Performance benchmarking per agent per CLI ✓
+- AGENT-11: All agents write to same `.planning/` directory structure ✓
 
 **Success Criteria:**
-1. User invokes `gsd-executor` agent via `/gsd:execute-phase 1` and agent functions in Claude Code (native), GitHub Copilot CLI (custom agent), and Codex CLI (skill) with equivalent outputs
-2. User reviews agent capability matrix showing which of the 11 agents are fully supported, partially supported, or unsupported in each CLI with clear explanations
-3. User runs multi-phase workflow starting in Claude Code (planner), switching to Codex CLI (executor), then GitHub Copilot CLI (verifier) and each agent reads previous agent's outputs from `.planning/` directory without errors
-4. User accesses performance data showing execution time for each agent in each CLI to make informed CLI selection decisions
-5. User encounters agent limitation in Codex CLI and receives clear documentation explaining what works differently and why
+1. User invokes `gsd-executor` agent via `/gsd:execute-phase 1` and agent functions in Claude Code (native), GitHub Copilot CLI (custom agent), and Codex CLI (skill) with equivalent outputs ✓
+2. User reviews agent capability matrix showing which of the 11 agents are fully supported, partially supported, or unsupported in each CLI with clear explanations ✓
+3. User runs multi-phase workflow starting in Claude Code (planner), switching to Codex CLI (executor), then GitHub Copilot CLI (verifier) and each agent reads previous agent's outputs from `.planning/` directory without errors ✓
+4. User accesses performance data showing execution time for each agent in each CLI to make informed CLI selection decisions ✓
+5. User encounters agent limitation in Codex CLI and receives clear documentation explaining what works differently and why ✓
 
 **Plans:** 7 plans (4 original + 3 gap closure)
 
 Plans:
+- [x] 04-01-PLAN.md — Agent orchestration core (registry + invoker)
+- [x] 04-02-PLAN.md — Performance tracking (perf_hooks integration)
+- [x] 04-03-PLAN.md — Capability matrix and documentation
+- [x] 04-04-PLAN.md — Result validation and testing
+- [x] 04-05-PLAN.md — Gap Closure: Replace adapter stubs with real CLI execution
+- [x] 04-06-PLAN.md — Gap Closure: Wire agent invoker into command system
+- [x] 04-07-PLAN.md — Gap Closure: Enable equivalence testing and update capability matrix
+
+---
 - [x] 04-01-PLAN.md — Agent orchestration core (registry + invoker)
 - [x] 04-02-PLAN.md — Performance tracking (perf_hooks integration)
 - [x] 04-03-PLAN.md — Capability matrix and documentation
@@ -208,7 +219,7 @@ Plans:
 | 1 - Foundation | Complete | 2026-01-19 |
 | 2 - Adapter Implementation | Complete | 2026-01-19 |
 | 3 - Command System | Complete | 2026-01-19 |
-| 4 - Agent Translation | Pending | — |
+| 4 - Agent Translation | Complete | 2026-01-19 |
 | 5 - State Management | Pending | — |
 | 6 - Documentation & Verification | Pending | — |
 
