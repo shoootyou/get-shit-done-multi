@@ -32,6 +32,7 @@ ${cyan}   ██████╗ ███████╗██████╗
 const args = process.argv.slice(2);
 const hasGlobal = args.includes('--global') || args.includes('-g');
 const hasLocal = args.includes('--local') || args.includes('-l');
+const hasCopilot = args.includes('--copilot') || args.includes('--github-copilot') || args.includes('--copilot-cli');
 
 // Parse --config-dir argument
 function parseConfigDirArg() {
@@ -63,9 +64,10 @@ if (hasHelp) {
   console.log(`  ${yellow}Usage:${reset} npx get-shit-done-cc [options]
 
   ${yellow}Options:${reset}
-    ${cyan}-g, --global${reset}              Install globally (to Claude config directory)
-    ${cyan}-l, --local${reset}               Install locally (to ./.claude in current directory)
+    ${cyan}-g, --global${reset}              Install Claude globally (to Claude config directory)
+    ${cyan}-l, --local${reset}               Install Claude locally (to ./.claude in current directory)
     ${cyan}-c, --config-dir <path>${reset}   Specify custom Claude config directory
+    ${cyan}--copilot${reset}                 Install GitHub Copilot CLI assets locally (to ./.github)
     ${cyan}-h, --help${reset}                Show this help message
     ${cyan}--force-statusline${reset}        Replace existing statusline config
 
@@ -81,6 +83,9 @@ if (hasHelp) {
 
     ${dim}# Install to current project only${reset}
     npx get-shit-done-cc --local
+
+    ${dim}# Install GitHub Copilot CLI assets to this repository${reset}
+    npx get-shit-done-cc --copilot
 
   ${yellow}Notes:${reset}
     The --config-dir option is useful when you have multiple Claude Code
@@ -122,10 +127,29 @@ function writeSettings(settingsPath, settings) {
 }
 
 /**
+ * Replace Claude config paths for alternate install targets
+ */
+function replaceClaudePaths(content, pathPrefix, includeLocalPaths) {
+  let updated = content;
+  if (includeLocalPaths) {
+    updated = updated.replace(/~\/\.claude\/agents\//g, '.github/agents/');
+    updated = updated.replace(/\.claude\/agents\//g, '.github/agents/');
+  }
+  updated = updated.replace(/~\/\.claude\//g, pathPrefix);
+  if (includeLocalPaths) {
+    const prefixNoSlash = pathPrefix.endsWith('/') ? pathPrefix.slice(0, -1) : pathPrefix;
+    updated = updated.replace(/~\/\.claude\b/g, prefixNoSlash);
+    updated = updated.replace(/\.\/\.claude\//g, pathPrefix);
+    updated = updated.replace(/\.claude\//g, pathPrefix);
+  }
+  return updated;
+}
+
+/**
  * Recursively copy directory, replacing paths in .md files
  * Deletes existing destDir first to remove orphaned files from previous versions
  */
-function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
+function copyWithPathReplacement(srcDir, destDir, pathPrefix, includeLocalPaths = false) {
   // Clean install: remove existing destination to prevent orphaned files
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true });
@@ -139,11 +163,10 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
     const destPath = path.join(destDir, entry.name);
 
     if (entry.isDirectory()) {
-      copyWithPathReplacement(srcPath, destPath, pathPrefix);
+      copyWithPathReplacement(srcPath, destPath, pathPrefix, includeLocalPaths);
     } else if (entry.name.endsWith('.md')) {
-      // Replace ~/.claude/ with the appropriate prefix in markdown files
       let content = fs.readFileSync(srcPath, 'utf8');
-      content = content.replace(/~\/\.claude\//g, pathPrefix);
+      content = replaceClaudePaths(content, pathPrefix, includeLocalPaths);
       fs.writeFileSync(destPath, content);
     } else {
       fs.copyFileSync(srcPath, destPath);
@@ -238,6 +261,66 @@ function verifyFileInstalled(filePath, description) {
     console.error(`  ${yellow}✗${reset} Failed to install ${description}: file not created`);
     return false;
   }
+  return true;
+}
+
+function yamlEscape(value) {
+  return String(value).replace(/"/g, '\\"');
+}
+
+function parseFrontMatter(content) {
+  const match = content.match(/^---\s*[\s\S]*?\n---\s*\n?/);
+  if (!match) {
+    return { frontMatter: '', body: content };
+  }
+  return { frontMatter: match[0], body: content.slice(match[0].length) };
+}
+
+function getFrontMatterValue(frontMatter, key) {
+  const match = frontMatter.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'));
+  return match ? match[1].trim() : '';
+}
+
+function copyCopilotAgents(srcDir, destDir, pathPrefix) {
+  if (!fs.existsSync(srcDir)) {
+    return false;
+  }
+
+  fs.mkdirSync(destDir, { recursive: true });
+
+  // Remove old GSD agents before copying new ones
+  for (const file of fs.readdirSync(destDir)) {
+    if (file.startsWith('gsd-') && (file.endsWith('.agent.md') || file.endsWith('.md'))) {
+      fs.unlinkSync(path.join(destDir, file));
+    }
+  }
+
+  const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.md')) {
+      continue;
+    }
+    const srcPath = path.join(srcDir, entry.name);
+    const raw = fs.readFileSync(srcPath, 'utf8');
+    const { frontMatter, body } = parseFrontMatter(raw);
+    const name = getFrontMatterValue(frontMatter, 'name') || entry.name.replace(/\.md$/, '');
+    const description = getFrontMatterValue(frontMatter, 'description') || 'GSD agent for GitHub Copilot CLI.';
+    const updatedBody = replaceClaudePaths(body, pathPrefix, true).trimStart();
+    const copilotFrontMatter = [
+      '---',
+      `name: "${yamlEscape(name)}"`,
+      `description: "${yamlEscape(description)}"`,
+      'target: github-copilot',
+      'tools: ["*"]',
+      '---',
+      ''
+    ].join('\n');
+
+    const destName = entry.name.replace(/\.md$/, '.agent.md');
+    const destPath = path.join(destDir, destName);
+    fs.writeFileSync(destPath, `${copilotFrontMatter}\n${updatedBody}`);
+  }
+
   return true;
 }
 
@@ -412,6 +495,110 @@ function install(isGlobal) {
 }
 
 /**
+ * Install to GitHub Copilot CLI local directories
+ */
+function installCopilot() {
+  const src = path.join(__dirname, '..');
+  const projectDir = process.cwd();
+  const githubDir = path.join(projectDir, '.github');
+  const skillsDir = path.join(githubDir, 'skills');
+  const skillDir = path.join(skillsDir, 'get-shit-done');
+  const pathPrefix = '.github/skills/get-shit-done/';
+
+  console.log(`  Installing GitHub Copilot CLI assets to ${cyan}./.github${reset}\n`);
+
+  const failures = [];
+
+  // Copy core GSD resources into the skill directory
+  const skillSrc = path.join(src, 'get-shit-done');
+  copyWithPathReplacement(skillSrc, skillDir, pathPrefix, true);
+  if (verifyInstalled(skillDir, 'skills/get-shit-done')) {
+    console.log(`  ${green}✓${reset} Installed skill resources`);
+  } else {
+    failures.push('skills/get-shit-done');
+  }
+
+  // Copy commands into the skill directory
+  const commandsSrc = path.join(src, 'commands', 'gsd');
+  const commandsDest = path.join(skillDir, 'commands', 'gsd');
+  copyWithPathReplacement(commandsSrc, commandsDest, pathPrefix, true);
+  if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
+    console.log(`  ${green}✓${reset} Installed command definitions`);
+  } else {
+    failures.push('skills/get-shit-done/commands/gsd');
+  }
+
+  // Copy SKILL.md template
+  const skillTemplateSrc = path.join(src, 'lib-ghcc', 'SKILL.md');
+  const skillTemplateDest = path.join(skillDir, 'SKILL.md');
+  if (fs.existsSync(skillTemplateSrc)) {
+    fs.copyFileSync(skillTemplateSrc, skillTemplateDest);
+    if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
+      console.log(`  ${green}✓${reset} Installed SKILL.md`);
+    } else {
+      failures.push('skills/get-shit-done/SKILL.md');
+    }
+  } else {
+    failures.push('lib-ghcc/SKILL.md');
+  }
+
+  // Copy CHANGELOG.md and VERSION
+  const changelogSrc = path.join(src, 'CHANGELOG.md');
+  const changelogDest = path.join(skillDir, 'CHANGELOG.md');
+  if (fs.existsSync(changelogSrc)) {
+    fs.copyFileSync(changelogSrc, changelogDest);
+    if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
+      console.log(`  ${green}✓${reset} Installed CHANGELOG.md`);
+    } else {
+      failures.push('skills/get-shit-done/CHANGELOG.md');
+    }
+  }
+
+  const versionDest = path.join(skillDir, 'VERSION');
+  fs.writeFileSync(versionDest, pkg.version);
+  if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
+    console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
+  } else {
+    failures.push('skills/get-shit-done/VERSION');
+  }
+
+  // Install Copilot agents
+  const agentsSrc = path.join(src, 'agents');
+  const agentsDest = path.join(githubDir, 'agents');
+  if (copyCopilotAgents(agentsSrc, agentsDest, pathPrefix) && verifyInstalled(agentsDest, 'agents')) {
+    console.log(`  ${green}✓${reset} Installed Copilot agents`);
+  } else {
+    failures.push('agents');
+  }
+
+  // Install copilot-instructions.md if none exists
+  const instructionsSrc = path.join(src, 'lib-ghcc', 'copilot-instructions.md');
+  const instructionsDest = path.join(githubDir, 'copilot-instructions.md');
+  if (fs.existsSync(instructionsSrc)) {
+    if (!fs.existsSync(instructionsDest)) {
+      fs.mkdirSync(githubDir, { recursive: true });
+      fs.copyFileSync(instructionsSrc, instructionsDest);
+      if (verifyFileInstalled(instructionsDest, '.github/copilot-instructions.md')) {
+        console.log(`  ${green}✓${reset} Installed copilot-instructions.md`);
+      } else {
+        failures.push('.github/copilot-instructions.md');
+      }
+    } else {
+      console.log(`  ${yellow}⚠${reset} copilot-instructions.md already exists — skipped`);
+    }
+  }
+
+  if (failures.length > 0) {
+    console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
+    process.exit(1);
+  }
+
+  console.log(`
+  ${green}Done!${reset} Start GitHub Copilot CLI in this repo and use ${cyan}gsd:help${reset} for guidance.
+`);
+}
+
+/**
  * Apply statusline config, then print completion message
  */
 function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline) {
@@ -528,17 +715,21 @@ function promptLocation() {
 
   console.log(`  ${yellow}Where would you like to install?${reset}
 
-  ${cyan}1${reset}) Global ${dim}(${globalLabel})${reset} - available in all projects
-  ${cyan}2${reset}) Local  ${dim}(./.claude)${reset} - this project only
+  ${cyan}1${reset}) Cloud Global ${dim}(${globalLabel})${reset} - Claude, all projects
+  ${cyan}2${reset}) Cloude Local ${dim}(./.claude)${reset} - Claude, this project only
+  ${cyan}3${reset}) GitHub Copilot CLI ${dim}(./.github)${reset} - skills + agents for this repo
 `);
 
   rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
     answered = true;
     rl.close();
     const choice = answer.trim() || '1';
+    if (choice === '3') {
+      installCopilot();
+      return;
+    }
     const isGlobal = choice !== '2';
     const { settingsPath, settings, statuslineCommand } = install(isGlobal);
-    // Interactive mode - prompt for optional features
     handleStatusline(settings, true, (shouldInstallStatusline) => {
       finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
     });
@@ -549,9 +740,17 @@ function promptLocation() {
 if (hasGlobal && hasLocal) {
   console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
   process.exit(1);
+} else if (hasCopilot && (hasGlobal || hasLocal)) {
+  console.error(`  ${yellow}Cannot combine --copilot with --global or --local${reset}`);
+  process.exit(1);
+} else if (hasCopilot && explicitConfigDir) {
+  console.error(`  ${yellow}Cannot use --config-dir with --copilot${reset}`);
+  process.exit(1);
 } else if (explicitConfigDir && hasLocal) {
   console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
   process.exit(1);
+} else if (hasCopilot) {
+  installCopilot();
 } else if (hasGlobal) {
   const { settingsPath, settings, statuslineCommand } = install(true);
   // Non-interactive - respect flags

@@ -10,7 +10,9 @@
     "commands",
     "get-shit-done",
     "agents",
-    "hooks"
+    "hooks",
+    "lib-ghcc",
+    "docs"
   ],
   "keywords": [
     "claude",
