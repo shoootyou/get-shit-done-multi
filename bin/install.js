@@ -7,6 +7,7 @@ const readline = require('readline');
 const { detectInstalledCLIs, getDetectedCLIsMessage } = require('./lib/detect');
 const { getConfigPaths } = require('./lib/paths');
 const { preserveUserData, restoreUserData } = require('./lib/upgrade');
+const { replaceClaudePaths } = require('./lib/adapters/shared/path-rewriter');
 const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
