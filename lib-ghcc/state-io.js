@@ -8,6 +8,7 @@
  */
 
 import { promises as fs } from 'fs';
+import path from 'path';
 
 /**
  * Atomically write JSON data to file using write-then-rename pattern
@@ -18,9 +19,10 @@ import { promises as fs } from 'fs';
  * - Safe for concurrent access across multiple CLI processes
  * 
  * Process:
- * 1. Write to temp file with process PID
- * 2. Atomically rename temp to target (POSIX guarantee on same filesystem)
- * 3. Clean up temp file on any error
+ * 1. Ensure parent directory exists
+ * 2. Write to temp file with process PID
+ * 3. Atomically rename temp to target (POSIX guarantee on same filesystem)
+ * 4. Clean up temp file on any error
  * 
  * @param {string} filePath - Target file path
  * @param {Object} data - Data to write (will be JSON.stringify'd)
@@ -28,10 +30,16 @@ import { promises as fs } from 'fs';
  * @throws {Error} On write/rename failure or EXDEV (cross-filesystem)
  */
 export async function atomicWriteJSON(filePath, data) {
-  const tempPath = `${filePath}.${process.pid}.tmp`;
+  // Use PID + timestamp + random for uniqueness in concurrent scenarios
+  const uniqueSuffix = `${process.pid}.${Date.now()}.${Math.random().toString(36).substr(2, 9)}`;
+  const tempPath = `${filePath}.${uniqueSuffix}.tmp`;
   const jsonData = JSON.stringify(data, null, 2);
 
   try {
+    // Ensure parent directory exists
+    const parentDir = path.dirname(filePath);
+    await fs.mkdir(parentDir, { recursive: true });
+
     // Write to temp file in same directory (ensures same filesystem)
     await fs.writeFile(tempPath, jsonData, {
       mode: 0o600, // Restrictive permissions (owner read/write only)

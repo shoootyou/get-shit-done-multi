@@ -62,6 +62,10 @@ export class StateManager {
     if (!data._version) {
       throw new Error('State data must include _version field');
     }
+    
+    // Ensure directory exists before writing
+    await this.ensureStateDir();
+    
     const filePath = join(this.stateDir, filename);
     await atomicWriteJSON(filePath, data);
   }
