@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 5 of 6 (State Management)  
-**Plan:** 1 of 5  
+**Plan:** 2 of 5  
 **Status:** In progress  
-**Progress:** `██████████████████████` 83% (19 of 23 total plans complete)
+**Progress:** `███████████████████████` 87% (20 of 23 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 05-01-PLAN.md (Atomic file I/O and directory locking)
+**Last activity:** 2026-01-19 - Completed 05-02-PLAN.md (State management core)
 
-**Next Action:** Continue Phase 5 Plan 2
+**Next Action:** Continue Phase 5 Plan 3
 
 ---
 
@@ -122,6 +122,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 05 | 01 | Directory-based locking with fs.mkdir() | Node.js doesn't expose native locks, mkdir is atomic across processes |
 | 05 | 01 | Exponential backoff with jitter | Prevents thundering herd when multiple CLIs compete for lock |
 | 05 | 01 | Retry logic for JSON parse errors | Handle transient read-during-write scenarios with 3 retries and 50ms delay |
+| 05 | 02 | State files include _version field | Every state object has _version for migration tracking |
+| 05 | 02 | Config merge strategy: user + defaults | User config overrides defaults, enables graceful degradation |
+| 05 | 02 | Lazy loading in StateManager | Constructor does no I/O, enables lightweight object creation |
+| 05 | 02 | Migration backup via temp directory | Use /tmp staging to avoid fs.cp subdirectory-of-self error |
+| 05 | 02 | .meta.json separation | Track schema version separately from state files to avoid conflicts |
 
 
 ### Technical Discoveries
@@ -168,6 +173,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **JSON Parse Retry:** Retry up to 3 times with 50ms delay on SyntaxError to handle read-during-write scenarios
 - **EXDEV Error Handling:** Detect cross-filesystem boundary in rename operations, show clear error message
 - **Process PID in Temp Files:** ${filePath}.${process.pid}.tmp ensures unique temp files per process
+- **StateManager Pattern:** readState/writeState/updateState with _version tracking for CLI-agnostic state access
+- **Migration Framework:** backup-before-migrate pattern with sequential migration application and .meta.json version tracking
+- **Config Merge Pattern:** User settings override defaults, graceful degradation when config.json missing
+- **Lazy Loading Design:** No I/O in constructor, enables lightweight object creation and testing
+- **Temp Directory Backup:** Stage backups in /tmp before moving to final location to avoid fs.cp subdirectory error
 
 ### Open Questions
 
@@ -201,6 +211,7 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Phase 4 complete - Agent translation layer ready
 - [x] Begin Phase 5 (State Management)
 - [x] Complete Phase 5 Plan 01 (Atomic file I/O and directory locking)
+- [x] Complete Phase 5 Plan 02 (State management core)
 - [ ] Continue Phase 5 remaining plans
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
@@ -211,26 +222,28 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 5 (State Management) started. Atomic file I/O and directory locking complete.
+**Context:** Phase 5 (State Management) in progress. Atomic I/O and state management core complete.
 
-**Starting Point:** Phase 5 Plan 1 complete. Ready for Phase 5 Plan 2.
+**Starting Point:** Phase 5 Plan 2 complete. Ready for Phase 5 Plan 3.
 
 **Key Context:**
+- **Phase 5 Plan 02 Complete:** State management core with versioning and migration
+  - **state-manager.js:** StateManager class with readState/writeState/updateState, config management
+  - **state-migrations.js:** Migration framework with migrateState, validateState, CURRENT_STATE_VERSION
+  - Version tracking via _version field, config merge with defaults
+  - Bug fix: Migration backup uses temp directory to avoid fs.cp subdirectory error
+  - All verification tests pass (3 min execution)
 - **Phase 5 Plan 01 Complete:** Atomic file I/O and directory locking
   - **state-io.js:** atomicWriteJSON/atomicReadJSON with write-then-rename pattern
   - **directory-lock.js:** DirectoryLock class with acquire/release/withLock methods
-  - Zero npm dependencies - pure Node.js fs/promises API
-  - All verification tests pass
 - **Phase 4 Complete:** Agent translation layer fully ready
   - 11 GSD agents registered with CLI-agnostic invocation
   - Performance tracking, capability matrix, result validation
-  - Real CLI execution in all three adapters
-  - Command integration with AI-interpreted execution
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 5 Plan 2 (State management layer implementation)
+- **Next:** Phase 5 Plan 3 (State-aware command system)
 
-**Last Session:** 2026-01-19 22:10-22:12 UTC
-**Stopped at:** Completed 05-01-PLAN.md (Atomic file I/O and directory locking)
+**Last Session:** 2026-01-19 22:16-22:19 UTC
+**Stopped at:** Completed 05-02-PLAN.md (State management core)
 **Resume file:** None
 
 ---
