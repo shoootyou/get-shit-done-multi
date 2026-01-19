@@ -485,11 +485,18 @@ function install(isGlobal) {
     }
   }
 
-  // Verify installation
+  // Verify installation with detailed reporting
   const verifyResult = claudeAdapter.verify(dirs);
-  if (!verifyResult.success) {
+  if (verifyResult.success) {
+    const commandCount = fs.readdirSync(dirs.commands)
+      .filter(f => f.endsWith('.md')).length;
+    const agentCount = fs.readdirSync(dirs.agents)
+      .filter(f => f.endsWith('.agent.md')).length;
+    console.log(`  ${dim}✓ Verified: ${commandCount} commands, ${agentCount} agents${reset}\n`);
+  } else {
     console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
     verifyResult.errors.forEach(err => console.error(`    - ${err}`));
+    console.log();
   }
 
   // If critical components failed, exit with error
@@ -647,12 +654,18 @@ function installCopilot() {
     failures.push('issue templates');
   }
 
-  // Verify installation
+  // Verify installation with detailed reporting
   const verifyResult = copilotAdapter.verify(dirs);
-  if (!verifyResult.success) {
+  if (verifyResult.success) {
+    const skillFiles = fs.readdirSync(dirs.skills)
+      .filter(f => f.endsWith('.md')).length;
+    const agentCount = fs.readdirSync(dirs.agents)
+      .filter(f => f.endsWith('.agent.md')).length;
+    console.log(`  ${dim}✓ Verified: ${skillFiles} skill files, ${agentCount} agents${reset}\n`);
+  } else {
     console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
     verifyResult.errors.forEach(err => console.error(`    - ${err}`));
-    console.log(); // Blank line before success message
+    console.log();
   }
 
   if (failures.length > 0) {
@@ -753,12 +766,18 @@ function installCodex(isGlobal) {
     }
   }
 
-  // Verify installation
+  // Verify installation with detailed reporting
   const verifyResult = codexAdapter.verify(dirs);
-  if (!verifyResult.success) {
+  if (verifyResult.success) {
+    const skillFiles = fs.readdirSync(dirs.skills)
+      .filter(f => f.endsWith('.md')).length;
+    const agentDirs = fs.readdirSync(dirs.agents)
+      .filter(f => fs.statSync(path.join(dirs.agents, f)).isDirectory()).length;
+    console.log(`  ${dim}✓ Verified: ${skillFiles} skill files, ${agentDirs} agent skills${reset}\n`);
+  } else {
     console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
     verifyResult.errors.forEach(err => console.error(`    - ${err}`));
-    console.log(); // Blank line before success message
+    console.log();
   }
 
   if (failures.length > 0) {
