@@ -33,12 +33,13 @@ Extend GSD from single-CLI to multi-CLI support (Claude Code, GitHub Copilot CLI
 4. User upgrades from previous GSD version and all files in `.planning/` remain intact with no data loss
 5. Installation completes with clear messaging showing which CLI(s) were configured and what commands are now available
 
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 - [ ] 01-01-PLAN.md — Foundation utilities (path handling and CLI detection)
 - [ ] 01-02-PLAN.md — Installer extension (Codex support and version management)
 - [ ] 01-03-PLAN.md — Integration verification (cross-platform testing)
+- [ ] 01-04-PLAN.md — Upgrade module integration (wire data preservation into installer)
 
 ---
 
