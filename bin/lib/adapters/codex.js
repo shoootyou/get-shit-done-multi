@@ -27,8 +27,8 @@ const { agentToSkill } = require('./shared/format-converter');
  * @returns {string|null} return.commands - Commands directory path (null for local installations)
  */
 function getTargetDirs(isGlobal) {
-  const { globalConfigPath, localConfigPath } = getConfigPaths('codex');
-  const basePath = isGlobal ? globalConfigPath : localConfigPath;
+  const { global, local } = getConfigPaths('codex');
+  const basePath = isGlobal ? global : local;
   
   const skillsPath = path.join(basePath, 'skills', 'get-shit-done');
   

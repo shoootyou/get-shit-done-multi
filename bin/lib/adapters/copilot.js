@@ -25,8 +25,8 @@ const { replaceClaudePaths } = require('./shared/path-rewriter');
  * @returns {string|null} return.commands - Commands directory path (null for Copilot)
  */
 function getTargetDirs(isGlobal) {
-  const { globalConfigPath, localConfigPath } = getConfigPaths('copilot');
-  const basePath = isGlobal ? globalConfigPath : localConfigPath;
+  const { global, local } = getConfigPaths('copilot');
+  const basePath = isGlobal ? global : local;
   
   return {
     skills: path.join(basePath, 'skills', 'get-shit-done'),

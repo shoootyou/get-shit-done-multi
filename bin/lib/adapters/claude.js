@@ -19,8 +19,8 @@ const { getConfigPaths } = require('../paths');
  * @returns {string} return.commands - Commands directory path
  */
 function getTargetDirs(isGlobal) {
-  const { globalConfigPath, localConfigPath } = getConfigPaths('claude');
-  const basePath = isGlobal ? globalConfigPath : localConfigPath;
+  const { global, local } = getConfigPaths('claude');
+  const basePath = isGlobal ? global : local;
   
   return {
     skills: path.join(basePath, 'get-shit-done'),
