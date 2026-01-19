@@ -148,42 +148,10 @@ function writeSettings(settingsPath, settings) {
 }
 
 /**
- * Replace Claude config paths for alternate install targets
- */
-function replaceClaudePaths(content, pathPrefix, includeLocalPaths) {
-  let updated = content;
-  if (includeLocalPaths) {
-    const commandPrefix = `${pathPrefix}commands/`;
-    updated = updated.replace(/~\/\.claude\/get-shit-done\//g, pathPrefix);
-    updated = updated.replace(/\.\/\.claude\/get-shit-done\//g, pathPrefix);
-    updated = updated.replace(/\.claude\/get-shit-done\//g, pathPrefix);
-    const prefixNoSlash = pathPrefix.endsWith('/') ? pathPrefix.slice(0, -1) : pathPrefix;
-    updated = updated.replace(/~\/\.claude\/get-shit-done\b/g, prefixNoSlash);
-    updated = updated.replace(/\.\/\.claude\/get-shit-done\b/g, prefixNoSlash);
-    updated = updated.replace(/\.claude\/get-shit-done\b/g, prefixNoSlash);
-
-    updated = updated.replace(/~\/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
-    updated = updated.replace(/\.\/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
-    updated = updated.replace(/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
-    updated = updated.replace(/~\/\.claude\/commands\//g, commandPrefix);
-    updated = updated.replace(/\.\/\.claude\/commands\//g, commandPrefix);
-    updated = updated.replace(/\.claude\/commands\//g, commandPrefix);
-
-    updated = updated.replace(/~\/\.claude\/agents\//g, '.github/agents/');
-    updated = updated.replace(/\.\/\.claude\/agents\//g, '.github/agents/');
-    updated = updated.replace(/\.claude\/agents\//g, '.github/agents/');
-
-    return updated;
-  }
-
-  return updated.replace(/~\/\.claude\//g, pathPrefix);
-}
-
-/**
- * Recursively copy directory, replacing paths in .md files
+ * Recursively copy directory, replacing paths in .md files using adapter
  * Deletes existing destDir first to remove orphaned files from previous versions
  */
-function copyWithPathReplacement(srcDir, destDir, pathPrefix, includeLocalPaths = false) {
+function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill') {
   // Clean install: remove existing destination to prevent orphaned files
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true });
@@ -197,10 +165,10 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, includeLocalPaths 
     const destPath = path.join(destDir, entry.name);
 
     if (entry.isDirectory()) {
-      copyWithPathReplacement(srcPath, destPath, pathPrefix, includeLocalPaths);
+      copyWithPathReplacement(srcPath, destPath, adapter, contentType);
     } else if (entry.name.endsWith('.md')) {
       let content = fs.readFileSync(srcPath, 'utf8');
-      content = replaceClaudePaths(content, pathPrefix, includeLocalPaths);
+      content = adapter.convertContent(content, contentType);
       fs.writeFileSync(destPath, content);
     } else {
       fs.copyFileSync(srcPath, destPath);
@@ -385,22 +353,17 @@ function copyCopilotAgents(srcDir, destDir, pathPrefix) {
  */
 function install(isGlobal) {
   const src = path.join(__dirname, '..');
-  // Priority: explicit --config-dir arg > CLAUDE_CONFIG_DIR env var > default ~/.claude
-  const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.CLAUDE_CONFIG_DIR);
-  const defaultGlobalDir = configDir || path.join(os.homedir(), '.claude');
-  const claudeDir = isGlobal
-    ? defaultGlobalDir
-    : path.join(process.cwd(), '.claude');
+  
+  // Get target directories from adapter
+  const dirs = claudeAdapter.getTargetDirs(isGlobal);
+  
+  // Determine base directory (for display and settings)
+  const { globalConfigPath, localConfigPath } = getConfigPaths('claude');
+  const claudeDir = isGlobal ? globalConfigPath : localConfigPath;
 
   const locationLabel = isGlobal
     ? claudeDir.replace(os.homedir(), '~')
     : claudeDir.replace(process.cwd(), '.');
-
-  // Path prefix for file references
-  // Use actual path when CLAUDE_CONFIG_DIR is set, otherwise use ~ shorthand
-  const pathPrefix = isGlobal
-    ? (configDir ? `${claudeDir}/` : '~/.claude/')
-    : './.claude/';
 
   console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
 
@@ -413,15 +376,10 @@ function install(isGlobal) {
   // Clean up orphaned files from previous versions
   cleanupOrphanedFiles(claudeDir);
 
-  // Create commands directory
-  const commandsDir = path.join(claudeDir, 'commands');
-  fs.mkdirSync(commandsDir, { recursive: true });
-
   // Copy commands/gsd with path replacement
   const gsdSrc = path.join(src, 'commands', 'gsd');
-  const gsdDest = path.join(commandsDir, 'gsd');
-  copyWithPathReplacement(gsdSrc, gsdDest, pathPrefix);
-  if (verifyInstalled(gsdDest, 'commands/gsd')) {
+  copyWithPathReplacement(gsdSrc, dirs.commands, claudeAdapter, 'command');
+  if (verifyInstalled(dirs.commands, 'commands/gsd')) {
     console.log(`  ${green}✓${reset} Installed commands/gsd`);
   } else {
     failures.push('commands/gsd');
@@ -429,9 +387,8 @@ function install(isGlobal) {
 
   // Copy get-shit-done skill with path replacement
   const skillSrc = path.join(src, 'get-shit-done');
-  const skillDest = path.join(claudeDir, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
-  if (verifyInstalled(skillDest, 'get-shit-done')) {
+  copyWithPathReplacement(skillSrc, dirs.skills, claudeAdapter, 'skill');
+  if (verifyInstalled(dirs.skills, 'get-shit-done')) {
     console.log(`  ${green}✓${reset} Installed get-shit-done`);
   } else {
     failures.push('get-shit-done');
@@ -441,28 +398,27 @@ function install(isGlobal) {
   // Only delete gsd-*.md files to preserve user's custom agents
   const agentsSrc = path.join(src, 'agents');
   if (fs.existsSync(agentsSrc)) {
-    const agentsDest = path.join(claudeDir, 'agents');
-    fs.mkdirSync(agentsDest, { recursive: true });
+    fs.mkdirSync(dirs.agents, { recursive: true });
 
     // Remove old GSD agents (gsd-*.md) before copying new ones
-    if (fs.existsSync(agentsDest)) {
-      for (const file of fs.readdirSync(agentsDest)) {
+    if (fs.existsSync(dirs.agents)) {
+      for (const file of fs.readdirSync(dirs.agents)) {
         if (file.startsWith('gsd-') && file.endsWith('.md')) {
-          fs.unlinkSync(path.join(agentsDest, file));
+          fs.unlinkSync(path.join(dirs.agents, file));
         }
       }
     }
 
-    // Copy new agents (don't use copyWithPathReplacement which would wipe the folder)
+    // Copy new agents
     const agentEntries = fs.readdirSync(agentsSrc, { withFileTypes: true });
     for (const entry of agentEntries) {
       if (entry.isFile() && entry.name.endsWith('.md')) {
         let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
-        content = content.replace(/~\/\.claude\//g, pathPrefix);
-        fs.writeFileSync(path.join(agentsDest, entry.name), content);
+        content = claudeAdapter.convertContent(content, 'agent');
+        fs.writeFileSync(path.join(dirs.agents, entry.name), content);
       }
     }
-    if (verifyInstalled(agentsDest, 'agents')) {
+    if (verifyInstalled(dirs.agents, 'agents')) {
       console.log(`  ${green}✓${reset} Installed agents`);
     } else {
       failures.push('agents');
@@ -471,7 +427,7 @@ function install(isGlobal) {
 
   // Copy CHANGELOG.md
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(claudeDir, 'get-shit-done', 'CHANGELOG.md');
+  const changelogDest = path.join(dirs.skills, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
@@ -482,7 +438,7 @@ function install(isGlobal) {
   }
 
   // Write VERSION file for whats-new command
-  const versionDest = path.join(claudeDir, 'get-shit-done', 'VERSION');
+  const versionDest = path.join(dirs.skills, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
@@ -515,6 +471,13 @@ function install(isGlobal) {
     } else {
       failures.push('issue templates');
     }
+  }
+
+  // Verify installation
+  const verifyResult = claudeAdapter.verify(dirs);
+  if (!verifyResult.success) {
+    console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
+    verifyResult.errors.forEach(err => console.error(`    - ${err}`));
   }
 
   // If critical components failed, exit with error
@@ -572,23 +535,24 @@ function install(isGlobal) {
  */
 function installCopilot() {
   const src = path.join(__dirname, '..');
+  
+  // Get target directories from adapter (always local for Copilot)
+  const dirs = copilotAdapter.getTargetDirs(false);
+  
   const projectDir = process.cwd();
   const githubDir = path.join(projectDir, '.github');
-  const skillsDir = path.join(githubDir, 'skills');
-  const skillDir = path.join(skillsDir, 'get-shit-done');
-  const pathPrefix = '.github/skills/get-shit-done/';
 
   console.log(`  Installing GitHub Copilot CLI assets to ${cyan}./.github${reset}\n`);
 
   // Preserve user data before upgrade
-  const backups = preserveUserData(skillDir);
+  const backups = preserveUserData(dirs.skills);
 
   const failures = [];
 
   // Copy core GSD resources into the skill directory
   const skillSrc = path.join(src, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, skillDir, pathPrefix, true);
-  if (verifyInstalled(skillDir, 'skills/get-shit-done')) {
+  copyWithPathReplacement(skillSrc, dirs.skills, copilotAdapter, 'skill');
+  if (verifyInstalled(dirs.skills, 'skills/get-shit-done')) {
     console.log(`  ${green}✓${reset} Installed skill resources`);
   } else {
     failures.push('skills/get-shit-done');
@@ -596,8 +560,8 @@ function installCopilot() {
 
   // Copy commands into the skill directory
   const commandsSrc = path.join(src, 'commands', 'gsd');
-  const commandsDest = path.join(skillDir, 'commands', 'gsd');
-  copyWithPathReplacement(commandsSrc, commandsDest, pathPrefix, true);
+  const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
+  copyWithPathReplacement(commandsSrc, commandsDest, copilotAdapter, 'command');
   if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
     console.log(`  ${green}✓${reset} Installed command definitions`);
   } else {
@@ -606,7 +570,7 @@ function installCopilot() {
 
   // Copy SKILL.md template
   const skillTemplateSrc = path.join(src, 'lib-ghcc', 'SKILL.md');
-  const skillTemplateDest = path.join(skillDir, 'SKILL.md');
+  const skillTemplateDest = path.join(dirs.skills, 'SKILL.md');
   if (fs.existsSync(skillTemplateSrc)) {
     fs.copyFileSync(skillTemplateSrc, skillTemplateDest);
     if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
@@ -620,7 +584,7 @@ function installCopilot() {
 
   // Copy CHANGELOG.md and VERSION
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(skillDir, 'CHANGELOG.md');
+  const changelogDest = path.join(dirs.skills, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
@@ -630,7 +594,7 @@ function installCopilot() {
     }
   }
 
-  const versionDest = path.join(skillDir, 'VERSION');
+  const versionDest = path.join(dirs.skills, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
@@ -640,8 +604,8 @@ function installCopilot() {
 
   // Install Copilot agents
   const agentsSrc = path.join(src, 'agents');
-  const agentsDest = path.join(githubDir, 'agents');
-  if (copyCopilotAgents(agentsSrc, agentsDest, pathPrefix) && verifyInstalled(agentsDest, 'agents')) {
+  // Use adapter to get correct agents path
+  if (copyCopilotAgents(agentsSrc, dirs.agents, '.github/skills/get-shit-done/') && verifyInstalled(dirs.agents, 'agents')) {
     console.log(`  ${green}✓${reset} Installed Copilot agents`);
   } else {
     failures.push('agents');
@@ -671,6 +635,14 @@ function installCopilot() {
     failures.push('issue templates');
   }
 
+  // Verify installation
+  const verifyResult = copilotAdapter.verify(dirs);
+  if (!verifyResult.success) {
+    console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
+    verifyResult.errors.forEach(err => console.error(`    - ${err}`));
+    console.log(); // Blank line before success message
+  }
+
   if (failures.length > 0) {
     console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
     process.exit(1);
@@ -678,7 +650,7 @@ function installCopilot() {
 
   // Restore user data after upgrade
   if (backups && Object.keys(backups).length > 0) {
-    restoreUserData(skillDir, backups);
+    restoreUserData(dirs.skills, backups);
   }
 
   console.log(`
@@ -691,39 +663,37 @@ function installCopilot() {
  */
 function installCodex(isGlobal) {
   const src = path.join(__dirname, '..');
-  const { global: globalPath, local: localPath } = getConfigPaths('codex');
-  const codexDir = isGlobal ? globalPath : localPath;
-  const skillsDir = path.join(codexDir, 'skills');
-  const skillDir = path.join(skillsDir, 'get-shit-done');
+  
+  // Get target directories from adapter
+  const dirs = codexAdapter.getTargetDirs(isGlobal);
+  
+  const { globalConfigPath, localConfigPath } = getConfigPaths('codex');
+  const codexDir = isGlobal ? globalConfigPath : localConfigPath;
   
   const locationLabel = isGlobal
     ? codexDir.replace(os.homedir(), '~')
     : codexDir.replace(process.cwd(), '.');
-  
-  const pathPrefix = isGlobal
-    ? '~/.codex/skills/get-shit-done/'
-    : './.codex/skills/get-shit-done/';
 
   console.log(`  Installing Codex CLI assets to ${cyan}${locationLabel}${reset}\n`);
 
   // Preserve user data before upgrade
-  const backups = preserveUserData(skillDir);
+  const backups = preserveUserData(dirs.skills);
 
   const failures = [];
 
   // Copy core GSD resources into the skill directory
   const skillSrc = path.join(src, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, skillDir, pathPrefix, true);
-  if (verifyInstalled(skillDir, 'skills/get-shit-done')) {
+  copyWithPathReplacement(skillSrc, dirs.skills, codexAdapter, 'skill');
+  if (verifyInstalled(dirs.skills, 'skills/get-shit-done')) {
     console.log(`  ${green}✓${reset} Installed skill resources`);
   } else {
     failures.push('skills/get-shit-done');
   }
 
-  // Copy commands into the skill directory
+  // Copy commands into the skill directory (commands embedded in skills for Codex)
   const commandsSrc = path.join(src, 'commands', 'gsd');
-  const commandsDest = path.join(skillDir, 'commands', 'gsd');
-  copyWithPathReplacement(commandsSrc, commandsDest, pathPrefix, true);
+  const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
+  copyWithPathReplacement(commandsSrc, commandsDest, codexAdapter, 'command');
   if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
     console.log(`  ${green}✓${reset} Installed command definitions`);
   } else {
@@ -732,7 +702,7 @@ function installCodex(isGlobal) {
 
   // Copy CHANGELOG.md and VERSION
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(skillDir, 'CHANGELOG.md');
+  const changelogDest = path.join(dirs.skills, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
@@ -742,12 +712,41 @@ function installCodex(isGlobal) {
     }
   }
 
-  const versionDest = path.join(skillDir, 'VERSION');
+  const versionDest = path.join(dirs.skills, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
   } else {
     failures.push('skills/get-shit-done/VERSION');
+  }
+
+  // Codex: convert agents to skill format (folder-per-skill structure)
+  const agentsSrc = path.join(src, 'agents');
+  if (fs.existsSync(agentsSrc)) {
+    const agentFiles = fs.readdirSync(agentsSrc).filter(f => f.endsWith('.agent.md'));
+    for (const agentFile of agentFiles) {
+      const agentPath = path.join(agentsSrc, agentFile);
+      const agentContent = fs.readFileSync(agentPath, 'utf8');
+      const skillContent = codexAdapter.convertContent(agentContent, 'agent');
+      
+      const agentName = agentFile.replace('.agent.md', '');
+      const agentSkillDir = path.join(dirs.agents, agentName);
+      fs.mkdirSync(agentSkillDir, {recursive: true});
+      fs.writeFileSync(path.join(agentSkillDir, 'SKILL.md'), skillContent);
+    }
+    if (verifyInstalled(dirs.agents, 'agents')) {
+      console.log(`  ${green}✓${reset} Installed agents as skills`);
+    } else {
+      failures.push('agents');
+    }
+  }
+
+  // Verify installation
+  const verifyResult = codexAdapter.verify(dirs);
+  if (!verifyResult.success) {
+    console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
+    verifyResult.errors.forEach(err => console.error(`    - ${err}`));
+    console.log(); // Blank line before success message
   }
 
   if (failures.length > 0) {
@@ -757,7 +756,7 @@ function installCodex(isGlobal) {
 
   // Restore user data after upgrade
   if (backups && Object.keys(backups).length > 0) {
-    restoreUserData(skillDir, backups);
+    restoreUserData(dirs.skills, backups);
   }
 
   console.log(`
