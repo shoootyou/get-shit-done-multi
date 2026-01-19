@@ -23,7 +23,7 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 **Status:** Phase 6 in progress  
 **Progress:** `██████████████████████████░░░` 86% (25 of 29 total plans complete)
 
-**Last activity:** 2026-01-20 - Completed 06-03-PLAN.md (CLI Recommendation Engine)
+**Last activity:** 2026-01-20 - Completed 06-01-PLAN.md (Documentation Generation Infrastructure)
 
 **Next Action:** Continue Phase 6 - Plan 04 (Automated Integration Testing)
 
@@ -153,6 +153,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 06 | 03 | Platform-specific notes inform users about path handling | Windows, macOS, and Linux users see relevant configuration information |
 | 06 | 03 | Status display uses visual indicators (✓ for installed, ○ for available) | Provides clear at-a-glance CLI installation status |
 | 06 | 03 | Optional useCase parameter for targeted recommendations | Allows team/personal/general guidance based on user context |
+| 06 | 01 | Use regex for JSDoc extraction vs full parser | Zero dependencies requirement, regex sufficient for extracting comments |
+| 06 | 01 | Generate CLI comparison from capability-matrix.js | Single source of truth, avoid manual doc maintenance |
+| 06 | 01 | Support levels with visual icons (✓/⚠/✗) | Visual scanning for quick capability assessment |
+| 06 | 01 | Include generation timestamps in docs | Users know documentation freshness, helpful for debugging |
+| 06 | 01 | Separate categories (agents/commands/state) in JSON | Enable filtering/grouping in interactive UI |
 
 
 ### Technical Discoveries
@@ -226,6 +231,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Command Discovery Pattern:** Search upward from cwd or use __dirname for module location
 - **Agent Capability Checking:** Load capability matrix from orchestration module for support level verification
 - **Fix Suggestion Pattern:** Include actionable remediation steps in test result objects
+- **Regex-based JSDoc Extraction:** Pattern /\/\*\*([\s\S]*?)\*\//g reliably matches JSDoc blocks without full parser
+- **JSDoc Tag Parsing:** Pattern /@(\w+)\s+(.+)$/ extracts @param, @returns, etc. into structured objects
+- **Doc Generation from Metadata:** Transform capability-matrix.js data into Markdown tables with visual icons
+- **JSON Data Export Pattern:** Include _meta object with generation timestamp, version, source, generator
+- **CLI Comparison Format:** Table structure | Agent | Claude Code | Copilot CLI | Codex CLI | for feature availability
 
 ### Open Questions
 
@@ -276,21 +286,29 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 **Context:** Phase 5 (State Management) complete. Phase 6 (Documentation & Verification) in progress.
 
-**Starting Point:** Phase 6 in progress. Completed 06-03 (CLI Recommendation Engine).
+**Starting Point:** Phase 6 in progress. Completed 06-01 (Documentation Generation Infrastructure).
 
 **Key Context:**
-- **Phase 6 Plan 03 Complete:** CLI recommendation engine production-ready
-  - **06-03 Complete:** Intelligent CLI selection recommendations
-    - getRecommendations() analyzes installed CLIs and platform
-    - Status display with visual indicators (✓ installed, ○ available)
-    - Platform-specific notes for Windows/Mac/Linux
-    - Multi-CLI setup benefits explained
-    - Integrated into installer with recommendations display
-    - INSTALL-09 requirement satisfied
+- **Phase 6 Plan 01 Complete:** Documentation generation infrastructure production-ready
+  - **06-01 Complete:** Automated documentation generation system
+    - extractDocComments() extracts JSDoc via regex patterns
+    - generate-comparison.js creates CLI comparison table
+    - generate-matrix.js generates capability-data.json
+    - docs/cli-comparison.md shows 11 agents across 3 CLIs
+    - docs/capability-data.json provides structured data for UI
+    - Zero npm dependencies maintained
+    - DOCS-01 and DOCS-06 requirements satisfied
 - **Phase 6 Plan 02 Complete:** Diagnostic test framework production-ready
   - Installation verification system with doctor pattern
   - CLI detection, command verification, agent capability tests
   - /gsd:verify-installation command with fix suggestions
+- **Phase 6 Plan 03 Complete:** CLI recommendation engine production-ready
+  - getRecommendations() analyzes installed CLIs and platform
+  - Status display with visual indicators (✓ installed, ○ available)
+  - Platform-specific notes for Windows/Mac/Linux
+  - Multi-CLI setup benefits explained
+  - Integrated into installer with recommendations display
+  - INSTALL-09 requirement satisfied
 - **Phase 5 Complete:** State management fully production-ready
 - **Phase 4 Complete:** Agent translation layer ready
 - **All Verification and Installation Components Working:**
@@ -301,8 +319,8 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Zero npm dependencies maintained:** All using Node.js built-ins
 - **Next:** Phase 6 Plan 04 (Automated Integration Testing)
 
-**Last Session:** 2026-01-20 00:11-00:12 CET
-**Stopped at:** Completed 06-03-PLAN.md (CLI Recommendation Engine)
+**Last Session:** 2026-01-20 00:35-00:40 CET
+**Stopped at:** Completed 06-01-PLAN.md (Documentation Generation Infrastructure)
 **Resume file:** None
 
 ---
