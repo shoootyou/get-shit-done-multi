@@ -133,6 +133,14 @@ Plans:
 4. User accesses performance data showing execution time for each agent in each CLI to make informed CLI selection decisions
 5. User encounters agent limitation in Codex CLI and receives clear documentation explaining what works differently and why
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Agent orchestration core (registry + invoker)
+- [ ] 04-02-PLAN.md — Performance tracking (perf_hooks integration)
+- [ ] 04-03-PLAN.md — Capability matrix and documentation
+- [ ] 04-04-PLAN.md — Result validation and testing
+
 ---
 
 ### Phase 5: State Management — CLI Interoperability
