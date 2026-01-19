@@ -1,5 +1,5 @@
 ---
-name: invoke-agent
+name: gsd:invoke-agent
 description: Invoke a GSD agent with a custom prompt across any CLI
 category: orchestration
 arguments:
