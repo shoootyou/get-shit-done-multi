@@ -66,6 +66,13 @@ Plans:
 4. GSD agents appear in `.github/agents/` for GitHub Copilot and as skills in `.codex/skills/` for Codex with correct format conversion
 5. User switches between global and local installations without path resolution errors
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Create adapter layer architecture (CLI-specific modules + shared utilities)
+- [ ] 02-02-PLAN.md — Wire adapters into installer (refactor install.js to use adapter pattern)
+- [ ] 02-03-PLAN.md — Add --all flag and enhanced verification (multi-CLI deployment)
+
 ---
 
 ### Phase 3: Command System — Unified Command Interface
