@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 4 of 6 (Agent Translation)  
-**Plan:** 04 of 4 (completed)  
-**Status:** Phase 4 complete  
-**Progress:** `███████████████` 115% (15 of 13 total plans complete)
+**Plan:** 05 of 7 (in progress)  
+**Status:** Phase 4 in progress  
+**Progress:** `█████████████████░░░` 88% (16 of 18 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 04-04-PLAN.md (Result validation and error recovery)
+**Last activity:** 2026-01-19 - Completed 04-05-PLAN.md (Adapter CLI integration)
 
-**Next Action:** Begin Phase 5 (Testing & Verification)
+**Next Action:** Continue Phase 4 (Plans 06-07 remain)
 
 ---
 
@@ -106,6 +106,9 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 04 | 03 | Programmatic regeneration API | generateCapabilityDocs() enables automated doc updates when capabilities change |
 | 04 | 03 | Structured capability format (level + notes) | Enables both programmatic logic (level) and user communication (notes) |
 | 04 | 03 | Visual icons for quick scanning | Users can quickly scan ✓/⚠/✗ before reading detailed notes |
+| 04 | 05 | Use execFile instead of exec for CLI invocation | Prevents shell injection vulnerabilities by directly invoking executables |
+| 04 | 05 | Preserve stderr in error responses | Enables debugging CLI failures with detailed error messages |
+| 04 | 05 | Promisify execFile at module level | Enables clean async/await syntax in invokeAgent functions |
 
 ### Technical Discoveries
 
@@ -170,7 +173,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Complete Phase 4 Plan 02 (performance tracking)
 - [x] Complete Phase 4 Plan 03 (capability matrix and documentation)
 - [x] Complete Phase 4 Plan 04 (result validation and error recovery)
-- [x] Phase 4 complete - Agent translation layer ready
+- [x] Complete Phase 4 Plan 05 (adapter CLI integration)
+- [ ] Complete Phase 4 Plan 06 (remaining plans)
+- [ ] Complete Phase 4 Plan 07 (remaining plans)
+- [ ] Phase 4 complete - Agent translation layer ready
 - [ ] Begin Phase 5 (Testing & Verification)
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
@@ -181,17 +187,16 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 4 (Agent Translation) complete. All agent orchestration, performance tracking, capability matrix, and result validation implemented.
+**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration, performance tracking, capability matrix, result validation, and adapter CLI integration complete.
 
-**Starting Point:** Phase 4 complete. Ready to begin Phase 5 (Testing & Verification).
+**Starting Point:** Phase 4 Plan 05 complete. Ready to continue with Plans 06-07.
 
 **Key Context:**
-- **Phase 4 Complete:** Agent translation layer ready
+- **Phase 4 Plans 01-05 Complete:** Agent translation layer partially ready
   - **Plan 01:** Agent orchestration core
     - Agent Registry: Map-based storage for 11 GSD agents with CLI-specific metadata
     - Agent Invoker: CLI-agnostic invocation with detectCLI integration
     - Adapter Integration: Claude, Copilot, Codex adapters with invokeAgent methods
-    - Mock results for testing before CLI SDKs available
   - **Plan 02:** Agent performance tracking
     - PerformanceTracker: Sub-millisecond precision using perf_hooks
     - Automatic measurement: All agent invocations tracked (success and failure)
@@ -209,15 +214,23 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
     - validate-planning-dir.js: User-facing validation tool
     - equivalence-test.js: Cross-CLI output comparison framework
     - 6-test suite covering all validation scenarios
+  - **Plan 05:** Adapter CLI integration
+    - Real CLI execution in all three adapters (claude.js, copilot.js, codex.js)
+    - child_process.execFile for secure CLI invocation
+    - Error handling with stderr capture
+    - Mock results replaced with real CLI commands
+    - validateStructure(), validateJSON(), validateAgentOutput() methods
+    - validate-planning-dir.js: User-facing validation tool
+    - equivalence-test.js: Cross-CLI output comparison framework
+    - 6-test suite covering all validation scenarios
 - **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Phase 5 Ready:** Testing & Verification to integrate all components
+- **Adapter CLI integration complete:** Real CLI command execution in all three adapters
+- **Phase 4 Plans 06-07:** Remaining to complete phase
 
-**Last Session:** 2026-01-19 20:53-21:08 UTC
-**Stopped at:** Completed 04-04-PLAN.md (Result validation and error recovery)
+**Last Session:** 2026-01-19 21:17-21:20 UTC
+**Stopped at:** Completed 04-05-PLAN.md (Adapter CLI integration)
 **Resume file:** None
-
-**Note:** Task 4 of Plan 04-04 requires manual commit due to bash tool failure during execution. See 04-04-SUMMARY.md for commit commands.
 
 ---
 
