@@ -8,9 +8,13 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { execFile } = require('node:child_process');
+const { promisify } = require('node:util');
 const { getConfigPaths } = require('../paths');
 const { replaceClaudePaths } = require('./shared/path-rewriter');
 const { agentToSkill } = require('./shared/format-converter');
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Get target installation directories for Codex CLI
@@ -165,17 +169,31 @@ function verify(dirs) {
  * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
  */
 async function invokeAgent(agent, prompt, options = {}) {
-  // TODO: Implement actual CLI invocation once Codex CLI skill API available
-  // Expected command: codex skill run {agentName} --prompt "{prompt}"
-  
-  // Mock result for now - enables testing orchestration layer
-  return {
-    success: true,
-    cli: 'codex',
-    agent: agent.name,
-    result: 'Mock agent execution (CLI command pending)',
-    duration: 0 // ms - will be tracked when actual execution implemented
-  };
+  try {
+    // Codex CLI skill invocation
+    // Command: codex skill run {skillName} --prompt "{prompt}"
+    const { stdout, stderr } = await execFileAsync('codex', [
+      'skill', 'run', agent.name,
+      '--prompt', prompt
+    ]);
+    
+    return {
+      success: true,
+      cli: 'codex',
+      agent: agent.name,
+      result: stdout.trim(),
+      duration: 0
+    };
+  } catch (error) {
+    return {
+      success: false,
+      cli: 'codex',
+      agent: agent.name,
+      error: error.message,
+      stderr: error.stderr || '',
+      duration: 0
+    };
+  }
 }
 
 module.exports = {
