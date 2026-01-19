@@ -19,13 +19,13 @@ Foundation phase execution - building cross-platform installation infrastructure
 ## Current Position
 
 **Phase:** 1 of 6 (Foundation - Installation Infrastructure)  
-**Plan:** 02 of 4 (completed)  
+**Plan:** 03 of 4 (completed)  
 **Status:** In progress - Phase 1  
-**Progress:** `██░░░░░░░░` ~5% (2 of ~40 total plans complete)
+**Progress:** `██░░░░░░░░` ~7% (3 of ~40 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 01-02-PLAN.md (Codex installation and upgrade module)
+**Last activity:** 2026-01-19 - Completed 01-03-PLAN.md (Installation testing & verification)
 
-**Next Action:** Continue Phase 1 execution with 01-03-PLAN.md
+**Next Action:** Continue Phase 1 execution with 01-04-PLAN.md
 
 ---
 
@@ -64,14 +64,21 @@ Foundation phase execution - building cross-platform installation infrastructure
 | 01 | 02 | Follow Copilot installation pattern for Codex | Both use skills-based structure, different from Claude |
 | 01 | 02 | Atomic backup/restore with timestamp-based naming | Prevents data loss, enables recovery from failed upgrades |
 | 01 | 02 | Preserve .planning and user-data directories | User project data must survive version upgrades |
+| 01 | 03 | Claude config path: ~/Library/Application Support/Claude | Actual path used by Claude CLI (not ~/.claude) |
+| 01 | 03 | Copilot config path: ~/.copilot | Actual path used by Copilot CLI (not ~/.config/github-copilot-cli) |
+| 01 | 03 | Codex should not install GitHub issue templates | Only relevant for .github/ installations (Claude/Copilot) |
 
 ### Technical Discoveries
 
 - **Cross-platform path handling:** path.join() handles Windows vs POSIX separators automatically
-- **CLI detection pattern:** Check for global config directories (~/.claude, ~/.codex, ~/.config/github-copilot-cli)
+- **CLI detection pattern:** Check for global config directories
+  - Claude: ~/Library/Application Support/Claude
+  - Copilot: ~/.copilot
+  - Codex: ~/.codex
 - **Safe directory creation:** fs.mkdirSync({recursive: true}) is idempotent and safe
 - **Codex installation structure:** Uses skills-based structure like Copilot (.codex/skills/get-shit-done/)
 - **Atomic operations:** fs.renameSync() provides atomic backup/restore for data preservation
+- **GitHub issue templates:** Only relevant for Claude and Copilot (install to .github/)
 
 ### Open Questions
 
@@ -87,7 +94,7 @@ Foundation phase execution - building cross-platform installation infrastructure
 
 - [x] Complete Phase 1 Plan 01 (path utilities and CLI detection)
 - [x] Complete Phase 1 Plan 02 (Codex installation and upgrade module)
-- [ ] Execute Phase 1 Plan 03
+- [x] Complete Phase 1 Plan 03 (installation testing and verification)
 - [ ] Execute Phase 1 Plan 04
 - [ ] Verify Codex CLI version on npm before Phase 2
 - [ ] Research agent orchestration patterns for Codex before Phase 4
@@ -100,18 +107,19 @@ Foundation phase execution - building cross-platform installation infrastructure
 
 **Context:** Phase 1 execution in progress. Foundation infrastructure for cross-platform installation (path utilities, CLI detection, version management, adapter framework).
 
-**Starting Point:** Plans 01-01 and 01-02 complete. Continue with Plan 01-03.
+**Starting Point:** Plans 01-01, 01-02, and 01-03 complete. Continue with Plan 01-04.
 
 **Key Context:**
 - **Zero npm dependencies:** Using only Node.js built-ins (`fs`, `path`, `os`)
 - **Cross-platform achieved:** All path operations use path.join()
-- **CLI detection working:** Identifies claude, copilot, codex installations
+- **CLI detection working:** Correctly identifies all three CLIs using proper config paths
 - **Multi-CLI support complete:** Claude, Copilot, and Codex installation working
 - **Upgrade module created:** Data preservation ready (not yet integrated into installer)
+- **Testing validated:** Automated tests confirm path utilities, detection, and installation work correctly
 - **Patterns established:** JSDoc comments, cross-platform path handling, installCLI(isGlobal) pattern
 
-**Last Session:** 2026-01-19 14:56-15:00 UTC
-**Stopped at:** Completed 01-02-PLAN.md (Codex installation and upgrade module)
+**Last Session:** 2026-01-19 16:03-16:13 UTC
+**Stopped at:** Completed 01-03-PLAN.md (Installation testing and verification)
 **Resume file:** None
 
 ---
