@@ -19,13 +19,13 @@ Foundation phase execution - building cross-platform installation infrastructure
 ## Current Position
 
 **Phase:** 1 of 6 (Foundation - Installation Infrastructure)  
-**Plan:** 03 of 4 (completed)  
-**Status:** In progress - Phase 1  
-**Progress:** `██░░░░░░░░` ~7% (3 of ~40 total plans complete)
+**Plan:** 04 of 4 (completed)  
+**Status:** Phase 1 complete  
+**Progress:** `███░░░░░░░` ~10% (4 of ~40 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 01-03-PLAN.md (Installation testing & verification)
+**Last activity:** 2026-01-19 - Completed 01-04-PLAN.md (Upgrade module integration)
 
-**Next Action:** Continue Phase 1 execution with 01-04-PLAN.md
+**Next Action:** Run Phase 1 verification (01-VERIFICATION.md) to confirm all requirements satisfied before proceeding to Phase 2
 
 ---
 
@@ -67,6 +67,8 @@ Foundation phase execution - building cross-platform installation infrastructure
 | 01 | 03 | Claude config path: ~/Library/Application Support/Claude | Actual path used by Claude CLI (not ~/.claude) |
 | 01 | 03 | Copilot config path: ~/.copilot | Actual path used by Copilot CLI (not ~/.config/github-copilot-cli) |
 | 01 | 03 | Codex should not install GitHub issue templates | Only relevant for .github/ installations (Claude/Copilot) |
+| 01 | 04 | Check backups object before restore | Handle fresh installs gracefully when no existing data |
+| 01 | 04 | Apply preserve/restore to all three CLI paths | Consistent data preservation across Claude, Copilot, Codex |
 
 ### Technical Discoveries
 
@@ -95,7 +97,8 @@ Foundation phase execution - building cross-platform installation infrastructure
 - [x] Complete Phase 1 Plan 01 (path utilities and CLI detection)
 - [x] Complete Phase 1 Plan 02 (Codex installation and upgrade module)
 - [x] Complete Phase 1 Plan 03 (installation testing and verification)
-- [ ] Execute Phase 1 Plan 04
+- [x] Complete Phase 1 Plan 04 (upgrade module integration)
+- [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
 - [ ] Research agent orchestration patterns for Codex before Phase 4
 
@@ -105,21 +108,21 @@ Foundation phase execution - building cross-platform installation infrastructure
 
 ### For Next Session
 
-**Context:** Phase 1 execution in progress. Foundation infrastructure for cross-platform installation (path utilities, CLI detection, version management, adapter framework).
+**Context:** Phase 1 complete. Foundation infrastructure for cross-platform installation built with path utilities, CLI detection, version management, and data preservation.
 
-**Starting Point:** Plans 01-01, 01-02, and 01-03 complete. Continue with Plan 01-04.
+**Starting Point:** All Phase 1 plans (01-01 through 01-04) complete. Ready for Phase 1 verification, then Phase 2.
 
 **Key Context:**
 - **Zero npm dependencies:** Using only Node.js built-ins (`fs`, `path`, `os`)
 - **Cross-platform achieved:** All path operations use path.join()
 - **CLI detection working:** Correctly identifies all three CLIs using proper config paths
 - **Multi-CLI support complete:** Claude, Copilot, and Codex installation working
-- **Upgrade module created:** Data preservation ready (not yet integrated into installer)
+- **Upgrade module integrated:** Data preservation active in all three installation paths
 - **Testing validated:** Automated tests confirm path utilities, detection, and installation work correctly
-- **Patterns established:** JSDoc comments, cross-platform path handling, installCLI(isGlobal) pattern
+- **Patterns established:** JSDoc comments, cross-platform path handling, installCLI(isGlobal) pattern, atomic backup/restore
 
-**Last Session:** 2026-01-19 16:03-16:13 UTC
-**Stopped at:** Completed 01-03-PLAN.md (Installation testing and verification)
+**Last Session:** 2026-01-19 15:53-15:57 UTC
+**Stopped at:** Completed 01-04-PLAN.md (Upgrade module integration) - Phase 1 complete
 **Resume file:** None
 
 ---
