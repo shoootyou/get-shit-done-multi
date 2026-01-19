@@ -18,11 +18,11 @@ function getConfigPaths(cli) {
   
   const paths = {
     claude: {
-      global: path.join(home, '.claude'),
+      global: path.join(home, 'Library', 'Application Support', 'Claude'),
       local: path.join(cwd, '.claude')
     },
     copilot: {
-      global: path.join(home, '.config', 'github-copilot-cli'),
+      global: path.join(home, '.copilot'),
       local: path.join(cwd, '.github')
     },
     codex: {
