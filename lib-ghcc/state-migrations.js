@@ -55,17 +55,27 @@ export async function migrateState(stateDir = '.planning') {
   }
 
   // Create backup before migration
-  const backupDir = join(stateDir, `backup-v${currentVersion}-${Date.now()}`);
-  await mkdir(backupDir, { recursive: true });
+  // Use temp directory to avoid "cannot copy directory to subdirectory of itself" error
+  const tmpBackupDir = join('/tmp', `gsd-backup-${Date.now()}`);
+  await mkdir(tmpBackupDir, { recursive: true });
   
-  // Copy all files except existing backups
-  await cp(stateDir, backupDir, {
+  // Copy all files except existing backups to temp location
+  await cp(stateDir, tmpBackupDir, {
     recursive: true,
     filter: (src) => {
       // Exclude backup directories from backup
       return !src.includes('backup-');
     }
   });
+  
+  // Move backup to final location inside stateDir
+  const backupDir = join(stateDir, `backup-v${currentVersion}-${Date.now()}`);
+  await mkdir(stateDir, { recursive: true }); // Ensure stateDir exists
+  await cp(tmpBackupDir, backupDir, { recursive: true });
+  
+  // Clean up temp backup
+  const { rm } = await import('fs/promises');
+  await rm(tmpBackupDir, { recursive: true, force: true });
 
   // Apply migrations sequentially
   for (let v = currentVersion; v < CURRENT_STATE_VERSION; v++) {
