@@ -715,6 +715,15 @@ function installCodex(isGlobal) {
     failures.push('skills/get-shit-done');
   }
 
+  // Copy SKILL.md to the skill root (required for Codex skill recognition)
+  const skillMdSrc = path.join(src, '.github', 'skills', 'get-shit-done', 'SKILL.md');
+  const skillMdDest = path.join(dirs.skills, 'SKILL.md');
+  if (fs.existsSync(skillMdSrc)) {
+    const skillContent = fs.readFileSync(skillMdSrc, 'utf8');
+    const convertedContent = codexAdapter.convertContent(skillContent, 'skill');
+    fs.writeFileSync(skillMdDest, convertedContent);
+  }
+
   // Copy commands into the skill directory (commands embedded in skills for Codex)
   const commandsSrc = path.join(src, 'commands', 'gsd');
   const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
