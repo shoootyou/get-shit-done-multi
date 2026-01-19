@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 5 of 6 (State Management)  
-**Plan:** 2 of 5  
+**Plan:** 3 of 5  
 **Status:** In progress  
-**Progress:** `███████████████████████` 87% (20 of 23 total plans complete)
+**Progress:** `████████████████████████` 91% (21 of 23 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 05-02-PLAN.md (State management core)
+**Last activity:** 2026-01-19 - Completed 05-03-PLAN.md (Session persistence and state validation)
 
-**Next Action:** Continue Phase 5 Plan 3
+**Next Action:** Continue Phase 5 Plan 4
 
 ---
 
@@ -127,6 +127,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 05 | 02 | Lazy loading in StateManager | Constructor does no I/O, enables lightweight object creation |
 | 05 | 02 | Migration backup via temp directory | Use /tmp staging to avoid fs.cp subdirectory-of-self error |
 | 05 | 02 | .meta.json separation | Track schema version separately from state files to avoid conflicts |
+| 05 | 03 | SessionManager uses DirectoryLock | Ensures concurrent CLI usage doesn't corrupt session file |
+| 05 | 03 | 24-hour session expiry | Prevents stale session data from persisting indefinitely |
+| 05 | 03 | Session separate from persistent state | Session is temporary work context (.session.json), STATE.md is persistent |
+| 05 | 03 | Validate without modifying by default | StateValidator.validate() is safe to run frequently |
+| 05 | 03 | repair() requires explicit autoFix flag | Prevents accidental data changes, user must explicitly enable repairs |
+| 05 | 03 | Backup unparseable files | Rather than deleting, move to .backup/ for data recovery option |
+| 05 | 03 | detectConcurrentModifications tracking | Tracks which CLI last modified state via .meta.json for race condition debugging |
 
 
 ### Technical Discoveries
@@ -178,6 +185,12 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Config Merge Pattern:** User settings override defaults, graceful degradation when config.json missing
 - **Lazy Loading Design:** No I/O in constructor, enables lightweight object creation and testing
 - **Temp Directory Backup:** Stage backups in /tmp before moving to final location to avoid fs.cp subdirectory error
+- **Session Persistence Pattern:** SessionManager with saveSession/loadSession/switchCLI/restoreSession for CLI-agnostic session tracking
+- **24-hour Session Expiry:** Sessions expire after 24 hours to prevent stale state (maxAge = 24 * 60 * 60 * 1000)
+- **Session Structure:** {cli, timestamp, currentPhase, currentPlan, context, _version} for complete session state
+- **State Validation Pattern:** validate() checks without modifying, repair() requires autoFix flag for safety
+- **Repair with Backup:** Move unparseable files to .backup/ with timestamp before deletion for data recovery
+- **Concurrent Modification Detection:** Track lastCLI in .meta.json to detect race conditions across CLIs
 
 ### Open Questions
 
@@ -212,6 +225,7 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Begin Phase 5 (State Management)
 - [x] Complete Phase 5 Plan 01 (Atomic file I/O and directory locking)
 - [x] Complete Phase 5 Plan 02 (State management core)
+- [x] Complete Phase 5 Plan 03 (Session persistence and state validation)
 - [ ] Continue Phase 5 remaining plans
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
@@ -222,17 +236,23 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 5 (State Management) in progress. Atomic I/O and state management core complete.
+**Context:** Phase 5 (State Management) in progress. Session persistence and state validation complete.
 
-**Starting Point:** Phase 5 Plan 2 complete. Ready for Phase 5 Plan 3.
+**Starting Point:** Phase 5 Plan 3 complete. Ready for Phase 5 Plan 4.
 
 **Key Context:**
+- **Phase 5 Plan 03 Complete:** Session persistence and state validation
+  - **session-manager.js:** SessionManager class with saveSession/loadSession/switchCLI/restoreSession
+  - **state-validator.js:** StateValidator class with validate/repair/ensureConsistency
+  - DirectoryLock integration for concurrent CLI safety
+  - 24-hour session expiry, concurrent modification detection
+  - Auto-repair with backup-before-delete for corrupted files
+  - All verification tests pass (2 min execution)
 - **Phase 5 Plan 02 Complete:** State management core with versioning and migration
   - **state-manager.js:** StateManager class with readState/writeState/updateState, config management
   - **state-migrations.js:** Migration framework with migrateState, validateState, CURRENT_STATE_VERSION
   - Version tracking via _version field, config merge with defaults
   - Bug fix: Migration backup uses temp directory to avoid fs.cp subdirectory error
-  - All verification tests pass (3 min execution)
 - **Phase 5 Plan 01 Complete:** Atomic file I/O and directory locking
   - **state-io.js:** atomicWriteJSON/atomicReadJSON with write-then-rename pattern
   - **directory-lock.js:** DirectoryLock class with acquire/release/withLock methods
@@ -240,10 +260,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
   - 11 GSD agents registered with CLI-agnostic invocation
   - Performance tracking, capability matrix, result validation
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 5 Plan 3 (State-aware command system)
+- **Next:** Phase 5 Plan 4 (Multi-process state coordination)
 
-**Last Session:** 2026-01-19 22:16-22:19 UTC
-**Stopped at:** Completed 05-02-PLAN.md (State management core)
+**Last Session:** 2026-01-19 22:21-22:24 UTC
+**Stopped at:** Completed 05-03-PLAN.md (Session persistence and state validation)
 **Resume file:** None
 
 ---
