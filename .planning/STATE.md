@@ -19,13 +19,13 @@ Foundation phase execution - building cross-platform installation infrastructure
 ## Current Position
 
 **Phase:** 1 of 6 (Foundation - Installation Infrastructure)  
-**Plan:** 01 of 4 (completed)  
+**Plan:** 02 of 4 (completed)  
 **Status:** In progress - Phase 1  
-**Progress:** `█░░░░░░░░░` ~2% (1 of ~40 total plans complete)
+**Progress:** `██░░░░░░░░` ~5% (2 of ~40 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 01-01-PLAN.md (path utilities and CLI detection)
+**Last activity:** 2026-01-19 - Completed 01-02-PLAN.md (Codex installation and upgrade module)
 
-**Next Action:** Continue Phase 1 execution with 01-02-PLAN.md
+**Next Action:** Continue Phase 1 execution with 01-03-PLAN.md
 
 ---
 
@@ -60,12 +60,18 @@ Foundation phase execution - building cross-platform installation infrastructure
 | 01 | 01 | Use path.join() exclusively | Cross-platform compatibility (Windows vs POSIX) |
 | 01 | 01 | Detect CLIs via global config directory existence | Reliable detection method using fs.existsSync() |
 | 01 | 01 | Zero npm dependencies - Node.js built-ins only | Reduces installation footprint, ensures stability |
+| 01 | 02 | Use getConfigPaths('codex') for consistent path handling | Reuse existing utility from 01-01, maintains consistency |
+| 01 | 02 | Follow Copilot installation pattern for Codex | Both use skills-based structure, different from Claude |
+| 01 | 02 | Atomic backup/restore with timestamp-based naming | Prevents data loss, enables recovery from failed upgrades |
+| 01 | 02 | Preserve .planning and user-data directories | User project data must survive version upgrades |
 
 ### Technical Discoveries
 
 - **Cross-platform path handling:** path.join() handles Windows vs POSIX separators automatically
 - **CLI detection pattern:** Check for global config directories (~/.claude, ~/.codex, ~/.config/github-copilot-cli)
 - **Safe directory creation:** fs.mkdirSync({recursive: true}) is idempotent and safe
+- **Codex installation structure:** Uses skills-based structure like Copilot (.codex/skills/get-shit-done/)
+- **Atomic operations:** fs.renameSync() provides atomic backup/restore for data preservation
 
 ### Open Questions
 
@@ -80,7 +86,7 @@ Foundation phase execution - building cross-platform installation infrastructure
 ### Todos
 
 - [x] Complete Phase 1 Plan 01 (path utilities and CLI detection)
-- [ ] Execute Phase 1 Plan 02
+- [x] Complete Phase 1 Plan 02 (Codex installation and upgrade module)
 - [ ] Execute Phase 1 Plan 03
 - [ ] Execute Phase 1 Plan 04
 - [ ] Verify Codex CLI version on npm before Phase 2
@@ -94,16 +100,18 @@ Foundation phase execution - building cross-platform installation infrastructure
 
 **Context:** Phase 1 execution in progress. Foundation infrastructure for cross-platform installation (path utilities, CLI detection, version management, adapter framework).
 
-**Starting Point:** Plan 01-01 complete (path utilities and CLI detection). Continue with Plan 01-02.
+**Starting Point:** Plans 01-01 and 01-02 complete. Continue with Plan 01-03.
 
 **Key Context:**
 - **Zero npm dependencies:** Using only Node.js built-ins (`fs`, `path`, `os`)
 - **Cross-platform achieved:** All path operations use path.join()
 - **CLI detection working:** Identifies claude, copilot, codex installations
-- **Patterns established:** JSDoc comments, cross-platform path handling
+- **Multi-CLI support complete:** Claude, Copilot, and Codex installation working
+- **Upgrade module created:** Data preservation ready (not yet integrated into installer)
+- **Patterns established:** JSDoc comments, cross-platform path handling, installCLI(isGlobal) pattern
 
-**Last Session:** 2026-01-19 14:53-14:55 UTC
-**Stopped at:** Completed 01-01-PLAN.md
+**Last Session:** 2026-01-19 14:56-15:00 UTC
+**Stopped at:** Completed 01-02-PLAN.md (Codex installation and upgrade module)
 **Resume file:** None
 
 ---
