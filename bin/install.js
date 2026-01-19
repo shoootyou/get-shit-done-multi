@@ -727,16 +727,6 @@ function installCodex(isGlobal) {
     failures.push('skills/get-shit-done/VERSION');
   }
 
-  // Install GitHub issue templates for local installs only
-  if (!isGlobal) {
-    const projectDir = process.cwd();
-    if (installIssueTemplates(projectDir)) {
-      console.log(`  ${green}✓${reset} Installed GitHub issue templates`);
-    } else {
-      failures.push('issue templates');
-    }
-  }
-
   if (failures.length > 0) {
     console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
     process.exit(1);
