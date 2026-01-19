@@ -8,6 +8,7 @@
  */
 
 import { promises as fs } from 'fs';
+import path from 'path';
 
 /**
  * Directory-based lock for multi-process coordination
@@ -63,6 +64,10 @@ export class DirectoryLock {
    * @throws {Error} After maxRetries exhausted or on non-EEXIST errors
    */
   async acquire() {
+    // Ensure parent directory exists before creating lock
+    const parentDir = path.dirname(this.lockPath);
+    await fs.mkdir(parentDir, { recursive: true });
+    
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       try {
         // Atomic lock acquisition - mkdir is atomic across processes
