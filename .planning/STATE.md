@@ -12,20 +12,20 @@
 Enable developers to use GSD workflows in Codex CLI with the same power and reliability they experience in Claude Code and GitHub Copilot CLI, with seamless switching between all three CLIs on the same project.
 
 ### Current Focus
-Command system development - building dynamic command infrastructure with registry, parser, loader, executor, and error handling.
+Agent translation - building orchestration layer that enables CLI-agnostic agent invocation across Claude, Copilot, and Codex.
 
 ---
 
 ## Current Position
 
-**Phase:** 3 of 6 (Command System)  
-**Plan:** 03 of 3 (completed)  
-**Status:** Phase 3 complete - Ready for Phase 4  
-**Progress:** `███████████` 100% (11 of 11 total plans complete)
+**Phase:** 4 of 6 (Agent Translation)  
+**Plan:** 01 of 3 (completed)  
+**Status:** Phase 4 in progress  
+**Progress:** `████████████░` 92% (12 of 13 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 03-03-PLAN.md (Command recording and verification)
+**Last activity:** 2026-01-19 - Completed 04-01-PLAN.md (Agent orchestration core)
 
-**Next Action:** Execute 04-01-PLAN.md (Installation system - first plan of Phase 4)
+**Next Action:** Execute 04-02-PLAN.md (Performance tracking)
 
 ---
 
@@ -36,8 +36,8 @@ Command system development - building dynamic command infrastructure with regist
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
 | Phases Complete | 3/6 | 6/6 | In Progress |
-| Requirements Delivered | ~18/51 | 51/51 | In Progress |
-| Success Criteria Met | ~12/30 | 30/30 | In Progress |
+| Requirements Delivered | ~22/51 | 51/51 | In Progress |
+| Success Criteria Met | ~14/30 | 30/30 | In Progress |
 | Blockers | 0 | 0 | ✓ |
 
 ### Quality
@@ -82,6 +82,11 @@ Command system development - building dynamic command infrastructure with regist
 | 03 | 03 | Store recordings in .planning/command-recordings/ | Keeps recordings with project planning artifacts |
 | 03 | 03 | No test framework dependency | Simple console.log assertions maintain zero-dependency goal |
 | 03 | 03 | Structured verification results | { success, commandCount, issues } pattern for programmatic checks |
+| 04 | 01 | Map-based storage for agent registry | O(1) lookup performance, standard JavaScript data structure |
+| 04 | 01 | Separate capability tracking per agent-CLI | Store capabilities as separate Map with ${agentName}:${cli} keys for flexibility |
+| 04 | 01 | Mock results for adapter.invokeAgent() | Enable testing orchestration layer before CLI SDKs available |
+| 04 | 01 | Graceful error messages for unsupported agents | Guide users to capability matrix when agent unsupported on CLI |
+| 04 | 01 | Default capability 'full' for all agents | All 11 agents default to full capability - adjust as CLI SDKs reveal limitations |
 
 ### Technical Discoveries
 
@@ -105,6 +110,9 @@ Command system development - building dynamic command infrastructure with regist
 - **Command recording pattern:** JSON files with timestamp, CLI, command, args, result, duration in .planning/command-recordings/
 - **Verification pattern:** Structured results with success boolean and issues array for programmatic validation
 - **Test pattern:** Simple console.log-based assertions with ✅/❌ markers, no test framework dependency
+- **Agent Registry Pattern:** Map-based storage with O(1) lookup, capability tracking, getAgent/setCapability API
+- **Agent Invoker Pattern:** Detect CLI → load registry → validate → load adapter → invoke
+- **Adapter invokeAgent signature:** (agent, prompt, options) → {success, cli, agent, result, duration}
 
 ### Open Questions
 
@@ -128,9 +136,11 @@ Command system development - building dynamic command infrastructure with regist
 - [x] Complete Phase 3 Plan 02 (command executor and error handler)
 - [x] Complete Phase 3 Plan 03 (command recording and verification)
 - [x] Phase 3 complete - Command system foundation ready
+- [x] Complete Phase 4 Plan 01 (agent orchestration core)
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
-- [ ] Research agent orchestration patterns for Codex before Phase 4
+- [ ] Complete Phase 4 Plan 02 (performance tracking)
+- [ ] Complete Phase 4 Plan 03 (result validation)
 
 ---
 
@@ -138,26 +148,23 @@ Command system development - building dynamic command infrastructure with regist
 
 ### For Next Session
 
-**Context:** Phase 3 (Command System) complete. All command system infrastructure including registry, parser, loader, executor, error handler, help generator, recording, and verification complete.
+**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration core complete with registry, invoker, and adapter integration.
 
-**Starting Point:** 03-03-PLAN.md complete. Command system ready for Phase 4 (Installation System) integration.
+**Starting Point:** 04-01-PLAN.md complete. Agent orchestration ready for Phase 4 Plan 02 (Performance tracking).
 
 **Key Context:**
-- **Phase 3 Complete:** Command system foundation with all components
-  - Command Registry: Map-based storage with O(1) lookup
-  - Argument Parser: Thin wrapper around util.parseArgs()
-  - Command Loader: Dynamic loading from filesystem with frontmatter parsing
-  - Command Executor: CLI detection, feature checking, graceful degradation
-  - Error Handler: CommandError class with suggestions and graceful degradation
-  - Help Generator: Auto-generated from metadata, 4 categories, 24 commands
-  - Command Recorder: JSON-based execution recording for cross-CLI comparison
-  - Command Verifier: Installation validation checking all 24 commands
-  - Test Suite: 17 automated tests covering all components
+- **Phase 4 Plan 01 Complete:** Agent orchestration core
+  - Agent Registry: Map-based storage for 11 GSD agents with CLI-specific metadata
+  - Agent Invoker: CLI-agnostic invocation with detectCLI integration
+  - Adapter Integration: invokeAgent methods in Claude, Copilot, Codex adapters
+  - Capability Tracking: full/partial/unsupported levels per agent-CLI combination
+  - Mock Results: Enable testing orchestration layer before CLI SDKs available
+- **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Ready for Phase 4:** Installation system integration
+- **Ready for Phase 4 Plan 02:** Performance tracking to benchmark agent execution
 
-**Last Session:** 2026-01-19 19:20-19:32 UTC
-**Stopped at:** Completed 03-03-PLAN.md (Command recording and verification) - Phase 3 complete
+**Last Session:** 2026-01-19 20:46-20:49 UTC
+**Stopped at:** Completed 04-01-PLAN.md (Agent orchestration core)
 **Resume file:** None
 
 ---
