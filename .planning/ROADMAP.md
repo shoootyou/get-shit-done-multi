@@ -133,13 +133,16 @@ Plans:
 4. User accesses performance data showing execution time for each agent in each CLI to make informed CLI selection decisions
 5. User encounters agent limitation in Codex CLI and receives clear documentation explaining what works differently and why
 
-**Plans:** 4 plans
+**Plans:** 7 plans (4 original + 3 gap closure)
 
 Plans:
-- [ ] 04-01-PLAN.md — Agent orchestration core (registry + invoker)
-- [ ] 04-02-PLAN.md — Performance tracking (perf_hooks integration)
-- [ ] 04-03-PLAN.md — Capability matrix and documentation
-- [ ] 04-04-PLAN.md — Result validation and testing
+- [x] 04-01-PLAN.md — Agent orchestration core (registry + invoker)
+- [x] 04-02-PLAN.md — Performance tracking (perf_hooks integration)
+- [x] 04-03-PLAN.md — Capability matrix and documentation
+- [x] 04-04-PLAN.md — Result validation and testing
+- [ ] 04-05-PLAN.md — Gap Closure: Replace adapter stubs with real CLI execution
+- [ ] 04-06-PLAN.md — Gap Closure: Wire agent invoker into command system
+- [ ] 04-07-PLAN.md — Gap Closure: Enable equivalence testing and update capability matrix
 
 ---
 
