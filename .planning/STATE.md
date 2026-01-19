@@ -18,14 +18,14 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ## Current Position
 
-**Phase:** 5 of 6 (State Management)  
-**Plan:** 5 of 5 (Phase complete)  
-**Status:** Phase 5 complete  
-**Progress:** `█████████████████████████` 100% (23 of 23 total plans complete)
+**Phase:** 6 of 6 (Documentation & Verification)  
+**Plan:** 2 of 6 (In progress)  
+**Status:** Phase 6 in progress  
+**Progress:** `█████████████████████████░` 83% (24 of 29 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 05-05-PLAN.md (State management integration and testing)
+**Last activity:** 2026-01-19 - Completed 06-02-PLAN.md (Diagnostic test framework)
 
-**Next Action:** Begin Phase 6 (Integration Testing)
+**Next Action:** Continue Phase 6 - Plan 03 (CLI Recommendation Engine)
 
 ---
 
@@ -143,6 +143,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 05 | 05 | DirectoryLock.withLock() wraps agent invocation | Prevents concurrent agent invocations from corrupting state |
 | 05 | 05 | Automatic usage tracking in agent-invoker | Transparent instrumentation without separate tracking calls |
 | 05 | 05 | Unique temp filenames with PID+timestamp+random | Prevents concurrent write collisions in same process |
+| 06 | 02 | Use doctor pattern from Salesforce CLI | Modular diagnostic tests with pass/fail/warn statuses for CLI verification |
+| 06 | 02 | Three status levels with icons (✓/✗/⚠) | Clear visual indicators for user-friendly verification output |
+| 06 | 02 | Include fix suggestions in test results | Actionable remediation steps help users resolve issues without support |
+| 06 | 02 | 5-second timeout for CLI version checks | Prevents hanging when CLI not installed or unresponsive |
+| 06 | 02 | Agent tests check support level from capability matrix | Single source of truth keeps verification in sync with actual capabilities |
 
 
 ### Technical Discoveries
@@ -210,6 +215,12 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Unique Temp File Pattern:** PID+timestamp+random suffix prevents concurrent write collisions in same process (Promise.all scenario)
 - **Parent Directory Creation:** All write operations ensure parent directories exist (fs.mkdir with recursive: true)
 - **Concurrent Modification Detection:** Track lastCLI in .meta.json to detect race conditions across CLIs
+- **Doctor Pattern for Verification:** Modular diagnostic tests with pass/fail/warn statuses, extends DiagnosticTest base class
+- **CLI Detection with Timeout:** child_process.spawn with 5-second timeout prevents hanging on missing CLIs
+- **Skill Verification Pattern:** Check CLI global dir → skill dir → required files (hierarchical validation)
+- **Command Discovery Pattern:** Search upward from cwd or use __dirname for module location
+- **Agent Capability Checking:** Load capability matrix from orchestration module for support level verification
+- **Fix Suggestion Pattern:** Include actionable remediation steps in test result objects
 
 ### Open Questions
 
@@ -260,33 +271,32 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 **Context:** Phase 5 (State Management) complete. All state management components implemented, tested, and integrated into agent orchestration.
 
-**Starting Point:** Phase 5 complete. Ready for Phase 6 (Integration Testing).
+**Starting Point:** Phase 6 in progress. Completed 06-02 (Diagnostic test framework).
 
 **Key Context:**
+- **Phase 6 Plan 02 Complete:** Diagnostic test framework production-ready
+  - **06-02 Complete:** Installation verification system with doctor pattern
+    - DiagnosticTest base class for extensible test framework
+    - runDiagnostics() runner with formatted output and icons
+    - CLI detection tests (installed + skill registered)
+    - Command verification (24 GSD commands)
+    - Agent capability tests (11 agents with support levels)
+    - /gsd:verify-installation command with fix suggestions
+    - Integration test passed with comprehensive verification
 - **Phase 5 Complete:** State management fully production-ready
-  - **05-05 Complete:** State management integration and testing
-    - State modules integrated into agent-invoker with DirectoryLock wrapper
-    - Fixed 4 critical bugs (concurrent writes, directory creation)
-    - Comprehensive test suite: 8 unit tests + 4 integration tests, all passing
-    - Cross-CLI compatibility verified
-  - **05-04 Complete:** CLI resilience and cost tracking
-  - **05-03 Complete:** Session persistence and state validation  
-  - **05-02 Complete:** State management core with versioning
-  - **05-01 Complete:** Atomic file I/O and directory locking
 - **Phase 4 Complete:** Agent translation layer ready
-- **All State Components Working:**
-  - Atomic operations prevent data corruption
-  - Locking prevents concurrent conflicts
-  - Migrations enable version upgrades
-  - Sessions enable CLI switching
-  - Validation detects corruption
-  - Fallback provides resilience
-  - Usage tracking provides visibility
+- **All Verification Components Working:**
+  - Doctor pattern enables modular diagnostic tests
+  - CLI detection with timeout handling
+  - Skill registration verification
+  - Command availability checking
+  - Agent capability checking from matrix
+  - Fix suggestions guide users to resolution
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 6 (Integration Testing) - End-to-end verification
+- **Next:** Phase 6 Plan 03 (CLI Recommendation Engine)
 
-**Last Session:** 2026-01-19 22:31-22:39 UTC
-**Stopped at:** Completed 05-05-PLAN.md (State management integration and testing)
+**Last Session:** 2026-01-19 23:11-23:16 UTC
+**Stopped at:** Completed 06-02-PLAN.md (Diagnostic test framework)
 **Resume file:** None
 
 ---
