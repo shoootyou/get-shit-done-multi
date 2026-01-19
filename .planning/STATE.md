@@ -18,14 +18,14 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ## Current Position
 
-**Phase:** 4 of 6 (Agent Translation)  
-**Plan:** 7 of 7 (complete)  
-**Status:** Phase 4 complete  
-**Progress:** `█████████████████████` 100% (18 of 18 total plans complete)
+**Phase:** 5 of 6 (State Management)  
+**Plan:** 1 of 5  
+**Status:** In progress  
+**Progress:** `██████████████████████` 83% (19 of 23 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 04-07-PLAN.md (Gap closure and verification)
+**Last activity:** 2026-01-19 - Completed 05-01-PLAN.md (Atomic file I/O and directory locking)
 
-**Next Action:** Begin Phase 5 (Testing & Verification)
+**Next Action:** Continue Phase 5 Plan 2
 
 ---
 
@@ -117,6 +117,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 04 | 07 | Capability level 'full' with requirements | Keep level 'full' for complete infrastructure, but note CLI installation requirements |
 | 04 | 07 | Phase status in generated docs | Add status sections to generated docs for user clarity on implementation state |
 | 04 | 07 | Graceful degradation messaging | Provide clear warnings when CLIs unavailable instead of failing tests |
+| 05 | 01 | Write-then-rename for atomicity | POSIX guarantee on same filesystem, prevents partial writes |
+| 05 | 01 | Process PID in temp filenames | Prevents conflicts when multiple CLI processes write to same file |
+| 05 | 01 | Directory-based locking with fs.mkdir() | Node.js doesn't expose native locks, mkdir is atomic across processes |
+| 05 | 01 | Exponential backoff with jitter | Prevents thundering herd when multiple CLIs compete for lock |
+| 05 | 01 | Retry logic for JSON parse errors | Handle transient read-during-write scenarios with 3 retries and 50ms delay |
 
 
 ### Technical Discoveries
@@ -157,6 +162,12 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **User-facing Validation Tools:** CLI scripts with status indicators (✅ ❌ ⚠️) and exit codes for scripting integration
 - **AI-interpreted Command Pattern:** Command system returns prompts to AI agents; JavaScript in commands is read and executed by AI, not Node.js
 - **Command Auto-discovery:** Loader scans commands/gsd/ directory for .md files and auto-registers them with metadata from frontmatter
+- **Write-then-rename Pattern:** Write to temp file with process PID, then fs.rename() for atomic file operations
+- **Directory-based Locking:** fs.mkdir() is atomic across processes (OS kernel guarantee), used for multi-process coordination
+- **Exponential Backoff with Jitter:** baseDelay * 2^attempt + random(0, 100ms) prevents thundering herd
+- **JSON Parse Retry:** Retry up to 3 times with 50ms delay on SyntaxError to handle read-during-write scenarios
+- **EXDEV Error Handling:** Detect cross-filesystem boundary in rename operations, show clear error message
+- **Process PID in Temp Files:** ${filePath}.${process.pid}.tmp ensures unique temp files per process
 
 ### Open Questions
 
@@ -188,7 +199,9 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Complete Phase 4 Plan 06 (command integration)
 - [x] Complete Phase 4 Plan 07 (gap closure and verification)
 - [x] Phase 4 complete - Agent translation layer ready
-- [ ] Begin Phase 5 (Testing & Verification)
+- [x] Begin Phase 5 (State Management)
+- [x] Complete Phase 5 Plan 01 (Atomic file I/O and directory locking)
+- [ ] Continue Phase 5 remaining plans
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
 
@@ -198,56 +211,26 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 4 (Agent Translation) complete. All agent orchestration infrastructure built and verified. Ready for Phase 5 (Testing & Verification).
+**Context:** Phase 5 (State Management) started. Atomic file I/O and directory locking complete.
 
-**Starting Point:** Phase 4 complete. Ready to begin Phase 5.
+**Starting Point:** Phase 5 Plan 1 complete. Ready for Phase 5 Plan 2.
 
 **Key Context:**
+- **Phase 5 Plan 01 Complete:** Atomic file I/O and directory locking
+  - **state-io.js:** atomicWriteJSON/atomicReadJSON with write-then-rename pattern
+  - **directory-lock.js:** DirectoryLock class with acquire/release/withLock methods
+  - Zero npm dependencies - pure Node.js fs/promises API
+  - All verification tests pass
 - **Phase 4 Complete:** Agent translation layer fully ready
-  - **Plan 01:** Agent orchestration core
-    - Agent Registry: Map-based storage for 11 GSD agents with CLI-specific metadata
-    - Agent Invoker: CLI-agnostic invocation with detectCLI integration
-    - Adapter Integration: Claude, Copilot, Codex adapters with invokeAgent methods
-  - **Plan 02:** Agent performance tracking
-    - PerformanceTracker: Sub-millisecond precision using perf_hooks
-    - Automatic measurement: All agent invocations tracked (success and failure)
-    - Metric persistence: .planning/metrics/agent-performance.json
-    - Bounded retention: Last 100 measurements per agent/CLI combo
-  - **Plan 03:** Capability matrix and documentation
-    - AGENT_CAPABILITIES: All 11 agents with full support on Claude, Copilot, Codex
-    - CLI_LIMITATIONS: Platform constraints documented
-    - generateCapabilityMatrix(): Returns structured array for programmatic use
-    - generateCapabilityDocs(): Auto-generates markdown documentation
-    - docs/agent-capabilities.md with table, notes, and limitations
-  - **Plan 04:** Result validation and error recovery
-    - ResultValidator: Validates .planning/ directory structure for CLI compatibility
-    - validateStructure(), validateJSON(), validateAgentOutput() methods
-    - validate-planning-dir.js: User-facing validation tool
-    - equivalence-test.js: Cross-CLI output comparison framework
-    - 6-test suite covering all validation scenarios
-  - **Plan 05:** Adapter CLI integration
-    - Real CLI execution in all three adapters (claude.js, copilot.js, codex.js)
-    - child_process.execFile for secure CLI invocation
-    - Error handling with stderr capture
-    - Mock results replaced with real CLI commands
-  - **Plan 06:** Command integration
-    - commands/gsd/invoke-agent.md: User-facing agent invocation command
-    - AI-interpreted execution pattern: JavaScript in markdown for agent processing
-    - Auto-discovery: Loader finds and registers commands from .md files
-    - Command system integration: Agent invocation through standard command interface
-  - **Plan 07:** Gap closure and verification
-    - Equivalence tests updated to use real adapters with CLI availability checks
-    - Capability matrix reflecting actual implementation (real CLI execution noted)
-    - Documentation regenerated with Phase 4 completion status
-    - All 4 verification gaps closed and validated
-- **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
+  - 11 GSD agents registered with CLI-agnostic invocation
+  - Performance tracking, capability matrix, result validation
+  - Real CLI execution in all three adapters
+  - Command integration with AI-interpreted execution
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Command system architecture:** AI-interpreted prompts, not direct JavaScript execution
-- **Next:** Phase 5 (Testing & Verification) to validate cross-CLI equivalence and integration
-- **Phase 4 Plan 07:** Remaining to complete phase
+- **Next:** Phase 5 Plan 2 (State management layer implementation)
 
-**Last Session:** 2026-01-19 21:28-21:32 UTC
-**Stopped at:** Completed 04-07-PLAN.md (Gap closure and verification)
+**Last Session:** 2026-01-19 22:10-22:12 UTC
+**Stopped at:** Completed 05-01-PLAN.md (Atomic file I/O and directory locking)
 **Resume file:** None
 
 ---
