@@ -2,7 +2,9 @@
 
 # GET SHIT DONE
 
-**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.**
+**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code and GitHub Copilot CLI.**
+
+**Published by Croonix. Original author: TÂCHES. Source: https://github.com/glittercowboy/get-shit-done**
 
 **Solves context rot — the quality degradation that happens as Claude fills its context window.**
 
@@ -77,6 +79,27 @@ npx get-shit-done-cc
 
 That's it. Verify with `/gsd:help` inside your Claude Code interface.
 
+### GitHub Copilot CLI
+
+Copilot CLI installs are local to the current repository.
+
+```bash
+npx get-shit-done-cc --copilot
+```
+
+This installs:
+- `.github/skills/get-shit-done`
+- `.github/agents` (GSD agents only)
+- `.github/ISSUE_TEMPLATE/gsd-new-project.yml`
+
+Start the CLI and run:
+
+```
+gsd:help
+```
+
+For details, see `docs/github-copilot-cli.md`.
+
 ### Staying Updated
 
 GSD evolves fast. Check for updates periodically:
@@ -91,15 +114,23 @@ Update with:
 npx get-shit-done-cc@latest
 ```
 
+### Attribution
+
+Published by Croonix. Original project and author:
+https://github.com/glittercowboy/get-shit-done
+
+Details in `docs/attribution.md`.
+
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
 
 ```bash
 npx get-shit-done-cc --global   # Install to ~/.claude/
 npx get-shit-done-cc --local    # Install to ./.claude/
+npx get-shit-done-cc --copilot  # Install to ./.github (GitHub Copilot CLI)
 ```
 
-Use `--global` (`-g`) or `--local` (`-l`) to skip the interactive prompt.
+Use `--global` (`-g`), `--local` (`-l`), or `--copilot` to skip the interactive prompt.
 
 </details>
 

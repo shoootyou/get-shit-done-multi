@@ -264,6 +264,28 @@ function verifyFileInstalled(filePath, description) {
   return true;
 }
 
+function installIssueTemplates(projectDir) {
+  const srcDir = path.join(__dirname, '..', 'github', 'ISSUE_TEMPLATE');
+  if (!fs.existsSync(srcDir)) {
+    return false;
+  }
+  const destDir = path.join(projectDir, '.github', 'ISSUE_TEMPLATE');
+  fs.mkdirSync(destDir, { recursive: true });
+  const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) {
+      continue;
+    }
+    if (!entry.name.startsWith('gsd-')) {
+      continue;
+    }
+    const srcPath = path.join(srcDir, entry.name);
+    const destPath = path.join(destDir, entry.name);
+    fs.copyFileSync(srcPath, destPath);
+  }
+  return true;
+}
+
 function yamlEscape(value) {
   return String(value).replace(/"/g, '\\"');
 }
@@ -449,6 +471,15 @@ function install(isGlobal) {
     }
   }
 
+  // Install GitHub issue templates for local installs only
+  if (!isGlobal) {
+    if (installIssueTemplates(process.cwd())) {
+      console.log(`  ${green}✓${reset} Installed GitHub issue templates`);
+    } else {
+      failures.push('issue templates');
+    }
+  }
+
   // If critical components failed, exit with error
   if (failures.length > 0) {
     console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
@@ -586,6 +617,13 @@ function installCopilot() {
     } else {
       console.log(`  ${yellow}⚠${reset} copilot-instructions.md already exists — skipped`);
     }
+  }
+
+  // Install GitHub issue templates
+  if (installIssueTemplates(projectDir)) {
+    console.log(`  ${green}✓${reset} Installed GitHub issue templates`);
+  } else {
+    failures.push('issue templates');
   }
 
   if (failures.length > 0) {

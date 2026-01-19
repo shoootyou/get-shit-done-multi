@@ -21,6 +21,7 @@ npx get-shit-done-cc --copilot
 This installs:
 - `.github/skills/get-shit-done`
 - `.github/agents` (GSD agents only)
+- `.github/ISSUE_TEMPLATE/gsd-new-project.yml`
 
 It does not modify global Copilot settings.
 
@@ -54,3 +55,4 @@ It does not modify global Copilot settings.
 ## Update or remove
 - Re-run `npx get-shit-done-cc --copilot` to refresh the installation.
 - Remove `.github/skills/get-shit-done` and any `gsd-*.agent.md` files in `.github/agents` to uninstall.
+ - Remove `.github/ISSUE_TEMPLATE/gsd-new-project.yml` to remove the issue template.

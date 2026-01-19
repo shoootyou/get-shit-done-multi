@@ -23,7 +23,10 @@
     "context-engineering",
     "spec-driven-development"
   ],
-  "author": "TÂCHES",
+  "author": "Croonix",
+  "contributors": [
+    "TÂCHES (original author, https://github.com/glittercowboy/get-shit-done)"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

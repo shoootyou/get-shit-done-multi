@@ -6,6 +6,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- GitHub Copilot CLI local installation (`--copilot`) with skills, agents, and Copilot instructions
+- GitHub issue template for `gsd:new-project` intake
+- Copilot and attribution documentation under `docs/`
+
+### Changed
+- Installer prompt options now include Copilot and renamed Claude options
+- Package metadata now lists Croonix as publisher with original author credited
+
 ## [1.6.4] - 2026-01-17
 
 ### Fixed
