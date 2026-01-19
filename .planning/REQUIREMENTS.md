@@ -4,16 +4,16 @@
 
 ### Installation & Setup
 
-- [ ] **INSTALL-01**: User can run `npx get-shit-done-cc --codex` to install GSD locally to `.codex/skills/get-shit-done/`
-- [ ] **INSTALL-02**: User can run `npx get-shit-done-cc --codex-global` to install GSD globally to `~/.codex/skills/get-shit-done/`
-- [ ] **INSTALL-03**: Installer auto-detects which CLIs are installed (Claude Code, GitHub Copilot CLI, Codex CLI)
-- [ ] **INSTALL-04**: Installer offers to install for all detected CLIs in a single run
-- [ ] **INSTALL-05**: Installation preserves existing user customizations and state in `.planning/`
-- [ ] **INSTALL-06**: Installer handles version upgrades without data loss
-- [ ] **INSTALL-07**: Cross-platform path handling works correctly on Mac, Windows, and Linux
-- [ ] **INSTALL-08**: Post-install verification confirms all commands are accessible
+- [x] **INSTALL-01**: User can run `npx get-shit-done-cc --codex` to install GSD locally to `.codex/skills/get-shit-done/`
+- [x] **INSTALL-02**: User can run `npx get-shit-done-cc --codex-global` to install GSD globally to `~/.codex/skills/get-shit-done/`
+- [x] **INSTALL-03**: Installer auto-detects which CLIs are installed (Claude Code, GitHub Copilot CLI, Codex CLI)
+- [x] **INSTALL-04**: Installer offers to install for all detected CLIs in a single run
+- [x] **INSTALL-05**: Installation preserves existing user customizations and state in `.planning/`
+- [x] **INSTALL-06**: Installer handles version upgrades without data loss
+- [x] **INSTALL-07**: Cross-platform path handling works correctly on Mac, Windows, and Linux
+- [x] **INSTALL-08**: Post-install verification confirms all commands are accessible
 - [ ] **INSTALL-09**: Installer provides intelligent CLI selection recommendations based on task type
-- [ ] **INSTALL-10**: Installation completes with clear success/failure messaging and next steps
+- [x] **INSTALL-10**: Installation completes with clear success/failure messaging and next steps
 
 ### Command System
 
@@ -23,16 +23,16 @@
 - [x] **CMD-04**: Command errors are translated to user-friendly messages regardless of CLI
 - [x] **CMD-05**: User can run the same command in multiple CLIs and compare results
 - [x] **CMD-06**: Command execution sequences can be recorded for documentation purposes
-- [ ] **CMD-07**: Codex CLI commands use prompt files in `~/.codex/prompts/gsd/` or `.codex/prompts/gsd/`
+- [x] **CMD-07**: Codex CLI commands use prompt files in `~/.codex/prompts/gsd/` or `.codex/prompts/gsd/`
 - [x] **CMD-08**: Command help and usage information is accessible via `/gsd:help` in all CLIs
 - [x] **CMD-09**: Commands handle missing dependencies or CLI-specific limitations gracefully
-- [ ] **CMD-10**: Command invocation works with both global and local installations
+- [x] **CMD-10**: Command invocation works with both global and local installations
 
 ### Agent/Subagent System
 
 - [ ] **AGENT-01**: All 11 GSD agents (executor, planner, roadmapper, debugger, verifier, etc.) function in Codex CLI
-- [ ] **AGENT-02**: GitHub Copilot CLI agents continue working with custom agent definitions in `.github/agents/`
-- [ ] **AGENT-03**: Codex CLI agents work as skills since Codex lacks native custom agent support
+- [x] **AGENT-02**: GitHub Copilot CLI agents continue working with custom agent definitions in `.github/agents/`
+- [x] **AGENT-03**: Codex CLI agents work as skills since Codex lacks native custom agent support
 - [ ] **AGENT-04**: Agent functionality is equivalent across CLIs (same inputs produce same outputs)
 - [ ] **AGENT-05**: Agent invocation is transparent to user (they don't need to know implementation differs)
 - [ ] **AGENT-06**: Documentation clearly explains which agent features work differently per CLI
