@@ -132,17 +132,30 @@ function writeSettings(settingsPath, settings) {
 function replaceClaudePaths(content, pathPrefix, includeLocalPaths) {
   let updated = content;
   if (includeLocalPaths) {
-    updated = updated.replace(/~\/\.claude\/agents\//g, '.github/agents/');
-    updated = updated.replace(/\.claude\/agents\//g, '.github/agents/');
-  }
-  updated = updated.replace(/~\/\.claude\//g, pathPrefix);
-  if (includeLocalPaths) {
+    const commandPrefix = `${pathPrefix}commands/`;
+    updated = updated.replace(/~\/\.claude\/get-shit-done\//g, pathPrefix);
+    updated = updated.replace(/\.\/\.claude\/get-shit-done\//g, pathPrefix);
+    updated = updated.replace(/\.claude\/get-shit-done\//g, pathPrefix);
     const prefixNoSlash = pathPrefix.endsWith('/') ? pathPrefix.slice(0, -1) : pathPrefix;
-    updated = updated.replace(/~\/\.claude\b/g, prefixNoSlash);
-    updated = updated.replace(/\.\/\.claude\//g, pathPrefix);
-    updated = updated.replace(/\.claude\//g, pathPrefix);
+    updated = updated.replace(/~\/\.claude\/get-shit-done\b/g, prefixNoSlash);
+    updated = updated.replace(/\.\/\.claude\/get-shit-done\b/g, prefixNoSlash);
+    updated = updated.replace(/\.claude\/get-shit-done\b/g, prefixNoSlash);
+
+    updated = updated.replace(/~\/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
+    updated = updated.replace(/\.\/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
+    updated = updated.replace(/\.claude\/commands\/gsd\//g, `${commandPrefix}gsd/`);
+    updated = updated.replace(/~\/\.claude\/commands\//g, commandPrefix);
+    updated = updated.replace(/\.\/\.claude\/commands\//g, commandPrefix);
+    updated = updated.replace(/\.claude\/commands\//g, commandPrefix);
+
+    updated = updated.replace(/~\/\.claude\/agents\//g, '.github/agents/');
+    updated = updated.replace(/\.\/\.claude\/agents\//g, '.github/agents/');
+    updated = updated.replace(/\.claude\/agents\//g, '.github/agents/');
+
+    return updated;
   }
-  return updated;
+
+  return updated.replace(/~\/\.claude\//g, pathPrefix);
 }
 
 /**
