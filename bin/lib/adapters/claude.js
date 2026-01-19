@@ -7,7 +7,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('node:child_process');
+const { promisify } = require('node:util');
 const { getConfigPaths } = require('../paths');
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Get target installation directories for Claude CLI
@@ -112,17 +116,32 @@ function verify(dirs) {
  * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
  */
 async function invokeAgent(agent, prompt, options = {}) {
-  // TODO: Implement actual CLI invocation once Claude Code SDK available
-  // Expected command: claude-code agent invoke {agentName} --prompt "{prompt}"
-  
-  // Mock result for now - enables testing orchestration layer
-  return {
-    success: true,
-    cli: 'claude',
-    agent: agent.name,
-    result: 'Mock agent execution (CLI command pending)',
-    duration: 0 // ms - will be tracked when actual execution implemented
-  };
+  try {
+    // Construct CLI command
+    // Note: Exact command TBD based on Claude CLI docs - may be `claude-code agent invoke` or similar
+    // For now, use placeholder that will be updated during testing
+    const { stdout, stderr } = await execFileAsync('claude-code', [
+      'agent', 'invoke', agent.name,
+      '--prompt', prompt
+    ]);
+    
+    return {
+      success: true,
+      cli: 'claude',
+      agent: agent.name,
+      result: stdout.trim(),
+      duration: 0 // Will be tracked by PerformanceTracker in agent-invoker
+    };
+  } catch (error) {
+    return {
+      success: false,
+      cli: 'claude',
+      agent: agent.name,
+      error: error.message,
+      stderr: error.stderr || '',
+      duration: 0
+    };
+  }
 }
 
 module.exports = {
