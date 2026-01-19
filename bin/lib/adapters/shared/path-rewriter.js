@@ -64,6 +64,12 @@ function replaceClaudePaths(content, targetPrefix, options = {}) {
     updated = updated.replace(/\.\/\.claude\/agents\//g, '.github/agents/');
     updated = updated.replace(/\.claude\/agents\//g, '.github/agents/');
 
+    // Stage 4: Replace .github/skills references for Codex (when targetPrefix is .codex/skills/)
+    if (targetPrefix.includes('.codex/skills/')) {
+      updated = updated.replace(/\.github\/skills\/get-shit-done\//g, targetPrefix);
+      updated = updated.replace(/\.github\/agents\//g, `${targetPrefix}agents/`);
+    }
+
     return updated;
   }
 
