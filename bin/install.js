@@ -810,7 +810,7 @@ function installCodex(isGlobal) {
   }
 
   console.log(`
-  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}/gsd:help${reset} for guidance.
+  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}/gsd/help${reset} for guidance.
 `);
 }
 
