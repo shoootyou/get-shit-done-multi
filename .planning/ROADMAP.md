@@ -161,7 +161,7 @@ Plans:
 
 **Goal:** Users can switch CLIs mid-project with full state consistency and zero data loss
 
-**Status:** Pending
+**Status:** Complete
 
 **Dependencies:** Phase 4 (requires agents functional across CLIs)
 
@@ -188,11 +188,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Atomic I/O and directory locking (foundation)
-- [ ] 05-02-PLAN.md — State manager and migration framework (core)
-- [ ] 05-03-PLAN.md — Session persistence and validation (interoperability)
-- [ ] 05-04-PLAN.md — CLI fallback and usage tracking (resilience)
-- [ ] 05-05-PLAN.md — Integration and verification (testing)
+- [x] 05-01-PLAN.md — Atomic I/O and directory locking (foundation)
+- [x] 05-02-PLAN.md — State manager and migration framework (core)
+- [x] 05-03-PLAN.md — Session persistence and validation (interoperability)
+- [x] 05-04-PLAN.md — CLI fallback and usage tracking (resilience)
+- [x] 05-05-PLAN.md — Integration and verification (testing)
 
 ---
 

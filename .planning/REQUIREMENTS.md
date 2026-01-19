@@ -39,21 +39,21 @@
 - [x] **AGENT-07**: Unified agent registry shows which agents are available in each CLI
 - [x] **AGENT-08**: Agent results can be passed between CLIs when switching mid-project
 - [x] **AGENT-09**: Performance benchmarking shows execution time per agent per CLI
-- [ ] **AGENT-10**: Agent failures trigger smart retry logic (try different CLI if available)
+- [x] **AGENT-10**: Agent failures trigger smart retry logic (try different CLI if available)
 - [x] **AGENT-11**: All agents write to same `.planning/` directory structure regardless of CLI
 
 ### State Management
 
-- [ ] **STATE-01**: `.planning/` directory structure works identically across all three CLIs
-- [ ] **STATE-02**: User can start work in Claude Code and resume in Codex CLI without data loss
-- [ ] **STATE-03**: User can switch between CLIs mid-phase and state remains consistent
-- [ ] **STATE-04**: Configuration in `.planning/config.json` is respected by all CLIs
-- [ ] **STATE-05**: Session persistence allows resuming work after CLI restart or switch
-- [ ] **STATE-06**: Smart retry logic automatically tries alternate CLI if command fails
-- [ ] **STATE-07**: Cost tracking logs API usage per CLI to `.planning/usage.json`
-- [ ] **STATE-08**: State validation detects and repairs inconsistencies from CLI switches
-- [ ] **STATE-09**: Concurrent CLI usage (two CLIs open simultaneously) doesn't corrupt state
-- [ ] **STATE-10**: State migration handles format changes across GSD versions
+- [x] **STATE-01**: `.planning/` directory structure works identically across all three CLIs
+- [x] **STATE-02**: User can start work in Claude Code and resume in Codex CLI without data loss
+- [x] **STATE-03**: User can switch between CLIs mid-phase and state remains consistent
+- [x] **STATE-04**: Configuration in `.planning/config.json` is respected by all CLIs
+- [x] **STATE-05**: Session persistence allows resuming work after CLI restart or switch
+- [x] **STATE-06**: Smart retry logic automatically tries alternate CLI if command fails
+- [x] **STATE-07**: Cost tracking logs API usage per CLI to `.planning/usage.json`
+- [x] **STATE-08**: State validation detects and repairs inconsistencies from CLI switches
+- [x] **STATE-09**: Concurrent CLI usage (two CLIs open simultaneously) doesn't corrupt state
+- [x] **STATE-10**: State migration handles format changes across GSD versions
 
 ### Documentation
 
@@ -130,7 +130,7 @@
 | AGENT-07 | Phase 4 | Complete |
 | AGENT-08 | Phase 4 | Complete |
 | AGENT-09 | Phase 4 | Complete |
-| AGENT-10 | Phase 5 | Pending |
+| AGENT-10 | Phase 5 | Complete |
 | AGENT-11 | Phase 4 | Complete |
 | STATE-01 | Phase 5 | Pending |
 | STATE-02 | Phase 5 | Pending |
