@@ -4,6 +4,22 @@ This document shows which GSD agents are supported on each CLI platform.
 
 **Generated:** 2026-01-19
 
+## Phase 4 Status: Infrastructure Complete ✅
+
+As of Phase 4 gap closure, the agent translation layer is **fully implemented**:
+
+- ✅ All 11 GSD agents registered and available
+- ✅ CLI-agnostic orchestration layer built
+- ✅ Real CLI command execution (adapters no longer use mocks)
+- ✅ Performance tracking with sub-millisecond precision
+- ✅ User-facing `/gsd:invoke-agent` command for agent invocation
+
+**Next steps:** Phase 5 (Testing & Verification) will validate cross-CLI equivalence and integration.
+
+**Testing agent availability:** Run `/gsd:invoke-agent {agent-name} "{prompt}"` to test if an agent works on your installed CLI.
+
+---
+
 ## Support Levels
 
 - ✓ **Full Support**: All features work without limitations
@@ -32,69 +48,69 @@ Each agent's specific implementation details and notes per CLI:
 
 ### gsd-executor
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-planner
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-verifier
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-debugger
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-phase-researcher
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-plan-checker
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-codebase-mapper
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-project-researcher
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-research-synthesizer
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-roadmapper
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ### gsd-integration-checker
 
-- **Claude Code**: Native support, no limitations
-- **GitHub Copilot CLI**: Custom agent, full feature parity
-- **Codex CLI**: Skill-based, all features supported
+- **Claude Code**: Real CLI execution via claude-code command (requires Claude CLI installed)
+- **GitHub Copilot CLI**: Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)
+- **Codex CLI**: Real CLI execution via codex skill command (requires Codex CLI installed)
 
 ## CLI-Specific Limitations
 
@@ -121,4 +137,4 @@ Platform constraints that affect GSD workflow execution:
 ---
 
 *This document is auto-generated from capability-matrix.js*  
-*Last updated: 2026-01-19T20:55:43.672Z*
+*Last updated: 2026-01-19T21:31:11.942Z*
