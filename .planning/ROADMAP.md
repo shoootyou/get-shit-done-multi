@@ -200,6 +200,8 @@ Plans:
 
 **Goal:** Developers have comprehensive documentation, verification tools, and confidence that multi-CLI support works reliably
 
+**Status:** Ready for execution
+
 **Dependencies:** Phase 5 (requires all features implemented)
 
 **Requirements:**
@@ -221,6 +223,16 @@ Plans:
 3. User encounters issue and finds solution in troubleshooting guide organized by CLI and common error patterns with exact commands to fix
 4. User runs `/gsd:verify-installation` command and receives comprehensive report showing which CLIs are installed, which commands are available, which agents work, and any configuration warnings
 5. User views interactive capability matrix (web or CLI) filtering by CLI, feature, or agent and sees real-time accuracy (auto-generated from codebase, not manually maintained)
+
+**Plans:** 6 plans in 3 waves
+
+Plans:
+- [ ] 06-01-PLAN.md — Doc generation infrastructure and CLI comparison table (Wave 1)
+- [ ] 06-02-PLAN.md — Verification system with diagnostic tests (Wave 1)
+- [ ] 06-03-PLAN.md — Installer intelligence and CLI recommendations (Wave 1)
+- [ ] 06-04-PLAN.md — Static documentation (setup guides, troubleshooting, migration) (Wave 2)
+- [ ] 06-05-PLAN.md — Interactive capability matrix HTML/JS/CSS (Wave 2)
+- [ ] 06-06-PLAN.md — Documentation automation (pre-commit hook, validation) (Wave 3)
 
 ---
 
