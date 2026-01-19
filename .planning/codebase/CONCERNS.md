@@ -4,183 +4,199 @@
 
 ## Tech Debt
 
-**Empty catch blocks - Silent error suppression:**
-- Issue: Multiple catch blocks swallow exceptions without logging, making debugging difficult
-- Files: `hooks/gsd-check-update.js:31`, `hooks/gsd-check-update.js:36`, `hooks/statusline.js:58`, `hooks/statusline.js:71`
-- Impact: Update check failures and statusline errors fail silently - users don't know when features break
-- Fix approach: Add minimal logging (e.g., write to stderr or debug file) to catch blocks while keeping non-blocking behavior
+**No Dependency Management:**
+- Issue: No dependencies listed in `package.json` - relies only on Node.js built-ins
+- Files: `package.json`, `bin/install.js`, `hooks/gsd-check-update.js`, `hooks/statusline.js`
+- Impact: Limited flexibility, all functionality must use Node.js stdlib. No external libraries for enhanced features.
+- Fix approach: This is intentional for zero-dependency portability, but consider if features like better terminal UI, HTTP clients, or JSON validation would benefit from deps.
 
-**Synchronous file operations in installer:**
-- Issue: Installer uses `fs.readFileSync`, `fs.writeFileSync` throughout, blocking event loop during installation
-- Files: `bin/install.js:114`, `bin/install.js:126`, `bin/install.js:168`, `bin/install.js:170`, `bin/install.js:304`, `bin/install.js:321`, `bin/install.js:401`, `bin/install.js:403`
-- Impact: Large projects with many agent files can freeze installer for several seconds, poor UX on slower systems
-- Fix approach: Migrate to async/await with `fs.promises` API for better performance, especially for multi-file operations
-
-**Destructive clean install behavior:**
-- Issue: Installer performs `fs.rmSync(destDir, { recursive: true })` at line 155 to remove existing directories before copying
-- Files: `bin/install.js:155`
-- Impact: User customizations or local changes to GSD files in `.claude/` get wiped without warning during updates
-- Fix approach: Implement backup mechanism or selective file merge instead of full directory deletion
-
-**Large monolithic installer file:**
-- Issue: Single 768-line installer handles all installation logic, path replacement, settings management, and user interaction
-- Files: `bin/install.js` (768 lines)
-- Impact: Difficult to maintain, test, or extend - adding new installation targets requires understanding entire file
-- Fix approach: Extract modules for settings management, path replacement, file operations, and user prompting
-
-**Empty return values without context:**
-- Issue: Functions return `null`, `{}`, or `[]` without clear error indication
+**Empty Returns Pattern:**
+- Issue: Silent failures with empty object/null returns instead of throwing errors
 - Files: `bin/install.js:54`, `bin/install.js:116`, `bin/install.js:119`
-- Impact: Callers can't distinguish between "settings file missing" vs "settings file corrupted" scenarios
-- Fix approach: Use explicit error objects or throw exceptions with context instead of silent fallback values
+- Impact: Errors in JSON parsing or settings reading fail silently, making debugging harder
+- Fix approach: Add logging or throw descriptive errors when JSON parse fails or settings are corrupted
+
+**Large Monolithic Install Script:**
+- Issue: `bin/install.js` is 819 lines doing installation, file copying, path replacement, prompting, and verification
+- Files: `bin/install.js`
+- Impact: Hard to test individual functions, changes risk breaking multiple install scenarios
+- Fix approach: Split into modules: `lib/installer.js`, `lib/path-utils.js`, `lib/prompt.js`, `lib/file-ops.js`
+
+**Synchronous File Operations:**
+- Issue: All file operations use sync APIs (`readFileSync`, `writeFileSync`, `rmSync`, `unlinkSync`)
+- Files: `bin/install.js:114`, `bin/install.js:126`, `bin/install.js:168`, `bin/install.js:181`, `bin/install.js:183`, `bin/install.js:201`, `hooks/statusline.js:55`, `hooks/statusline.js:67`
+- Impact: Blocks event loop during install, could cause issues with large file trees
+- Fix approach: Migrate to async file operations with proper error handling. Consider using `fs/promises` API.
+
+**Complex Path Replacement Logic:**
+- Issue: String replacement for paths across 3 install modes (global, local, copilot) with many edge cases
+- Files: `bin/install.js:132-159`
+- Impact: Fragile to path variations, hard to verify all cases work. Easy to miss edge cases.
+- Fix approach: Use structured path mapping with tests for each install scenario
+
+**Stdin Edge Cases:**
+- Issue: Complex workarounds for stdin not being TTY or closing unexpectedly (WSL2, npx scenarios)
+- Files: `bin/install.js:734`, `bin/install.js:748-761`
+- Impact: Installation may behave unexpectedly in different terminal environments
+- Fix approach: Consider CLI argument approach instead of interactive prompts for CI/automated scenarios
+
+**Background Process Spawn:**
+- Issue: Update check spawns detached process with stringified code in spawn call
+- Files: `hooks/gsd-check-update.js:21-46`
+- Impact: Debugging is hard, error handling is minimal, process may silently fail
+- Fix approach: Extract to separate script file, add proper error logging to cache file
 
 ## Known Bugs
 
-**WSL2/Non-TTY detection fallback:**
-- Symptoms: Installation prompts fail or hang on WSL2 and non-interactive terminals
-- Files: `bin/install.js:682-689`
-- Trigger: Running `npx get-shit-done-cc` in WSL2 or piped stdin environments
-- Workaround: Fixed in v1.6.4 - now detects non-TTY and falls back to global install automatically
+**Double-execution Prevention:**
+- Symptoms: Installer tracks `answered` flag to prevent double-execution when readline closes unexpectedly
+- Files: `bin/install.js:749`, `bin/install.js:753-760`
+- Trigger: Non-interactive terminals or stdin closure during prompt
+- Workaround: Uses flag to prevent duplicate install attempts
 
-**Orphaned hook files from previous versions:**
-- Symptoms: Old `gsd-notify.sh` hook remains after updating from pre-1.6.x versions
-- Files: Referenced in `bin/install.js:180-192`
-- Trigger: Updating from v1.5.x or earlier
-- Workaround: Installer now auto-removes orphaned files in `cleanupOrphanedFiles()` function
+**Statusline Silent Failures:**
+- Symptoms: Statusline script catches all errors and fails silently
+- Files: `hooks/statusline.js:81-83`
+- Trigger: Any JSON parse error, missing cache files, or filesystem issues
+- Workaround: None - errors are completely swallowed. Consider logging to temp file.
 
 ## Security Considerations
 
-**Command execution from external data:**
-- Risk: `execSync('npm view get-shit-done-cc version')` in background process without input validation
+**Command Injection in Update Check:**
+- Risk: Uses `execSync('npm view get-shit-done-cc version')` without input sanitization
 - Files: `hooks/gsd-check-update.js:35`
-- Current mitigation: Command is hardcoded string without user input interpolation, runs with 10s timeout
-- Recommendations: No immediate risk, but document that custom forks should validate package names if they parameterize this
+- Current mitigation: Hard-coded package name, no user input
+- Recommendations: Consider using npm registry API instead of shell command
 
-**Tilde expansion from environment variables:**
-- Risk: Manual tilde expansion at `bin/install.js:101-106` could mishandle malicious paths
-- Files: `bin/install.js:101-106`
-- Current mitigation: Only applied to `CLAUDE_CONFIG_DIR` env var and `--config-dir` argument
-- Recommendations: Use `os.homedir()` consistently and validate paths don't escape expected directories
+**Path Traversal Risk:**
+- Risk: User-provided `--config-dir` path is expanded but not validated
+- Files: `bin/install.js:38-55`, `bin/install.js:101-106`, `bin/install.js:368`, `bin/install.js:763`
+- Current mitigation: Only expands tilde, doesn't sanitize beyond that
+- Recommendations: Validate config dir is within reasonable bounds, check for path traversal patterns (`..`, symlinks)
 
-**Path traversal in installation targets:**
-- Risk: No validation that custom `--config-dir` paths don't write outside expected boundaries
-- Files: `bin/install.js:38-56` (parseConfigDirArg)
-- Current mitigation: None - user controls destination path completely
-- Recommendations: Add path validation to ensure config directory is absolute and doesn't use `..` traversal
+**Recursive Directory Deletion:**
+- Risk: `fs.rmSync(destDir, { recursive: true })` deletes entire directory trees
+- Files: `bin/install.js:168`
+- Current mitigation: Only called on calculated install paths
+- Recommendations: Add safety check to ensure path contains expected markers (`.claude`, `.github`) before deletion
+
+**Environment Variable Injection:**
+- Risk: Reads `process.env.CLAUDE_CONFIG_DIR` without validation
+- Files: `bin/install.js:368`, `bin/install.js:763`
+- Current mitigation: Only used for path resolution
+- Recommendations: Validate env var doesn't contain malicious paths
 
 ## Performance Bottlenecks
 
-**Synchronous file I/O during installation:**
-- Problem: Installer blocks on every file read/write, creating noticeable lag
-- Files: `bin/install.js:152-175` (copyWithPathReplacement), multiple fs.*Sync calls throughout
-- Cause: Using sync API for convenience, but affects perceived installation speed
-- Improvement path: Batch file operations with Promise.all() after converting to async
+**Synchronous NPM Check:**
+- Problem: Update check runs `execSync('npm view ...')` with 10s timeout on every Claude session start
+- Files: `hooks/gsd-check-update.js:35`
+- Cause: Network call blocks for up to 10 seconds
+- Improvement path: Cache more aggressively (24hrs), reduce timeout to 3s, or skip check if offline
 
-**Spawned update check process at every session start:**
-- Problem: SessionStart hook spawns Node.js subprocess to check npm for updates every time
-- Files: `hooks/gsd-check-update.js:21-51`
-- Cause: No rate limiting or cache TTL check before spawning
-- Improvement path: Check cache timestamp first, only spawn if >24 hours since last check
+**Recursive File Operations:**
+- Problem: Install copies entire directory trees synchronously without streaming
+- Files: `bin/install.js:165-188`
+- Cause: Recursive readDir/writeFile on entire agent + command + skill directories
+- Improvement path: Use streams for large files, show progress for long operations
 
-**Statusline reads entire todos directory on every render:**
-- Problem: Reads and filters all todo files on each statusline update
-- Files: `hooks/statusline.js:47-71`
-- Cause: No in-memory caching of session-specific todo file path
-- Improvement path: Cache todo file path in memory or use session-based lookup instead of scanning directory
+**Statusline Reads Multiple Files:**
+- Problem: Every statusline render reads multiple JSON files from disk
+- Files: `hooks/statusline.js:46-72`
+- Cause: Checks todos directory, cache file on every statusline update
+- Improvement path: Add in-memory cache with TTL, batch reads
 
 ## Fragile Areas
 
-**Path replacement in markdown files:**
-- Files: `bin/install.js:130-145` (replaceClaudePaths), `bin/install.js:152-175`
-- Why fragile: String replacement with regex can break if markdown files contain similar patterns in code blocks or examples
-- Safe modification: Test path replacement against all agent .md files, add unit tests for edge cases
-- Test coverage: None - no automated tests for path replacement logic
+**Path Replacement in Markdown:**
+- Files: `bin/install.js:132-159`, `bin/install.js:180-183`
+- Why fragile: Uses 15+ string replacements to update paths in .md files. Easy to miss edge cases or add conflicting patterns.
+- Safe modification: Add test cases for each install mode (global, local, copilot) before changing patterns
+- Test coverage: None - no automated tests
 
-**Settings.json merge logic:**
-- Files: `bin/install.js:197-233` (cleanupOrphanedHooks)
-- Why fragile: Deep object manipulation of hook arrays without schema validation
-- Safe modification: Validate settings structure before manipulation, add explicit error handling for malformed settings
-- Test coverage: None - no tests for settings merge or cleanup
+**Settings.json Manipulation:**
+- Files: `bin/install.js:111-127`, `bin/install.js:210-246`
+- Why fragile: Direct JSON parse/stringify without schema validation. Orphaned hook cleanup relies on string matching.
+- Safe modification: Read existing settings first, backup before writing, validate structure
+- Test coverage: None - no tests for settings merging or cleanup
 
-**Readline prompt handling with multiple exit paths:**
-- Files: `bin/install.js:680-710` (promptLocation), `bin/install.js:650-675` (handleStatusline)
-- Why fragile: Complex async flow with multiple callbacks, close event handlers, and answered flag to prevent double-execution
-- Safe modification: Refactor to async/await or Promises to linearize control flow
-- Test coverage: None - difficult to test interactive prompts without mocking
+**Interactive Prompt Flow:**
+- Files: `bin/install.js:700-788`
+- Why fragile: Multiple nested callbacks, readline event handling, edge cases for non-TTY terminals
+- Safe modification: Test in multiple environments (Mac terminal, WSL2, CI, npx)
+- Test coverage: None - manual testing only
+
+**Hook Registration:**
+- Files: `bin/install.js:470-540`
+- Why fragile: Compares existing hook arrays, merges with new hooks, handles different formats
+- Safe modification: Ensure hooks array is well-formed before merging, validate command paths exist
+- Test coverage: None
 
 ## Scaling Limits
 
-**Single-file command distribution:**
-- Current capacity: 26 commands in `commands/gsd/` directory (average 8KB each)
-- Limit: No technical limit, but discoverability and maintenance difficulty increases linearly
-- Scaling path: Group related commands into sub-namespaces (e.g., `/gsd:plan/*`, `/gsd:execute/*`) or add command categories
+**Single Install Script:**
+- Current capacity: Handles ~10 agents, ~25 commands, statusline hook
+- Limit: 819-line script becomes unmaintainable beyond current scope
+- Scaling path: Modularize into separate installer, file utilities, hook manager, path transformer
 
-**Agent markdown file duplication:**
-- Current capacity: 13 agents x 2 locations (source + installed) = 26 files kept in sync
-- Limit: Installation copies agents to both `.claude/agents/` and `.github/agents/`, doubling storage and update complexity
-- Scaling path: Use symlinks where supported, or generate target-specific versions only when needed
+**Agent File Size:**
+- Current capacity: 11 agents totaling 8,337 lines
+- Limit: Large agent files (35K+ lines like `gsd-debugger.md`) are hard to maintain
+- Scaling path: Consider splitting large agents into sub-agents or extracting shared references
+
+**Cache Directory Growth:**
+- Current capacity: `~/.claude/cache/` stores update check results
+- Limit: Single cache file, no cleanup strategy
+- Scaling path: Add cache eviction, size limits, or periodic cleanup
 
 ## Dependencies at Risk
 
-**No dependencies declared:**
-- Risk: Package has zero runtime dependencies, relies entirely on Node.js built-ins
-- Impact: No dependency supply chain risk, but limits functionality to Node.js stdlib capabilities
-- Migration plan: Not applicable - this is actually a strength of the project
+**Node.js Built-ins Only:**
+- Risk: Zero external dependencies means vulnerable to Node.js API changes
+- Impact: Breaking changes in `fs`, `readline`, `child_process` APIs could break installer
+- Migration plan: Pin minimum Node version (currently >=16.7.0), test on major Node releases
 
-**Minimum Node.js version (16.7.0):**
-- Risk: Node 16 reaches EOL September 2023 - some users on LTS versions may have older Node
-- Impact: Package won't install on Node < 16.7.0 due to engines requirement
-- Migration plan: Consider bumping minimum to Node 18 LTS (maintained until 2025-04-30) and document in README
+**Relies on npm CLI:**
+- Risk: Update check uses `npm view` command which may not be available in all environments
+- Impact: Update notification breaks if npm not in PATH
+- Migration plan: Consider npm registry HTTP API instead of CLI
 
 ## Missing Critical Features
 
-**No rollback mechanism:**
-- Problem: If installation fails midway, no way to restore previous GSD version
-- Blocks: Safe updates - users risk breaking their setup when updating
-- Priority: Medium - workaround is to reinstall previous version via npm
+**No Rollback Mechanism:**
+- Problem: Install overwrites files without backup, no way to undo
+- Blocks: Users can't easily revert to previous GSD version if new version breaks
+- Priority: High
 
-**No installation verification:**
-- Problem: Installer shows checkmarks but doesn't verify files are actually usable
-- Blocks: Detecting corrupted installations or permission issues
-- Priority: Low - installer now has basic verification (v1.6.4+), but doesn't test file contents
+**No Version Migration:**
+- Problem: No automated migration for breaking changes between versions
+- Blocks: Users must manually clean up when file structure or settings format changes
+- Priority: Medium
 
-**No automated tests:**
-- Problem: Entire project has zero test files (0 test files found)
-- Blocks: Confident refactoring, preventing regressions, validating edge cases
-- Priority: High - critical for maintaining quality as project grows
+**No Install Verification:**
+- Problem: Install checks if files exist but doesn't verify they work
+- Blocks: Broken installs may not be detected until user tries to use commands
+- Priority: Medium
 
 ## Test Coverage Gaps
 
-**Installer logic (bin/install.js):**
-- What's not tested: Path replacement, settings merging, orphan cleanup, readline prompts, file operations
-- Files: `bin/install.js` (768 lines, 0% coverage)
-- Risk: Changes to installer can break installation on different platforms without detection
+**Install Script:**
+- What's not tested: All installation logic, path replacement, settings merging
+- Files: `bin/install.js`
+- Risk: Breaking changes can ship undetected, regressions in install scenarios
 - Priority: High
 
-**Hook scripts:**
-- What's not tested: Update check logic, statusline rendering, cache file handling
-- Files: `hooks/gsd-check-update.js` (52 lines), `hooks/statusline.js` (84 lines)
-- Risk: Silent failures in background processes, malformed statusline output
+**Hook Scripts:**
+- What's not tested: Update check background process, statusline rendering
+- Files: `hooks/gsd-check-update.js`, `hooks/statusline.js`
+- Risk: Hook failures are silent, no way to detect if they work
 - Priority: Medium
 
-**Command markdown files:**
-- What's not tested: 26 command definitions in `commands/gsd/` have no validation
-- Files: All `.md` files in `commands/gsd/` directory
-- Risk: Syntax errors or incorrect instructions in command files only discovered at runtime by users
-- Priority: Low - these are consumed by Claude, harder to unit test
-
-## CI/CD Pipeline Missing
-
-**No automated CI:**
-- Problem: No GitHub Actions, CircleCI, or other CI pipeline detected
-- Impact: Manual testing required for every change, no automated validation before npm publish
-- Files: `.github/workflows/` directory does not exist
-- Priority: High - increases risk of publishing broken versions to npm
-
-**No automated npm publishing:**
-- Problem: Package publishing appears to be manual process
-- Impact: Human error in version tagging, changelog updates, or npm publish command
-- Priority: Medium - could automate with semantic-release or GitHub Actions
+**Command Orchestrators:**
+- What's not tested: None of the GSD commands have automated tests
+- Files: `commands/gsd/*.md`
+- Risk: Command changes may break workflows, no regression detection
+- Priority: Low - commands are prompts, not code
 
 ---
 

@@ -482,14 +482,8 @@ function install(isGlobal) {
     }
   }
 
-  // Install GitHub issue templates for local installs only
-  if (!isGlobal) {
-    if (installIssueTemplates(process.cwd())) {
-      console.log(`  ${green}✓${reset} Installed GitHub issue templates`);
-    } else {
-      failures.push('issue templates');
-    }
-  }
+  // Claude doesn't need GitHub issue templates (only Copilot uses them)
+  // Templates are installed in installCopilot() function instead
 
   // Verify installation with detailed reporting
   const verifyResult = claudeAdapter.verify(dirs);
@@ -497,7 +491,7 @@ function install(isGlobal) {
     const commandCount = fs.readdirSync(dirs.commands)
       .filter(f => f.endsWith('.md')).length;
     const agentCount = fs.readdirSync(dirs.agents)
-      .filter(f => f.endsWith('.agent.md')).length;
+      .filter(f => f.startsWith('gsd-') && f.endsWith('.md')).length;
     console.log(`  ${dim}✓ Verified: ${commandCount} commands, ${agentCount} agents${reset}\n`);
   } else {
     console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);

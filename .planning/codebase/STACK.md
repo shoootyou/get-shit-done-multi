@@ -5,63 +5,70 @@
 ## Languages
 
 **Primary:**
-- JavaScript (Node.js) - Installation scripts, hooks, and utilities
+- JavaScript (Node.js) - All executable scripts, hooks, and installation logic
 
 **Secondary:**
-- Markdown - Command definitions, agent prompts, templates, and documentation
+- Markdown - Agent definitions, command specs, documentation, templates
+- JSON - Configuration files, package manifests
 
 ## Runtime
 
 **Environment:**
-- Node.js >= 16.7.0
+- Node.js 16.7.0+ (specified in `package.json` engines field)
 
 **Package Manager:**
-- npm (npx distribution)
-- Lockfile: Not present (distribution package)
+- npm
+- Lockfile: Not committed (listed in `.gitignore`)
 
 ## Frameworks
 
 **Core:**
-- No external frameworks - Pure Node.js standard library
+- None - Pure Node.js implementation using standard library
 
 **Testing:**
-- Not detected in distribution
+- Not detected
 
 **Build/Dev:**
-- No build tooling - Direct script execution
+- None - Direct execution of JS files with shebang (`#!/usr/bin/env node`)
 
 ## Key Dependencies
 
 **Critical:**
-- None - Uses only Node.js built-in modules
+- None - Zero npm dependencies (pure Node.js standard library)
 
 **Infrastructure:**
-- `fs` (built-in) - File system operations for installation and config
-- `path` (built-in) - Path manipulation
-- `os` (built-in) - System information and home directory detection
-- `readline` (built-in) - Interactive CLI prompts
-- `child_process` (built-in) - Spawning processes for hooks and updates
+- Built-in Node.js modules only:
+  - `fs` - File system operations (`bin/install.js`, `hooks/*.js`)
+  - `path` - Path manipulation
+  - `os` - OS utilities (homedir, platform detection)
+  - `readline` - Interactive CLI prompts (`bin/install.js`)
+  - `child_process` - Spawning processes (`hooks/gsd-check-update.js`)
 
 ## Configuration
 
 **Environment:**
-- Installation location configured via CLI flags or environment variables
-- `CLAUDE_CONFIG_DIR` - Custom config directory location
-- Supports `~/.claude` (global), `./.claude` (local), or `./.github` (Copilot CLI)
+- No `.env` files detected
+- Configuration via JSON files:
+  - `get-shit-done/templates/config.json` - GSD system config (gates, parallelization)
+  - `.github/skills/get-shit-done/templates/config.json` - Copilot CLI version
 
 **Build:**
-- No build configuration - Scripts run directly
+- No build system - interpreted JavaScript
+- No TypeScript, no transpilation, no bundling
 
 ## Platform Requirements
 
 **Development:**
-- Node.js >= 16.7.0
-- Works on Mac, Windows, and Linux
+- Node.js 16.7.0 or higher
+- npm (bundled with Node.js)
+- Compatible with Mac, Windows, Linux
 
 **Production:**
-- Deployment target: Claude Code IDE or GitHub Copilot CLI
-- Installed via npx as `get-shit-done-cc`
-- Available on npm registry
+- Runs as installed npm package (`get-shit-done-cc`)
+- Installation targets:
+  - Claude Code: `~/.claude/get-shit-done/`
+  - GitHub Copilot CLI: `./.github/skills/get-shit-done/`
+  - Global: `~/.claude/`
 
 ---
 

@@ -4,16 +4,18 @@
 
 ## APIs & External Services
 
-**NPM Registry:**
-- npm view command - Check for package updates
-  - SDK/Client: npm CLI (via child_process.execSync)
-  - Auth: None required (public package)
+**npm Registry:**
+- npm view command - Fetches latest package version
   - Used in: `hooks/gsd-check-update.js`
+  - Purpose: Background update checking
+  - Auth: None (public registry)
 
-**GitHub:**
-- Repository hosting - https://github.com/glittercowboy/get-shit-done
-  - Used for: Source code, releases, issue tracking
-  - Integration: URL references in package.json and documentation
+**Context7 (Optional):**
+- Context7 MCP server - Documentation query service
+  - Tools: `mcp__context7__resolve-library-id`, `mcp__context7__query-docs`
+  - Used in: `agents/gsd-phase-researcher.md`, `agents/gsd-project-researcher.md`, `agents/gsd-planner.md`
+  - Purpose: Fetch library documentation during research/planning phases
+  - Auth: Not specified
 
 ## Data Storage
 
@@ -22,25 +24,21 @@
 
 **File Storage:**
 - Local filesystem only
-  - Config: `~/.claude/` or `./.claude/` or `./.github/`
-  - Cache: `~/.claude/cache/` for update check results
-  - Todos: `~/.claude/todos/` for session state
-  - State: `.planning/` directory for project state
+  - User config: `~/.claude/get-shit-done/`
+  - Project state: `.planning/` (project directory)
+  - Cache: `~/.claude/cache/gsd-update-check.json`
+  - Version tracking: `~/.claude/get-shit-done/VERSION`
 
 **Caching:**
-- Custom file-based cache
+- Local file-based cache for npm update checks
   - Location: `~/.claude/cache/gsd-update-check.json`
-  - Purpose: Update availability check results
-  - Implementation: JSON files written by hook scripts
+  - Data: `{ update_available, installed, latest, checked }`
+  - TTL: Not specified
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- None - System operates as local scripts
-
-**Implementation:**
-- No authentication required
-- Runs with user's filesystem permissions
+- None (no user authentication system)
 
 ## Monitoring & Observability
 
@@ -48,32 +46,26 @@
 - None
 
 **Logs:**
-- Console output only
-  - Install script: Colored terminal output with status indicators
-  - Hooks: Background execution, results cached to JSON
+- Console output only (no structured logging)
+- Update checks cached to: `~/.claude/cache/gsd-update-check.json`
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- npm registry (https://www.npmjs.com/package/get-shit-done-cc)
+- npm Registry (`get-shit-done-cc` package)
 
 **CI Pipeline:**
-- Not detected in repository
-
-**Distribution:**
-- npx execution: `npx get-shit-done-cc`
-- Version tracking: VERSION file + package.json
+- GitHub repository: `https://github.com/glittercowboy/get-shit-done`
+- GitHub Copilot CLI assets: `.github/skills/`, `.github/agents/`
+- Issue templates: `.github/ISSUE_TEMPLATE/gsd-new-project.yml`
 
 ## Environment Configuration
 
 **Required env vars:**
-- None required
-
-**Optional env vars:**
-- `CLAUDE_CONFIG_DIR` - Override default Claude config location
+- None
 
 **Secrets location:**
-- Not applicable - No secrets used
+- Not applicable (no secrets/credentials required)
 
 ## Webhooks & Callbacks
 
@@ -82,38 +74,6 @@
 
 **Outgoing:**
 - None
-
-## IDE/Tool Integration
-
-**Claude Code:**
-- Custom commands directory: `commands/gsd/*.md`
-- Skill system: `get-shit-done/` directory structure
-- Agents: `.claude/agents/gsd-*.md` (11 specialized agents)
-- Hooks: Session lifecycle hooks (SessionStart, Stop)
-- Statusline: Custom statusbar via `hooks/statusline.js`
-
-**GitHub Copilot CLI:**
-- Skills: `.github/skills/get-shit-done/`
-- Agents: `.github/agents/gsd-*.agent.md` (converted with YAML frontmatter)
-- Instructions: `.github/copilot-instructions.md`
-
-## Session Lifecycle Hooks
-
-**SessionStart:**
-- `hooks/gsd-check-update.js` - Background update checker
-  - Spawns detached process
-  - Queries npm registry for latest version
-  - Writes result to cache file
-  - Timeout: 10 seconds
-
-**Stop:**
-- Not configured in default installation
-
-**Statusline:**
-- `hooks/statusline.js` - Real-time status display
-  - Reads JSON from stdin (provided by IDE)
-  - Shows: model, current task, directory, context usage
-  - Color-coded progress bar for context window
 
 ---
 

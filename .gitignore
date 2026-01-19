@@ -8,3 +8,6 @@ CLAUDE.md
 
 # Local test installs
 .claude/
+.github/agents
+.github/skills
+.codex

@@ -4,209 +4,154 @@
 
 ## Pattern Overview
 
-**Overall:** Orchestrator-Agent Meta-Prompting System
+**Overall:** Meta-Prompting System with Orchestration Layer
 
 **Key Characteristics:**
-- Thin orchestrators coordinate workflow, delegate execution to specialized agents
-- Agents are isolated prompt files loaded into fresh context windows via Task tool
-- State flows through markdown files in `.planning/` directory
-- Commands are executable markdown files with frontmatter configuration
-- Multi-wave parallel execution using dependency-aware task grouping
+- Command-driven workflow system for AI-assisted development
+- Multi-agent orchestration with specialized subagents
+- Document-based state management and context engineering
+- Template-driven artifact generation
 
 ## Layers
 
-**User Interface Layer:**
-- Purpose: Command invocation surface
-- Location: `commands/gsd/*.md`
-- Contains: Slash command definitions with frontmatter metadata, process steps, validation logic
-- Depends on: Workflow layer, Template layer
-- Used by: Claude Code slash command system (or GitHub Copilot CLI skill wrapper)
+**Installation Layer:**
+- Purpose: Deploy GSD assets to Claude Code or GitHub Copilot CLI configurations
+- Location: `bin/install.js`
+- Contains: Install logic, path rewriting, configuration setup
+- Depends on: Node.js filesystem APIs, package.json metadata
+- Used by: Users via `npx get-shit-done-cc` commands
 
-**Orchestrator Layer:**
-- Purpose: Coordinate multi-agent workflows, manage state transitions, handle user interaction
-- Location: `commands/gsd/*.md` (process sections), `get-shit-done/workflows/*.md`
-- Contains: Coordination logic, agent spawning, result aggregation, checkpoint handling
-- Depends on: Agent layer, State layer, Template layer
-- Used by: User Interface layer
-- Pattern: Parse arguments → Validate → Spawn agents → Collect results → Update state → Present to user
+**Command Layer:**
+- Purpose: Define user-facing commands and their execution logic
+- Location: `commands/gsd/`
+- Contains: 24 command definition files (.md format) with embedded prompts
+- Depends on: Workflow layer, template layer, agent layer
+- Used by: Claude Code/Copilot CLI when user invokes commands
+
+**Workflow Layer:**
+- Purpose: Orchestrate multi-step processes and coordinate subagent spawning
+- Location: `get-shit-done/workflows/`
+- Contains: 12 workflow orchestration files defining process steps
+- Depends on: Agent layer, template layer, references
+- Used by: Command layer to execute complex operations
 
 **Agent Layer:**
-- Purpose: Execute isolated specialized tasks in fresh context windows
-- Location: `agents/*.md`
-- Contains: Specialized agent prompts (planner, executor, verifier, researcher, debugger, etc.)
-- Depends on: State layer, Template layer, Reference layer
-- Used by: Orchestrator layer via Task tool
-- Pattern: Load state → Execute specialized work → Write output → Return structured confirmation
-
-**State Layer:**
-- Purpose: Persistent project memory and inter-agent communication
-- Location: `.planning/*.md`, `.planning/phases/*/` (created during runtime)
-- Contains: PROJECT.md, ROADMAP.md, STATE.md, REQUIREMENTS.md, phase plans and summaries
-- Depends on: Template layer
-- Used by: All layers (read/write project state)
+- Purpose: Specialized AI subagents for focused tasks
+- Location: `agents/`
+- Contains: 11 agent definition files with role, tools, and process instructions
+- Depends on: Template layer, workflow layer
+- Used by: Workflow layer via Task/subagent spawning
 
 **Template Layer:**
-- Purpose: Define document structures and conventions
-- Location: `get-shit-done/templates/*.md`
-- Contains: Markdown templates for all state documents
-- Depends on: Nothing (pure templates)
-- Used by: Orchestrator layer, Agent layer
+- Purpose: Define structure for generated artifacts (PROJECT.md, PLAN.md, etc.)
+- Location: `get-shit-done/templates/`
+- Contains: 21 template files for various document types
+- Depends on: Nothing (pure structure definitions)
+- Used by: Commands, workflows, and agents during artifact generation
 
 **Reference Layer:**
-- Purpose: Provide reusable guidance and conventions
-- Location: `get-shit-done/references/*.md`
-- Contains: Questioning patterns, verification patterns, git integration, TDD, UI brand, checkpoints
+- Purpose: Provide reusable context snippets and guidelines
+- Location: `get-shit-done/references/`
+- Contains: 7 reference documents (checkpoints, TDD, git integration, etc.)
 - Depends on: Nothing (pure reference material)
-- Used by: Agent layer (loaded via @-references)
+- Used by: Commands and workflows via @reference includes
 
-**Installation Layer:**
-- Purpose: Deploy system to Claude Code or GitHub Copilot CLI environments
-- Location: `bin/install.js`, `hooks/*.js`
-- Contains: Node.js installer script, status line hooks
-- Depends on: Nothing (bootstraps system)
-- Used by: External (npx invocation)
+**Runtime Hooks:**
+- Purpose: Enhance CLI experience with statusline and update checks
+- Location: `hooks/`
+- Contains: 2 Node.js scripts for statusline rendering and version checking
+- Depends on: Claude Code statusline API, filesystem access
+- Used by: Claude Code at runtime
 
 ## Data Flow
 
 **Command Invocation Flow:**
 
-1. User types `/gsd:command-name [args]` (or `gsd:command-name` in Copilot CLI)
-2. Claude loads `commands/gsd/command-name.md`
-3. Orchestrator parses arguments, validates environment
-4. Orchestrator reads current state from `.planning/STATE.md`
-5. Orchestrator spawns specialized agents via Task tool
-6. Agents execute in parallel (where dependencies allow)
-7. Agents write outputs to `.planning/` directory
-8. Agents return structured confirmations to orchestrator
-9. Orchestrator updates STATE.md
-10. Orchestrator presents results to user with "Next Up" guidance
+1. User types `/gsd:command` or `gsd:command`
+2. Claude/Copilot CLI loads command definition from `commands/gsd/<command>.md`
+3. Command loads workflow from `get-shit-done/workflows/<workflow>.md` (if orchestration needed)
+4. Workflow spawns specialized agents from `agents/` via Task tool
+5. Agents execute, write artifacts to `.planning/`, return confirmation
+6. Workflow aggregates results, updates STATE.md
+7. User receives summary output
 
-**Phase Execution Flow:**
+**Artifact Generation Flow:**
 
-1. `/gsd:plan-phase N` → Spawns `gsd-phase-researcher` (optional) → Spawns `gsd-planner` → Spawns `gsd-plan-checker` → Iterates until plans pass → Writes `{phase}-RESEARCH.md`, `{phase}-{N}-PLAN.md`
-2. `/gsd:execute-phase N` → Discovers plans → Groups by wave → Spawns `gsd-executor` agents in parallel per wave → Executors commit atomically → Spawns `gsd-verifier` → Writes `{phase}-{N}-SUMMARY.md`, `{phase}-VERIFICATION.md`
-3. `/gsd:verify-work N` → Extracts testable deliverables → Prompts user for each → On failure: spawns `gsd-debugger` agents → spawns `gsd-planner` in gaps mode → Writes `{phase}-UAT.md`, fix plans
+1. Agent/workflow loads template from `get-shit-done/templates/<template>.md`
+2. Gathers context via Bash/Read tools (codebase exploration, user input)
+3. Fills template placeholders with gathered data
+4. Writes completed artifact to `.planning/` directory
+5. Commits artifact to git with semantic message
 
 **State Management:**
-- STATE.md acts as project memory (decisions, blockers, position)
-- ROADMAP.md tracks phases and their completion status
-- Each phase gets directory: `.planning/phases/{NN}-{slug}/`
-- Plans contain frontmatter metadata (wave, dependencies, autonomous flag)
-- Git commits track each completed task atomically
+- All project state stored in `.planning/` directory structure
+- STATE.md acts as "project memory" updated by workflows
+- Each phase/plan tracked via filesystem (directories and *-PLAN.md files)
+- Git commits provide audit trail of all changes
 
 ## Key Abstractions
 
-**Command:**
-- Purpose: User-facing entry point with argument handling
-- Examples: `commands/gsd/new-project.md`, `commands/gsd/execute-phase.md`, `commands/gsd/plan-phase.md`
-- Pattern: Frontmatter (name, description, allowed-tools) + execution_context (@-references) + process steps + success criteria
+**Command Definition:**
+- Purpose: Self-contained instruction set for Claude/Copilot
+- Examples: `commands/gsd/new-project.md`, `commands/gsd/execute-phase.md`
+- Pattern: YAML frontmatter + XML-structured prompts + process steps
 
-**Agent:**
-- Purpose: Isolated specialist executing in fresh context
+**Agent Definition:**
+- Purpose: Specialized role with tools, constraints, and process
 - Examples: `agents/gsd-executor.md`, `agents/gsd-planner.md`, `agents/gsd-verifier.md`
-- Pattern: Frontmatter (name, description, tools, color) + role + philosophy + process + templates + rules
+- Pattern: YAML frontmatter + role description + process steps + success criteria
 
-**Workflow:**
-- Purpose: Reusable orchestration logic shared across commands
-- Examples: `get-shit-done/workflows/execute-phase.md`, `get-shit-done/workflows/execute-plan.md`
-- Pattern: Purpose + core principles + process steps + checkpoint handling + edge cases
+**Workflow Orchestration:**
+- Purpose: Multi-step process coordination with subagent management
+- Examples: `get-shit-done/workflows/execute-phase.md`, `get-shit-done/workflows/map-codebase.md`
+- Pattern: Purpose statement + philosophy + process steps + agent spawning logic
 
-**Plan:**
-- Purpose: Executable prompt containing 2-3 atomic tasks
-- Location: `.planning/phases/{NN}-{slug}/{NN}-{MM}-PLAN.md`
-- Pattern: Frontmatter (phase, plan, wave, autonomous, depends_on) + objective + context (@-references) + tasks (with verification) + success criteria
-
-**Wave:**
-- Purpose: Dependency-aware execution group for parallel task processing
-- Implementation: Plans tagged with `wave: N` in frontmatter
-- Pattern: Wave 1 (no dependencies) → Wave 2 (depends on Wave 1) → Wave 3 (depends on Wave 2)
-
-**Checkpoint:**
-- Purpose: Pause point for user input during long-running agent execution
-- Implementation: Tasks with `type="checkpoint"` in plan XML
-- Pattern: Agent executes to checkpoint → Returns structured state → Orchestrator presents to user → Spawns fresh continuation agent
+**Template Structure:**
+- Purpose: Skeleton for generated artifacts with placeholders
+- Examples: `get-shit-done/templates/project.md`, `get-shit-done/templates/phase-prompt.md`
+- Pattern: Frontmatter + section headers + [Placeholder] markers + guidance
 
 ## Entry Points
 
-**CLI Installation:**
+**NPX Installation Entry:**
 - Location: `bin/install.js`
-- Triggers: `npx get-shit-done-cc [--global|--local|--copilot]`
-- Responsibilities: Copy commands, agents, workflows, templates, references to target directory (~/.claude or ./.claude or ./.github)
+- Triggers: `npx get-shit-done-cc [options]`
+- Responsibilities: Parse args, detect target (Claude/Copilot), copy assets, configure statusline
 
-**Project Initialization:**
-- Location: `commands/gsd/new-project.md`
-- Triggers: `/gsd:new-project` command
-- Responsibilities: Question user → Optional research → Extract requirements → Generate roadmap → Create PROJECT.md, ROADMAP.md, STATE.md, config.json
+**Command Invocation Entry:**
+- Location: `commands/gsd/<command>.md`
+- Triggers: User types `/gsd:command` in Claude Code or `gsd:command` in Copilot CLI
+- Responsibilities: Load context, execute workflow, manage state, output results
 
-**Phase Planning:**
-- Location: `commands/gsd/plan-phase.md`
-- Triggers: `/gsd:plan-phase N` command
-- Responsibilities: Research domain → Create atomic plans → Verify plans → Write PLAN.md files
-
-**Phase Execution:**
-- Location: `commands/gsd/execute-phase.md`
-- Triggers: `/gsd:execute-phase N` command
-- Responsibilities: Discover plans → Group by wave → Execute in parallel → Verify completion → Write SUMMARY.md files
-
-**Manual Verification:**
-- Location: `commands/gsd/verify-work.md`
-- Triggers: `/gsd:verify-work N` command
-- Responsibilities: Walk user through testable deliverables → Diagnose failures → Create fix plans → Write UAT.md
-
-**Progress Check:**
-- Location: `commands/gsd/progress.md`
-- Triggers: `/gsd:progress` command
-- Responsibilities: Load STATE.md → Present current position → Suggest next command
-
-**Codebase Mapping:**
-- Location: `commands/gsd/map-codebase.md`
-- Triggers: `/gsd:map-codebase` command
-- Responsibilities: Spawn 4 parallel `gsd-codebase-mapper` agents → Write STACK.md, ARCHITECTURE.md, STRUCTURE.md, CONVENTIONS.md, TESTING.md, INTEGRATIONS.md, CONCERNS.md to `.planning/codebase/`
+**Skill Loader Entry (Copilot):**
+- Location: `lib-ghcc/SKILL.md`, `.github/skills/get-shit-done/SKILL.md`
+- Triggers: Copilot CLI detects skill invocation
+- Responsibilities: Map slash commands to command files, load @references, provide tool mappings
 
 ## Error Handling
 
-**Strategy:** Fail fast with clear error messages, provide recovery guidance
+**Strategy:** Defensive validation with early exits
 
 **Patterns:**
-- Validation checks at command start (project exists, phase exists, git initialized)
-- Bash error handling: `command || { echo "ERROR: ..."; exit 1; }`
-- Agent failures: Orchestrator presents error, suggests retry or manual intervention
-- Checkpoint system: Long-running agents pause for user input rather than guessing
-- Git integration: Atomic commits per task enable surgical rollback
+- Pre-flight checks at start of each command (e.g., "Abort if project exists")
+- Explicit error messages with user guidance (e.g., "ERROR: No phase directory matching '5'")
+- State reconstruction offers when STATE.md missing
+- Git repo existence validation before operations
+- File existence checks before read operations
 
 ## Cross-Cutting Concerns
 
-**Logging:** Status messages with Unicode symbols (◆ for spawning, ✓ for success, ⚠ for warnings)
+**Logging:** Minimal - relies on git commits for audit trail, bash output for real-time status
 
-**Validation:** 
-- Argument parsing and normalization (phase numbers, flags)
-- File existence checks before operations
-- Git repository validation
-- Roadmap consistency verification
+**Validation:** Pre-flight checks in commands, state existence validation, git status checks
 
-**Authentication:** Not applicable (local CLI tool, no external auth)
+**Authentication:** Not applicable - local filesystem operations only
 
-**Context Management:**
-- Orchestrators stay at ~15-30% context usage
-- Agents get fresh 200k token contexts
-- @-references load context on-demand
-- State documents sized to avoid degradation (hard limits enforced)
+**Path Resolution:** Dynamic path rewriting during install (Claude: `~/.claude`, Copilot: `.github/skills/get-shit-done`)
 
-**Git Integration:**
-- Atomic commits per task with conventional commit format
-- Phase-prefixed commit messages: `feat({phase}): description`
-- Automatic staging and committing in executors
-- Tag creation on milestone completion
+**Version Management:** Update check hook (`hooks/gsd-check-update.js`), version display in statusline
 
-**Parallel Execution:**
-- Task tool spawns multiple agents simultaneously
-- Wave-based dependency management prevents race conditions
-- Executors write to isolated plan-specific files (no conflicts)
-
-**Dual Installation Support:**
-- Single codebase supports both Claude Code (~/.claude) and GitHub Copilot CLI (./.github)
-- SKILL.md and copilot-instructions.md provide Copilot-specific guidance
-- Path references use placeholders (~/.claude) with runtime resolution
+**Context Engineering:** @reference includes, template-based generation, subagent isolation for fresh context
 
 ---
 

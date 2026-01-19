@@ -5,279 +5,307 @@
 ## Test Framework
 
 **Runner:**
-- None configured in codebase
-- No test dependencies in `package.json`
-- No test configuration files detected
+- Not detected
+- No test configuration files found (no jest.config.*, vitest.config.*, etc.)
 
 **Assertion Library:**
-- Not applicable - no tests exist
+- Not detected
 
 **Run Commands:**
-```bash
-# No test commands configured
-# See TDD plan setup guidance below
-```
+- No test scripts defined in `package.json`
+- Package.json does not include test dependencies
+
+**Status:**
+This project does not have automated tests. Testing is manual and relies on:
+1. Installation verification in `bin/install.js` via `verifyInstalled()` functions
+2. File existence checks after operations
+3. Manual testing of Claude Code/Copilot CLI integration
 
 ## Test File Organization
 
 **Location:**
-- No existing test files detected
-- No established pattern
+- No test files detected (no `*.test.js`, `*.spec.js`, `__tests__/` directories)
 
-**Naming:**
-- Per TDD reference, supports: `*.test.ts`, `*.spec.ts`
-- Can be co-located or in `__tests__/` or `tests/` directories
+**Pattern:**
+- Not applicable — no test suite present
 
-**Structure:**
-```
-No tests directory structure exists yet
-```
+## Verification Patterns
 
-## TDD Philosophy
-
-**Core Principle:**
-> Can you write `expect(fn(input)).toBe(output)` before writing `fn`?
-> Yes → TDD plan | No → Standard plan
-
-**From `get-shit-done/references/tdd.md`:**
-
-TDD is about design quality, not coverage metrics. The red-green-refactor cycle forces thinking about behavior before implementation.
-
-## Test Structure
-
-**When to use TDD (create dedicated TDD plan):**
-- Business logic with defined inputs/outputs
-- API endpoints with request/response contracts
-- Data transformations, parsing, formatting
-- Validation rules and constraints
-- Algorithms with testable behavior
-- State machines and workflows
-- Utility functions with clear specifications
-
-**Skip TDD (use standard plan):**
-- UI layout, styling, visual components
-- Configuration changes
-- Glue code connecting existing components
-- One-off scripts and migrations
-- Simple CRUD with no business logic
-- Exploratory prototyping
-
-**Suite Organization:**
-```markdown
-One feature per TDD plan. TDD plans produce 2-3 commits:
-- RED: Write failing test
-- GREEN: Implement to pass
-- REFACTOR: Clean up (if needed)
+**Installation Verification:**
+```javascript
+function verifyInstalled(dirPath, description) {
+  if (!fs.existsSync(dirPath)) {
+    console.error(`Failed to install ${description}: directory not created`);
+    return false;
+  }
+  try {
+    const entries = fs.readdirSync(dirPath);
+    if (entries.length === 0) {
+      console.error(`Failed to install ${description}: directory is empty`);
+      return false;
+    }
+  } catch (e) {
+    console.error(`Failed to install ${description}: ${e.message}`);
+    return false;
+  }
+  return true;
+}
 ```
 
-## Mocking
+**File Verification:**
+```javascript
+function verifyFileInstalled(filePath, description) {
+  if (!fs.existsSync(filePath)) {
+    console.error(`Failed to install ${description}: file not created`);
+    return false;
+  }
+  return true;
+}
+```
 
-**Framework:** Not configured
+**Location:**
+- `bin/install.js` lines 251-278
 
-**Patterns:**
-- Test behavior, not implementation
-- Test public API, observable behavior
-- Avoid mocking internals or private methods
+## Testing Strategy
 
-## Test Quality Guidelines
+**Manual Testing:**
+The project uses human verification checkpoints defined in markdown:
 
-**Good Tests:**
-- Test behavior, not implementation: "returns formatted date string"
-- One concept per test: Separate tests for valid input, empty input, malformed input
-- Descriptive names: "should reject empty email", "returns null for invalid ID"
-- No implementation details: Test public API only
+```xml
+<task type="checkpoint:human-verify" gate="blocking">
+  <what-built>Description of what was built</what-built>
+  <how-to-verify>
+    1. Step-by-step verification instructions
+    2. Expected behavior
+    3. URLs or commands to test
+  </how-to-verify>
+  <resume-signal>How to continue after verification</resume-signal>
+</task>
+```
 
-**Bad Tests:**
-- Testing implementation: "calls formatDate helper with correct params"
-- Multiple concepts in one test
-- Generic names: "test1", "handles error", "works correctly"
-- Testing internal state
+**Reference:** `get-shit-done/references/checkpoints.md`
 
-## Framework Setup (First TDD Plan)
+**Integration Testing:**
+- Tests run in actual Claude Code/GitHub Copilot CLI environment
+- Users verify commands work: `/gsd:help`, `/gsd:new-project`, etc.
+- Installation verification built into installer script
 
-**When executing first TDD plan, set up testing:**
+## Verification Commands
 
-**1. Detect project type:**
+**Bash Verification Patterns:**
+
+Used throughout command/workflow files to verify prerequisites:
+
 ```bash
-if [ -f package.json ]; then echo "node"; fi
-if [ -f requirements.txt ] || [ -f pyproject.toml ]; then echo "python"; fi
-if [ -f go.mod ]; then echo "go"; fi
-if [ -f Cargo.toml ]; then echo "rust"; fi
+# Check file existence
+[ -f .planning/PROJECT.md ] && echo "exists"
+
+# Count files
+ls .planning/todos/pending/*.md 2>/dev/null | wc -l
+
+# Verify git repo
+[ -d .git ] || [ -f .git ]
+
+# Detect code files
+find . -name "*.ts" -o -name "*.js" | grep -v node_modules
+
+# Verify command success
+curl -X POST localhost:3000/api/auth/login | grep "200"
 ```
 
-**2. Install minimal framework:**
+**Examples:**
+- `commands/gsd/new-project.md` — Brownfield detection
+- `commands/gsd/check-todos.md` — TODO counting
+- `agents/gsd-verifier.md` — Goal-backward verification
 
-| Project | Framework | Install |
-|---------|-----------|---------|
-| Node.js | Jest | `npm install -D jest @types/jest ts-jest` |
-| Node.js (Vite) | Vitest | `npm install -D vitest` |
-| Python | pytest | `pip install pytest` |
-| Go | testing | Built-in |
-| Rust | cargo test | Built-in |
+## Mock Data & Fixtures
 
-**3. Create config:**
-- Jest: `jest.config.js` with ts-jest preset
-- Vitest: `vitest.config.ts` with test globals
-- pytest: `pytest.ini` or `pyproject.toml` section
+**Not applicable** — No test suite present
 
-**4. Verify setup:**
-```bash
-npm test  # Node
-pytest    # Python
-go test ./...  # Go
-cargo test    # Rust
-```
-
-## TDD Plan Structure
-
-**Frontmatter:**
-```yaml
----
-phase: XX-name
-plan: NN
-type: tdd
----
-```
-
-**Sections:**
-```markdown
-<objective>
-[What feature and why]
-Purpose: [Design benefit of TDD for this feature]
-Output: [Working, tested feature]
-</objective>
-
-<feature>
-  <name>[Feature name]</name>
-  <files>[source file, test file]</files>
-  <behavior>
-    [Expected behavior in testable terms]
-    Cases: input → expected output
-  </behavior>
-  <implementation>[How to implement once tests pass]</implementation>
-</feature>
-
-<verification>
-[Test command that proves feature works]
-</verification>
-
-<success_criteria>
-- Failing test written and committed
-- Implementation passes test
-- Refactor complete (if needed)
-- All 2-3 commits present
-</success_criteria>
-```
-
-## Red-Green-Refactor Cycle
-
-**RED - Write failing test:**
-1. Create test file following project conventions
-2. Write test describing expected behavior
-3. Run test - it MUST fail
-4. If test passes: feature exists or test is wrong
-5. Commit: `test({phase}-{plan}): add failing test for [feature]`
-
-**GREEN - Implement to pass:**
-1. Write minimal code to make test pass
-2. No cleverness, no optimization - just make it work
-3. Run test - it MUST pass
-4. Commit: `feat({phase}-{plan}): implement [feature]`
-
-**REFACTOR (if needed):**
-1. Clean up implementation if obvious improvements exist
-2. Run tests - MUST still pass
-3. Only commit if changes made: `refactor({phase}-{plan}): clean up [feature]`
-
-## Commit Pattern
-
-**TDD commits follow project standard:**
-```bash
-# RED phase
-test(08-02): add failing test for email validation
-
-- Tests valid email formats accepted
-- Tests invalid formats rejected
-- Tests empty input handling
-
-# GREEN phase
-feat(08-02): implement email validation
-
-- Regex pattern matches RFC 5322
-- Returns boolean for validity
-- Handles edge cases (empty, null)
-
-# REFACTOR phase (optional)
-refactor(08-02): extract regex to constant
-
-- Moved pattern to EMAIL_REGEX constant
-- No behavior changes
-- Tests still pass
-```
-
-**Format:** `{type}({phase}-{plan}): {description}`
-
-**Types:**
-- `test` - Test-only (TDD RED)
-- `feat` - Feature implementation (TDD GREEN)
-- `refactor` - Code cleanup (TDD REFACTOR)
-- `fix` - Bug fix
-- `perf` - Performance improvement
-- `chore` - Dependencies, config, tooling
+**Pattern:**
+Templates in `get-shit-done/templates/` serve as fixtures for document generation:
+- `project.md` — PROJECT.md template
+- `roadmap.md` — ROADMAP.md template
+- `phase-prompt.md` — PLAN.md template
+- `verification-report.md` — VERIFICATION.md template
 
 ## Coverage
 
-**Requirements:** No coverage targets enforced
+**Requirements:** None enforced
 
-**Philosophy:** 
-- TDD is about design quality, not coverage metrics
-- Focus on behavioral testing over coverage percentages
-- Coverage emerges from TDD discipline
+**Status:** No coverage tooling
 
-## Context Budget
+**Alternative Quality Measures:**
+1. GSD Verifier Agent (`agents/gsd-verifier.md`) — Goal-backward verification
+2. Plan Checker Agent (`agents/gsd-plan-checker.md`) — Plan quality analysis
+3. Integration Checker Agent (`agents/gsd-integration-checker.md`) — Cross-phase verification
 
-**TDD plans target ~40% context usage** (lower than standard plans' ~50%)
+## Test Types
 
-**Why lower:**
-- RED phase: write test, run test, potentially debug why it didn't fail
-- GREEN phase: implement, run test, potentially iterate on failures
-- REFACTOR phase: modify code, run tests, verify no regressions
+**Unit Tests:**
+- Not present
 
-Each phase involves reading files, running commands, analyzing output. The back-and-forth is inherently heavier than linear task execution.
+**Integration Tests:**
+- Manual integration testing via Claude Code/Copilot CLI
+- Installation script verification functions act as integration tests
 
-## Error Handling
+**E2E Tests:**
+- Manual E2E flows documented in workflows
+- Human verification checkpoints in plans
 
-**Test doesn't fail in RED phase:**
-- Feature may already exist - investigate
-- Test may be wrong (not testing what you think)
-- Fix before proceeding
+## Quality Assurance Approach
 
-**Test doesn't pass in GREEN phase:**
-- Debug implementation
-- Don't skip to refactor
-- Keep iterating until green
+**Document-Driven Verification:**
 
-**Tests fail in REFACTOR phase:**
-- Undo refactor
-- Commit was premature
-- Refactor in smaller steps
+The system uses markdown documents with embedded verification logic:
 
-**Unrelated tests break:**
-- Stop and investigate
-- May indicate coupling issue
-- Fix before proceeding
+**Example from `agents/gsd-verifier.md`:**
+```bash
+# Check for incomplete implementations
+grep -E "(TODO|FIXME|XXX|HACK|PLACEHOLDER)" "$file"
 
-## Current State
+# Check for empty stubs
+grep -c -E "TODO|FIXME|placeholder|not implemented|coming soon" "$path"
 
-**Test infrastructure:** Not configured
+# Find console.log debugging
+grep -rn "console\.log" src/ --include="*.ts"
+```
 
-**Test files:** None exist
+**Goal-Backward Verification:**
+1. Read phase goal from ROADMAP.md
+2. Analyze actual implementation
+3. Verify implementation achieves goal
+4. Generate VERIFICATION.md report
 
-**Next steps when adding tests:**
-1. First TDD plan will install framework (see Framework Setup above)
-2. Follow TDD plan structure from `get-shit-done/references/tdd.md`
-3. Create dedicated TDD plan per feature (not batched)
-4. Follow RED-GREEN-REFACTOR cycle with atomic commits
+**Pattern:**
+- Each phase ends with `/gsd:verify-work` command
+- Spawns `gsd-verifier` agent with fresh context
+- Agent reads goal, inspects code, produces verification report
+- Documents gaps between promise and delivery
+
+## Common Verification Patterns
+
+**File Structure Verification:**
+```bash
+# Verify required files exist
+required_files=("src/index.ts" "package.json" "README.md")
+for file in "${required_files[@]}"; do
+  [ -f "$file" ] || echo "Missing: $file"
+done
+```
+
+**API Testing:**
+```bash
+# Test endpoint
+curl -X POST http://localhost:3000/api/endpoint \
+  -H "Content-Type: application/json" \
+  -d '{"key": "value"}' \
+  | grep "200"
+```
+
+**Build Verification:**
+```bash
+# Build and check success
+npm run build && [ -d dist ] && echo "Build successful"
+```
+
+**Deployment Verification:**
+```bash
+# Verify deployment
+vercel ls | grep "production"
+curl https://deployed-url.com | grep "expected-content"
+```
+
+## TDD Reference
+
+**Location:** `get-shit-done/references/tdd.md`
+
+**Pattern:**
+When `/gsd:plan-phase` detects testing-related phases, it includes TDD reference:
+
+**TDD Workflow:**
+1. RED: Write failing test (commit: `test(phase-plan): description`)
+2. GREEN: Minimal implementation to pass (commit: `feat(phase-plan): description`)
+3. REFACTOR: Improve code (commit: `refactor(phase-plan): description`)
+
+**Used for phases with keywords:**
+- "test", "testing", "TDD", "spec", "coverage"
+
+## Installation Testing
+
+**Self-Verification:**
+
+`bin/install.js` includes built-in verification:
+
+```javascript
+// Track installation failures
+let failed = false;
+
+// Verify commands
+failed = !verifyInstalled(commandsDir, 'commands/gsd') || failed;
+
+// Verify get-shit-done directory
+failed = !verifyInstalled(gsdDir, 'get-shit-done') || failed;
+
+// Verify agents
+failed = !verifyInstalled(agentsDir, 'agents') || failed;
+
+// If critical components failed, exit with error
+if (failed) {
+  console.error('Installation failed');
+  process.exit(1);
+}
+```
+
+**Success Output:**
+```
+  ✓ Installed commands/gsd
+  ✓ Installed get-shit-done
+  ✓ Installed agents
+  ✓ Installed CHANGELOG.md
+```
+
+## Recommendations for Adding Tests
+
+**If automated tests are added, follow these conventions:**
+
+**File Naming:**
+- Co-locate tests: `install.test.js` next to `install.js`
+- Or separate: `tests/install.test.js`
+
+**Test Structure:**
+```javascript
+describe('install', () => {
+  describe('verifyInstalled', () => {
+    it('returns false when directory does not exist', () => {
+      // Test implementation
+    });
+    
+    it('returns false when directory is empty', () => {
+      // Test implementation
+    });
+    
+    it('returns true when directory has files', () => {
+      // Test implementation
+    });
+  });
+});
+```
+
+**Mocking:**
+```javascript
+// Mock fs module
+jest.mock('fs');
+const fs = require('fs');
+
+// Mock file existence
+fs.existsSync.mockReturnValue(true);
+```
+
+**Framework Suggestion:**
+- Jest — Most common for Node.js projects
+- Vitest — Modern, fast alternative
+- Node's native test runner (`node:test`) — No dependencies
 
 ---
 

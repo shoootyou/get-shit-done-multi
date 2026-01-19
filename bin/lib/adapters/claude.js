@@ -71,17 +71,18 @@ function verify(dirs) {
     errors.push(`Commands directory missing: ${dirs.commands}`);
   }
   
-  // Check SKILL.md exists
-  const skillFile = path.join(dirs.skills, 'SKILL.md');
-  if (!fs.existsSync(skillFile)) {
-    errors.push(`SKILL.md missing: ${skillFile}`);
+  // Claude doesn't use SKILL.md (that's for Copilot/Codex only)
+  // Check for workflows directory instead (core GSD content)
+  const workflowsDir = path.join(dirs.skills, 'workflows');
+  if (!fs.existsSync(workflowsDir)) {
+    errors.push(`Workflows directory missing: ${workflowsDir}`);
   }
   
-  // Check at least one agent file exists
+  // Check at least one agent file exists (Claude uses .md not .agent.md)
   if (fs.existsSync(dirs.agents)) {
-    const agentFiles = fs.readdirSync(dirs.agents).filter(f => f.endsWith('.agent.md'));
+    const agentFiles = fs.readdirSync(dirs.agents).filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
     if (agentFiles.length === 0) {
-      errors.push(`No .agent.md files found in: ${dirs.agents}`);
+      errors.push(`No GSD agent files found in: ${dirs.agents}`);
     }
   }
   
