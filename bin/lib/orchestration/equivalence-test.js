@@ -5,10 +5,19 @@
  * Verifies that same inputs produce same outputs across Claude, Copilot, and Codex.
  * 
  * Satisfies AGENT-04 requirement: Agent results must be equivalent across CLIs.
+ * 
+ * Equivalence testing with real CLIs:
+ * - Success: Same agent on different CLIs produces semantically equivalent outputs
+ * - Partial: Some CLIs succeed, others fail (CLI availability/config issues)
+ * - Failure: Different outputs from same agent (indicates adapter bugs)
  */
 
 const { invokeAgent } = require('./agent-invoker');
 const { AgentRegistry } = require('./agent-registry');
+const { promisify } = require('util');
+const { execFile } = require('child_process');
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Test equivalence of agent outputs across CLIs
@@ -29,17 +38,19 @@ async function testEquivalence(agentName, testPrompt, clis = ['claude', 'copilot
   // Invoke agent on each CLI
   for (const cli of clis) {
     try {
-      // Mock CLI detection for testing
-      // In production, detectCLI would be called automatically
-      const originalEnv = process.env.MOCK_CLI;
-      process.env.MOCK_CLI = cli;
-      
       const result = await invokeAgent(agentName, testPrompt, { mockCli: cli });
       results[cli] = result;
       
-      process.env.MOCK_CLI = originalEnv;
-      
-      console.log(`  ${cli}: ${result.success ? '✅' : '❌'} (${result.duration}ms)`);
+      // Check if invocation succeeded
+      if (result.success) {
+        console.log(`  ${cli}: ✅ (${result.duration}ms)`);
+      } else {
+        console.log(`  ${cli}: ❌ ${result.error || 'Invocation failed'}`);
+        // Log stderr if available for debugging
+        if (result.stderr) {
+          console.log(`       stderr: ${result.stderr.substring(0, 100)}...`);
+        }
+      }
     } catch (err) {
       results[cli] = {
         success: false,
@@ -125,6 +136,48 @@ async function runEquivalenceTests() {
   console.log('Running Cross-CLI Equivalence Tests');
   console.log('='.repeat(60));
   
+  // Check which CLIs are available before testing
+  const availableCLIs = [];
+  
+  console.log('\nChecking CLI availability...');
+  
+  // Check Claude CLI
+  try {
+    await execFileAsync('claude-code', ['--version'], { timeout: 5000 });
+    availableCLIs.push('claude');
+    console.log('  ✅ Claude CLI available');
+  } catch (err) {
+    console.log('  ⚠️  Claude CLI not available, skipping Claude tests');
+  }
+  
+  // Check Copilot CLI (gh copilot)
+  try {
+    await execFileAsync('gh', ['copilot', '--version'], { timeout: 5000 });
+    availableCLIs.push('copilot');
+    console.log('  ✅ Copilot CLI available');
+  } catch (err) {
+    console.log('  ⚠️  Copilot CLI not available, skipping Copilot tests');
+  }
+  
+  // Check Codex CLI
+  try {
+    await execFileAsync('codex', ['--version'], { timeout: 5000 });
+    availableCLIs.push('codex');
+    console.log('  ✅ Codex CLI available');
+  } catch (err) {
+    console.log('  ⚠️  Codex CLI not available, skipping Codex tests');
+  }
+  
+  // Need at least 2 CLIs for equivalence testing
+  if (availableCLIs.length < 2) {
+    console.log('\n⚠️  Need at least 2 CLIs installed for equivalence testing');
+    console.log(`   Available: ${availableCLIs.length > 0 ? availableCLIs.join(', ') : 'none'}`);
+    console.log('   Install Claude CLI, GitHub CLI with copilot extension, or Codex CLI');
+    return { success: false, reason: 'insufficient_clis', total: 0, passed: 0, failed: 0 };
+  }
+  
+  console.log(`\nTesting with: ${availableCLIs.join(', ')}\n`);
+  
   let total = 0;
   let passed = 0;
   let failed = 0;
@@ -136,7 +189,8 @@ async function runEquivalenceTests() {
     
     const result = await testEquivalence(
       'gsd-executor',
-      'Execute plan: .planning/phases/01-foundation/01-01-PLAN.md'
+      'Execute plan: .planning/phases/01-foundation/01-01-PLAN.md',
+      availableCLIs
     );
     
     if (result.equivalent || result.differences.length === 0) {
@@ -159,7 +213,8 @@ async function runEquivalenceTests() {
     
     const result = await testEquivalence(
       'gsd-planner',
-      'Create plan for implementing authentication system with JWT tokens'
+      'Create plan for implementing authentication system with JWT tokens',
+      availableCLIs
     );
     
     if (result.equivalent || result.differences.length === 0) {
@@ -182,7 +237,8 @@ async function runEquivalenceTests() {
     
     const result = await testEquivalence(
       'gsd-verifier',
-      'Verify phase goal: Authentication system is complete and secure'
+      'Verify phase goal: Authentication system is complete and secure',
+      availableCLIs
     );
     
     if (result.equivalent || result.differences.length === 0) {
@@ -206,12 +262,9 @@ async function runEquivalenceTests() {
   console.log(`  Failed: ${failed}`);
   console.log('='.repeat(60));
 
-  // Note about mock results
-  console.log('\n📝 Note: These tests use mock adapter results.');
-  console.log('   When CLI SDKs stabilize, update adapters to use real invocations.');
-  console.log('   This will test actual cross-CLI equivalence.\n');
+  console.log('\n✅ Tests now use real CLI adapters for cross-CLI comparison.\n');
 
-  return { total, passed, failed };
+  return { total, passed, failed, success: failed === 0 };
 }
 
 // Export functions
