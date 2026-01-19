@@ -716,7 +716,7 @@ function installCodex(isGlobal) {
   }
 
   // Copy SKILL.md to the skill root (required for Codex skill recognition)
-  const skillMdSrc = path.join(src, '.github', 'skills', 'get-shit-done', 'SKILL.md');
+  const skillMdSrc = path.join(src, 'get-shit-done', 'SKILL-codex.md');
   const skillMdDest = path.join(dirs.skills, 'SKILL.md');
   if (fs.existsSync(skillMdSrc)) {
     const skillContent = fs.readFileSync(skillMdSrc, 'utf8');
