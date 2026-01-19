@@ -843,7 +843,22 @@ function installAll() {
       const { settingsPath, settings, statuslineCommand } = install(true);
       // Skip statusline prompts in batch mode
       finishInstall(settingsPath, settings, statuslineCommand, false);
-      results.push({ cli: 'Claude Code', success: true });
+      
+      // Capture verification
+      const dirs = claudeAdapter.getTargetDirs(true);
+      const verifyResult = claudeAdapter.verify(dirs);
+      const commandCount = verifyResult.success ? 
+        fs.readdirSync(dirs.commands).filter(f => f.endsWith('.md')).length : 0;
+      const agentCount = verifyResult.success ?
+        fs.readdirSync(dirs.agents).filter(f => f.endsWith('.agent.md')).length : 0;
+      
+      results.push({ 
+        cli: 'Claude Code', 
+        success: true,
+        commands: commandCount,
+        agents: agentCount,
+        verified: verifyResult.success
+      });
     } catch (err) {
       console.error(`  ${yellow}⚠ Claude installation failed: ${err.message}${reset}\n`);
       results.push({ cli: 'Claude Code', success: false, error: err.message });
@@ -855,7 +870,22 @@ function installAll() {
     console.log(`  ${cyan}━━━ GitHub Copilot CLI ━━━${reset}\n`);
     try {
       installCopilot();
-      results.push({ cli: 'GitHub Copilot CLI', success: true });
+      
+      // Capture verification
+      const dirs = copilotAdapter.getTargetDirs(false);
+      const verifyResult = copilotAdapter.verify(dirs);
+      const skillFiles = verifyResult.success ?
+        fs.readdirSync(dirs.skills).filter(f => f.endsWith('.md')).length : 0;
+      const agentCount = verifyResult.success ?
+        fs.readdirSync(dirs.agents).filter(f => f.endsWith('.agent.md')).length : 0;
+      
+      results.push({ 
+        cli: 'GitHub Copilot CLI', 
+        success: true,
+        commands: skillFiles,
+        agents: agentCount,
+        verified: verifyResult.success
+      });
     } catch (err) {
       console.error(`  ${yellow}⚠ Copilot installation failed: ${err.message}${reset}\n`);
       results.push({ cli: 'GitHub Copilot CLI', success: false, error: err.message });
@@ -867,7 +897,22 @@ function installAll() {
     console.log(`  ${cyan}━━━ Codex CLI ━━━${reset}\n`);
     try {
       installCodex(true); // Global install
-      results.push({ cli: 'Codex CLI', success: true });
+      
+      // Capture verification
+      const dirs = codexAdapter.getTargetDirs(true);
+      const verifyResult = codexAdapter.verify(dirs);
+      const skillFiles = verifyResult.success ?
+        fs.readdirSync(dirs.skills).filter(f => f.endsWith('.md')).length : 0;
+      const agentDirs = verifyResult.success ?
+        fs.readdirSync(dirs.agents).filter(f => fs.statSync(path.join(dirs.agents, f)).isDirectory()).length : 0;
+      
+      results.push({ 
+        cli: 'Codex CLI', 
+        success: true,
+        commands: skillFiles,
+        agents: agentDirs,
+        verified: verifyResult.success
+      });
     } catch (err) {
       console.error(`  ${yellow}⚠ Codex installation failed: ${err.message}${reset}\n`);
       results.push({ cli: 'Codex CLI', success: false, error: err.message });
@@ -878,11 +923,19 @@ function installAll() {
   console.log(`\n  ${cyan}━━━ Installation Summary ━━━${reset}\n`);
   results.forEach(result => {
     const status = result.success ? `${green}✓${reset}` : `${yellow}✗${reset}`;
-    console.log(`  ${status} ${result.cli}${result.error ? ` (${result.error})` : ''}`);
+    let line = `  ${status} ${result.cli}`;
+    
+    if (result.success && result.verified) {
+      line += ` ${dim}(${result.commands} commands, ${result.agents} agents)${reset}`;
+    } else if (result.error) {
+      line += ` ${dim}(${result.error})${reset}`;
+    }
+    
+    console.log(line);
   });
   
   const successCount = results.filter(r => r.success).length;
-  console.log(`\n  Installed to ${successCount}/${results.length} CLI(s)\n`);
+  console.log(`\n  ${green}✓${reset} Installed to ${successCount}/${results.length} CLI(s)\n`);
 }
 
 /**
