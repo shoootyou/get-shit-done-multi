@@ -6,64 +6,78 @@
  */
 
 /**
+ * Capability Matrix Status (Phase 4 Gap Closure Complete):
+ * 
+ * ✅ Agent registry: All 11 agents registered
+ * ✅ Agent invoker: CLI-agnostic invocation layer
+ * ✅ Adapters: Real CLI command execution (not mocks)
+ * ✅ Performance tracking: Sub-millisecond precision
+ * ✅ Command integration: User-facing invoke-agent command
+ * 
+ * Level 'full' indicates infrastructure complete and CLI execution implemented.
+ * Actual availability depends on CLI installation (claude-code, gh, codex).
+ * Use /gsd:invoke-agent to test agent availability on your system.
+ */
+
+/**
  * Agent capability definitions across all three CLI platforms
  * Level values: 'full', 'partial', 'unsupported'
  */
 const AGENT_CAPABILITIES = {
   'gsd-executor': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-planner': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-verifier': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-debugger': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-phase-researcher': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-plan-checker': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-codebase-mapper': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-project-researcher': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-research-synthesizer': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-roadmapper': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   },
   'gsd-integration-checker': {
-    claude: { level: 'full', notes: 'Native support, no limitations' },
-    copilot: { level: 'full', notes: 'Custom agent, full feature parity' },
-    codex: { level: 'full', notes: 'Skill-based, all features supported' }
+    claude: { level: 'full', notes: 'Real CLI execution via claude-code command (requires Claude CLI installed)' },
+    copilot: { level: 'full', notes: 'Real CLI execution via gh copilot command (requires GitHub CLI + copilot extension)' },
+    codex: { level: 'full', notes: 'Real CLI execution via codex skill command (requires Codex CLI installed)' }
   }
 };
 
