@@ -756,7 +756,7 @@ function installCodex(isGlobal) {
   }
 
   // Codex: convert agents to skill format (folder-per-skill structure)
-  const agentsSrc = path.join(src, 'agents');
+  const agentsSrc = path.join(src, '.github', 'agents');
   if (fs.existsSync(agentsSrc)) {
     const agentFiles = fs.readdirSync(agentsSrc).filter(f => f.endsWith('.agent.md'));
     for (const agentFile of agentFiles) {
