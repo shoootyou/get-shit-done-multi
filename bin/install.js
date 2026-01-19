@@ -8,6 +8,7 @@ const { detectInstalledCLIs, getDetectedCLIsMessage } = require('./lib/detect');
 const { getConfigPaths } = require('./lib/paths');
 const { preserveUserData, restoreUserData } = require('./lib/upgrade');
 const { replaceClaudePaths } = require('./lib/adapters/shared/path-rewriter');
+const { getRecommendations } = require('../lib-ghcc/cli-recommender');
 const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
@@ -84,6 +85,14 @@ if (hasHelp) {
     ${cyan}-h, --help${reset}                Show this help message
     ${cyan}--force-statusline${reset}        Replace existing statusline config
 
+  ${yellow}CLI Recommendations:${reset}
+    ${green}Claude Code${reset}              Recommended for solo developers - fastest startup, native agent support
+    ${green}GitHub Copilot CLI${reset}       Recommended for teams - GitHub integration, collaborative workflows
+    ${green}Codex CLI${reset}                Recommended for OpenAI users - integrates with existing OpenAI workflows
+
+    ${dim}Multi-CLI Setup:${reset} You can install GSD for multiple CLIs and switch between them
+    seamlessly. Run with ${cyan}--all${reset} to install for all detected CLIs at once.
+
   ${yellow}Examples:${reset}
     ${dim}# Install to all detected CLIs in one command${reset}
     npx get-shit-done-cc --all
@@ -124,10 +133,37 @@ if (hasAll) {
   process.exit(0);
 }
 
-// Display detected CLIs
+// Display detected CLIs and recommendations
 const detected = detectInstalledCLIs();
-const detectionMsg = getDetectedCLIsMessage(detected);
-console.log(`  ${dim}${detectionMsg}${reset}\n`);
+const currentCLIs = Object.entries(detected)
+  .filter(([_, isInstalled]) => isInstalled)
+  .map(([cli, _]) => cli);
+
+// Get intelligent recommendations
+const recommendations = getRecommendations({
+  currentCLIs,
+  platform: os.platform()
+});
+
+// Display CLI status
+console.log(`  ${cyan}CLI Status:${reset}`);
+for (const cli of recommendations.installed) {
+  console.log(`  ${green}✓${reset} ${cli.message}`);
+}
+for (const cli of recommendations.available) {
+  console.log(`  ${dim}○${reset} ${cli.message}`);
+}
+
+// Display recommendation
+console.log(`\n  ${cyan}Recommendation:${reset}`);
+console.log(`  ${recommendations.recommendation}`);
+
+// Display platform notes if any
+if (recommendations.platformNotes.length > 0) {
+  console.log(`\n  ${dim}Note: ${recommendations.platformNotes.join(', ')}${reset}`);
+}
+
+console.log(); // Empty line for spacing
 
 /**
  * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
