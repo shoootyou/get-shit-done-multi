@@ -62,7 +62,11 @@ function convertContent(content, type) {
   // Step 1: Replace Claude paths with Codex paths
   let converted = replaceClaudePaths(content, '.codex/skills/get-shit-done/', { isLocal: true });
   
-  // Step 2: For agents, apply format conversion
+  // Step 2: Replace /gsd: command syntax with /gsd/ (Codex prompt syntax)
+  converted = converted.replace(/\/gsd:/g, '/gsd/');
+  converted = converted.replace(/`\/gsd:/g, '`/gsd/');
+  
+  // Step 3: For agents, apply format conversion
   if (type === 'agent') {
     // Extract agent name from content or use default
     const nameMatch = converted.match(/name:\s*(.+)/);
