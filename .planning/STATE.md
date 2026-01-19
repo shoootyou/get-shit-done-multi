@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 4 of 6 (Agent Translation)  
-**Plan:** 02 of 4 (completed)  
-**Status:** Phase 4 in progress  
-**Progress:** `█████████████` 100% (13 of 13 total plans complete)
+**Plan:** 04 of 4 (completed)  
+**Status:** Phase 4 complete  
+**Progress:** `███████████████` 115% (15 of 13 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 04-02-PLAN.md (Agent performance tracking)
+**Last activity:** 2026-01-19 - Completed 04-04-PLAN.md (Result validation and error recovery)
 
-**Next Action:** Execute 04-03-PLAN.md (Prompt templates and adaptation)
+**Next Action:** Begin Phase 5 (Testing & Verification)
 
 ---
 
@@ -94,6 +94,18 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 04 | 02 | Singleton PerformanceTracker instance | Shared across all invocations for consistent metrics collection |
 | 04 | 02 | Track failed execution times | Record duration even on failure for complete performance picture |
 | 04 | 02 | .planning/metrics/ excluded from git | Runtime performance data is not source code, aligns with .planning/ exclusion convention |
+| 04 | 03 | Default all agents to 'full' capability on all CLIs | Phase 4 baseline assumption - real-world limitations may emerge during testing |
+| 04 | 03 | Three support levels (full/partial/unsupported) | Simple classification mapping to icons: ✓ (full), ⚠ (partial), ✗ (unsupported) |
+| 04 | 03 | Separate CLI limitations from agent capabilities | Platform constraints affect all agents, document once rather than repeating |
+| 04 | 03 | Include generation timestamp in docs | Helps users know documentation freshness and debugging |
+| 04 | 04 | Use async fs.promises for all validation methods | Non-blocking I/O prevents performance degradation during validation |
+| 04 | 04 | Define requiredStructure object with type expectations | Clear mapping of required files/directories makes validation explicit and maintainable |
+| 04 | 04 | validateAgentOutput checks PLAN.md structure | Ensures PLAN files have proper frontmatter, objective, tasks, verification sections |
+| 04 | 04 | Equivalence tests support multiple comparison modes | Exact, semantic, and structural comparison enables flexible cross-CLI output validation |
+| 04 | 04 | User-facing validation tool before CLI switching | validate-planning-dir.js provides clear validation report with status indicators |
+| 04 | 03 | Programmatic regeneration API | generateCapabilityDocs() enables automated doc updates when capabilities change |
+| 04 | 03 | Structured capability format (level + notes) | Enables both programmatic logic (level) and user communication (notes) |
+| 04 | 03 | Visual icons for quick scanning | Users can quickly scan ✓/⚠/✗ before reading detailed notes |
 
 ### Technical Discoveries
 
@@ -120,6 +132,17 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Agent Registry Pattern:** Map-based storage with O(1) lookup, capability tracking, getAgent/setCapability API
 - **Agent Invoker Pattern:** Detect CLI → load registry → validate → load adapter → invoke
 - **Adapter invokeAgent signature:** (agent, prompt, options) → {success, cli, agent, result, duration}
+- **Capability Matrix Pattern:** AGENT_CAPABILITIES object with nested CLI properties (level + notes per agent/CLI combo)
+- **Documentation Generation Pattern:** Transform structured capability data to markdown with table, notes, and limitations
+- **Support Level Iconography:** ✓/⚠/✗ for visual scanning, maps to full/partial/unsupported
+- **CLI Limitations Tracking:** Platform constraints documented separately with feature flags and notes
+- **Matrix Generation API:** generateCapabilityMatrix() returns array for programmatic use and documentation generation
+- **Result Validation Pattern:** Structured results with {valid, errors, warnings} for comprehensive validation feedback
+- **Directory Structure Validation:** Check required files/directories with type verification (file vs directory)
+- **JSON Parsing Validation:** Catch SyntaxError and return descriptive messages for malformed JSON
+- **Agent Output Validation:** Check PLAN files for frontmatter, required sections (objective, tasks, verification)
+- **Equivalence Testing Pattern:** Compare agent outputs with exact, semantic (whitespace-normalized), and structural (JSON keys) matching
+- **User-facing Validation Tools:** CLI scripts with status indicators (✅ ❌ ⚠️) and exit codes for scripting integration
 
 ### Open Questions
 
@@ -145,8 +168,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Phase 3 complete - Command system foundation ready
 - [x] Complete Phase 4 Plan 01 (agent orchestration core)
 - [x] Complete Phase 4 Plan 02 (performance tracking)
-- [ ] Complete Phase 4 Plan 03 (prompt templates and adaptation)
-- [ ] Complete Phase 4 Plan 04 (result validation and error recovery)
+- [x] Complete Phase 4 Plan 03 (capability matrix and documentation)
+- [x] Complete Phase 4 Plan 04 (result validation and error recovery)
+- [x] Phase 4 complete - Agent translation layer ready
+- [ ] Begin Phase 5 (Testing & Verification)
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
 
@@ -156,9 +181,9 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration with performance tracking complete.
+**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration, performance tracking, and capability matrix complete.
 
-**Starting Point:** 04-02-PLAN.md complete. Agent orchestration ready for Phase 4 Plan 03 (Prompt templates and adaptation).
+**Starting Point:** 04-03-PLAN.md complete. Ready for Phase 4 Plan 04 (Result validation and error recovery).
 
 **Key Context:**
 - **Phase 4 Plan 01 Complete:** Agent orchestration core
@@ -172,15 +197,19 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
   - Metric persistence: .planning/metrics/agent-performance.json
   - Bounded retention: Last 100 measurements per agent/CLI combo
   - Test suite: 16 tests covering instantiation, tracking, averaging, persistence
-  - Adapter Integration: invokeAgent methods in Claude, Copilot, Codex adapters
-  - Capability Tracking: full/partial/unsupported levels per agent-CLI combination
-  - Mock Results: Enable testing orchestration layer before CLI SDKs available
+- **Phase 4 Plan 03 Complete:** Capability matrix and documentation
+  - AGENT_CAPABILITIES: All 11 agents with full support on Claude, Copilot, Codex
+  - CLI_LIMITATIONS: Platform constraints documented (slash commands, agents, parallel)
+  - generateCapabilityMatrix(): Returns structured array for programmatic use
+  - generateCapabilityDocs(): Auto-generates markdown documentation
+  - docs/agent-capabilities.md: 124 lines with table, notes, limitations
+  - Support level icons: ✓/⚠/✗ for quick visual scanning
 - **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Ready for Phase 4 Plan 03:** Prompt templates and adaptation for CLI-specific formatting
+- **Ready for Phase 4 Plan 04:** Result validation and error recovery
 
-**Last Session:** 2026-01-19 20:46-20:50 UTC
-**Stopped at:** Completed 04-02-PLAN.md (Agent performance tracking)
+**Last Session:** 2026-01-19 20:53-20:56 UTC
+**Stopped at:** Completed 04-03-PLAN.md (Capability matrix and documentation)
 **Resume file:** None
 
 ---

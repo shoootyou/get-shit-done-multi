@@ -121,4 +121,4 @@ Platform constraints that affect GSD workflow execution:
 ---
 
 *This document is auto-generated from capability-matrix.js*  
-*Last updated: 2026-01-19T20:54:56.922Z*
+*Last updated: 2026-01-19T20:55:43.672Z*
