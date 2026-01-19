@@ -7,8 +7,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('node:child_process');
+const { promisify } = require('node:util');
 const { getConfigPaths } = require('../paths');
 const { replaceClaudePaths } = require('./shared/path-rewriter');
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Get target installation directories for Copilot CLI
@@ -107,17 +111,31 @@ function verify(dirs) {
  * @returns {Promise<Object>} Structured result with success, cli, agent, result, duration
  */
 async function invokeAgent(agent, prompt, options = {}) {
-  // TODO: Implement actual CLI invocation once GitHub CLI agent extension available
-  // Expected command: gh copilot agent run {agentName} --prompt "{prompt}"
-  
-  // Mock result for now - enables testing orchestration layer
-  return {
-    success: true,
-    cli: 'copilot',
-    agent: agent.name,
-    result: 'Mock agent execution (CLI command pending)',
-    duration: 0 // ms - will be tracked when actual execution implemented
-  };
+  try {
+    // GitHub CLI with copilot extension
+    // Command: gh copilot agent run {agentName} --prompt "{prompt}"
+    const { stdout, stderr } = await execFileAsync('gh', [
+      'copilot', 'agent', 'run', agent.name,
+      '--prompt', prompt
+    ]);
+    
+    return {
+      success: true,
+      cli: 'copilot',
+      agent: agent.name,
+      result: stdout.trim(),
+      duration: 0
+    };
+  } catch (error) {
+    return {
+      success: false,
+      cli: 'copilot',
+      agent: agent.name,
+      error: error.message,
+      stderr: error.stderr || '',
+      duration: 0
+    };
+  }
 }
 
 module.exports = {
