@@ -7,6 +7,10 @@
 
 const { AgentRegistry } = require('./agent-registry');
 const { detectCLI } = require('../detect');
+const { PerformanceTracker } = require('./performance-tracker');
+
+// Instantiate tracker (singleton shared across all invocations)
+const perfTracker = new PerformanceTracker();
 
 /**
  * Invoke an agent with CLI abstraction
@@ -17,9 +21,13 @@ const { detectCLI } = require('../detect');
  * @throws {Error} If agent not found or unsupported on current CLI
  */
 async function invokeAgent(agentName, prompt, options = {}) {
+  let startMark;
   try {
     // Detect current CLI
     const cli = detectCLI();
+    
+    // Start performance tracking
+    startMark = perfTracker.startAgent(agentName, cli);
     
     // Get CLI name without suffix for adapter loading
     const cliAdapter = cli.replace('-code', '').replace('-cli', '');
@@ -51,6 +59,9 @@ async function invokeAgent(agentName, prompt, options = {}) {
     
     // Check if adapter has invokeAgent method
     if (typeof adapter.invokeAgent !== 'function') {
+      // End tracking for fallback case
+      const duration = await perfTracker.endAgent(agentName, cli, startMark);
+      
       // Graceful fallback for adapters not yet wired
       return {
         success: true,
@@ -59,7 +70,9 @@ async function invokeAgent(agentName, prompt, options = {}) {
         cli,
         result: null,
         performance: {
-          cli
+          cli,
+          duration,
+          timestamp: new Date().toISOString()
         }
       };
     }
@@ -67,19 +80,41 @@ async function invokeAgent(agentName, prompt, options = {}) {
     // Invoke agent via adapter
     const result = await adapter.invokeAgent(agent, prompt, options);
     
+    // End performance tracking
+    const duration = await perfTracker.endAgent(agentName, cli, startMark);
+    
     // Return structured result
     return {
       success: true,
       result,
       performance: {
-        cli
+        cli,
+        duration,
+        timestamp: new Date().toISOString()
       }
     };
     
   } catch (error) {
+    // End tracking even on failure to record failed execution time
+    if (startMark) {
+      try {
+        await perfTracker.endAgent(agentName, detectCLI(), startMark);
+      } catch (perfError) {
+        // Ignore performance tracking errors in exception path
+      }
+    }
+    
     // Re-throw with context
     throw new Error(`Agent invocation failed for '${agentName}': ${error.message}`);
   }
 }
 
-module.exports = { invokeAgent };
+/**
+ * Get the performance tracker instance for external queries
+ * @returns {PerformanceTracker} The shared performance tracker instance
+ */
+function getPerformanceTracker() {
+  return perfTracker;
+}
+
+module.exports = { invokeAgent, getPerformanceTracker };
