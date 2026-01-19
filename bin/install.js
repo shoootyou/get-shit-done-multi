@@ -6,6 +6,7 @@ const os = require('os');
 const readline = require('readline');
 const { detectInstalledCLIs, getDetectedCLIsMessage } = require('./lib/detect');
 const { getConfigPaths } = require('./lib/paths');
+const { preserveUserData, restoreUserData } = require('./lib/upgrade');
 
 // Colors
 const cyan = '\x1b[36m';
@@ -400,6 +401,9 @@ function install(isGlobal) {
 
   console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
 
+  // Preserve user data before upgrade
+  const backups = preserveUserData(claudeDir);
+
   // Track installation failures
   const failures = [];
 
@@ -552,6 +556,11 @@ function install(isGlobal) {
     console.log(`  ${green}✓${reset} Configured update check hook`);
   }
 
+  // Restore user data after upgrade
+  if (backups && Object.keys(backups).length > 0) {
+    restoreUserData(claudeDir, backups);
+  }
+
   return { settingsPath, settings, statuslineCommand };
 }
 
@@ -567,6 +576,9 @@ function installCopilot() {
   const pathPrefix = '.github/skills/get-shit-done/';
 
   console.log(`  Installing GitHub Copilot CLI assets to ${cyan}./.github${reset}\n`);
+
+  // Preserve user data before upgrade
+  const backups = preserveUserData(skillDir);
 
   const failures = [];
 
@@ -661,6 +673,11 @@ function installCopilot() {
     process.exit(1);
   }
 
+  // Restore user data after upgrade
+  if (backups && Object.keys(backups).length > 0) {
+    restoreUserData(skillDir, backups);
+  }
+
   console.log(`
   ${green}Done!${reset} Start GitHub Copilot CLI in this repo and use ${cyan}gsd:help${reset} for guidance.
 `);
@@ -685,6 +702,9 @@ function installCodex(isGlobal) {
     : './.codex/skills/get-shit-done/';
 
   console.log(`  Installing Codex CLI assets to ${cyan}${locationLabel}${reset}\n`);
+
+  // Preserve user data before upgrade
+  const backups = preserveUserData(skillDir);
 
   const failures = [];
 
@@ -730,6 +750,11 @@ function installCodex(isGlobal) {
   if (failures.length > 0) {
     console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
     process.exit(1);
+  }
+
+  // Restore user data after upgrade
+  if (backups && Object.keys(backups).length > 0) {
+    restoreUserData(skillDir, backups);
   }
 
   console.log(`
