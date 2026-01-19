@@ -177,6 +177,11 @@ function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill'
     const srcPath = path.join(srcDir, entry.name);
     const destPath = path.join(destDir, entry.name);
 
+    // Skip CLI-specific SKILL source files (SKILL-codex.md, SKILL-copilot.md, etc.)
+    if (entry.name.match(/^SKILL-\w+\.md$/)) {
+      continue;
+    }
+
     if (entry.isDirectory()) {
       copyWithPathReplacement(srcPath, destPath, adapter, contentType);
     } else if (entry.name.endsWith('.md')) {
@@ -588,18 +593,21 @@ function installCopilot() {
     failures.push('skills/get-shit-done/commands/gsd');
   }
 
-  // Copy SKILL.md template
-  const skillTemplateSrc = path.join(src, 'lib-ghcc', 'SKILL.md');
+  // Copy SKILL.md template for Copilot
+  const skillTemplateSrc = path.join(src, 'get-shit-done', 'SKILL-copilot.md');
   const skillTemplateDest = path.join(dirs.skills, 'SKILL.md');
   if (fs.existsSync(skillTemplateSrc)) {
-    fs.copyFileSync(skillTemplateSrc, skillTemplateDest);
+    const skillContent = fs.readFileSync(skillTemplateSrc, 'utf8');
+    // Apply path replacement through adapter
+    const convertedContent = copilotAdapter.convertContent(skillContent, 'skill');
+    fs.writeFileSync(skillTemplateDest, convertedContent);
     if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
       console.log(`  ${green}✓${reset} Installed SKILL.md`);
     } else {
       failures.push('skills/get-shit-done/SKILL.md');
     }
   } else {
-    failures.push('lib-ghcc/SKILL.md');
+    failures.push('get-shit-done/SKILL-copilot.md (source missing)');
   }
 
   // Copy CHANGELOG.md and VERSION
