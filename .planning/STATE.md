@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 4 of 6 (Agent Translation)  
-**Plan:** 05 of 7 (in progress)  
+**Plan:** 06 of 7 (in progress)  
 **Status:** Phase 4 in progress  
-**Progress:** `█████████████████░░░` 88% (16 of 18 total plans complete)
+**Progress:** `█████████████████░░░` 94% (17 of 18 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 04-05-PLAN.md (Adapter CLI integration)
+**Last activity:** 2026-01-19 - Completed 04-06-PLAN.md (Command integration)
 
-**Next Action:** Continue Phase 4 (Plans 06-07 remain)
+**Next Action:** Continue Phase 4 (Plan 07 remains)
 
 ---
 
@@ -109,6 +109,10 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 04 | 05 | Use execFile instead of exec for CLI invocation | Prevents shell injection vulnerabilities by directly invoking executables |
 | 04 | 05 | Preserve stderr in error responses | Enables debugging CLI failures with detailed error messages |
 | 04 | 05 | Promisify execFile at module level | Enables clean async/await syntax in invokeAgent functions |
+| 04 | 06 | Command name follows GSD convention | All GSD commands use gsd: prefix (gsd:invoke-agent not invoke-agent) |
+| 04 | 06 | Command contains AI-interpretable JavaScript prompt | JavaScript code in markdown for agent execution, not direct Node.js execution |
+| 04 | 06 | No code changes to executor needed | Loader auto-discovers new .md files in commands/gsd/ directory |
+| 04 | 06 | Agent invocation integrated as command prompt | Agent invocation through standard command interface for AI agent processing |
 
 ### Technical Discoveries
 
@@ -146,6 +150,8 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Agent Output Validation:** Check PLAN files for frontmatter, required sections (objective, tasks, verification)
 - **Equivalence Testing Pattern:** Compare agent outputs with exact, semantic (whitespace-normalized), and structural (JSON keys) matching
 - **User-facing Validation Tools:** CLI scripts with status indicators (✅ ❌ ⚠️) and exit codes for scripting integration
+- **AI-interpreted Command Pattern:** Command system returns prompts to AI agents; JavaScript in commands is read and executed by AI, not Node.js
+- **Command Auto-discovery:** Loader scans commands/gsd/ directory for .md files and auto-registers them with metadata from frontmatter
 
 ### Open Questions
 
@@ -174,7 +180,7 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Complete Phase 4 Plan 03 (capability matrix and documentation)
 - [x] Complete Phase 4 Plan 04 (result validation and error recovery)
 - [x] Complete Phase 4 Plan 05 (adapter CLI integration)
-- [ ] Complete Phase 4 Plan 06 (remaining plans)
+- [x] Complete Phase 4 Plan 06 (command integration)
 - [ ] Complete Phase 4 Plan 07 (remaining plans)
 - [ ] Phase 4 complete - Agent translation layer ready
 - [ ] Begin Phase 5 (Testing & Verification)
@@ -187,12 +193,12 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration, performance tracking, capability matrix, result validation, and adapter CLI integration complete.
+**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration, performance tracking, capability matrix, result validation, adapter CLI integration, and command integration complete.
 
-**Starting Point:** Phase 4 Plan 05 complete. Ready to continue with Plans 06-07.
+**Starting Point:** Phase 4 Plan 06 complete. Ready to continue with Plan 07.
 
 **Key Context:**
-- **Phase 4 Plans 01-05 Complete:** Agent translation layer partially ready
+- **Phase 4 Plans 01-06 Complete:** Agent translation layer almost ready
   - **Plan 01:** Agent orchestration core
     - Agent Registry: Map-based storage for 11 GSD agents with CLI-specific metadata
     - Agent Invoker: CLI-agnostic invocation with detectCLI integration
@@ -219,17 +225,18 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
     - child_process.execFile for secure CLI invocation
     - Error handling with stderr capture
     - Mock results replaced with real CLI commands
-    - validateStructure(), validateJSON(), validateAgentOutput() methods
-    - validate-planning-dir.js: User-facing validation tool
-    - equivalence-test.js: Cross-CLI output comparison framework
-    - 6-test suite covering all validation scenarios
+  - **Plan 06:** Command integration
+    - commands/gsd/invoke-agent.md: User-facing agent invocation command
+    - AI-interpreted execution pattern: JavaScript in markdown for agent processing
+    - Auto-discovery: Loader finds and registers commands from .md files
+    - Command system integration: Agent invocation through standard command interface
 - **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Adapter CLI integration complete:** Real CLI command execution in all three adapters
-- **Phase 4 Plans 06-07:** Remaining to complete phase
+- **Command system architecture:** AI-interpreted prompts, not direct JavaScript execution
+- **Phase 4 Plan 07:** Remaining to complete phase
 
-**Last Session:** 2026-01-19 21:17-21:20 UTC
-**Stopped at:** Completed 04-05-PLAN.md (Adapter CLI integration)
+**Last Session:** 2026-01-19 21:22-21:26 UTC
+**Stopped at:** Completed 04-06-PLAN.md (Command integration)
 **Resume file:** None
 
 ---
