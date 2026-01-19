@@ -68,11 +68,22 @@ function convertContent(content, type) {
   converted = converted.replace(/\/gsd:(\S+)/g, '$get-shit-done $1');
   converted = converted.replace(/`\/gsd:(\S+)`/g, '`$get-shit-done $1`');
   
-  // Step 3: Replace generic "CLI" or "Claude Code" references for Codex
+  // Step 3: Replace CLI-specific references
   converted = converted.replace(/\bClaude Code\b/g, 'Codex CLI');
   converted = converted.replace(/\bLaunch Claude Code\b/g, 'Start Codex CLI');
+  converted = converted.replace(/\brun Claude Code\b/g, 'use Codex CLI');
   
-  // Step 4: For agents, apply format conversion
+  // Step 4: Replace assistant references with generic terms
+  // "Claude = builder" → "AI = builder"
+  // "Claude handles" → "AI handles"
+  // "Claude's discretion" → "AI's discretion"
+  converted = converted.replace(/\bClaude = /g, 'AI = ');
+  converted = converted.replace(/\bClaude handles\b/g, 'AI handles');
+  converted = converted.replace(/\bClaude's discretion\b/gi, "AI's discretion");
+  converted = converted.replace(/\bClaude's Discretion\b/g, "AI's Discretion");
+  converted = converted.replace(/\bcaptures Claude discretion\b/g, "captures AI discretion");
+  
+  // Step 5: For agents, apply format conversion
   if (type === 'agent') {
     // Extract agent name from content or use default
     const nameMatch = converted.match(/name:\s*(.+)/);
