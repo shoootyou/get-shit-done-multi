@@ -161,6 +161,8 @@ Plans:
 
 **Goal:** Users can switch CLIs mid-project with full state consistency and zero data loss
 
+**Status:** Pending
+
 **Dependencies:** Phase 4 (requires agents functional across CLIs)
 
 **Requirements:**
@@ -174,6 +176,7 @@ Plans:
 - STATE-08: State validation detects and repairs inconsistencies
 - STATE-09: Concurrent CLI usage doesn't corrupt state
 - STATE-10: State migration handles format changes across versions
+- AGENT-10: Agent failures trigger smart retry logic (try different CLI if available)
 
 **Success Criteria:**
 1. User runs Phase 1 planning in Claude Code, then executes Phase 1 in GitHub Copilot CLI, then verifies Phase 1 in Codex CLI, and all three CLIs read/write to same `.planning/` directory with zero data loss or corruption
@@ -181,6 +184,15 @@ Plans:
 3. User encounters CLI failure mid-command and GSD automatically retries with next available CLI from configured fallback order without user intervention
 4. User reviews `.planning/usage.json` and sees API usage costs broken down by CLI, command, and agent for informed cost optimization
 5. User upgrades GSD version and state migration tool automatically detects format changes, backs up existing state, and migrates to new format without data loss
+
+**Plans:** 5 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Atomic I/O and directory locking (foundation)
+- [ ] 05-02-PLAN.md — State manager and migration framework (core)
+- [ ] 05-03-PLAN.md — Session persistence and validation (interoperability)
+- [ ] 05-04-PLAN.md — CLI fallback and usage tracking (resilience)
+- [ ] 05-05-PLAN.md — Integration and verification (testing)
 
 ---
 
