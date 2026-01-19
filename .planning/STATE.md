@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 4 of 6 (Agent Translation)  
-**Plan:** 01 of 3 (completed)  
+**Plan:** 02 of 4 (completed)  
 **Status:** Phase 4 in progress  
-**Progress:** `████████████░` 92% (12 of 13 total plans complete)
+**Progress:** `█████████████` 100% (13 of 13 total plans complete)
 
-**Last activity:** 2026-01-19 - Completed 04-01-PLAN.md (Agent orchestration core)
+**Last activity:** 2026-01-19 - Completed 04-02-PLAN.md (Agent performance tracking)
 
-**Next Action:** Execute 04-02-PLAN.md (Performance tracking)
+**Next Action:** Execute 04-03-PLAN.md (Prompt templates and adaptation)
 
 ---
 
@@ -87,6 +87,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 04 | 01 | Mock results for adapter.invokeAgent() | Enable testing orchestration layer before CLI SDKs available |
 | 04 | 01 | Graceful error messages for unsupported agents | Guide users to capability matrix when agent unsupported on CLI |
 | 04 | 01 | Default capability 'full' for all agents | All 11 agents default to full capability - adjust as CLI SDKs reveal limitations |
+| 04 | 02 | Use perf_hooks for sub-millisecond timing | Node.js built-in provides performance.mark/measure API, avoiding external dependencies |
+| 04 | 02 | PerformanceObserver for automatic collection | Decouples measurement from storage via observer pattern |
+| 04 | 02 | Async fs.promises for metric storage | Non-blocking file I/O prevents degrading agent execution performance |
+| 04 | 02 | Keep last 100 measurements per agent/CLI | Prevent unbounded metric file growth while maintaining sufficient data for analysis |
+| 04 | 02 | Singleton PerformanceTracker instance | Shared across all invocations for consistent metrics collection |
+| 04 | 02 | Track failed execution times | Record duration even on failure for complete performance picture |
+| 04 | 02 | .planning/metrics/ excluded from git | Runtime performance data is not source code, aligns with .planning/ exclusion convention |
 
 ### Technical Discoveries
 
@@ -137,10 +144,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - [x] Complete Phase 3 Plan 03 (command recording and verification)
 - [x] Phase 3 complete - Command system foundation ready
 - [x] Complete Phase 4 Plan 01 (agent orchestration core)
+- [x] Complete Phase 4 Plan 02 (performance tracking)
+- [ ] Complete Phase 4 Plan 03 (prompt templates and adaptation)
+- [ ] Complete Phase 4 Plan 04 (result validation and error recovery)
 - [ ] Run Phase 1 verification to confirm all requirements satisfied
 - [ ] Verify Codex CLI version on npm before Phase 2
-- [ ] Complete Phase 4 Plan 02 (performance tracking)
-- [ ] Complete Phase 4 Plan 03 (result validation)
 
 ---
 
@@ -148,23 +156,31 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 ### For Next Session
 
-**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration core complete with registry, invoker, and adapter integration.
+**Context:** Phase 4 (Agent Translation) in progress. Agent orchestration with performance tracking complete.
 
-**Starting Point:** 04-01-PLAN.md complete. Agent orchestration ready for Phase 4 Plan 02 (Performance tracking).
+**Starting Point:** 04-02-PLAN.md complete. Agent orchestration ready for Phase 4 Plan 03 (Prompt templates and adaptation).
 
 **Key Context:**
 - **Phase 4 Plan 01 Complete:** Agent orchestration core
   - Agent Registry: Map-based storage for 11 GSD agents with CLI-specific metadata
   - Agent Invoker: CLI-agnostic invocation with detectCLI integration
+  - Adapter Integration: Claude, Copilot, Codex adapters with invokeAgent methods
+  - Mock results for testing before CLI SDKs available
+- **Phase 4 Plan 02 Complete:** Agent performance tracking
+  - PerformanceTracker: Sub-millisecond precision using perf_hooks
+  - Automatic measurement: All agent invocations tracked (success and failure)
+  - Metric persistence: .planning/metrics/agent-performance.json
+  - Bounded retention: Last 100 measurements per agent/CLI combo
+  - Test suite: 16 tests covering instantiation, tracking, averaging, persistence
   - Adapter Integration: invokeAgent methods in Claude, Copilot, Codex adapters
   - Capability Tracking: full/partial/unsupported levels per agent-CLI combination
   - Mock Results: Enable testing orchestration layer before CLI SDKs available
 - **11 GSD agents registered:** executor, planner, verifier, debugger, phase-researcher, plan-checker, codebase-mapper, project-researcher, research-synthesizer, roadmapper, integration-checker
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Ready for Phase 4 Plan 02:** Performance tracking to benchmark agent execution
+- **Ready for Phase 4 Plan 03:** Prompt templates and adaptation for CLI-specific formatting
 
-**Last Session:** 2026-01-19 20:46-20:49 UTC
-**Stopped at:** Completed 04-01-PLAN.md (Agent orchestration core)
+**Last Session:** 2026-01-19 20:46-20:50 UTC
+**Stopped at:** Completed 04-02-PLAN.md (Agent performance tracking)
 **Resume file:** None
 
 ---
