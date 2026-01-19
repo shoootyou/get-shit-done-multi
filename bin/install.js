@@ -41,6 +41,7 @@ const hasLocal = args.includes('--local') || args.includes('-l');
 const hasCopilot = args.includes('--copilot') || args.includes('--github-copilot') || args.includes('--copilot-cli');
 const hasCodex = args.includes('--codex') || args.includes('--codex-cli');
 const hasCodexGlobal = args.includes('--codex-global');
+const hasAll = args.includes('--all') || args.includes('-A');
 
 // Parse --config-dir argument
 function parseConfigDirArg() {
@@ -75,6 +76,7 @@ if (hasHelp) {
     ${cyan}-g, --global${reset}              Install Claude globally (to Claude config directory)
     ${cyan}-l, --local${reset}               Install Claude locally (to ./.claude in current directory)
     ${cyan}-c, --config-dir <path>${reset}   Specify custom Claude config directory
+    ${cyan}--all, -A${reset}                Install to all detected CLIs (Claude, Copilot, Codex)
     ${cyan}--copilot${reset}                 Install GitHub Copilot CLI assets locally (to ./.github)
     ${cyan}--codex${reset}                   Install Codex CLI assets locally (to ./.codex)
     ${cyan}--codex-global${reset}            Install Codex CLI assets globally (to ~/.codex)
@@ -82,6 +84,9 @@ if (hasHelp) {
     ${cyan}--force-statusline${reset}        Replace existing statusline config
 
   ${yellow}Examples:${reset}
+    ${dim}# Install to all detected CLIs in one command${reset}
+    npx get-shit-done-cc --all
+
     ${dim}# Install to default ~/.claude directory${reset}
     npx get-shit-done-cc --global
 
@@ -108,6 +113,13 @@ if (hasHelp) {
     configurations (e.g., for different subscriptions). It takes priority
     over the CLAUDE_CONFIG_DIR environment variable.
 `);
+  process.exit(0);
+}
+
+// Handle --all flag first
+if (hasAll) {
+  console.log(banner);
+  installAll();
   process.exit(0);
 }
 
@@ -782,6 +794,76 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
   console.log(`
   ${green}Done!${reset} Launch Claude Code and run ${cyan}/gsd:help${reset}.
 `);
+}
+
+/**
+ * Install to all detected CLIs
+ */
+function installAll() {
+  const detected = detectInstalledCLIs();
+  const availableCLIs = Object.entries(detected)
+    .filter(([_, isInstalled]) => isInstalled)
+    .map(([cli, _]) => cli);
+  
+  if (availableCLIs.length === 0) {
+    console.log(`  ${yellow}No CLIs detected. Install a CLI first:${reset}`);
+    console.log(`    - Claude Code: https://claude.ai/download`);
+    console.log(`    - GitHub Copilot CLI: npm install -g @github/copilot-cli`);
+    console.log(`    - Codex CLI: npm install -g @codex/cli`);
+    process.exit(1);
+  }
+  
+  console.log(`  ${green}Installing to ${availableCLIs.length} detected CLI(s)...${reset}\n`);
+  
+  const results = [];
+  
+  // Install Claude if detected
+  if (detected.claude) {
+    console.log(`  ${cyan}━━━ Claude Code ━━━${reset}\n`);
+    try {
+      const { settingsPath, settings, statuslineCommand } = install(true);
+      // Skip statusline prompts in batch mode
+      finishInstall(settingsPath, settings, statuslineCommand, false);
+      results.push({ cli: 'Claude Code', success: true });
+    } catch (err) {
+      console.error(`  ${yellow}⚠ Claude installation failed: ${err.message}${reset}\n`);
+      results.push({ cli: 'Claude Code', success: false, error: err.message });
+    }
+  }
+  
+  // Install Copilot if detected
+  if (detected.copilot) {
+    console.log(`  ${cyan}━━━ GitHub Copilot CLI ━━━${reset}\n`);
+    try {
+      installCopilot();
+      results.push({ cli: 'GitHub Copilot CLI', success: true });
+    } catch (err) {
+      console.error(`  ${yellow}⚠ Copilot installation failed: ${err.message}${reset}\n`);
+      results.push({ cli: 'GitHub Copilot CLI', success: false, error: err.message });
+    }
+  }
+  
+  // Install Codex if detected
+  if (detected.codex) {
+    console.log(`  ${cyan}━━━ Codex CLI ━━━${reset}\n`);
+    try {
+      installCodex(true); // Global install
+      results.push({ cli: 'Codex CLI', success: true });
+    } catch (err) {
+      console.error(`  ${yellow}⚠ Codex installation failed: ${err.message}${reset}\n`);
+      results.push({ cli: 'Codex CLI', success: false, error: err.message });
+    }
+  }
+  
+  // Summary
+  console.log(`\n  ${cyan}━━━ Installation Summary ━━━${reset}\n`);
+  results.forEach(result => {
+    const status = result.success ? `${green}✓${reset}` : `${yellow}✗${reset}`;
+    console.log(`  ${status} ${result.cli}${result.error ? ` (${result.error})` : ''}`);
+  });
+  
+  const successCount = results.filter(r => r.success).length;
+  console.log(`\n  Installed to ${successCount}/${results.length} CLI(s)\n`);
 }
 
 /**
