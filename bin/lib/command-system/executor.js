@@ -7,6 +7,7 @@
 import { createRequire } from 'node:module';
 import { registry } from './registry.js';
 import { formatError, degradeGracefully, CommandError } from './error-handler.js';
+import { generateHelp } from './help-generator.js';
 
 // Create require for CommonJS modules
 const require = createRequire(import.meta.url);
@@ -21,6 +22,17 @@ const { detectCLI } = require('../detect.js');
  */
 export async function executeCommand(commandName, args = []) {
   try {
+    // Special handling for help command
+    if (commandName === 'gsd:help') {
+      const helpArg = args[0];
+      const helpText = generateHelp(helpArg);
+      console.log(helpText);
+      return {
+        success: true,
+        result: helpText
+      };
+    }
+    
     // Detect which CLI is currently running
     const currentCLI = detectCLI();
     
