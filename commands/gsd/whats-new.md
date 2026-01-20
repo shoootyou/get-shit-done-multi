@@ -26,7 +26,7 @@ cat ~/.claude/get-shit-done/VERSION 2>/dev/null
 
 Your installation doesn't include version tracking.
 
-**To fix:** `npx get-shit-done-cc --global`
+**To fix:** `npx get-shit-done-multi --global`
 
 This will reinstall with version tracking enabled.
 ```
@@ -107,7 +107,7 @@ You're on the latest version.
 
 [View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
 
-**To update:** `npx get-shit-done-cc --global`
+**To update:** `npx get-shit-done-multi --global`
 ```
 
 **Breaking changes:** Surface prominently with **BREAKING:** prefix in the output.

@@ -4,7 +4,64 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.8.0] - 2026-01-20
+
+### Added
+- `/gsd:archive-milestone` command for safe milestone archiving with git validation
+- `/gsd:list-milestones` command to view archived milestones with metadata
+- `/gsd:restore-milestone` command to restore archived milestones
+- `.planning/MILESTONES.md` registry tracking all archived milestones
+- Codebase mapping exclusion system respecting `.gitignore` and custom patterns
+- Smart infrastructure directory exclusion (.github, .claude, .codex, node_modules, etc.)
+- Git tag creation (`archive/[milestone-name]`) for historical reference
+- Atomic file operations for milestone archival safety
+- Directory tree visualization in codebase mapping
+- File count and line count metrics in codebase documents
+
+### Changed
+- `map-codebase` now excludes infrastructure directories by default
+- Exclusion patterns explicitly passed to mapper agents (enforcement fix)
+- Archive operations moved to `.planning/history/[milestone-name]/` directory structure
+- Workflow integration suggests archive after milestone verification
+
+### Fixed
+- Codebase mapper agents now correctly apply exclusion patterns
+- Empty directory handling (e.g., only .github/) produces accurate zero-file reports
+
+## [1.7.0] - 2026-01-19
+
+### Added
+- Multi-CLI installation system supporting OpenAI Codex CLI (`--codex`, `--codex-global`)
+- Auto-detection of installed CLIs (Claude Code, GitHub Copilot CLI, Codex CLI)
+- Unified command system - all 24 GSD commands work identically across three CLIs
+- Agent translation layer - 11 specialized agents converted to Codex skills
+- Cross-CLI state management with atomic file operations
+- Session persistence and CLI switching support
+- Directory-based locking for concurrent CLI usage safety
+- CLI comparison matrix and interactive capability browser
+- Documentation generation infrastructure with pre-commit automation
+- Diagnostic test framework (`/gsd:verify-installation`) for CLI verification
+- CLI recommendation engine for optimal CLI selection
+- Cost tracking and usage analytics across all CLIs
+- Performance benchmarking per agent per CLI
+- GitHub Copilot CLI local installation (`--copilot`) with skills, agents, and Copilot instructions
+- GitHub issue template for `gsd:new-project` intake
+- Copilot and attribution documentation under `docs/`
+
+### Changed
+- Installation now supports three target CLIs with single installer
+- Command invocation works identically across platforms (`/gsd:command-name`)
+- State directory `.planning/` now shared across all CLIs
+- Agent results can be passed between CLIs when switching mid-project
+- Smart retry logic attempts alternate CLI if command fails
+- Installer prompt options now include Copilot and renamed Claude options
+- Package metadata now lists shoootyou as maintainer with original creator credited
+
+### Technical
+- Zero npm dependencies maintained (pure Node.js built-ins only)
+- 51 requirements shipped with 100% coverage
+- 6 phases completed: Foundation, Adapter Implementation, Command System, Agent Translation, State Management, Documentation & Verification
+- Cross-platform support verified (macOS, Windows, Linux)
 
 ## [1.6.4] - 2026-01-17
 
@@ -186,7 +243,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.5.17] - 2026-01-15
 
 ### Added
-- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-cc`)
+- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-multi`)
 
 ## [1.5.16] - 2026-01-15
 
@@ -925,7 +982,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.6.4...HEAD
+[1.8.0]: https://github.com/shoootyou/get-shit-done-multi/releases/tag/v1.8.0
+[1.7.0]: https://github.com/shoootyou/get-shit-done-multi/releases/tag/v1.7.0
 [1.6.4]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4
 [1.6.3]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.3
 [1.6.2]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.2
