@@ -1,16 +1,6 @@
----
-generated: true
-timestamp: 2026-01-20T00:13:29.292Z
-generator: generate-comparison.js
-gsd-version: 1.6.4
----
-
-> **Note:** This file is auto-generated. Do not edit manually.
-> Last generated: January 20, 2026
-
 # CLI Comparison Matrix
 
-**Last generated:** 2026-01-20 00:13 UTC
+**Last generated:** 2026-01-20 00:24 UTC
 
 This document compares GSD (Get Shit Done) feature availability across Claude Code, GitHub Copilot CLI, and Codex CLI.
 
