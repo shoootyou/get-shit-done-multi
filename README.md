@@ -502,6 +502,17 @@ This ensures absolute paths are used instead of `~` which may not expand correct
 
 ---
 
+## Credits & Standing on Shoulders of Giants
+
+This project serves as a bridge for Gemini users to access the incredible meta-prompting system designed by **TÂCHES** (glittercowboy).
+
+**Original Project:** [Get Shit Done](https://github.com/glittercowboy/get-shit-done)
+**Original Author:** TÂCHES
+
+We acknowledge and deeply appreciate the original work that made this adaptation possible. The core philosophy, structure, and brilliance of GSD belong to its original creator. This fork merely translates that brilliance into the language of Gemini.
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
