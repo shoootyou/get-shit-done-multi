@@ -19,13 +19,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 ## Current Position
 
 **Phase:** 6 of 6 (Documentation & Verification)  
-**Plan:** 4 of 6 (Complete)  
+**Plan:** 5 of 6 (Complete)  
 **Status:** Phase 6 in progress  
-**Progress:** `███████████████████████████░░` 90% (26 of 29 total plans complete)
+**Progress:** `████████████████████████████░` 93% (27 of 29 total plans complete)
 
-**Last activity:** 2026-01-20 - Completed 06-04-PLAN.md (User Documentation)
+**Last activity:** 2026-01-20 - Completed 06-05-PLAN.md (Interactive Capability Matrix)
 
-**Next Action:** Continue Phase 6 - Plan 05 (End-user Documentation)
+**Next Action:** Continue Phase 6 - Plan 06 (Final Verification)
 
 ---
 
@@ -165,6 +165,11 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 | 06 | 04 | CLI-specific sections in all guides | Each CLI has unique gotchas, generic docs miss important details |
 | 06 | 04 | Real commands with expected outputs | Users can verify they're doing it right, reduces support questions |
 | 06 | 04 | Extensive cross-referencing | Documentation is interconnected, users navigate between guides easily |
+| 06 | 05 | Dynamic command extraction from filesystem | Rather than hardcoding commands, parse files for always-current data |
+| 06 | 05 | Vanilla JS class-based architecture | Modularity without framework overhead, maintains zero-dependency goal |
+| 06 | 05 | Click cells to show full notes | Progressive disclosure - hover for tooltip, click for full details |
+| 06 | 05 | Search across all fields | Match feature name, description, and notes for comprehensive search |
+| 06 | 05 | Responsive statistics display | Real-time filtered counts by category provide immediate feedback |
 
 
 ### Technical Discoveries
@@ -243,6 +248,13 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Doc Generation from Metadata:** Transform capability-matrix.js data into Markdown tables with visual icons
 - **JSON Data Export Pattern:** Include _meta object with generation timestamp, version, source, generator
 - **CLI Comparison Format:** Table structure | Agent | Claude Code | Copilot CLI | Codex CLI | for feature availability
+- **Dynamic Command Discovery:** fs.readdirSync on commands/gsd/ directory to extract all command files and parse frontmatter descriptions
+- **Vanilla JS Class Pattern:** CapabilityMatrix class with constructor → init → loadData → render → attachEvents lifecycle
+- **Fetch API for Data Loading:** Modern browser API for loading JSON without jQuery or other libraries
+- **Event Delegation:** Attach single listener to container, use event.target.closest() to find relevant element
+- **Progressive Disclosure UI:** Hover shows tooltip (title attribute), click shows full modal for detailed notes
+- **Real-time Filter Updates:** Input events trigger updateDisplay() → renderRows() → updateStats() for instant feedback
+- **HTML Escaping Pattern:** Use textContent to set div content, then read innerHTML for safe XSS prevention
 
 ### Open Questions
 
@@ -293,9 +305,18 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 
 **Context:** Phase 5 (State Management) complete. Phase 6 (Documentation & Verification) in progress.
 
-**Starting Point:** Phase 6 in progress. Completed 06-04 (User Documentation).
+**Starting Point:** Phase 6 in progress. Completed 06-05 (Interactive Capability Matrix).
 
 **Key Context:**
+- **Phase 6 Plan 05 Complete:** Interactive capability matrix production-ready
+  - **06-05 Complete:** Interactive HTML capability matrix
+    - bin/doc-generator/extract-capabilities.js dynamically extracts 46 features from codebase
+    - docs/capability-matrix.html provides self-contained single-page web app
+    - Multi-dimensional filtering (CLI, category, search) with real-time statistics
+    - Visual support indicators (✓/⚠/✗) with detailed notes on hover/click
+    - Vanilla JavaScript - zero framework dependencies
+    - Responsive design works on desktop and mobile
+    - DOCS-07 requirement satisfied
 - **Phase 6 Plan 04 Complete:** User documentation production-ready
   - **06-04 Complete:** Comprehensive user documentation
     - docs/implementation-differences.md explains CLI architectural variations
@@ -312,16 +333,17 @@ Agent translation - building orchestration layer that enables CLI-agnostic agent
 - **Phase 4 Complete:** Agent translation layer ready
 - **All Documentation Components Complete:**
   - CLI comparison matrix (auto-generated)
+  - Interactive capability matrix (HTML/JS/CSS)
   - Implementation differences guide
   - Three CLI-specific setup guides
   - Troubleshooting guide organized by symptom
   - Migration guide with backup procedures
   - Verification and recommendation systems
 - **Zero npm dependencies maintained:** All using Node.js built-ins
-- **Next:** Phase 6 Plan 05 (End-user Documentation)
+- **Next:** Phase 6 Plan 06 (Final Verification)
 
-**Last Session:** 2026-01-20 00:47-00:55 CET
-**Stopped at:** Completed 06-04-PLAN.md (User Documentation)
+**Last Session:** 2026-01-20 00:57-01:02 CET
+**Stopped at:** Completed 06-05-PLAN.md (Interactive Capability Matrix)
 **Resume file:** None
 
 ---
