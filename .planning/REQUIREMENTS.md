@@ -12,7 +12,7 @@
 - [x] **INSTALL-06**: Installer handles version upgrades without data loss
 - [x] **INSTALL-07**: Cross-platform path handling works correctly on Mac, Windows, and Linux
 - [x] **INSTALL-08**: Post-install verification confirms all commands are accessible
-- [ ] **INSTALL-09**: Installer provides intelligent CLI selection recommendations based on task type
+- [x] **INSTALL-09**: Installer provides intelligent CLI selection recommendations based on task type
 - [x] **INSTALL-10**: Installation completes with clear success/failure messaging and next steps
 
 ### Command System
@@ -57,16 +57,16 @@
 
 ### Documentation
 
-- [ ] **DOCS-01**: CLI comparison table shows features side-by-side (Claude vs Copilot vs Codex)
-- [ ] **DOCS-02**: Implementation differences guide explains what works differently per CLI
-- [ ] **DOCS-03**: Setup instructions exist for each CLI (Claude Code, Copilot CLI, Codex CLI)
-- [ ] **DOCS-04**: Troubleshooting guide covers CLI-specific common issues
-- [ ] **DOCS-05**: Migration guide helps users transition from single-CLI to multi-CLI setup
-- [ ] **DOCS-06**: Documentation generator auto-creates CLI comparison from code
-- [ ] **DOCS-07**: Interactive capability matrix UI shows which features work in which CLIs
-- [ ] **DOCS-08**: Code examples demonstrate usage in each CLI
-- [ ] **DOCS-09**: Release notes clearly indicate CLI-specific changes
-- [ ] **DOCS-10**: Documentation is versioned and remains accurate across releases
+- [x] **DOCS-01**: CLI comparison table shows features side-by-side (Claude vs Copilot vs Codex)
+- [x] **DOCS-02**: Implementation differences guide explains what works differently per CLI
+- [x] **DOCS-03**: Setup instructions exist for each CLI (Claude Code, Copilot CLI, Codex CLI)
+- [x] **DOCS-04**: Troubleshooting guide covers CLI-specific common issues
+- [x] **DOCS-05**: Migration guide helps users transition from single-CLI to multi-CLI setup
+- [x] **DOCS-06**: Documentation generator auto-creates CLI comparison from code
+- [x] **DOCS-07**: Interactive capability matrix UI shows which features work in which CLIs
+- [x] **DOCS-08**: Code examples demonstrate usage in each CLI
+- [x] **DOCS-09**: Release notes clearly indicate CLI-specific changes
+- [x] **DOCS-10**: Documentation is versioned and remains accurate across releases
 
 ## v2 Requirements
 
