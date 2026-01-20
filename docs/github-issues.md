@@ -7,8 +7,8 @@ GSD installs a GitHub issue template that captures the minimum context required 
 - `.github/ISSUE_TEMPLATE/gsd-new-project.yml`
 
 ## When it is installed
-- Local Claude install (`npx get-shit-done-cc --local`)
-- GitHub Copilot CLI install (`npx get-shit-done-cc --copilot`)
+- Local Claude install (`npx get-shit-done-multi --local`)
+- GitHub Copilot CLI install (`npx get-shit-done-multi --copilot`)
 
 Global Claude installs do not touch repository files.
 

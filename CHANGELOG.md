@@ -55,7 +55,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Agent results can be passed between CLIs when switching mid-project
 - Smart retry logic attempts alternate CLI if command fails
 - Installer prompt options now include Copilot and renamed Claude options
-- Package metadata now lists Croonix as publisher with original author credited
+- Package metadata now lists shoootyou as maintainer with original creator credited
 
 ### Technical
 - Zero npm dependencies maintained (pure Node.js built-ins only)
@@ -243,7 +243,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.5.17] - 2026-01-15
 
 ### Added
-- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-cc`)
+- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-multi`)
 
 ## [1.5.16] - 2026-01-15
 

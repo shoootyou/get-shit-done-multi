@@ -38,7 +38,7 @@ Recommended for most use cases - keeps GSD configuration within your project:
 cd /path/to/your/project
 
 # Install GSD for Claude Code
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -66,7 +66,7 @@ Install once, use across all projects:
 
 ```bash
 # Install globally for Claude Code
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -131,7 +131,7 @@ claude --version
 **Issue:** "Skills not found"
 ```bash
 # Solution: Re-run installation
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Or check installation path
 ls -la .claude/get-shit-done/
@@ -289,7 +289,7 @@ Claude Code uses OS-specific paths:
 **Solutions:**
 1. **If skills not installed:**
    ```bash
-   npx get-shit-done-cc --claude
+   npx get-shit-done-multi --claude
    ```
 
 2. **If skills installed but not detected:**
@@ -297,7 +297,7 @@ Claude Code uses OS-specific paths:
    - Check path: `ls -la .claude/get-shit-done/`
 
 3. **If persistent:**
-   - Reinstall globally: `npx get-shit-done-cc --claude`
+   - Reinstall globally: `npx get-shit-done-multi --claude`
    - Check Claude Code version: `claude --version` (requires v1.0.0+)
 
 ### Permission Denied
@@ -322,7 +322,7 @@ ls -la ~/Library/Application\ Support/Claude/
 
 3. **Reinstall with correct permissions:**
    ```bash
-   npx get-shit-done-cc --claude
+   npx get-shit-done-multi --claude
    ```
 
 ### Agent Timeout
@@ -362,7 +362,7 @@ Want to use GSD with multiple CLIs? You can seamlessly switch:
 ```bash
 # Add Copilot CLI to existing Claude Code project
 cd your-project
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # State is shared automatically
 cat .planning/STATE.md  # Shows same progress

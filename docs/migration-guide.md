@@ -96,7 +96,7 @@ cd my-project
 ls .claude/get-shit-done/  # ✓ Exists
 
 # Add Copilot CLI
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -128,7 +128,7 @@ Install all three CLIs at once.
 cd my-project
 
 # Add all CLIs simultaneously
-npx get-shit-done-cc --all
+npx get-shit-done-multi --all
 
 # This installs:
 # - Claude Code: .claude/get-shit-done/
@@ -150,7 +150,7 @@ cd my-project
 ls .github/skills/get-shit-done/  # ✓ Exists
 
 # Add Claude Code
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # State preserved automatically
 cat .planning/STATE.md  # Same progress
@@ -189,7 +189,7 @@ Choose installation command based on your target:
 
 **Add Claude Code:**
 ```bash
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Installs to:
 # - Global: ~/Library/Application Support/Claude/get-shit-done/ (macOS)
@@ -201,7 +201,7 @@ npx get-shit-done-cc --claude
 # Requires GitHub CLI installed and authenticated
 gh auth login  # If not already authenticated
 
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Installs to:
 # - Local only: .github/skills/get-shit-done/
@@ -212,7 +212,7 @@ npx get-shit-done-cc --copilot
 # Requires OpenAI API key configured
 export OPENAI_API_KEY="your-api-key"
 
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # Installs to:
 # - Global: ~/.codex/skills/get-shit-done/
@@ -226,7 +226,7 @@ npx get-shit-done-cc --codex
 # - gh copilot --version
 # - codex --version
 
-npx get-shit-done-cc --all
+npx get-shit-done-multi --all
 
 # Installs GSD for all detected CLIs
 ```
@@ -337,7 +337,7 @@ Create `.planning/config.json` to customize behavior:
 .github/skills/get-shit-done/  # Committed to repo
 
 # Add Claude Code locally:
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Result:
 # - Team: Uses Copilot CLI (via .github/)
@@ -355,7 +355,7 @@ ls ~/Library/Application\ Support/Claude/get-shit-done/
 
 # Add Copilot CLI to project:
 cd special-project
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Result:
 # - Global Claude Code: Available in all projects
@@ -372,7 +372,7 @@ npx get-shit-done-cc --copilot
 ls .codex/skills/get-shit-done/
 
 # Add Claude Code:
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Update preference in .planning/config.json:
 {
@@ -540,7 +540,7 @@ grep version .github/skills/get-shit-done/package.json
 grep version .codex/skills/get-shit-done/package.json
 
 # If versions differ, upgrade all:
-npx get-shit-done-cc --all --upgrade
+npx get-shit-done-multi --all --upgrade
 ```
 
 ### Git Ignore Configuration
@@ -581,7 +581,7 @@ npx get-shit-done-cc --all --upgrade
    - Optional: Claude Code (solo work)
    - Optional: Codex CLI (OpenAI integration)
    
-   Install all: `npx get-shit-done-cc --all`
+   Install all: `npx get-shit-done-multi --all`
    ```
 
 2. **Add verification to CI:**

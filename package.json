@@ -1,9 +1,9 @@
 {
-  "name": "get-shit-done-cc",
+  "name": "get-shit-done-multi",
   "version": "1.6.4",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.",
+  "description": "A meta-prompting, context engineering and spec-driven development system for AI coding assistants. Multi-CLI version by shoootyou, based on original work by TÂCHES.",
   "bin": {
-    "get-shit-done-cc": "bin/install.js"
+    "get-shit-done-multi": "bin/install.js"
   },
   "files": [
     "bin",
@@ -23,9 +23,9 @@
     "context-engineering",
     "spec-driven-development"
   ],
-  "author": "Croonix",
+  "author": "shoootyou",
   "contributors": [
-    "TÂCHES (original author, https://github.com/glittercowboy/get-shit-done)"
+    "TÂCHES (original creator, https://github.com/glittercowboy/get-shit-done)"
   ],
   "license": "MIT",
   "repository": {

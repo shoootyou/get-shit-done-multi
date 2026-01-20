@@ -52,7 +52,7 @@ Recommended for most use cases - keeps GSD configuration within your project:
 cd /path/to/your/project
 
 # Install GSD for Codex CLI
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -83,7 +83,7 @@ Install once, use across all projects:
 
 ```bash
 # Install globally for Codex CLI
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -151,7 +151,7 @@ npm install -g @openai/codex-cli
 **Issue:** "Skills not found"
 ```bash
 # Solution: Re-run installation
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # Or check installation path
 ls -la .codex/skills/get-shit-done/
@@ -310,7 +310,7 @@ Codex CLI uses `.codex/` directory structure:
 **Solutions:**
 1. **If skills not installed:**
    ```bash
-   npx get-shit-done-cc --codex
+   npx get-shit-done-multi --codex
    ```
 
 2. **If skills installed but not detected:**
@@ -318,7 +318,7 @@ Codex CLI uses `.codex/` directory structure:
    - Check path: `ls -la .codex/skills/get-shit-done/`
 
 3. **If persistent:**
-   - Reinstall globally: `npx get-shit-done-cc --codex`
+   - Reinstall globally: `npx get-shit-done-multi --codex`
    - Check Codex CLI version: `codex --version` (requires v0.84.0+)
 
 ### Permission Denied
@@ -347,7 +347,7 @@ ls -la ~/.codex/
 
 3. **Reinstall with correct permissions:**
    ```bash
-   npx get-shit-done-cc --codex
+   npx get-shit-done-multi --codex
    ```
 
 ### OpenAI API Error
@@ -416,7 +416,7 @@ Want to use GSD with multiple CLIs? You can seamlessly switch:
 ```bash
 # Add Claude Code to existing Codex CLI project
 cd your-project
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # State is shared automatically
 cat .planning/STATE.md  # Shows same progress

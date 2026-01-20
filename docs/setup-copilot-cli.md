@@ -54,7 +54,7 @@ GSD for Copilot CLI uses **local installation only** (no global option). This en
 cd /path/to/your/project
 
 # Install GSD for Copilot CLI
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Expected output:
 # ✓ Detecting installed CLIs...
@@ -139,7 +139,7 @@ gh extension install github/gh-copilot
 **Issue:** "Skills not found"
 ```bash
 # Solution: Re-run installation
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Or check installation path
 ls -la .github/skills/get-shit-done/
@@ -284,7 +284,7 @@ Copilot CLI uses **.github/** directory structure exclusively:
 **Solutions:**
 1. **If skills not installed:**
    ```bash
-   npx get-shit-done-cc --copilot
+   npx get-shit-done-multi --copilot
    ```
 
 2. **If skills installed but not detected:**
@@ -377,7 +377,7 @@ Want to use GSD with multiple CLIs? You can seamlessly switch:
 ```bash
 # Add Claude Code to existing Copilot CLI project
 cd your-project
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # State is shared automatically
 cat .planning/STATE.md  # Shows same progress

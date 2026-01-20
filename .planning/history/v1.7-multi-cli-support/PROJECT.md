@@ -23,8 +23,8 @@ GSD has proven valuable for structured development with Claude Code and GitHub C
 
 ## What Success Looks Like
 
-1. User runs `npx get-shit-done-cc --codex` and GSD installs to `.codex/` (local)
-2. User runs `npx get-shit-done-cc --codex-global` and GSD installs to `~/.codex/` (global)
+1. User runs `npx get-shit-done-multi --codex` and GSD installs to `.codex/` (local)
+2. User runs `npx get-shit-done-multi --codex-global` and GSD installs to `~/.codex/` (global)
 3. All 24 GSD commands work in Codex CLI using prompts (`/gsd:command` format)
 4. Specialized agents work in Codex (via skills, not custom agents since Codex lacks native support)
 5. User can run `/gsd:new-project` in Claude, then `/gsd:plan-phase 1` in Codex, then `/gsd:execute-phase 1` in Copilot - all on the same `.planning/` directory
@@ -138,7 +138,7 @@ GSD has proven valuable for structured development with Claude Code and GitHub C
 - Must respect `.planning/` directory structure exactly as-is
 
 **User Experience:**
-- Installation must be single command (`npx get-shit-done-cc --codex`)
+- Installation must be single command (`npx get-shit-done-multi --codex`)
 - Same commands must work across all three CLIs
 - Switching CLIs mid-project must work seamlessly
 - Documentation must be clear about differences

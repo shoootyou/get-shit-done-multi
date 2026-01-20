@@ -116,16 +116,16 @@ Local:   .codex/skills/get-shit-done/
 **Installation commands:**
 ```bash
 # Claude Code (global)
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # Copilot CLI (local)
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # Codex CLI (global)
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # All CLIs at once
-npx get-shit-done-cc --all
+npx get-shit-done-multi --all
 ```
 
 ## State Management
@@ -252,15 +252,15 @@ You can seamlessly switch between CLIs in the same project:
 ```bash
 # Start with Claude Code
 cd my-project
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 /gsd:new-project
 
 # Add Copilot CLI
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 # State preserved automatically
 
 # Add Codex CLI
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 # Still using same .planning/ directory
 
 # Verify all CLIs see same state

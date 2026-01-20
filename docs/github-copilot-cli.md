@@ -7,7 +7,7 @@ This repository installs Get Shit Done (GSD) for both Claude Code and GitHub Cop
 Interactive:
 
 ```bash
-npx get-shit-done-cc
+npx get-shit-done-multi
 ```
 
 Select `GitHub Copilot CLI` when prompted.
@@ -15,7 +15,7 @@ Select `GitHub Copilot CLI` when prompted.
 Non-interactive:
 
 ```bash
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 ```
 
 This installs:
@@ -53,6 +53,6 @@ It does not modify global Copilot settings.
 - All GSD paths point to `.github/skills/get-shit-done`.
 
 ## Update or remove
-- Re-run `npx get-shit-done-cc --copilot` to refresh the installation.
+- Re-run `npx get-shit-done-multi --copilot` to refresh the installation.
 - Remove `.github/skills/get-shit-done` and any `gsd-*.agent.md` files in `.github/agents` to uninstall.
  - Remove `.github/ISSUE_TEMPLATE/gsd-new-project.yml` to remove the issue template.

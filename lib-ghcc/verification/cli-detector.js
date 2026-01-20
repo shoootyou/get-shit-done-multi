@@ -157,7 +157,7 @@ class SkillRegisteredTest extends DiagnosticTest {
           status: 'fail',
           message: `GSD skill not registered in ${this.cli}`,
           fixes: [
-            `Run: npx get-shit-done-cc --${this.cli}`,
+            `Run: npx get-shit-done-multi --${this.cli}`,
             `Or manually copy skill files to: ${paths.skill}`
           ]
         };
@@ -177,7 +177,7 @@ class SkillRegisteredTest extends DiagnosticTest {
           status: 'warn',
           message: `GSD skill directory exists but missing files: ${missingFiles.join(', ')}`,
           fixes: [
-            `Run: npx get-shit-done-cc --${this.cli} to reinstall`,
+            `Run: npx get-shit-done-multi --${this.cli} to reinstall`,
             `Check skill directory: ${paths.skill}`
           ]
         };

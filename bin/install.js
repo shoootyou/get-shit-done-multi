@@ -72,7 +72,7 @@ console.log(banner);
 
 // Show help if requested
 if (hasHelp) {
-  console.log(`  ${yellow}Usage:${reset} npx get-shit-done-cc [options]
+  console.log(`  ${yellow}Usage:${reset} npx get-shit-done-multi [options]
 
   ${yellow}Options:${reset}
     ${cyan}-g, --global${reset}              Install Claude globally (to Claude config directory)
@@ -95,28 +95,28 @@ if (hasHelp) {
 
   ${yellow}Examples:${reset}
     ${dim}# Install to all detected CLIs in one command${reset}
-    npx get-shit-done-cc --all
+    npx get-shit-done-multi --all
 
     ${dim}# Install to default ~/.claude directory${reset}
-    npx get-shit-done-cc --global
+    npx get-shit-done-multi --global
 
     ${dim}# Install to custom config directory (for multiple Claude accounts)${reset}
-    npx get-shit-done-cc --global --config-dir ~/.claude-bc
+    npx get-shit-done-multi --global --config-dir ~/.claude-bc
 
     ${dim}# Using environment variable${reset}
-    CLAUDE_CONFIG_DIR=~/.claude-bc npx get-shit-done-cc --global
+    CLAUDE_CONFIG_DIR=~/.claude-bc npx get-shit-done-multi --global
 
     ${dim}# Install to current project only${reset}
-    npx get-shit-done-cc --local
+    npx get-shit-done-multi --local
 
     ${dim}# Install GitHub Copilot CLI assets to this repository${reset}
-    npx get-shit-done-cc --copilot
+    npx get-shit-done-multi --copilot
 
     ${dim}# Install Codex CLI assets to current project${reset}
-    npx get-shit-done-cc --codex
+    npx get-shit-done-multi --codex
 
     ${dim}# Install Codex CLI assets globally${reset}
-    npx get-shit-done-cc --codex-global
+    npx get-shit-done-multi --codex-global
 
   ${yellow}Notes:${reset}
     The --config-dir option is useful when you have multiple Claude Code
@@ -538,7 +538,7 @@ function install(isGlobal) {
   // If critical components failed, exit with error
   if (failures.length > 0) {
     console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
-    console.error(`  Try running directly: node ~/.npm/_npx/*/node_modules/get-shit-done-cc/bin/install.js --global\n`);
+    console.error(`  Try running directly: node ~/.npm/_npx/*/node_modules/get-shit-done-multi/bin/install.js --global\n`);
     process.exit(1);
   }
 

@@ -88,7 +88,7 @@ runDiagnostics(tests).then(summary => {
 **Common Issues:**
 
 1. **CLI not installed**: Follow the installation link provided
-2. **Skill not registered**: Run `npx get-shit-done-cc --<cli>` to register
+2. **Skill not registered**: Run `npx get-shit-done-multi --<cli>` to register
 3. **Commands missing**: Reinstall GSD package
 4. **Agent not supported**: Use a different CLI for that agent
 

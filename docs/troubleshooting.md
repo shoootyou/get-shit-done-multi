@@ -42,7 +42,7 @@ This guide helps you diagnose and resolve common issues when using GSD (Get Shit
 ls -la .claude/get-shit-done/
 
 # 2. If missing, install
-npx get-shit-done-cc --claude
+npx get-shit-done-multi --claude
 
 # 3. Restart Claude Code to refresh skills
 # (Skills are cached by Claude Code runtime)
@@ -57,7 +57,7 @@ npx get-shit-done-cc --claude
 ls -la .github/skills/get-shit-done/
 
 # 2. If missing, install
-npx get-shit-done-cc --copilot
+npx get-shit-done-multi --copilot
 
 # 3. Reload skills
 gh copilot reload
@@ -72,7 +72,7 @@ gh copilot reload
 ls -la .codex/skills/get-shit-done/
 
 # 2. If missing, install
-npx get-shit-done-cc --codex
+npx get-shit-done-multi --codex
 
 # 3. Reload skills
 codex skills reload
@@ -116,10 +116,10 @@ ls .codex/skills/get-shit-done/    # Local
 1. **Determine intended installation type:**
    ```bash
    # For global: Affects all projects
-   npx get-shit-done-cc --claude  # Installs globally by default
+   npx get-shit-done-multi --claude  # Installs globally by default
    
    # For local: Project-specific
-   npx get-shit-done-cc --claude --local
+   npx get-shit-done-multi --claude --local
    ```
 
 2. **Remove incorrect installation:**
@@ -316,7 +316,7 @@ cat .claude/get-shit-done/package.json 2>/dev/null
 3. **Reinstall skills:**
    ```bash
    rm -rf .claude/get-shit-done/
-   npx get-shit-done-cc --claude
+   npx get-shit-done-multi --claude
    ```
 
 **Root Cause:**
@@ -589,7 +589,7 @@ codex skills list
    rm -rf .codex/prompts/*
    
    # Reinstall to regenerate
-   npx get-shit-done-cc --codex
+   npx get-shit-done-multi --codex
    ```
 
 **Root Cause:**
@@ -624,7 +624,7 @@ cat .codex/prompts/new-project.txt
 
 2. **Reinstall to regenerate prompts:**
    ```bash
-   npx get-shit-done-cc --codex
+   npx get-shit-done-multi --codex
    ```
 
 3. **Verify Codex CLI config:**
@@ -794,7 +794,7 @@ cat .planning/command-recordings/latest.json
 
 2. **Reinstall if modified:**
    ```bash
-   npx get-shit-done-cc --claude --force  # Overwrites existing
+   npx get-shit-done-multi --claude --force  # Overwrites existing
    ```
 
 3. **Check input quality:**

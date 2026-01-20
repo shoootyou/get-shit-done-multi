@@ -59,7 +59,7 @@ class CommandAvailableTest extends DiagnosticTest {
           status: 'fail',
           message: 'commands/gsd/ directory not found',
           fixes: [
-            'Reinstall GSD: npm install -g get-shit-done-cc',
+            'Reinstall GSD: npm install -g get-shit-done-multi',
             'Check that you are in a GSD-enabled directory'
           ]
         };
@@ -97,7 +97,7 @@ class CommandAvailableTest extends DiagnosticTest {
           status: 'fail',
           message: 'No GSD commands found',
           fixes: [
-            'Run: npx get-shit-done-cc --<cli> to install GSD',
+            'Run: npx get-shit-done-multi --<cli> to install GSD',
             'Check CLI skill/prompt directory exists'
           ]
         };
