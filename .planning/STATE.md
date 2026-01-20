@@ -8,24 +8,21 @@
 
 ## Project Reference
 
-### Core Value
-Enable developers to use GSD workflows in Codex CLI with the same power and reliability they experience in Claude Code and GitHub Copilot CLI, with seamless switching between all three CLIs on the same project.
+See: .planning/PROJECT.md (updated 2026-01-20)
 
-### Current Focus
-Agent translation - building orchestration layer that enables CLI-agnostic agent invocation across Claude, Copilot, and Codex.
+**Core value:** Enable developers to use GSD workflows in Codex CLI with the same power and reliability they experience in Claude Code and GitHub Copilot CLI, with seamless switching between all three CLIs on the same project.
+
+**Current focus:** v1.0 milestone complete — Planning next milestone
 
 ---
 
 ## Current Position
 
-**Phase:** 6 of 6 (Documentation & Verification)  
-**Plan:** 6 of 6 (Complete)  
-**Status:** Phase 6 complete - Project complete  
-**Progress:** `█████████████████████████████` 100% (29 of 29 total plans complete)
+**Milestone:** v1.0 complete (2026-01-20)  
+**Status:** Ready for next milestone  
+**Last activity:** 2026-01-20 - v1.0 milestone archived
 
-**Last activity:** 2026-01-20 - Completed 06-06-PLAN.md (Documentation Automation)
-
-**Next Action:** Project complete - All phases finished
+**Next Action:** Run `/gsd:new-milestone` to start v2.0 planning
 
 ---
 
