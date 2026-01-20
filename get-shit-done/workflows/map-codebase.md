@@ -67,6 +67,70 @@ mkdir -p .planning/codebase
 - TESTING.md (from quality mapper)
 - CONCERNS.md (from concerns mapper)
 
+Continue to check_config.
+</step>
+
+<step name="check_config">
+Check for optional exclusion config file:
+
+```bash
+# Check for optional exclusion config
+if [ -f .planning/map-config.json ]; then
+  echo "Found custom exclusion config: .planning/map-config.json"
+  cat .planning/map-config.json
+else
+  echo "No custom config - using defaults (.claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage)"
+fi
+```
+
+**Config file format (.planning/map-config.json):**
+```json
+{
+  "exclude": [
+    "additional-pattern",
+    "vendor/",
+    "*.generated.*"
+  ]
+}
+```
+
+Continue to build_exclusion_list.
+</step>
+
+<step name="build_exclusion_list">
+Build explicit exclusion list to pass to each agent spawn.
+
+**Purpose:** Create a single source of truth for exclusions that agents will use in all tool calls. This prevents agents from scanning infrastructure directories (.github, .claude, .codex).
+
+```bash
+# Build complete exclusion list
+EXCLUDE_DIRS=".claude,.github,.codex,node_modules,.git,dist,build,out,target,coverage"
+
+# Add .gitignore patterns
+if [ -f .gitignore ]; then
+  GITIGNORE_PATTERNS=$(grep -v '^#' .gitignore | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+  if [ -n "$GITIGNORE_PATTERNS" ]; then
+    EXCLUDE_DIRS="${EXCLUDE_DIRS},${GITIGNORE_PATTERNS}"
+  fi
+fi
+
+# Add custom patterns from map-config.json
+if [ -f .planning/map-config.json ]; then
+  CUSTOM_PATTERNS=$(cat .planning/map-config.json | grep -oP '"exclude":\s*\[\s*\K[^\]]+' | tr -d '"' | tr -d ' ')
+  if [ -n "$CUSTOM_PATTERNS" ]; then
+    EXCLUDE_DIRS="${EXCLUDE_DIRS},${CUSTOM_PATTERNS}"
+  fi
+fi
+
+echo "Exclusion list built: ${EXCLUDE_DIRS}"
+```
+
+**What happens:**
+- Starts with default infrastructure patterns
+- Adds .gitignore patterns if file exists
+- Adds custom patterns from .planning/map-config.json if file exists
+- Stores in EXCLUDE_DIRS variable for use in spawn_agents step
+
 Continue to spawn_agents.
 </step>
 
@@ -96,6 +160,13 @@ Write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
 
+**EXCLUDE these directories:** ${EXCLUDE_DIRS}
+
+When using tools:
+- Grep tool: Use path parameter to exclude these directories
+- Glob tool: Verify results don't include excluded paths
+- Bash tool: Use find/grep with -not -path patterns for each excluded dir
+
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
@@ -117,6 +188,13 @@ Analyze this codebase architecture and directory structure.
 Write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
+
+**EXCLUDE these directories:** ${EXCLUDE_DIRS}
+
+When using tools:
+- Grep tool: Use path parameter to exclude these directories
+- Glob tool: Verify results don't include excluded paths
+- Bash tool: Use find/grep with -not -path patterns for each excluded dir
 
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
@@ -140,6 +218,13 @@ Write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
 
+**EXCLUDE these directories:** ${EXCLUDE_DIRS}
+
+When using tools:
+- Grep tool: Use path parameter to exclude these directories
+- Glob tool: Verify results don't include excluded paths
+- Bash tool: Use find/grep with -not -path patterns for each excluded dir
+
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
@@ -160,6 +245,13 @@ Analyze this codebase for technical debt, known issues, and areas of concern.
 
 Write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
+
+**EXCLUDE these directories:** ${EXCLUDE_DIRS}
+
+When using tools:
+- Grep tool: Use path parameter to exclude these directories
+- Glob tool: Verify results don't include excluded paths
+- Bash tool: Use find/grep with -not -path patterns for each excluded dir
 
 Explore thoroughly. Write document directly using template. Return confirmation only.
 ```
@@ -197,6 +289,9 @@ Verify all documents created successfully:
 ```bash
 ls -la .planning/codebase/
 wc -l .planning/codebase/*.md
+
+# Extract codebase metrics from STRUCTURE.md
+grep -A 10 "Codebase Metrics" .planning/codebase/STRUCTURE.md 2>/dev/null || echo "Metrics not found in STRUCTURE.md"
 ```
 
 **Verification checklist:**
@@ -243,7 +338,12 @@ wc -l .planning/codebase/*.md
 ```
 Codebase mapping complete.
 
-Created .planning/codebase/:
+**Codebase Metrics:**
+- Files analyzed: [N] files
+- Lines of code: [N] lines
+- Test files: [N] files
+
+**Documents created** (.planning/codebase/):
 - STACK.md ([N] lines) - Technologies and dependencies
 - ARCHITECTURE.md ([N] lines) - System design and patterns
 - STRUCTURE.md ([N] lines) - Directory layout and organization
@@ -251,6 +351,12 @@ Created .planning/codebase/:
 - TESTING.md ([N] lines) - Test structure and practices
 - INTEGRATIONS.md ([N] lines) - External services and APIs
 - CONCERNS.md ([N] lines) - Technical debt and issues
+
+**Excluded from analysis:**
+Infrastructure: .claude, .github, .codex, node_modules, .git
+Build artifacts: dist, build, out, target, coverage
+
+Metrics reflect application code only (infrastructure excluded)
 
 
 ---
@@ -269,6 +375,7 @@ Created .planning/codebase/:
 - Re-run mapping: `/gsd:map-codebase`
 - Review specific file: `cat .planning/codebase/STACK.md`
 - Edit any document before proceeding
+- **Customize exclusions:** Create `.planning/map-config.json` with additional patterns
 
 ---
 ```

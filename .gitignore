@@ -3,8 +3,10 @@ package-lock.json
 .DS_Store
 TO-DOS.md
 CLAUDE.md
-.planning
 /research.claude/
 
-# Local test installs
+# Planning folder and files
 .planning-old
+.planning/config.json
+.planning/debug
+.planning/VERIFICATION.md

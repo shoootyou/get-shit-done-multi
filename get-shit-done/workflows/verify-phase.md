@@ -583,6 +583,12 @@ See ~/.claude/get-shit-done/templates/verification-report.md for complete templa
 {If passed:}
 All must-haves verified. Phase goal achieved. Ready to proceed.
 
+### Next Steps
+
+With phase complete, consider:
+1. `/gsd:verify-milestone` - Verify entire milestone is complete
+2. `/gsd:archive-milestone` - Archive completed milestone for clean slate
+
 {If gaps_found:}
 ### Gaps Found
 
