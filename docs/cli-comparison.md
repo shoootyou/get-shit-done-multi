@@ -1,3 +1,13 @@
+---
+generated: true
+timestamp: 2026-01-20T00:10:09.892Z
+generator: generate-comparison.js
+gsd-version: 1.6.4
+---
+
+> **Note:** This file is auto-generated. Do not edit manually.
+> Last generated: January 20, 2026
+
 # CLI Comparison Matrix
 
 **Last generated:** 2026-01-19 23:37 UTC
