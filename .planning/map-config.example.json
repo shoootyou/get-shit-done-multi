@@ -1,0 +1,12 @@
+{
+  "exclude": [
+    "*.log",
+    "*.tmp",
+    "temp/",
+    "scratch/",
+    ".DS_Store",
+    "*.swp",
+    "*.swo"
+  ],
+  "_comment": "Custom exclusion patterns for map-codebase. Copy to .planning/map-config.json to activate. Uses gitignore pattern syntax."
+}

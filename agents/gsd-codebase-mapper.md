@@ -62,6 +62,9 @@ Describe only what IS, never what WAS or what you considered. No temporal langua
 
 **Be prescriptive, not descriptive:**
 Your documents guide future Claude instances writing code. "Use X pattern" is more useful than "X pattern is used."
+
+**Exclude infrastructure directories to focus on application code only:**
+Apply exclusion patterns to avoid analyzing tooling, dependencies, and generated artifacts. Focus on the actual application codebase.
 </philosophy>
 
 <process>
@@ -76,8 +79,38 @@ Based on focus, determine which documents you'll write:
 - `concerns` → CONCERNS.md
 </step>
 
+<step name="parse_exclusions">
+Parse exclusion list from spawn prompt parameter.
+
+The workflow passes exclusion list as: **EXCLUDE these directories:** .claude,.github,...
+
+Extract comma-separated list and store for use in exploration commands.
+
+**For Bash commands:**
+- Convert each dir to `-not -path '*/DIR/*'` format
+- Example: `.github` becomes `-not -path '*/.github/*'`
+
+**For Grep commands:**
+- Use `--exclude-dir={dir1,dir2,...}` format
+- Example: `--exclude-dir={.github,.claude,.codex,...}`
+
+**For Glob commands:**
+- Verify results don't include excluded paths
+- Filter out any matches in excluded directories
+</step>
+
 <step name="explore_codebase">
-Explore the codebase thoroughly for your focus area.
+Explore the codebase thoroughly for your focus area. **Apply exclusion patterns from parse_exclusions step to all commands.**
+
+**CRITICAL: Apply exclusions from spawn prompt:**
+The workflow provides: **EXCLUDE these directories:** [list]
+
+Use this list in ALL tool calls:
+- Grep tool: `--exclude-dir={dirs from list}`
+- Glob tool: Verify results don't include excluded paths
+- Bash tool: Add `-not -path '*/DIR/*'` for each excluded dir
+
+Example exclusions: .claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage
 
 **For tech focus:**
 ```bash
@@ -88,20 +121,107 @@ cat package.json 2>/dev/null | head -100
 # Config files
 ls -la *.config.* .env* tsconfig.json .nvmrc .python-version 2>/dev/null
 
-# Find SDK/API imports
-grep -r "import.*stripe\|import.*supabase\|import.*aws\|import.*@" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -50
+# Find SDK/API imports (exclude infrastructure directories)
+grep -r "import.*stripe\|import.*supabase\|import.*aws\|import.*@" src/ \
+  --include="*.ts" --include="*.tsx" \
+  --exclude-dir={node_modules,.git,.claude,.github,.codex,dist,build,out,target,coverage} \
+  2>/dev/null | head -50
+
+# Quick size metrics (exclude infrastructure)
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.tsx" -o -name "*.jsx" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | wc -l
 ```
 
 **For arch focus:**
 ```bash
-# Directory structure
-find . -type d -not -path '*/node_modules/*' -not -path '*/.git/*' | head -50
+# Generate directory tree (excluding infrastructure)
+tree -L 3 -I 'node_modules|.git|.github|.claude|.codex|dist|build|out|target|coverage' --charset ascii 2>/dev/null || \
+  find . -type d \
+    -not -path '*/node_modules/*' \
+    -not -path '*/.git/*' \
+    -not -path '*/.github/*' \
+    -not -path '*/.claude/*' \
+    -not -path '*/.codex/*' \
+    -not -path '*/dist/*' \
+    -not -path '*/build/*' \
+    -not -path '*/out/*' \
+    -not -path '*/target/*' \
+    -not -path '*/coverage/*' \
+    | head -100
+
+# Count files by type (excluding infrastructure)
+find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | wc -l
+
+find . -type f \( -name "*.test.*" -o -name "*.spec.*" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | wc -l
+
+# Count total lines (excluding infrastructure)
+find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | xargs wc -l 2>/dev/null | tail -1
+
+# Directory structure (exclude infrastructure and generated directories)
+find . -type d \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | head -50
 
 # Entry points
 ls src/index.* src/main.* src/app.* src/server.* app/page.* 2>/dev/null
 
-# Import patterns to understand layers
-grep -r "^import" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -100
+# Import patterns to understand layers (exclude infrastructure)
+grep -r "^import" src/ \
+  --include="*.ts" --include="*.tsx" \
+  --exclude-dir={node_modules,.git,.claude,.github,.codex,dist,build,out,target,coverage} \
+  2>/dev/null | head -100
 ```
 
 **For quality focus:**
@@ -110,27 +230,100 @@ grep -r "^import" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -10
 ls .eslintrc* .prettierrc* eslint.config.* biome.json 2>/dev/null
 cat .prettierrc 2>/dev/null
 
-# Test files and config
+# Test files and config (exclude infrastructure)
 ls jest.config.* vitest.config.* 2>/dev/null
-find . -name "*.test.*" -o -name "*.spec.*" | head -30
+find . \( -name "*.test.*" -o -name "*.spec.*" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | head -30
 
-# Sample source files for convention analysis
-ls src/**/*.ts 2>/dev/null | head -10
+# Sample source files for convention analysis (exclude infrastructure)
+find src/ -name "*.ts" -o -name "*.tsx" \
+  -not -path '*/node_modules/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/coverage/*' \
+  2>/dev/null | head -10
+
+# Count source and test files (exclude infrastructure)
+find . -type f \( -name "*.ts" -o -name "*.js" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  -not -path '*/.*test.*' \
+  -not -path '*/.*spec.*' \
+  | wc -l
+
+find . -type f \( -name "*.test.*" -o -name "*.spec.*" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | wc -l
 ```
 
 **For concerns focus:**
 ```bash
-# TODO/FIXME comments
-grep -rn "TODO\|FIXME\|HACK\|XXX" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -50
+# TODO/FIXME comments (exclude infrastructure)
+grep -rn "TODO\|FIXME\|HACK\|XXX" src/ \
+  --include="*.ts" --include="*.tsx" \
+  --exclude-dir={node_modules,.git,.claude,.github,.codex,dist,build,out,target,coverage} \
+  2>/dev/null | head -50
 
-# Large files (potential complexity)
-find src/ -name "*.ts" -o -name "*.tsx" | xargs wc -l 2>/dev/null | sort -rn | head -20
+# Large files - potential complexity (exclude infrastructure)
+find src/ \( -name "*.ts" -o -name "*.tsx" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/coverage/*' \
+  | xargs wc -l 2>/dev/null | sort -rn | head -20
 
-# Empty returns/stubs
-grep -rn "return null\|return \[\]\|return {}" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -30
+# Empty returns/stubs (exclude infrastructure)
+grep -rn "return null\|return \[\]\|return {}" src/ \
+  --include="*.ts" --include="*.tsx" \
+  --exclude-dir={node_modules,.git,.claude,.github,.codex,dist,build,out,target,coverage} \
+  2>/dev/null | head -30
+
+# Count TODOs and large files (exclude infrastructure)
+grep -r "TODO\|FIXME\|HACK" . --include="*.ts" --include="*.js" \
+  --exclude-dir={node_modules,.git,.claude,.github,.codex,dist,build,out,target,coverage} | wc -l
+
+find . -type f \( -name "*.ts" -o -name "*.js" \) \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*' \
+  -not -path '*/.github/*' \
+  -not -path '*/.claude/*' \
+  -not -path '*/.codex/*' \
+  -not -path '*/dist/*' \
+  -not -path '*/build/*' \
+  -not -path '*/out/*' \
+  -not -path '*/target/*' \
+  -not -path '*/coverage/*' \
+  | xargs wc -l 2>/dev/null | awk '$1 > 500' | wc -l
 ```
 
-Read key files identified during exploration. Use Glob and Grep liberally.
+Read key files identified during exploration. Use Glob and Grep liberally with exclusion patterns.
 </step>
 
 <step name="write_documents">
@@ -173,6 +366,10 @@ Ready for orchestrator summary.
 # Technology Stack
 
 **Analysis Date:** [YYYY-MM-DD]
+
+**Codebase Size:**
+- Files analyzed: [N] files
+- Lines of code: [N] lines (excluding node_modules, build artifacts)
 
 ## Languages
 
@@ -309,6 +506,11 @@ Ready for orchestrator summary.
 
 **Analysis Date:** [YYYY-MM-DD]
 
+**Scope:**
+- Source files: [N] files
+- Primary language: [Language] ([N]% of codebase)
+- LOC: [N] lines
+
 ## Pattern Overview
 
 **Overall:** [Pattern name]
@@ -378,14 +580,32 @@ Ready for orchestrator summary.
 
 **Analysis Date:** [YYYY-MM-DD]
 
+## Codebase Metrics
+
+**Analysis Date:** [YYYY-MM-DD]
+
+**Files Analyzed:**
+- Total files: [N] files
+- Source files: [N] files
+- Test files: [N] files
+- Config files: [N] files
+
+**Lines of Code:**
+- Total: [N] lines
+- Source: [N] lines
+- Tests: [N] lines
+
+**Excluded from analysis:**
+- Infrastructure: .claude, .github, .codex, node_modules, .git
+- Build artifacts: dist, build, out, target, coverage
+
 ## Directory Layout
 
+```plaintext
+[Insert tree command output here]
 ```
-[project-root]/
-├── [dir]/          # [Purpose]
-├── [dir]/          # [Purpose]
-└── [file]          # [Purpose]
-```
+
+Generated with: `tree -L 3 -I 'node_modules|.git|...' --charset ascii` or `find` command fallback
 
 ## Directory Purposes
 
@@ -446,6 +666,10 @@ Ready for orchestrator summary.
 # Coding Conventions
 
 **Analysis Date:** [YYYY-MM-DD]
+
+**Analysis Scope:**
+- Files reviewed: [N] source files
+- Test files: [N] files
 
 ## Naming Patterns
 
@@ -526,6 +750,11 @@ Ready for orchestrator summary.
 # Testing Patterns
 
 **Analysis Date:** [YYYY-MM-DD]
+
+**Test Coverage:**
+- Test files: [N] files
+- Source files: [N] files
+- Test ratio: [N]% (test files / source files)
 
 ## Test Framework
 
@@ -636,6 +865,11 @@ Ready for orchestrator summary.
 # Codebase Concerns
 
 **Analysis Date:** [YYYY-MM-DD]
+
+**Analysis Scope:**
+- Files scanned: [N] files
+- TODO/FIXME found: [N] instances
+- Large files (>500 LOC): [N] files
 
 ## Tech Debt
 
