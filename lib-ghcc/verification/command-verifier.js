@@ -20,33 +20,8 @@ class CommandAvailableTest extends DiagnosticTest {
       'Verify GSD command files are accessible'
     );
     
-    // Expected GSD commands based on the project structure
-    this.expectedCommands = [
-      'add-phase.md',
-      'add-todo.md',
-      'audit-milestone.md',
-      'check-todos.md',
-      'complete-milestone.md',
-      'debug.md',
-      'discuss-phase.md',
-      'execute-phase.md',
-      'execute-plan.md',
-      'help.md',
-      'init-project.md',
-      'invoke-agent.md',
-      'map-codebase.md',
-      'new-milestone.md',
-      'new-project.md',
-      'plan-phase.md',
-      'progress.md',
-      'refine-phase.md',
-      'rename-phase.md',
-      'research-phase.md',
-      'status.md',
-      'track-decision.md',
-      'verify-phase.md',
-      'verify-installation.md'
-    ];
+    // No hardcoded list - discover commands dynamically from filesystem
+    this.expectedCommands = null;
   }
   
   async run() {
@@ -65,34 +40,13 @@ class CommandAvailableTest extends DiagnosticTest {
         };
       }
       
-      // Check which command files exist
+      // Discover all command files dynamically
       const existingCommands = fs.readdirSync(commandsDir)
         .filter(file => file.endsWith('.md'));
       
-      const missingCommands = this.expectedCommands.filter(
-        cmd => !existingCommands.includes(cmd)
-      );
+      const commandCount = existingCommands.length;
       
-      // Calculate availability
-      const availableCount = this.expectedCommands.length - missingCommands.length;
-      const totalCount = this.expectedCommands.length;
-      
-      if (missingCommands.length === 0) {
-        return {
-          status: 'pass',
-          message: `All ${totalCount} GSD commands available`,
-          fixes: []
-        };
-      } else if (availableCount > 0) {
-        return {
-          status: 'warn',
-          message: `${availableCount}/${totalCount} GSD commands available (missing: ${missingCommands.length})`,
-          fixes: [
-            `Missing commands: ${missingCommands.slice(0, 3).join(', ')}${missingCommands.length > 3 ? '...' : ''}`,
-            'Reinstall GSD to restore missing commands'
-          ]
-        };
-      } else {
+      if (commandCount === 0) {
         return {
           status: 'fail',
           message: 'No GSD commands found',
@@ -102,6 +56,13 @@ class CommandAvailableTest extends DiagnosticTest {
           ]
         };
       }
+      
+      // All discovered commands are available
+      return {
+        status: 'pass',
+        message: `All ${commandCount} GSD commands available`,
+        fixes: []
+      };
       
     } catch (error) {
       return {

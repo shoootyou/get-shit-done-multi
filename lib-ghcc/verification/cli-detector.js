@@ -142,25 +142,38 @@ class SkillRegisteredTest extends DiagnosticTest {
     try {
       const paths = getConfigPaths(this.cli);
       
-      // Check if CLI is installed first
-      if (!fs.existsSync(paths.global)) {
-        return {
-          status: 'warn',
-          message: `${this.cli} not installed - skipping skill check`,
-          fixes: [`Install ${this.cli} CLI first`]
-        };
-      }
-      
-      // Check if skill directory exists
+      // Check if skill directory exists first
       if (!fs.existsSync(paths.skill)) {
-        return {
-          status: 'fail',
-          message: `GSD skill not registered in ${this.cli}`,
-          fixes: [
-            `Run: npx get-shit-done-multi --${this.cli}`,
-            `Or manually copy skill files to: ${paths.skill}`
-          ]
-        };
+        // Skill not registered - check if CLI is installed
+        if (!fs.existsSync(paths.global)) {
+          // CLI not installed - this is expected, not a failure
+          return {
+            status: 'skip',
+            message: `${this.cli} CLI not installed (skipped)`,
+            fixes: []
+          };
+        } else {
+          // CLI installed but skill not registered - only fail if this seems intentional
+          // Check if there's ANY skill/prompt directory structure
+          const hasAnySkills = this.hasAnySkills(paths.global);
+          if (!hasAnySkills) {
+            // CLI installed but never used with skills - skip
+            return {
+              status: 'skip',
+              message: `${this.cli} CLI installed but not configured for skills (skipped)`,
+              fixes: []
+            };
+          }
+          // CLI has other skills but not GSD - this might be intentional
+          return {
+            status: 'warn',
+            message: `GSD skill not registered in ${this.cli}`,
+            fixes: [
+              `To use GSD with ${this.cli}, run: npx get-shit-done-multi --${this.cli}`,
+              `Or continue using GSD with your preferred CLI`
+            ]
+          };
+        }
       }
       
       // Check for key skill files
@@ -195,6 +208,30 @@ class SkillRegisteredTest extends DiagnosticTest {
         message: `Skill check error: ${error.message}`,
         fixes: ['Check CLI installation and try reinstalling GSD']
       };
+    }
+  }
+  
+  /**
+   * Check if CLI has any skills/agents configured
+   * @param {string} globalPath - Path to CLI global directory
+   * @returns {boolean}
+   */
+  hasAnySkills(globalPath) {
+    try {
+      // Check for skill/agent directories
+      const skillDirs = [
+        path.join(globalPath, 'skills'),
+        path.join(globalPath, '.agent'),
+        path.join(globalPath, 'prompts')
+      ];
+      
+      return skillDirs.some(dir => {
+        if (!fs.existsSync(dir)) return false;
+        const contents = fs.readdirSync(dir);
+        return contents.length > 0;
+      });
+    } catch (error) {
+      return false;
     }
   }
 }

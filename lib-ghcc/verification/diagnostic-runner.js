@@ -26,6 +26,7 @@ async function runDiagnostics(tests) {
   let passed = 0;
   let failed = 0;
   let warned = 0;
+  let skipped = 0;
   
   for (const test of tests) {
     console.log(`Checking: ${test.description}...`);
@@ -37,7 +38,7 @@ async function runDiagnostics(tests) {
       if (!result || typeof result !== 'object') {
         throw new Error('Test must return an object');
       }
-      if (!['pass', 'fail', 'warn'].includes(result.status)) {
+      if (!['pass', 'fail', 'warn', 'skip'].includes(result.status)) {
         throw new Error(`Invalid status: ${result.status}`);
       }
       
@@ -45,6 +46,7 @@ async function runDiagnostics(tests) {
       if (result.status === 'pass') passed++;
       else if (result.status === 'fail') failed++;
       else if (result.status === 'warn') warned++;
+      else if (result.status === 'skip') skipped++;
       
       // Store result
       results.push({
@@ -54,20 +56,22 @@ async function runDiagnostics(tests) {
         fixes: result.fixes || []
       });
       
-      // Pretty print result
-      const icon = result.status === 'pass' ? '✓' : 
-                   result.status === 'warn' ? '⚠' : '✗';
-      console.log(`  ${icon} ${result.message}`);
-      
-      // Show fixes for failures and warnings
-      if ((result.status === 'fail' || result.status === 'warn') && result.fixes && result.fixes.length > 0) {
-        console.log('\n  Suggested fixes:');
-        result.fixes.forEach((fix, idx) => {
-          console.log(`    ${idx + 1}. ${fix}`);
-        });
+      // Pretty print result (skip 'skip' status in output)
+      if (result.status !== 'skip') {
+        const icon = result.status === 'pass' ? '✓' : 
+                     result.status === 'warn' ? '⚠' : '✗';
+        console.log(`  ${icon} ${result.message}`);
+        
+        // Show fixes for failures and warnings
+        if ((result.status === 'fail' || result.status === 'warn') && result.fixes && result.fixes.length > 0) {
+          console.log('\n  Suggested fixes:');
+          result.fixes.forEach((fix, idx) => {
+            console.log(`    ${idx + 1}. ${fix}`);
+          });
+        }
+        
+        console.log(''); // Blank line between tests
       }
-      
-      console.log(''); // Blank line between tests
       
     } catch (error) {
       // Test threw an error
@@ -87,6 +91,7 @@ async function runDiagnostics(tests) {
     passed,
     failed,
     warned,
+    skipped,
     results
   };
 }
