@@ -12,6 +12,7 @@ const { getRecommendations } = require('../lib-ghcc/cli-recommender');
 const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
+const { generateAgent } = require('./lib/template-system/generator');
 
 // Colors
 const cyan = '\x1b[36m';
@@ -232,6 +233,68 @@ function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill'
 }
 
 /**
+ * Generate agents from spec files using template system
+ * @param {string} specsDir - Directory containing spec files (*.md)
+ * @param {string} outputDir - Directory to write generated agents
+ * @param {string} platform - Target platform ('claude', 'copilot', 'codex')
+ * @returns {Object} { generated: number, failed: number, errors: Array }
+ */
+function generateAgentsFromSpecs(specsDir, outputDir, platform) {
+  const errors = [];
+  let generated = 0;
+  let failed = 0;
+
+  try {
+    // Ensure output directory exists
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    // Read all spec files
+    const specFiles = fs.readdirSync(specsDir)
+      .filter(file => file.endsWith('.md') && file !== '.gitkeep');
+
+    for (const specFile of specFiles) {
+      const specPath = path.join(specsDir, specFile);
+      
+      try {
+        // Generate agent using template system
+        const result = generateAgent(specPath, platform);
+        
+        if (result.success) {
+          // Write generated content to output directory
+          const outputPath = path.join(outputDir, specFile);
+          fs.writeFileSync(outputPath, result.output, 'utf8');
+          generated++;
+          
+          // Log warnings if any
+          if (result.warnings && result.warnings.length > 0) {
+            result.warnings.forEach(warning => {
+              console.log(`  ${yellow}⚠${reset} ${specFile}: ${warning.message || warning}`);
+            });
+          }
+        } else {
+          // Generation failed
+          failed++;
+          const errorMsg = result.errors && result.errors.length > 0
+            ? result.errors.map(e => e.message).join(', ')
+            : 'Unknown error';
+          errors.push({ file: specFile, error: errorMsg });
+          console.error(`  ${yellow}✗${reset} Failed to generate ${specFile}: ${errorMsg}`);
+        }
+      } catch (err) {
+        failed++;
+        errors.push({ file: specFile, error: err.message });
+        console.error(`  ${yellow}✗${reset} Error generating ${specFile}: ${err.message}`);
+      }
+    }
+  } catch (err) {
+    errors.push({ error: `Failed to read specs directory: ${err.message}` });
+    console.error(`  ${yellow}✗${reset} Failed to read specs directory: ${err.message}`);
+  }
+
+  return { generated, failed, errors };
+}
+
+/**
  * Clean up orphaned files from previous GSD versions
  */
 function cleanupOrphanedFiles(claudeDir) {
@@ -361,6 +424,37 @@ function getFrontMatterValue(frontMatter, key) {
 }
 
 function copyCopilotAgents(srcDir, destDir, pathPrefix) {
+  // Use template generation instead of static copying
+  const specsDir = path.join(__dirname, '..', 'specs', 'agents');
+  
+  if (fs.existsSync(specsDir)) {
+    // Remove old GSD agents before generating new ones
+    fs.mkdirSync(destDir, { recursive: true });
+    for (const file of fs.readdirSync(destDir)) {
+      if (file.startsWith('gsd-') && (file.endsWith('.agent.md') || file.endsWith('.md'))) {
+        fs.unlinkSync(path.join(destDir, file));
+      }
+    }
+
+    // Generate platform-optimized agents
+    const genResult = generateAgentsFromSpecs(specsDir, destDir, 'copilot');
+    
+    // Rename .md to .agent.md for Copilot convention
+    if (genResult.generated > 0) {
+      const files = fs.readdirSync(destDir);
+      for (const file of files) {
+        if (file.endsWith('.md') && !file.endsWith('.agent.md')) {
+          const oldPath = path.join(destDir, file);
+          const newPath = path.join(destDir, file.replace(/\.md$/, '.agent.md'));
+          fs.renameSync(oldPath, newPath);
+        }
+      }
+    }
+    
+    return genResult.generated > 0;
+  }
+  
+  // Fallback to old copy method if specs don't exist
   if (!fs.existsSync(srcDir)) {
     return false;
   }
@@ -449,13 +543,11 @@ function install(isGlobal) {
     failures.push('get-shit-done');
   }
 
-  // Copy agents to ~/.claude/agents (subagents must be at root level)
-  // Only delete gsd-*.md files to preserve user's custom agents
-  const agentsSrc = path.join(src, 'agents');
-  if (fs.existsSync(agentsSrc)) {
+  // Generate agents from specs using template system
+  const specsDir = path.join(src, 'specs', 'agents');
+  if (fs.existsSync(specsDir)) {
+    // Remove old GSD agents (gsd-*.md) before generating new ones
     fs.mkdirSync(dirs.agents, { recursive: true });
-
-    // Remove old GSD agents (gsd-*.md) before copying new ones
     if (fs.existsSync(dirs.agents)) {
       for (const file of fs.readdirSync(dirs.agents)) {
         if (file.startsWith('gsd-') && file.endsWith('.md')) {
@@ -464,13 +556,34 @@ function install(isGlobal) {
       }
     }
 
-    // Copy new agents
+    // Generate platform-optimized agents
+    const genResult = generateAgentsFromSpecs(specsDir, dirs.agents, 'claude');
+    if (genResult.generated > 0) {
+      const failedMsg = genResult.failed > 0 ? ` (${genResult.failed} failed)` : '';
+      console.log(`  ${green}✓${reset} Generated ${genResult.generated} agents from specs${failedMsg}`);
+    }
+    if (genResult.failed > 0) {
+      failures.push(`agents (${genResult.failed} generation failures)`);
+    }
+  }
+
+  // Copy agents to ~/.claude/agents (subagents must be at root level)
+  // Keep as fallback for any agents not in specs/
+  const agentsSrc = path.join(src, 'agents');
+  if (fs.existsSync(agentsSrc)) {
+    fs.mkdirSync(dirs.agents, { recursive: true });
+
+    // Copy any agents from static agents/ directory (fallback)
     const agentEntries = fs.readdirSync(agentsSrc, { withFileTypes: true });
     for (const entry of agentEntries) {
       if (entry.isFile() && entry.name.endsWith('.md')) {
-        let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
-        content = claudeAdapter.convertContent(content, 'agent');
-        fs.writeFileSync(path.join(dirs.agents, entry.name), content);
+        // Only copy if not already generated from specs
+        const destPath = path.join(dirs.agents, entry.name);
+        if (!fs.existsSync(destPath)) {
+          let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
+          content = claudeAdapter.convertContent(content, 'agent');
+          fs.writeFileSync(destPath, content);
+        }
       }
     }
     if (verifyInstalled(dirs.agents, 'agents')) {
@@ -798,22 +911,62 @@ function installCodex(isGlobal) {
     failures.push('skills/get-shit-done/VERSION');
   }
 
-  // Codex: convert agents to skill format (folder-per-skill structure)
+  // Generate agents from specs using template system (Codex optimization deferred, use claude for now)
+  const specsDir = path.join(src, 'specs', 'agents');
+  if (fs.existsSync(specsDir)) {
+    // Create temporary directory for generated agents
+    const tempAgentsDir = path.join(src, '.temp-codex-agents');
+    fs.mkdirSync(tempAgentsDir, { recursive: true });
+    
+    // Generate platform-optimized agents (use 'claude' for now, 'codex' optimization deferred)
+    const genResult = generateAgentsFromSpecs(specsDir, tempAgentsDir, 'claude');
+    
+    if (genResult.generated > 0) {
+      // Convert generated agents to Codex skill format
+      const agentFiles = fs.readdirSync(tempAgentsDir).filter(f => f.endsWith('.md'));
+      for (const agentFile of agentFiles) {
+        const agentPath = path.join(tempAgentsDir, agentFile);
+        const agentContent = fs.readFileSync(agentPath, 'utf8');
+        const skillContent = codexAdapter.convertContent(agentContent, 'agent');
+        
+        const agentName = agentFile.replace('.md', '');
+        const agentSkillDir = path.join(dirs.agents, agentName);
+        fs.mkdirSync(agentSkillDir, {recursive: true});
+        fs.writeFileSync(path.join(agentSkillDir, 'SKILL.md'), skillContent);
+      }
+      
+      // Clean up temp directory
+      fs.rmSync(tempAgentsDir, { recursive: true });
+      
+      if (verifyInstalled(dirs.agents, 'agents')) {
+        const failedMsg = genResult.failed > 0 ? ` (${genResult.failed} failed)` : '';
+        console.log(`  ${green}✓${reset} Generated and installed ${genResult.generated} agents as skills${failedMsg}`);
+      } else {
+        failures.push('agents');
+      }
+    }
+  }
+
+  // Codex: convert agents to skill format (folder-per-skill structure) - FALLBACK
   const agentsSrc = path.join(src, '.github', 'agents');
   if (fs.existsSync(agentsSrc)) {
     const agentFiles = fs.readdirSync(agentsSrc).filter(f => f.endsWith('.agent.md'));
     for (const agentFile of agentFiles) {
-      const agentPath = path.join(agentsSrc, agentFile);
-      const agentContent = fs.readFileSync(agentPath, 'utf8');
-      const skillContent = codexAdapter.convertContent(agentContent, 'agent');
-      
       const agentName = agentFile.replace('.agent.md', '');
       const agentSkillDir = path.join(dirs.agents, agentName);
-      fs.mkdirSync(agentSkillDir, {recursive: true});
-      fs.writeFileSync(path.join(agentSkillDir, 'SKILL.md'), skillContent);
+      
+      // Only copy if not already generated
+      if (!fs.existsSync(agentSkillDir)) {
+        const agentPath = path.join(agentsSrc, agentFile);
+        const agentContent = fs.readFileSync(agentPath, 'utf8');
+        const skillContent = codexAdapter.convertContent(agentContent, 'agent');
+        
+        fs.mkdirSync(agentSkillDir, {recursive: true});
+        fs.writeFileSync(path.join(agentSkillDir, 'SKILL.md'), skillContent);
+      }
     }
     if (verifyInstalled(dirs.agents, 'agents')) {
-      console.log(`  ${green}✓${reset} Installed agents as skills`);
+      console.log(`  ${green}✓${reset} Installed agents as skills (fallback)`);
     } else {
       failures.push('agents');
     }
