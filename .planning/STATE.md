@@ -14,10 +14,10 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 ## Current Position
 
 **Phase:** 3 of 6 (Spec Migration & Template Generation)
-**Plan:** 03 of 03 - Just completed 03-03-PLAN.md
+**Plan:** 05 of 05 - Just completed 03-05-PLAN.md (gap closure)
 **Status:** Phase complete ✅
-**Progress:** █████████░ 50% (3/6 phases complete, 9/18 total plans)
-**Last activity:** 2026-01-21 - Completed 03-03: Platform Generation Testing & Validation
+**Progress:** ██████████ 61% (3/6 phases complete, 11/18 total plans)
+**Last activity:** 2026-01-21 - Completed 03-05: Fix Metadata Field Structure (gap closure)
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -32,6 +32,8 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
   - 03-01: Template Generation System ✅
   - 03-02: Agent Migration ✅
   - 03-03: Platform Generation Testing ✅
+  - 03-04: YAML Frontmatter Format Fix ✅ (gap closure)
+  - 03-05: Fix Metadata Field Structure ✅ (gap closure)
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -40,19 +42,19 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 
 ### Velocity
 - **Phases completed:** 3/6 (50%)
-- **Plans completed:** 9 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 3/3)
+- **Plans completed:** 11 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 5/5)
 - **Requirements delivered:** 17/27 (63%)
-- **Current phase progress:** 100% (Phase 3: 3/3 plans complete)
+- **Current phase progress:** 100% (Phase 3: 5/5 plans complete including 2 gap closures)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)
-- **Test coverage:** 26 integration tests passing (100% success rate)
-- **Platform parity:** Achieved - both platforms fully supported
+- **Test coverage:** 46 tests passing (20 field-transformer + 26 integration = 100% success rate)
+- **Platform parity:** Achieved - both platforms fully supported with compliant metadata
 - **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 49/49 (100%)
 
 ### Efficiency
 - **Blockers resolved:** 0
-- **Deviation rate:** Not yet established
+- **Deviation rate:** 3 auto-fixes per plan on average (gap closure plans)
 - **Rework incidents:** 0
 
 ## Accumulated Context
@@ -102,6 +104,13 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 | Render-first pipeline in generator | Render templates before parsing YAML to avoid parse errors on conditional syntax | 2026-01-21 | 03-03 |
 | Platform-aware test strategy | Use appropriate-sized agents per platform (gsd-verifier for Copilot due to 30K limit) | 2026-01-21 | 03-03 |
 | Accept expected Copilot size failures | gsd-planner (41KB) and gsd-debugger (35KB) exceed Copilot's 30K limit - documented constraint | 2026-01-21 | 03-03 |
+| Use flowLevel: 1 for YAML formatting | Objects as block style, arrays as flow style for single-line tools format | 2026-01-21 | 03-04 |
+| Convert tools to string for Claude | Claude uses comma-separated string, Copilot uses flow array, conversion at serialization | 2026-01-21 | 03-04 |
+| Validator accepts both string and array tools | Forward compatibility for different input formats, normalizes for validation | 2026-01-21 | 03-04 |
+| Path resolution respects workDir | Spec paths resolve relative to workDir option, not cwd, for test flexibility | 2026-01-21 | 03-04 |
+| Claude has NO metadata fields | Official Claude spec doesn't include metadata field in supported frontmatter | 2026-01-21 | 03-05 |
+| Copilot nests metadata under metadata object | Official Copilot spec uses metadata object for custom/generated fields | 2026-01-21 | 03-05 |
+| Tests use absolute paths for specs | Allows tests to run from any directory, prevents path resolution issues | 2026-01-21 | 03-05 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -151,7 +160,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 3. **Phase 1 is COMPLETE** ✅ (Template Engine Foundation)
 4. **Phase 2 is COMPLETE** ✅ (Platform Abstraction Layer)
 5. **Phase 3 is COMPLETE** ✅ (Spec Migration & Template Generation)
-6. Review summaries: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md
+6. Review summaries: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md
 7. Reference ROADMAP.md Phase 4 for next phase
 
 **Phase 3 deliverables (COMPLETE):**
@@ -162,6 +171,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 - ✅ 26 integration tests (Phase 1-3 coverage)
 - ✅ Platform generation validated: Claude 11/11, Copilot 9/11
 - ✅ Sample agents and validation report demonstrating platform differences
+- ✅ Platform-specific YAML formatting (single-line tools and description)
 
 **Next milestone:**
 Begin Phase 4: Installation Workflow Integration
@@ -170,10 +180,11 @@ Begin Phase 4: Installation Workflow Integration
 - Generate agents at install time based on platform
 - Update documentation for new workflow
 
-**Phase 3 progress (100% complete - 3/3 plans):**
+**Phase 3 progress (100% complete - 4/4 plans):**
 - ✅ 03-01: Template generation system with validation and registry
 - ✅ 03-02: Migrated all 11 agents to spec-as-template format
 - ✅ 03-03: Platform generation testing and validation (26 tests passing)
+- ✅ 03-04: YAML frontmatter format fix (gap closure)
 
 ### Context Handoff
 
@@ -184,8 +195,8 @@ Begin Phase 4: Installation Workflow Integration
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T18:06:40Z
-**Stopped at:** Completed 03-03-PLAN.md (Platform Generation Testing & Validation)
+**Last session:** 2026-01-21T18:59:38Z
+**Stopped at:** Completed 03-04-PLAN.md (YAML Frontmatter Format Fix - gap closure)
 **Resume file:** None - Phase 3 complete, ready for Phase 4
 
 ---
