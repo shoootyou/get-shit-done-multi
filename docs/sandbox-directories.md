@@ -1,162 +1,118 @@
-# Docker Sandbox Directories
+# Sandbox Directories
 
-## Purpose
+> **Note:** This guide applies to both Docker and Podman. For Podman-specific info, see [podman-usage.md](podman-usage.md).
 
-The `.sandbox-*` directories provide isolated, persistent storage for the Docker development environment. They keep container state separate from your project files, improving security and maintainability.
+## What Are They?
+
+The `.sandbox-*` directories provide persistent storage for the container environment. They keep your data separate from your source code.
 
 ## Quick Start
 
-The directories are **automatically created** when you run:
+Directories are created automatically:
+
+**Docker:**
 ```bash
-make prep
-# or any make command that depends on prep (net, build, shell, etc.)
+make net  # Automatically creates .sandbox-* dirs
 ```
 
-You don't need to manually interact with these directories - Docker manages them automatically. However, understanding them helps troubleshoot and optimize your workflow.
+**Podman:**
+```bash
+make podman-net  # Automatically creates .sandbox-* dirs
+```
 
-## Directories
+You don't need to manage these manually. The container uses them automatically.
+
+## The Three Directories
 
 ### `.sandbox-home/`
-**Mount Point:** `/home/sandbox` inside the container  
-**Purpose:** Persistent home directory for the sandbox user
+**Maps to:** `/home/sandbox` in container  
+**Stores:** User configs, shell history, SSH keys
 
-This directory preserves:
-- Shell configuration files (`.bashrc`, `.bash_history`, etc.)
-- User preferences and settings
-- SSH keys and credentials (if needed)
-- Any user-level configuration that should survive container restarts
-
-**Why it matters:** Without this, every container restart would reset user preferences, command history, and configurations.
+Without this, every restart resets your history and configs.
 
 ---
 
 ### `.sandbox-cache/`
-**Mount Point:** `/home/sandbox/.cache` inside the container  
-**Purpose:** Persistent cache directory for package managers and build tools
+**Maps to:** `/home/sandbox/.cache` in container  
+**Stores:** Package caches (pip, npm, etc.)
 
-This directory stores:
-- `pip` cache (Python packages)
-- `npm` / `yarn` cache (Node.js packages)
-- Build tool caches (compilation artifacts, etc.)
-- Any application-level caches
-
-**Why it matters:** Dramatically speeds up package installations and builds by reusing downloaded packages. Without this, every `pip install` or `npm install` would re-download everything.
+Dramatically speeds up package installs by caching downloads.
 
 ---
 
 ### `.sandbox-rw/`
-**Mount Point:** `/workspace-rw` inside the container  
-**Purpose:** Safe write area for outputs and generated files
+**Maps to:** `/workspace-rw` in container  
+**Stores:** Generated files and outputs
 
-This directory is for:
-- Test outputs and reports
-- Generated files that shouldn't mix with source code
-- Temporary artifacts
-- Logs and diagnostic outputs
-
-**Why it matters:** Keeps generated content separate from your codebase, making it easier to clean up and preventing accidental commits of build artifacts.
-
----
-
-## Security Benefits
-
-1. **Isolation:** Container writes don't scatter throughout your filesystem
-2. **Clean separation:** Generated files stay out of version control
-3. **Easy cleanup:** Delete these directories to reset the environment completely
-4. **Reproducibility:** Fresh environment by removing `.sandbox-*` folders
-
-## Management
-
-### Creating directories
-```bash
-make prep
-# or manually:
-mkdir -p .sandbox-rw .sandbox-home .sandbox-cache
-```
-
-### Cleaning up
-```bash
-make clean
-# This removes containers AND .sandbox-* directories
-```
-
-### Adding to .gitignore
-These directories should be ignored by git (add to `.gitignore`):
-```
-.sandbox-home/
-.sandbox-cache/
-.sandbox-rw/
-```
-
----
+Keeps generated content separate from your source code.
 
 ## How to Use
 
-### Automatic Usage (Recommended)
-The directories work transparently - just use the Makefile commands:
+### Automatic (Recommended)
+
+Just use the commands - directories work transparently:
 
 ```bash
-# 1. Start interactive shell with network
-make net
+make net  # or: make podman-net
 
 # Inside container:
 pip install requests  # Cached in .sandbox-cache/
 npm install express   # Cached in .sandbox-cache/
-cd ~/.bashrc          # Persists in .sandbox-home/
+history              # Persists in .sandbox-home/
 ```
 
-### Manual Access (if needed)
+### Access from Host
 
-#### Accessing from Host
+If you need to inspect or access files:
+
 ```bash
 # View cached packages
 ls -lh .sandbox-cache/
 
-# Check user home persistence
+# Check user configs
 ls -la .sandbox-home/
 
 # Access generated outputs
 ls .sandbox-rw/
 ```
 
-#### Accessing from Container
-```bash
-make shell
+### Access from Container
 
-# Inside container:
+```bash
+make shell  # or: make podman-shell
+
 # Your project code
 cd /workspace
 
 # Write outputs here
 cd /workspace-rw
-python3 generate_report.py > report.html
+python3 generate.py > report.html
 
 # User home (configs, history)
-cd ~  # This is /home/sandbox → .sandbox-home/ on host
+cd ~  # This is .sandbox-home/ on host
 
 # Package cache
 ls ~/.cache  # This is .sandbox-cache/ on host
 ```
 
----
+## Examples
 
-## Workflow Examples
+### Install with cache
 
-### Example 1: Installing Dependencies
 ```bash
-# First time (downloads packages)
+# First time
 make net
-pip install pandas numpy matplotlib
-# Packages cached in .sandbox-cache/
+pip install pandas numpy
+# Downloads packages
 
-# Later (uses cache - much faster)
-make clean  # Removes container but keeps .sandbox-cache/
+# Later (after make clean)
 make net
-pip install pandas numpy matplotlib
-# Uses cached packages - instant!
+pip install pandas numpy
+# Uses cache - instant!
 ```
 
-### Example 2: Generating Reports
+### Generate outputs
+
 ```bash
 make shell
 
@@ -169,31 +125,35 @@ EOF
 exit
 
 # On host:
-open .sandbox-rw/report.html  # File is accessible!
+open .sandbox-rw/report.html
 ```
 
-### Example 3: Persistent Shell History
+### Persistent history
+
 ```bash
 make net
 history
-export MY_VAR="important"
 exit
 
 # Later:
 make net
-history  # Your previous commands are still there!
-# But MY_VAR is gone (use .bashrc for persistent exports)
+history  # Previous commands still there!
 ```
 
-### Example 4: Network Isolation
+## Cleanup
+
+### Keep everything
 ```bash
-# Install with network
-make net
-pip install requests
-exit
-
-# Run without network (secure)
-make nonet
-python3 -c "import requests; print('Requests available!')"
-# Works! Package is cached locally
+make down  # Stops container, keeps .sandbox-* dirs
 ```
+
+### Remove everything
+```bash
+make clean  # Removes container AND .sandbox-* dirs
+```
+
+## Further Reading
+
+- **[container-quickref.md](container-quickref.md)** - Command reference
+- **[containers-readme.md](containers-readme.md)** - Overview
+- **[podman-usage.md](podman-usage.md)** - Podman guide
