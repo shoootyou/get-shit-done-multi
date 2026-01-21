@@ -1,6 +1,6 @@
 # Platform Generation Validation Report
 
-**Generated:** 2026-01-21T18:06:40.368Z
+**Generated:** 2026-01-21T19:07:14.679Z
 **Agents tested:** 11
 
 ## Summary
@@ -14,33 +14,65 @@
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
-| gsd-planner | ✓ | 41098 | ✓ | 0 |
-| gsd-executor | ✓ | 20646 | ✓ | 0 |
-| gsd-verifier | ✓ | 21750 | ✓ | 0 |
-| gsd-codebase-mapper | ✓ | 22206 | ✓ | 0 |
-| gsd-debugger | ✓ | 35339 | ✓ | 0 |
-| gsd-phase-researcher | ✓ | 17453 | ✓ | 0 |
-| gsd-plan-checker | ✓ | 19922 | ✓ | 0 |
-| gsd-project-researcher | ✓ | 21757 | ✓ | 0 |
-| gsd-research-synthesizer | ✓ | 6880 | ✓ | 0 |
-| gsd-roadmapper | ✓ | 15778 | ✓ | 0 |
-| gsd-integration-checker | ✓ | 12114 | ✓ | 0 |
+| gsd-planner | ✓ | 41012 | ✓ | 0 |
+| gsd-executor | ✓ | 20561 | ✓ | 0 |
+| gsd-verifier | ✓ | 21671 | ✓ | 0 |
+| gsd-codebase-mapper | ✓ | 22124 | ✓ | 0 |
+| gsd-debugger | ✓ | 35253 | ✓ | 0 |
+| gsd-phase-researcher | ✓ | 17364 | ✓ | 0 |
+| gsd-plan-checker | ✓ | 19845 | ✓ | 0 |
+| gsd-project-researcher | ✓ | 21666 | ✓ | 0 |
+| gsd-research-synthesizer | ✓ | 6806 | ✓ | 0 |
+| gsd-roadmapper | ✓ | 15696 | ✓ | 0 |
+| gsd-integration-checker | ✓ | 12037 | ✓ | 0 |
 
 ## Copilot Generation Results
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
 | gsd-planner | ✗ | 0 | - | 1 (too large) |
-| gsd-executor | ✓ | 20647 | ✓ | 0 |
-| gsd-verifier | ✓ | 21751 | ✓ | 0 |
-| gsd-codebase-mapper | ✓ | 22207 | ✓ | 0 |
+| gsd-executor | ✓ | 20634 | ✓ | 0 |
+| gsd-verifier | ✓ | 21744 | ✓ | 0 |
+| gsd-codebase-mapper | ✓ | 22197 | ✓ | 0 |
 | gsd-debugger | ✗ | 0 | - | 1 (too large) |
-| gsd-phase-researcher | ✓ | 17406 | ✓ | 0 |
-| gsd-plan-checker | ✓ | 19923 | ✓ | 0 |
-| gsd-project-researcher | ✓ | 21710 | ✓ | 0 |
-| gsd-research-synthesizer | ✓ | 6881 | ✓ | 0 |
-| gsd-roadmapper | ✓ | 15779 | ✓ | 0 |
-| gsd-integration-checker | ✓ | 12115 | ✓ | 0 |
+| gsd-phase-researcher | ✓ | 17398 | ✓ | 0 |
+| gsd-plan-checker | ✓ | 19918 | ✓ | 0 |
+| gsd-project-researcher | ✓ | 21700 | ✓ | 0 |
+| gsd-research-synthesizer | ✓ | 6879 | ✓ | 0 |
+| gsd-roadmapper | ✓ | 15769 | ✓ | 0 |
+| gsd-integration-checker | ✓ | 12110 | ✓ | 0 |
+
+## Format Compliance
+
+### Claude Agents
+
+| Agent | Description | Tools | Metadata | Status |
+|-------|-------------|-------|----------|--------|
+| gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-research-synthesizer | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-roadmapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-verifier | ✅ | ✅ | ✅ | ✅ Pass |
+
+### Copilot Agents
+
+| Agent | Description | Tools | Metadata | Status |
+|-------|-------------|-------|----------|--------|
+| gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-research-synthesizer | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-roadmapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-verifier | ✅ | ✅ | ✅ | ✅ Pass |
 
 ## Platform Differences
 
