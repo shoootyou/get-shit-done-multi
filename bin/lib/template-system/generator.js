@@ -11,7 +11,7 @@
 const { parseSpec, parseSpecString } = require('./spec-parser');
 const { buildContext } = require('./context-builder');
 const { render, validate } = require('./engine');
-const { mapTools, validateTools } = require('./tool-mapper');
+const { mapTools, validateToolList } = require('./tool-mapper');
 const { transformFields, addPlatformMetadata } = require('./field-transformer');
 const { validateSpec, checkPromptLength } = require('./validators');
 const yaml = require('js-yaml');
@@ -145,19 +145,32 @@ function generateAgent(specPath, platform, options = {}) {
     // Step 3: Transform tools to platform-specific names
     if (spec.frontmatter.tools && Array.isArray(spec.frontmatter.tools)) {
       try {
-        const toolResult = mapTools(spec.frontmatter.tools, platform);
-        spec.frontmatter.tools = toolResult.mapped;
-        metadata.toolsTransformed = true;
+        // Validate tools first to get warnings
+        const toolValidation = validateToolList(spec.frontmatter.tools, platform);
         
-        // Add tool mapping warnings
-        if (toolResult.warnings && toolResult.warnings.length > 0) {
-          toolResult.warnings.forEach(warning => {
+        // Add validation warnings
+        if (toolValidation.warnings && toolValidation.warnings.length > 0) {
+          toolValidation.warnings.forEach(warning => {
             warnings.push({
               stage: 'tool-mapping',
-              message: warning.message || warning
+              message: typeof warning === 'string' ? warning : warning.message
             });
           });
         }
+        
+        // Add validation errors as warnings (non-blocking)
+        if (toolValidation.errors && toolValidation.errors.length > 0) {
+          toolValidation.errors.forEach(error => {
+            warnings.push({
+              stage: 'tool-mapping',
+              message: typeof error === 'string' ? error : error.message
+            });
+          });
+        }
+        
+        // Map tools to platform-specific names
+        spec.frontmatter.tools = mapTools(spec.frontmatter.tools, platform);
+        metadata.toolsTransformed = true;
       } catch (toolErr) {
         // Tool mapping errors are warnings, not blocking
         warnings.push({
@@ -506,18 +519,32 @@ function generateFromSpec(specObject, platform, options = {}) {
     // Transform tools to platform-specific names
     if (specObject.frontmatter.tools && Array.isArray(specObject.frontmatter.tools)) {
       try {
-        const toolResult = mapTools(specObject.frontmatter.tools, platform);
-        specObject.frontmatter.tools = toolResult.mapped;
-        metadata.toolsTransformed = true;
+        // Validate tools first to get warnings
+        const toolValidation = validateToolList(specObject.frontmatter.tools, platform);
         
-        if (toolResult.warnings && toolResult.warnings.length > 0) {
-          toolResult.warnings.forEach(warning => {
+        // Add validation warnings
+        if (toolValidation.warnings && toolValidation.warnings.length > 0) {
+          toolValidation.warnings.forEach(warning => {
             warnings.push({
               stage: 'tool-mapping',
-              message: warning.message || warning
+              message: typeof warning === 'string' ? warning : warning.message
             });
           });
         }
+        
+        // Add validation errors as warnings (non-blocking)
+        if (toolValidation.errors && toolValidation.errors.length > 0) {
+          toolValidation.errors.forEach(error => {
+            warnings.push({
+              stage: 'tool-mapping',
+              message: typeof error === 'string' ? error : error.message
+            });
+          });
+        }
+        
+        // Map tools to platform-specific names
+        specObject.frontmatter.tools = mapTools(specObject.frontmatter.tools, platform);
+        metadata.toolsTransformed = true;
       } catch (toolErr) {
         warnings.push({
           stage: 'tool-mapping',

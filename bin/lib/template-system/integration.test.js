@@ -287,10 +287,319 @@ description: Valid spec
   console.log('  ✓ validateOnly option test passed\n');
 }
 
+// ============================================================================
+// Phase 2: Platform Abstraction Integration Tests
+// ============================================================================
+
+/**
+ * Test 9: Platform-specific tool transformation
+ */
+function testToolTransformation() {
+  console.log('Test 9: Platform-specific tool transformation');
+  
+  const specContent = `---
+name: tool-test-agent
+description: Test tool transformation
+tools: ['Bash', 'Read', 'Edit']
+---
+
+# Tool Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-9.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Test Claude (case-sensitive)
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  assert.ok(claudeResult.output.includes('tools:'), 'Tools should be present');
+  assert.ok(claudeResult.metadata.toolsTransformed, 'Tools should be marked as transformed');
+  
+  // Test Copilot
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  assert.ok(copilotResult.metadata.toolsTransformed, 'Tools should be marked as transformed');
+  
+  console.log('  ✓ Platform-specific tool transformation test passed\n');
+}
+
+/**
+ * Test 10: Model field handling
+ */
+function testModelFieldHandling() {
+  console.log('Test 10: Model field handling');
+  
+  const specContent = `---
+name: model-test-agent
+description: Test model field
+model: haiku
+---
+
+# Model Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-10.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Test Claude (includes model)
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  assert.ok(claudeResult.output.includes('model: haiku'), 'Model should be included for Claude');
+  assert.strictEqual(claudeResult.warnings.length, 0, 'Claude should have no warnings about model');
+  
+  // Test Copilot (excludes model with warning)
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  assert.ok(!copilotResult.output.includes('model:'), 'Model should be excluded for Copilot');
+  assert.ok(copilotResult.warnings.length > 0, 'Copilot should have warnings');
+  assert.ok(copilotResult.warnings.some(w => w.field === 'model'), 'Should warn about model field');
+  
+  console.log('  ✓ Model field handling test passed\n');
+}
+
+/**
+ * Test 11: Hooks handling
+ */
+function testHooksHandling() {
+  console.log('Test 11: Hooks handling');
+  
+  const specContent = `---
+name: hooks-test-agent
+description: Test hooks field
+hooks:
+  on_create: echo "created"
+  on_message: echo "message"
+---
+
+# Hooks Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-11.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Test Claude (includes hooks)
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  assert.ok(claudeResult.output.includes('hooks:'), 'Hooks should be included for Claude');
+  
+  // Test Copilot (excludes hooks with warning)
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  assert.ok(!copilotResult.output.includes('hooks:'), 'Hooks should be excluded for Copilot');
+  assert.ok(copilotResult.warnings.some(w => w.field === 'hooks'), 'Should warn about hooks field');
+  
+  console.log('  ✓ Hooks handling test passed\n');
+}
+
+/**
+ * Test 12: Platform-specific tool warnings
+ */
+function testPlatformToolWarnings() {
+  console.log('Test 12: Platform-specific tool warnings');
+  
+  const specContent = `---
+name: warning-test-agent
+description: Test tool warnings
+tools: ['Bash', 'Read', 'WebFetch']
+---
+
+# Warning Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-12.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // WebFetch is Claude-only
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Generation should succeed with warnings');
+  assert.ok(copilotResult.warnings.length > 0, 'Should have warnings');
+  
+  // Canonical tools should have no warnings
+  const safeSpec = `---
+name: safe-test-agent
+description: Test safe tools
+tools: ['Bash', 'Read', 'Edit']
+---
+
+# Safe Test
+`;
+  
+  const safeSpecPath = path.join(testDir, 'test-spec-12b.md');
+  fs.writeFileSync(safeSpecPath, safeSpec);
+  
+  const safeResult = generateAgent(safeSpecPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(safeResult.success, true, 'Safe tools should succeed');
+  // Note: May have field-transform warnings, but not tool warnings
+  
+  console.log('  ✓ Platform-specific tool warnings test passed\n');
+}
+
+/**
+ * Test 13: Tool wildcard handling
+ */
+function testToolWildcardHandling() {
+  console.log('Test 13: Tool wildcard handling');
+  
+  const specContent = `---
+name: wildcard-test-agent
+description: Test wildcard tools
+tools: ['*']
+---
+
+# Wildcard Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-13.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Claude should fail validation (wildcards not allowed)
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, false, 'Claude should reject wildcard tools');
+  assert.ok(claudeResult.errors.some(e => 
+    e.message && e.message.includes('wildcard')
+  ), 'Should error about wildcard');
+  
+  // Copilot should succeed (wildcards allowed)
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Copilot should accept wildcard tools');
+  
+  console.log('  ✓ Tool wildcard handling test passed\n');
+}
+
+/**
+ * Test 14: Field validation integration
+ */
+function testFieldValidationIntegration() {
+  console.log('Test 14: Field validation integration');
+  
+  const specContent = `---
+name: validation-test-agent
+description: Test field validation
+tools: ['bash', 'read']
+---
+
+# Validation Test
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-14.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Lowercase tools should fail Claude validation
+  const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(result.success, false, 'Lowercase tools should fail Claude validation');
+  assert.ok(result.errors.some(e => 
+    e.field === 'tools' && e.message.includes('case')
+  ), 'Should error about tool case');
+  
+  console.log('  ✓ Field validation integration test passed\n');
+}
+
+/**
+ * Test 15: Prompt length validation
+ */
+function testPromptLengthValidation() {
+  console.log('Test 15: Prompt length validation');
+  
+  // Create a very long prompt (>30k chars for Copilot)
+  const longBody = 'x'.repeat(31000);
+  const specContent = `---
+name: length-test-agent
+description: Test prompt length
+---
+
+${longBody}
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-15.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Copilot should warn/fail (30k limit)
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, false, 'Long prompt should fail for Copilot');
+  assert.ok(copilotResult.errors.some(e => 
+    e.stage === 'prompt-length'
+  ), 'Should error about prompt length');
+  
+  // Claude should be fine (200k limit)
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, true, 'Long prompt should pass for Claude');
+  
+  console.log('  ✓ Prompt length validation test passed\n');
+}
+
+/**
+ * Test 16: End-to-end platform abstraction
+ */
+function testEndToEndPlatformAbstraction() {
+  console.log('Test 16: End-to-end platform abstraction');
+  
+  // Complex spec with multiple platform-specific features
+  const specContent = `---
+name: complex-platform-agent
+description: "{{platform}} agent with all features"
+tools: ['Bash', 'Read', 'Edit', 'Grep']
+model: haiku
+hooks:
+  on_create: echo "Agent created"
+skills:
+  - skill-one
+  - skill-two
+disallowedTools:
+  - WebFetch
+---
+
+# Complex Platform Agent
+
+This agent tests all platform abstraction features.
+
+Platform: {{platform}}
+Supports model selection: {{supportsModel}}
+Supports hooks: {{supportsHooks}}
+`;
+  
+  const specPath = path.join(testDir, 'test-spec-16.md');
+  fs.writeFileSync(specPath, specContent);
+  
+  // Generate for Claude
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  
+  // Extract frontmatter for checking
+  const claudeFrontmatter = claudeResult.output.split('---\n')[1];
+  assert.ok(claudeFrontmatter.includes('model: haiku'), 'Claude should include model');
+  assert.ok(claudeFrontmatter.includes('hooks:'), 'Claude should include hooks');
+  assert.ok(claudeFrontmatter.includes('skills:'), 'Claude should include skills');
+  assert.ok(claudeFrontmatter.includes('disallowedTools:'), 'Claude should include disallowedTools');
+  assert.ok(claudeResult.metadata.toolsTransformed, 'Tools should be transformed');
+  assert.ok(claudeResult.metadata.fieldsTransformed, 'Fields should be transformed');
+  assert.ok(claudeResult.metadata.validationPassed, 'Validation should pass');
+  
+  // Generate for Copilot
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/workspace' });
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  
+  // Extract frontmatter for checking
+  const copilotFrontmatter = copilotResult.output.split('---\n')[1];
+  assert.ok(!copilotFrontmatter.includes('model:'), 'Copilot should exclude model');
+  assert.ok(!copilotFrontmatter.includes('hooks:'), 'Copilot should exclude hooks');
+  assert.ok(!copilotFrontmatter.includes('skills:'), 'Copilot should exclude skills');
+  assert.ok(!copilotFrontmatter.includes('disallowedTools:'), 'Copilot should exclude disallowedTools');
+  assert.ok(copilotResult.warnings.length > 0, 'Copilot should have warnings');
+  assert.ok(copilotResult.warnings.some(w => w.field === 'model'), 'Should warn about model');
+  assert.ok(copilotResult.warnings.some(w => w.field === 'hooks'), 'Should warn about hooks');
+  assert.ok(copilotResult.metadata.validationPassed, 'Validation should pass');
+  
+  // Outputs should differ
+  assert.notStrictEqual(claudeResult.output, copilotResult.output, 'Outputs should differ by platform');
+  
+  console.log('  ✓ End-to-end platform abstraction test passed\n');
+}
+
 // Run all tests
 console.log('\n=== Template System Integration Tests ===\n');
 
 try {
+  // Phase 1 tests (8 tests)
   testHappyPath();
   testPlatformSwitching();
   testInvalidSpec();
@@ -300,7 +609,17 @@ try {
   testGenerateFromSpec();
   testValidateOnly();
   
-  console.log('✓ All integration tests passed!\n');
+  // Phase 2 tests (8 tests)
+  testToolTransformation();
+  testModelFieldHandling();
+  testHooksHandling();
+  testPlatformToolWarnings();
+  testToolWildcardHandling();
+  testFieldValidationIntegration();
+  testPromptLengthValidation();
+  testEndToEndPlatformAbstraction();
+  
+  console.log('✓ All 16 integration tests passed! (8 Phase 1 + 8 Phase 2)\n');
   process.exit(0);
 } catch (error) {
   console.error('\n✗ Test failed:', error.message);
