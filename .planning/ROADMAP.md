@@ -40,6 +40,13 @@ Plans:
 
 **Requirements:** PLAT-01, PLAT-02, PLAT-03, PLAT-04, PLAT-05, PLAT-06
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Tool compatibility matrix & canonical names
+- [ ] 02-02-PLAN.md — Platform capability flags & field transformers
+- [ ] 02-03-PLAN.md — Platform validators & integration tests
+
 **Success Criteria:**
 1. Tool compatibility matrix maps canonical names (`Bash`, `Read`, `Edit`, `Grep`) to platform-specific formats
 2. Platform capability flags control conditional rendering (model support, MCP config, hooks)
