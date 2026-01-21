@@ -9,15 +9,15 @@
 Agent definitions use native platform capabilities—Claude and Copilot each get configurations that leverage their specific features through declarative frontmatter, not interpretation.
 
 ### Current Focus
-Phase 3.1: Agent Size Optimization — Creating compact versions of oversized agents to achieve 100% Copilot platform coverage.
+Phase 4: Installation Workflow Integration — Integrating template generation into install.js with platform flags.
 
 ## Current Position
 
-**Phase:** 3.1 of 7 (Agent Size Optimization)
+**Phase:** 4 of 7 (Installation Workflow Integration)
 **Plan:** Ready for planning
-**Status:** Planning
-**Progress:** ████████████ 60% (3/7 phases complete, 13/21 total plans estimated)
-**Last activity:** 2026-01-21 - Phase 3.1 created to optimize gsd-planner and gsd-debugger for Copilot 30K limit
+**Status:** Ready to plan
+**Progress:** █████████████ 68% (4/7 phases complete, 17/~25 total plans estimated)
+**Last activity:** 2026-01-21 - Phase 3.1 complete: Agent splits with 100% platform coverage
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -36,22 +36,22 @@ Phase 3.1: Agent Size Optimization — Creating compact versions of oversized ag
   - 03-05: Fix Metadata Field Structure ✅ (gap closure)
   - 03-06: Complete Agent Generation & Validation ✅ (gap closure)
   - 03-07: Metadata Field Naming and Formatting ✅ (gap closure)
-- Phase 3.1: Agent Size Optimization — **Planning** 📋
-  - 03.1-01: TBD (compact infrastructure)
-  - 03.1-02: TBD (gsd-planner optimization)
-  - 03.1-03: TBD (gsd-debugger optimization)
-  - 03.1-04: TBD (validation & coverage)
-- Phase 4: Installation Workflow Integration — Pending
+- Phase 3.1: Agent Size Optimization — **Complete** ✅ (2026-01-21)
+  - 03.1-01: Document pattern & split gsd-planner ✅
+  - 03.1-02: Split gsd-debugger ✅
+  - 03.1-03: Update references ✅
+  - 03.1-04: Clean regeneration & validation ✅
+- Phase 4: Installation Workflow Integration — Ready to plan
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
 
 ## Performance Metrics
 
 ### Velocity
-- **Phases completed:** 3/7 (43%)
-- **Plans completed:** 13 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7)
-- **Requirements delivered:** 17/27 (63%)
-- **Current phase progress:** 0% (Phase 3.1: Planning)
+- **Phases completed:** 4/7 (57%)
+- **Plans completed:** 17 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4)
+- **Requirements delivered:** 21/27 (78%)
+- **Current phase progress:** 0% (Phase 4: Ready to plan)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)

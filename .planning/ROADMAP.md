@@ -98,7 +98,7 @@ Plans:
 - [x] 03.1-01-PLAN.md — Document pattern & split gsd-planner
 - [x] 03.1-02-PLAN.md — Split gsd-debugger
 - [x] 03.1-03-PLAN.md — Update references
-- [ ] 03.1-04-PLAN.md — Clean regeneration & validation (checkpoint)
+- [x] 03.1-04-PLAN.md — Clean regeneration & validation (checkpoint)
 
 **Success Criteria:**
 1. All 4 agents (2 split pairs) <30,000 characters each
@@ -167,12 +167,12 @@ Plans:
 | 1 - Template Engine Foundation | Complete | 2026-01-21 | ██████████ 100% |
 | 2 - Platform Abstraction Layer | Complete | 2026-01-21 | ██████████ 100% |
 | 3 - Spec Migration & Template Generation | Complete | 2026-01-21 | ██████████ 100% |
-| 3.1 - Agent Size Optimization | Planning | — | ░░░░░░░░░░ 0% |
+| 3.1 - Agent Size Optimization | Complete | 2026-01-21 | ██████████ 100% |
 | 4 - Installation Workflow Integration | Pending | — | ░░░░░░░░░░ 0% |
 | 5 - Cross-Platform Testing & Validation | Pending | — | ░░░░░░░░░░ 0% |
 | 6 - Documentation & Polish | Pending | — | ░░░░░░░░░░ 0% |
 
-**Overall:** 3/7 phases complete (43%)
+**Overall:** 4/7 phases complete (57%)
 | 2 - Platform Abstraction Layer | Complete | 2026-01-21 | ██████████ 100% |
 | 3 - Spec Migration & Template Generation | Planning | — | ░░░░░░░░░░ 0% |
 | 4 - Installation Workflow Integration | Pending | — | ░░░░░░░░░░ 0% |
