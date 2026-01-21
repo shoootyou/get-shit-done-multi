@@ -9,6 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates curl git tini sudo wget gnupg \
     python3 python3-venv python3-pip \
+    libsecret-1-0 \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 20 (required for Copilot CLI)
