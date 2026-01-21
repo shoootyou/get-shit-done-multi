@@ -30,7 +30,7 @@ const { AgentCapabilityTest } = require('../../lib-ghcc/verification/agent-verif
 const tests = [
   // CLI Installation Tests
   new CLIInstalledTest('Claude Code', 'claude'),
-  new CLIInstalledTest('GitHub Copilot CLI', 'gh'),
+  new CLIInstalledTest('GitHub Copilot CLI', 'copilot'),
   new CLIInstalledTest('Codex CLI', 'codex'),
   
   // Skill Registration Tests

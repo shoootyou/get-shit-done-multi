@@ -24,8 +24,9 @@ function getConfigPaths(cli) {
       skill: path.join(homeDir, 'Library', 'Application Support', 'Claude', '.agent', 'get-shit-done')
     },
     copilot: {
-      global: path.join(homeDir, '.copilot'),
-      skill: path.join(homeDir, '.copilot', 'skills', 'get-shit-done')
+      // GitHub Copilot CLI uses .github/skills/ in project directory
+      global: path.join(process.cwd(), '.github'),
+      skill: path.join(process.cwd(), '.github', 'skills', 'get-shit-done')
     },
     codex: {
       global: path.join(homeDir, '.codex'),
@@ -113,7 +114,7 @@ class CLIInstalledTest extends DiagnosticTest {
   getInstallInstruction() {
     const instructions = {
       'claude': 'Install Claude Code CLI from https://claude.ai/download',
-      'gh': 'Install GitHub CLI from https://cli.github.com/ then run: gh extension install github/gh-copilot',
+      'copilot': 'Install GitHub Copilot CLI from https://githubnext.com/projects/copilot-cli',
       'codex': 'Install Codex CLI: npm install -g @codex/cli'
     };
     
