@@ -172,12 +172,14 @@ const ft = require('./field-transformer');
   const frontmatter = { name: 'test-agent' };
   const result = ft.addPlatformMetadata(frontmatter, 'copilot');
   
-  assert.strictEqual(result._platform, undefined); // NOT at root level
-  assert.strictEqual(result._generated, undefined); // NOT at root level
+  assert.strictEqual(result.platform, undefined); // NOT at root level
+  assert.strictEqual(result.generated, undefined); // NOT at root level
   assert.ok(result.metadata); // MUST have metadata object
-  assert.strictEqual(result.metadata._platform, 'copilot'); // Inside metadata object
-  assert.ok(result.metadata._generated); // Inside metadata object
-  assert.ok(result.metadata._generated.match(/^\d{4}-\d{2}-\d{2}T/)); // ISO format
+  assert.strictEqual(result.metadata.platform, 'copilot'); // Inside metadata object (no underscore)
+  assert.ok(result.metadata.generated); // Inside metadata object (no underscore)
+  assert.ok(result.metadata.generated.match(/^\d{4}-\d{2}-\d{2}T/)); // ISO format
+  assert.strictEqual(result.metadata.projectName, 'get-shit-done-multi'); // Project name from package.json
+  assert.strictEqual(result.metadata.projectVersion, '1.8.0'); // Project version from package.json
   
   console.log('✓ Test 12: addPlatformMetadata - Copilot has nested metadata object');
 }
@@ -198,9 +200,11 @@ const ft = require('./field-transformer');
   assert.strictEqual(result.description, 'Test');
   assert.deepStrictEqual(result.tools, ['bash', 'read']);
   assert.ok(result.metadata);
-  assert.strictEqual(result.metadata._platform, 'copilot');
-  assert.strictEqual(result.metadata._templateVersion, '1.8.1');
-  assert.strictEqual(result.metadata._sourceSpec, '/path/to/spec.yml');
+  assert.strictEqual(result.metadata.platform, 'copilot'); // No underscore
+  assert.strictEqual(result.metadata.templateVersion, '1.8.1'); // No underscore
+  assert.strictEqual(result.metadata.sourceSpec, '/path/to/spec.yml'); // No underscore
+  assert.strictEqual(result.metadata.projectName, 'get-shit-done-multi'); // New field
+  assert.strictEqual(result.metadata.projectVersion, '1.8.0'); // New field
   
   console.log('✓ Test 13: addPlatformMetadata - Copilot preserves frontmatter, nests metadata');
 }
