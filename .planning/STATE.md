@@ -9,15 +9,15 @@
 Agent definitions use native platform capabilities—Claude and Copilot each get configurations that leverage their specific features through declarative frontmatter, not interpretation.
 
 ### Current Focus
-Phase 3: Spec Migration & Template Generation — Converting all existing agents to spec-as-template format with platform rendering.
+Phase 3.1: Agent Size Optimization — Creating compact versions of oversized agents to achieve 100% Copilot platform coverage.
 
 ## Current Position
 
-**Phase:** 3 of 6 (Spec Migration & Template Generation)
-**Plan:** 07 of 07 - Just completed 03-07-PLAN.md (gap closure - metadata formatting)
-**Status:** Phase complete ✅
-**Progress:** ████████████ 72% (3/6 phases complete, 13/18 total plans)
-**Last activity:** 2026-01-21 - Completed 03-07: Metadata Field Naming and Formatting (gap closure)
+**Phase:** 3.1 of 7 (Agent Size Optimization)
+**Plan:** Ready for planning
+**Status:** Planning
+**Progress:** ████████████ 60% (3/7 phases complete, 13/21 total plans estimated)
+**Last activity:** 2026-01-21 - Phase 3.1 created to optimize gsd-planner and gsd-debugger for Copilot 30K limit
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -36,6 +36,11 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
   - 03-05: Fix Metadata Field Structure ✅ (gap closure)
   - 03-06: Complete Agent Generation & Validation ✅ (gap closure)
   - 03-07: Metadata Field Naming and Formatting ✅ (gap closure)
+- Phase 3.1: Agent Size Optimization — **Planning** 📋
+  - 03.1-01: TBD (compact infrastructure)
+  - 03.1-02: TBD (gsd-planner optimization)
+  - 03.1-03: TBD (gsd-debugger optimization)
+  - 03.1-04: TBD (validation & coverage)
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -43,10 +48,10 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 ## Performance Metrics
 
 ### Velocity
-- **Phases completed:** 3/6 (50%)
+- **Phases completed:** 3/7 (43%)
 - **Plans completed:** 13 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7)
 - **Requirements delivered:** 17/27 (63%)
-- **Current phase progress:** 100% (Phase 3: 7/7 plans complete including 4 gap closures)
+- **Current phase progress:** 0% (Phase 3.1: Planning)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)

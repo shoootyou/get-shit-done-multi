@@ -79,10 +79,34 @@ Plans:
 
 ---
 
+### Phase 3.1: Agent Size Optimization
+**Goal:** Optimize oversized agents to fit Copilot's 30K character limit
+
+**Dependencies:** Phase 3 (needs working generation pipeline)
+
+**Requirements:** AGNT-02 (platform compatibility), AGNT-04 (validation)
+
+**Plans:** TBD
+
+Plans:
+- [ ] 03.1-01-PLAN.md — Compact version infrastructure & generator updates
+- [ ] 03.1-02-PLAN.md — gsd-planner optimization (41K → <30K chars)
+- [ ] 03.1-03-PLAN.md — gsd-debugger optimization (35K → <30K chars)
+- [ ] 03.1-04-PLAN.md — Validation & complete platform coverage testing
+
+**Success Criteria:**
+1. gsd-planner Copilot version reduced to <30,000 characters
+2. gsd-debugger Copilot version reduced to <30,000 characters
+3. Core protocols and functionality preserved in compact versions
+4. Generator automatically uses compact versions for Copilot platform
+5. All 11/11 agents working on both platforms (100% coverage)
+
+---
+
 ### Phase 4: Installation Workflow Integration
 **Goal:** Template generation integrated into existing install.js with flag support
 
-**Dependencies:** Phase 3 (needs working generation pipeline)
+**Dependencies:** Phase 3.1 (needs 100% platform coverage)
 
 **Requirements:** INST-01, INST-02, INST-03, INST-04, INST-05, INST-06, TMPL-02, TMPL-08, VERS-01, VERS-02, VERS-03
 
@@ -134,12 +158,13 @@ Plans:
 |-------|--------|-----------|----------|
 | 1 - Template Engine Foundation | Complete | 2026-01-21 | ██████████ 100% |
 | 2 - Platform Abstraction Layer | Complete | 2026-01-21 | ██████████ 100% |
-| 3 - Spec Migration & Template Generation | Complete | 2026-01-21 | █████████▌ 96% |
+| 3 - Spec Migration & Template Generation | Complete | 2026-01-21 | ██████████ 100% |
+| 3.1 - Agent Size Optimization | Planning | — | ░░░░░░░░░░ 0% |
 | 4 - Installation Workflow Integration | Pending | — | ░░░░░░░░░░ 0% |
 | 5 - Cross-Platform Testing & Validation | Pending | — | ░░░░░░░░░░ 0% |
 | 6 - Documentation & Polish | Pending | — | ░░░░░░░░░░ 0% |
 
-**Overall:** 3/6 phases complete (50%)
+**Overall:** 3/7 phases complete (43%)
 | 2 - Platform Abstraction Layer | Complete | 2026-01-21 | ██████████ 100% |
 | 3 - Spec Migration & Template Generation | Planning | — | ░░░░░░░░░░ 0% |
 | 4 - Installation Workflow Integration | Pending | — | ░░░░░░░░░░ 0% |
