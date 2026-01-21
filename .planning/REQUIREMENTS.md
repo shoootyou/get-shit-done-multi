@@ -21,12 +21,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Platform Compliance
 
-- [ ] **PLAT-01**: Claude agent format validated using https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
-- [ ] **PLAT-02**: Copilot agent format generated using https://docs.github.com/en/copilot/reference/custom-agents-configuration
-- [ ] **PLAT-03**: Both platforms have equal optimization priority (no compromise)
-- [ ] **PLAT-04**: Tool names use correct case sensitivity (Bash, Read, Edit, Grep)
+- [x] **PLAT-01**: Claude agent format validated using https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+- [x] **PLAT-02**: Copilot agent format generated using https://docs.github.com/en/copilot/reference/custom-agents-configuration
+- [x] **PLAT-03**: Both platforms have equal optimization priority (no compromise)
+- [x] **PLAT-04**: Tool names use correct case sensitivity (Bash, Read, Edit, Grep)
 - [ ] **PLAT-05**: Platform-specific features documented (model, hooks for Claude; mcp-servers for Copilot)
-- [ ] **PLAT-06**: Generated agents use YAML frontmatter for both platforms
+- [x] **PLAT-06**: Generated agents use YAML frontmatter for both platforms
 
 ### Installation Integration
 
@@ -103,12 +103,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TMPL-07 | Phase 1 | Complete |
 | TMPL-08 | Phase 4 | Pending |
 | TMPL-09 | Phase 1 | Complete |
-| PLAT-01 | Phase 2 | Pending |
-| PLAT-02 | Phase 2 | Pending |
-| PLAT-03 | Phase 2 | Pending |
-| PLAT-04 | Phase 2 | Pending |
+| PLAT-01 | Phase 2 | Complete |
+| PLAT-02 | Phase 2 | Complete |
+| PLAT-03 | Phase 2 | Complete |
+| PLAT-04 | Phase 2 | Complete |
 | PLAT-05 | Phase 6 | Pending |
-| PLAT-06 | Phase 2 | Pending |
+| PLAT-06 | Phase 2 | Complete |
 | INST-01 | Phase 4 | Pending |
 | INST-02 | Phase 4 | Pending |
 | INST-03 | Phase 4 | Pending |
