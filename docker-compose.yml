@@ -15,10 +15,14 @@ services:
     stdin_open: true
 
     # Reasonable security without breaking usability
-    cap_drop:
-      - ALL
+    # cap_drop:
+    #   - ALL  # Commented out to allow full apt functionality
+    cap_add:
+      - SETUID
+      - SETGID
+      - AUDIT_WRITE
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges:false
     pids_limit: 512
 
     # Resource limits (adjust as needed)
