@@ -1,10 +1,11 @@
 const { generateAgent } = require('./bin/lib/template-system/generator');
 const fs = require('fs');
+const path = require('path');
 
 // Generate Claude agent
 console.log('Generating Claude agent...');
 const claudeResult = generateAgent(
-  'specs/agents/gsd-planner.md',
+  path.join(__dirname, 'specs/agents/gsd-planner.md'),
   'claude',
   { workDir: '/workspace', validate: true }
 );
@@ -21,7 +22,7 @@ console.log('  Warnings:', claudeResult.warnings.length);
 // Generate Copilot agent (use smaller agent)
 console.log('\nGenerating Copilot agent...');
 const copilotResult = generateAgent(
-  'specs/agents/gsd-verifier.md',
+  path.join(__dirname, 'specs/agents/gsd-verifier.md'),
   'copilot',
   { workDir: '.github/skills/get-shit-done', validate: true }
 );

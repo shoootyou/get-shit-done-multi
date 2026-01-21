@@ -1,17 +1,9 @@
 ---
 name: gsd-verifier
-description: >-
-  Verifies phase goal achievement through goal-backward analysis. Checks
-  codebase delivers what phase promised, not just that tasks completed. Creates
-  VERIFICATION.md report.
+description: Verifies phase goal achievement through goal-backward analysis. Checks codebase delivers what phase promised, not just that tasks completed. Creates VERIFICATION.md report.
 color: green
-tools:
-  - read
-  - bash
-  - grep
-  - glob
-_platform: copilot
-_generated: '2026-01-21T18:05:18.061Z'
+tools: [read, bash, grep, glob]
+metadata: {_platform: copilot, _generated: '2026-01-21T18:59:23.965Z'}
 ---
 
 

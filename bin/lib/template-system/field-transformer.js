@@ -182,31 +182,44 @@ function validateFieldSupport(fieldName, platform) {
  * @param {string} options.version - Template system version
  * @returns {Object} Frontmatter with metadata added
  */
+/**
+ * Add platform-specific generation metadata to frontmatter
+ * @param {Object} frontmatter - Transformed frontmatter object
+ * @param {string} platform - Target platform ('claude' or 'copilot')
+ * @param {Object} options - Generation options
+ * @param {string} options.specPath - Path to source spec file
+ * @param {string} options.version - Template system version
+ * @returns {Object} Frontmatter with metadata added (platform-specific)
+ */
 function addPlatformMetadata(frontmatter, platform, options = {}) {
   if (!frontmatter || typeof frontmatter !== 'object') {
     return frontmatter;
   }
 
-  const metadata = {
-    // Platform identifier
-    _platform: platform,
-    
-    // Generation timestamp
-    _generated: new Date().toISOString(),
-    
-    // Template system version (if provided)
-    ...(options.version && { _templateVersion: options.version }),
-    
-    // Source spec path (if provided)
-    ...(options.specPath && { _sourceSpec: options.specPath })
-  };
+  // Claude: NO metadata fields (not in official spec)
+  // Reference: https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+  if (platform === 'claude') {
+    return frontmatter;  // Return unchanged
+  }
 
-  // Preserve existing frontmatter and add metadata
-  // Metadata fields prefixed with _ to avoid conflicts
-  return {
-    ...frontmatter,
-    ...metadata
-  };
+  // Copilot: Metadata MUST be nested under 'metadata' object
+  // Reference: https://docs.github.com/en/copilot/reference/custom-agents-configuration
+  if (platform === 'copilot') {
+    const metadata = {
+      _platform: platform,
+      _generated: new Date().toISOString(),
+      ...(options.version && { _templateVersion: options.version }),
+      ...(options.specPath && { _sourceSpec: options.specPath })
+    };
+    
+    return {
+      ...frontmatter,
+      metadata: metadata  // Nested under metadata object
+    };
+  }
+
+  // Unknown platform - return unchanged with no metadata
+  return frontmatter;
 }
 
 /**

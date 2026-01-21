@@ -154,48 +154,55 @@ const ft = require('./field-transformer');
   console.log('✓ Test 10: validateFieldSupport handles unknown fields');
 }
 
-// Test 11: addPlatformMetadata includes platform identifier
+// Test 11: addPlatformMetadata - Claude has NO metadata fields
 {
   const frontmatter = { name: 'test-agent', tools: ['Bash'] };
   const result = ft.addPlatformMetadata(frontmatter, 'claude');
   
-  assert.strictEqual(result._platform, 'claude');
-  assert.ok(result._generated); // Timestamp should exist
-  assert.strictEqual(result.name, 'test-agent'); // Preserves existing fields
+  assert.strictEqual(result._platform, undefined); // NO metadata in Claude
+  assert.strictEqual(result._generated, undefined); // NO metadata in Claude
+  assert.strictEqual(result.metadata, undefined);   // NO metadata object in Claude
+  assert.strictEqual(result.name, 'test-agent');    // Preserves existing fields
   
-  console.log('✓ Test 11: addPlatformMetadata includes platform identifier');
+  console.log('✓ Test 11: addPlatformMetadata - Claude has NO metadata fields');
 }
 
-// Test 12: addPlatformMetadata includes generation timestamp
+// Test 12: addPlatformMetadata - Copilot has nested metadata object
 {
   const frontmatter = { name: 'test-agent' };
   const result = ft.addPlatformMetadata(frontmatter, 'copilot');
   
-  assert.ok(result._generated);
-  assert.ok(result._generated.match(/^\d{4}-\d{2}-\d{2}T/)); // ISO format
+  assert.strictEqual(result._platform, undefined); // NOT at root level
+  assert.strictEqual(result._generated, undefined); // NOT at root level
+  assert.ok(result.metadata); // MUST have metadata object
+  assert.strictEqual(result.metadata._platform, 'copilot'); // Inside metadata object
+  assert.ok(result.metadata._generated); // Inside metadata object
+  assert.ok(result.metadata._generated.match(/^\d{4}-\d{2}-\d{2}T/)); // ISO format
   
-  console.log('✓ Test 12: addPlatformMetadata includes timestamp');
+  console.log('✓ Test 12: addPlatformMetadata - Copilot has nested metadata object');
 }
 
-// Test 13: addPlatformMetadata preserves existing frontmatter
+// Test 13: addPlatformMetadata - Copilot preserves frontmatter, nests metadata
 {
   const frontmatter = { 
     name: 'test-agent', 
     description: 'Test',
-    tools: ['Bash', 'Read']
+    tools: ['bash', 'read']
   };
-  const result = ft.addPlatformMetadata(frontmatter, 'claude', {
+  const result = ft.addPlatformMetadata(frontmatter, 'copilot', {
     version: '1.8.1',
     specPath: '/path/to/spec.yml'
   });
   
   assert.strictEqual(result.name, 'test-agent');
   assert.strictEqual(result.description, 'Test');
-  assert.deepStrictEqual(result.tools, ['Bash', 'Read']);
-  assert.strictEqual(result._templateVersion, '1.8.1');
-  assert.strictEqual(result._sourceSpec, '/path/to/spec.yml');
+  assert.deepStrictEqual(result.tools, ['bash', 'read']);
+  assert.ok(result.metadata);
+  assert.strictEqual(result.metadata._platform, 'copilot');
+  assert.strictEqual(result.metadata._templateVersion, '1.8.1');
+  assert.strictEqual(result.metadata._sourceSpec, '/path/to/spec.yml');
   
-  console.log('✓ Test 13: addPlatformMetadata preserves frontmatter and adds metadata');
+  console.log('✓ Test 13: addPlatformMetadata - Copilot preserves frontmatter, nests metadata');
 }
 
 // Test 14: Pitfall 3 scenario - model field handled correctly

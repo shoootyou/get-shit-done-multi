@@ -605,7 +605,7 @@ Supports hooks: {{supportsHooks}}
 function testClaudeAgentFromTemplate() {
   console.log('Test 17: Generate Claude agent from template spec with conditionals');
   
-  const specPath = 'specs/agents/gsd-planner.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-planner.md');
   const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
   
   assert.strictEqual(result.success, true, 'Generation should succeed');
@@ -638,7 +638,7 @@ function testCopilotAgentFromTemplate() {
   console.log('Test 18: Generate Copilot agent from same spec with different output');
   
   // Use smaller agent for Copilot due to 30K prompt limit
-  const specPath = 'specs/agents/gsd-verifier.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-verifier.md');
   const result = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
   
   assert.strictEqual(result.success, true, 'Generation should succeed');
@@ -669,7 +669,7 @@ function testPlatformOutputDifferences() {
   console.log('Test 19: Claude and Copilot outputs differ appropriately');
   
   // Use smaller agent for fair comparison
-  const specPath = 'specs/agents/gsd-verifier.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-verifier.md');
   const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
   const copilotResult = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
   
@@ -698,7 +698,7 @@ function testPlatformOutputDifferences() {
 function testClaudeAgentValidation() {
   console.log('Test 20: Generated Claude agent validates against Claude spec');
   
-  const specPath = 'specs/agents/gsd-planner.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-planner.md');
   const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
   
   assert.strictEqual(result.success, true, 'Generation should succeed');
@@ -722,7 +722,7 @@ function testCopilotAgentValidation() {
   console.log('Test 21: Generated Copilot agent validates against Copilot spec');
   
   // Use smaller agent for Copilot
-  const specPath = 'specs/agents/gsd-verifier.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-verifier.md');
   const result = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
   
   assert.strictEqual(result.success, true, 'Generation should succeed');
@@ -745,7 +745,7 @@ function testCopilotAgentValidation() {
 function testTemplateVariablesResolved() {
   console.log('Test 22: Template variables fully resolved in output');
   
-  const specPath = 'specs/agents/gsd-planner.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-planner.md');
   const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
   
   assert.strictEqual(result.success, true, 'Generation should succeed');
@@ -775,7 +775,7 @@ function testGenerateAllAgentsForClaude() {
   ];
   
   const results = agentNames.map(name => {
-    const specPath = `specs/agents/${name}.md`;
+    const specPath = path.join('/workspace', `specs/agents/${name}.md`);
     return { name, result: generateAgent(specPath, 'claude', { workDir: '/workspace' }) };
   });
   
@@ -805,7 +805,7 @@ function testGenerateAllAgentsForCopilot() {
   ];
   
   const results = agentNames.map(name => {
-    const specPath = `specs/agents/${name}.md`;
+    const specPath = path.join('/workspace', `specs/agents/${name}.md`);
     return { name, result: generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' }) };
   });
   
@@ -839,9 +839,9 @@ function testOriginalContentPreserved() {
   console.log('Test 25: Original agent content preserved in generated output');
   
   // Use verifier as it's a good size
-  const specPath = 'specs/agents/gsd-verifier.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-verifier.md');
   const spec = fs.readFileSync(specPath, 'utf8');
-  const original = fs.readFileSync('agents/gsd-verifier.md', 'utf8');
+  const original = fs.readFileSync(path.join('/workspace', 'agents/gsd-verifier.md'), 'utf8');
   
   const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
   
@@ -868,7 +868,7 @@ function testPlatformContextVariables() {
   console.log('Test 26: Platform-specific context variables substituted');
   
   // Use verifier for consistency
-  const specPath = 'specs/agents/gsd-verifier.md';
+  const specPath = path.join('/workspace', 'specs/agents/gsd-verifier.md');
   
   // Generate with custom workDir
   const claudeResult = generateAgent(specPath, 'claude', { workDir: '/test/claude' });
