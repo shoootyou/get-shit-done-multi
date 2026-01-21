@@ -61,11 +61,22 @@ function validateClaudeSpec(frontmatter) {
 
   // Tools validation (case-sensitive)
   if (frontmatter.tools) {
-    if (!Array.isArray(frontmatter.tools)) {
-      errors.push({ field: 'tools', message: 'tools must be an array' });
+    // Claude accepts both string format (tools: Read, Write) and array format
+    let toolsArray;
+    if (typeof frontmatter.tools === 'string') {
+      // Parse comma-separated string
+      toolsArray = frontmatter.tools.split(',').map(t => t.trim());
+    } else if (Array.isArray(frontmatter.tools)) {
+      toolsArray = frontmatter.tools;
     } else {
+      errors.push({ field: 'tools', message: 'tools must be either a comma-separated string or an array' });
+      toolsArray = [];
+    }
+    
+    if (toolsArray.length > 0) {
       // Check for wildcard syntax (not allowed on Claude)
-      if (frontmatter.tools.includes('*') || frontmatter.tools.includes('**')) {
+      // Only check for standalone * or **, not * within tool names like mcp__context7__*
+      if (toolsArray.some(t => t === '*' || t === '**')) {
         errors.push({ 
           field: 'tools', 
           message: 'Claude does not support wildcard tools ["*"]. Must specify tools explicitly.' 
@@ -73,7 +84,7 @@ function validateClaudeSpec(frontmatter) {
       }
 
       // Validate tool names are case-correct (Pitfall 1)
-      frontmatter.tools.forEach(tool => {
+      toolsArray.forEach(tool => {
         const toolInfo = TOOL_COMPATIBILITY_MATRIX[tool];
         
         if (!toolInfo) {

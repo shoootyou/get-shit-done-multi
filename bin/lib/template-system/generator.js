@@ -17,6 +17,39 @@ const { validateSpec, checkPromptLength } = require('./validators');
 const yaml = require('js-yaml');
 
 /**
+ * Serialize frontmatter with platform-specific YAML formatting
+ * @param {Object} frontmatter - Frontmatter object to serialize
+ * @param {string} platform - Target platform ('claude' or 'copilot')
+ * @returns {string} Formatted YAML string
+ */
+function serializeFrontmatter(frontmatter, platform) {
+  // Clone to avoid mutating original
+  const fm = JSON.parse(JSON.stringify(frontmatter));
+  
+  if (platform === 'claude') {
+    // Claude: tools as comma-separated string (not array)
+    if (Array.isArray(fm.tools)) {
+      fm.tools = fm.tools.join(', ');
+    }
+  } else if (platform === 'copilot') {
+    // Copilot: tools remains as array, will be formatted as single-line array
+    // (handled by YAML options below)
+  }
+  
+  // YAML dump options for single-line formatting
+  const yamlOptions = {
+    // flowLevel 1: objects as block, arrays as flow (single-line)
+    flowLevel: 1,
+    // Unlimited line width prevents wrapping
+    lineWidth: -1,
+    // Indent 2 spaces
+    indent: 2
+  };
+  
+  return yaml.dump(fm, yamlOptions);
+}
+
+/**
  * Generate agent from spec file
  * 
  * Pipeline stages:
@@ -78,7 +111,11 @@ function generateAgent(specPath, platform, options = {}) {
       const path = require('path');
       
       // Read raw file content
-      const absolutePath = path.resolve(specPath);
+      // If specPath is relative, resolve it from workDir (if provided)
+      const baseDir = options.workDir || process.cwd();
+      const absolutePath = path.isAbsolute(specPath) 
+        ? specPath 
+        : path.resolve(baseDir, specPath);
       if (!fs.existsSync(absolutePath)) {
         throw new Error(`Spec file not found: ${absolutePath}`);
       }
@@ -302,7 +339,7 @@ function generateAgent(specPath, platform, options = {}) {
     }
     
     // Step 7: Combine output and check prompt length
-    const frontmatterStr = yaml.dump(finalFrontmatter);
+    const frontmatterStr = serializeFrontmatter(finalFrontmatter, platform);
     const output = `---\n${frontmatterStr}---\n\n${spec.body}`;
     
     try {
@@ -574,7 +611,7 @@ function generateFromSpec(specObject, platform, options = {}) {
         });
       }
       
-      renderedFrontmatter = yaml.dump(finalFrontmatter);
+      renderedFrontmatter = serializeFrontmatter(finalFrontmatter, platform);
     } catch (transformErr) {
       return {
         success: false,
