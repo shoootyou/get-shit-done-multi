@@ -377,7 +377,7 @@ Output consumed by /gsd:execute-phase
 Plans must be executable prompts.
 </downstream_consumer>
 """,
-  subagent_type="gsd-planner",
+  subagent_type="gsd-planner-coordinator",
   description="Plan gap fixes for Phase {phase}"
 )
 ```
@@ -462,7 +462,7 @@ Read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
-  subagent_type="gsd-planner",
+  subagent_type="gsd-planner-coordinator",
   description="Revise Phase {phase} plans"
 )
 ```

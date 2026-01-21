@@ -287,7 +287,7 @@ Before returning PLANNING COMPLETE:
 ```
 Task(
   prompt=filled_prompt,
-  subagent_type="gsd-planner",
+  subagent_type="gsd-planner-coordinator",
   description="Plan Phase {phase}"
 )
 ```
@@ -397,7 +397,7 @@ Return what changed.
 ```
 Task(
   prompt=revision_prompt,
-  subagent_type="gsd-planner",
+  subagent_type="gsd-planner-coordinator",
   description="Revise Phase {phase} plans"
 )
 ```
