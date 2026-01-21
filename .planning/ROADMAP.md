@@ -80,26 +80,27 @@ Plans:
 ---
 
 ### Phase 3.1: Agent Size Optimization
-**Goal:** Optimize oversized agents to fit Copilot's 30K character limit
+**Goal:** Split oversized agents into coordinator/specialist pairs to achieve 100% Copilot platform coverage (15/15 agents) while preserving ALL content with zero information loss
 
 **Dependencies:** Phase 3 (needs working generation pipeline)
 
 **Requirements:** AGNT-02 (platform compatibility), AGNT-04 (validation)
 
-**Plans:** TBD
+**Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 03.1-01-PLAN.md — Compact version infrastructure & generator updates
-- [ ] 03.1-02-PLAN.md — gsd-planner optimization (41K → <30K chars)
-- [ ] 03.1-03-PLAN.md — gsd-debugger optimization (35K → <30K chars)
-- [ ] 03.1-04-PLAN.md — Validation & complete platform coverage testing
+- [ ] 03.1-01-PLAN.md — Document split pattern & split gsd-planner (coordinator + strategist)
+- [ ] 03.1-02-PLAN.md — Split gsd-debugger (investigator + specialist)
+- [ ] 03.1-03-PLAN.md — Update all command/orchestrator references to new coordinator names
+- [ ] 03.1-04-PLAN.md — Generate, validate, and verify 100% platform coverage
 
 **Success Criteria:**
-1. gsd-planner Copilot version reduced to <30,000 characters
-2. gsd-debugger Copilot version reduced to <30,000 characters
-3. Core protocols and functionality preserved in compact versions
-4. Generator automatically uses compact versions for Copilot platform
-5. All 11/11 agents working on both platforms (100% coverage)
+1. gsd-planner-coordinator + gsd-planner-strategist both <30,000 characters (preserves all 41K original content)
+2. gsd-debugger-investigator + gsd-debugger-specialist both <30,000 characters (preserves all 35K original content)
+3. Zero content loss - all examples, tables, and patterns preserved through functional decomposition
+4. Coordinators can spawn specialists via task tool for complex scenarios
+5. All 15/15 agents working on both platforms (100% coverage)
+6. Commands/orchestrators reference new coordinator agents (no breaking changes)
 
 ---
 
