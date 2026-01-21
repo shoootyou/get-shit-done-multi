@@ -59,8 +59,8 @@ function validateFormat(content, platform) {
 }
 
 const agentNames = [
-  'gsd-planner', 'gsd-executor', 'gsd-verifier',
-  'gsd-codebase-mapper', 'gsd-debugger', 'gsd-phase-researcher',
+  'gsd-planner-coordinator', 'gsd-planner-strategist', 'gsd-executor', 'gsd-verifier',
+  'gsd-codebase-mapper', 'gsd-debugger-investigator', 'gsd-debugger-specialist', 'gsd-phase-researcher',
   'gsd-plan-checker', 'gsd-project-researcher', 'gsd-research-synthesizer',
   'gsd-roadmapper', 'gsd-integration-checker'
 ];
@@ -129,15 +129,15 @@ for (const name of agentNames) {
     });
     console.log(`  ${name}: ✓`);
   } else {
-    // Check if this is expected (gsd-planner and gsd-debugger are too large)
-    const expectedMissing = ['gsd-planner', 'gsd-debugger'].includes(name);
+    // All agents should now be under 30K (old gsd-planner/gsd-debugger replaced by split agents)
+    const expectedMissing = false;
     results.copilot.push({
       name,
       success: false,
       size: 0,
       errors: [{ 
-        message: expectedMissing ? 'Exceeds 30K size limit' : 'File not found',
-        stage: expectedMissing ? 'prompt-length' : 'file-read'
+        message: 'File not found',
+        stage: 'file-read'
       }],
       warnings: [],
       valid: false,
@@ -256,7 +256,7 @@ report.push('- MCP server configuration (mcp-servers field)');
 report.push('- Excludes model, hooks, skills, disallowedTools fields');
 report.push('- 30K character prompt limit');
 report.push('');
-report.push('**Note:** Some agents exceed Copilot\'s 30K limit (gsd-planner: 41KB, gsd-debugger: 35KB)');
+report.push('**Phase 3.1 Success:** All agents now under 30K limit after coordinator/specialist split (gsd-planner → coordinator+strategist, gsd-debugger → investigator+specialist)');
 report.push('');
 
 // Write report

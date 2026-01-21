@@ -5,12 +5,11 @@ color: green
 
 {{#isClaude}}
 tools: [Read, Bash, Glob, Grep]
+model: sonnet
 {{/isClaude}}
 {{#isCopilot}}
 tools: [read, bash, glob, grep]
 {{/isCopilot}}
-
-model: claude-sonnet-4.5
 ---
 
 <role>

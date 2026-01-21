@@ -2,15 +2,17 @@ const { generateAgent } = require('./bin/lib/template-system/generator');
 const fs = require('fs');
 const path = require('path');
 
-// All 11 agents to generate
+// All 13 agents to generate (11 original - 2 old + 4 new = 13)
 const AGENTS = [
   'gsd-codebase-mapper',
-  'gsd-debugger',
+  'gsd-debugger-investigator',      // NEW (split from gsd-debugger)
+  'gsd-debugger-specialist',        // NEW (split from gsd-debugger)
   'gsd-executor',
   'gsd-integration-checker',
   'gsd-phase-researcher',
   'gsd-plan-checker',
-  'gsd-planner',
+  'gsd-planner-coordinator',        // NEW (split from gsd-planner)
+  'gsd-planner-strategist',         // NEW (split from gsd-planner)
   'gsd-project-researcher',
   'gsd-research-synthesizer',
   'gsd-roadmapper',
