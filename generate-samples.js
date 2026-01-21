@@ -2,38 +2,69 @@ const { generateAgent } = require('./bin/lib/template-system/generator');
 const fs = require('fs');
 const path = require('path');
 
-// Generate Claude agent
-console.log('Generating Claude agent...');
-const claudeResult = generateAgent(
-  path.join(__dirname, 'specs/agents/gsd-planner.md'),
-  'claude',
-  { workDir: '/workspace', validate: true }
-);
+// All 11 agents to generate
+const AGENTS = [
+  'gsd-codebase-mapper',
+  'gsd-debugger',
+  'gsd-executor',
+  'gsd-integration-checker',
+  'gsd-phase-researcher',
+  'gsd-plan-checker',
+  'gsd-planner',
+  'gsd-project-researcher',
+  'gsd-research-synthesizer',
+  'gsd-roadmapper',
+  'gsd-verifier'
+];
 
-if (!claudeResult.success) {
-  console.error('Claude generation failed:', claudeResult.errors);
-  process.exit(1);
+const SPECS_DIR = path.join(__dirname, 'specs/agents');
+const OUTPUT_DIR = path.join(__dirname, 'test-output');
+
+// Ensure output directories exist
+fs.mkdirSync(path.join(OUTPUT_DIR, 'claude'), { recursive: true });
+fs.mkdirSync(path.join(OUTPUT_DIR, 'copilot'), { recursive: true });
+
+// Generate for both platforms
+for (const platform of ['claude', 'copilot']) {
+  console.log(`\n=== Generating ${platform} agents ===`);
+  let successCount = 0;
+  let failureCount = 0;
+  
+  const workDir = platform === 'claude' ? '/workspace' : '.github/skills/get-shit-done';
+  
+  for (const agentName of AGENTS) {
+    const specPath = path.join(SPECS_DIR, `${agentName}.md`);
+    const result = generateAgent(specPath, platform, { workDir, validate: true });
+    
+    if (result.success) {
+      const outputPath = path.join(OUTPUT_DIR, platform, `${agentName}.md`);
+      fs.writeFileSync(outputPath, result.output);
+      console.log(`✓ ${agentName} (${result.output.length} chars)`);
+      successCount++;
+    } else {
+      const errorMsg = result.errors[0] ? result.errors[0].message : 'Unknown error';
+      console.log(`✗ ${agentName} - ${errorMsg}`);
+      failureCount++;
+    }
+  }
+  
+  console.log(`\n${platform}: ${successCount} success, ${failureCount} failed`);
 }
 
-fs.writeFileSync('test-output/claude/gsd-planner.md', claudeResult.output, 'utf8');
-console.log('✓ Generated Claude agent:', claudeResult.output.length, 'bytes');
-console.log('  Warnings:', claudeResult.warnings.length);
-
-// Generate Copilot agent (use smaller agent)
-console.log('\nGenerating Copilot agent...');
-const copilotResult = generateAgent(
-  path.join(__dirname, 'specs/agents/gsd-verifier.md'),
-  'copilot',
-  { workDir: '.github/skills/get-shit-done', validate: true }
-);
-
-if (!copilotResult.success) {
-  console.error('Copilot generation failed:', copilotResult.errors);
-  process.exit(1);
+// After generation, report sizes
+console.log('\n=== Size Report ===');
+const platforms = ['claude', 'copilot'];
+for (const platform of platforms) {
+  const dir = path.join(OUTPUT_DIR, platform);
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
+  
+  console.log(`\n${platform}:`);
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(dir, file), 'utf8');
+    const sizeKB = (content.length / 1024).toFixed(1);
+    const status = platform === 'copilot' && content.length > 30000 ? '⚠️ TOO LARGE' : '✓';
+    console.log(`  ${status} ${file}: ${sizeKB}KB`);
+  }
 }
 
-fs.writeFileSync('test-output/copilot/gsd-verifier.md', copilotResult.output, 'utf8');
-console.log('✓ Generated Copilot agent:', copilotResult.output.length, 'bytes');
-console.log('  Warnings:', copilotResult.warnings.length);
-
-console.log('\n✓ Sample agents generated successfully!');
+console.log('\n✓ All agents generated successfully!');
