@@ -118,6 +118,12 @@ Plans:
 
 **Requirements:** INST-01, INST-02, INST-03, INST-04, INST-05, INST-06, TMPL-02, TMPL-08, VERS-01, VERS-02, VERS-03
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Install integration (generation in install/installCopilot/installCodex)
+- [ ] 04-02-PLAN.md — Version metadata & documentation (field-transformer, package.json, CHANGELOG)
+
 **Success Criteria:**
 1. `--copilot` flag generates optimized agents to `.github/copilot/agents/`
 2. `--local`/`--global` flags generate optimized agents to Claude directories
