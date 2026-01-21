@@ -36,7 +36,7 @@ GSD evolves fast. Check for updates periodically:
 Shows what changed since your installed version. Update with:
 
 ```bash
-npx get-shit-done-cc@latest
+npx get-shit-done-multi@latest
 ```
 
 ## Core Workflow

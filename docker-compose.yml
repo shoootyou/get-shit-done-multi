@@ -1,0 +1,65 @@
+services:
+  ia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UBUNTU_VERSION: "24.04"
+        USERNAME: "sandbox"
+        UID: "9999"
+        GID: "9999"
+
+    container_name: ubuntu-ia-env
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+
+    # Reasonable security without breaking usability
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 512
+
+    # Resource limits (adjust as needed)
+    mem_limit: 8g
+    cpus: 4
+
+    # Ephemeral tmp (avoid clutter and reduce attack surface)
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=1g
+      - /run:rw,noexec,nosuid,nodev,size=64m
+
+    # Persistent volumes
+    volumes:
+      # Your repo/current directory as /workspace
+      - type: bind
+        source: .
+        target: /workspace
+        # If you want read-only, change to true
+        read_only: false
+
+      # Folder for outputs and "safe" writes
+      - type: bind
+        source: ./.sandbox-rw
+        target: /workspace-rw
+
+      # Persistent home (so installs, configs, history, etc. survive)
+      - type: bind
+        source: ./.sandbox-home
+        target: /home/sandbox
+
+      # Persistent cache (pip, npm, etc.)
+      - type: bind
+        source: ./.sandbox-cache
+        target: /home/sandbox/.cache
+
+    # Default: with network (for installing packages)
+    profiles: ["net"]
+
+  ia-nonet:
+    extends:
+      service: ia
+    container_name: ubuntu-ia-env-nonet
+    network_mode: "none"
+    profiles: ["nonet"]
