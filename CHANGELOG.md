@@ -4,6 +4,34 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.8.1] - 2026-01-21
+
+### Added
+- Template-based agent generation system for platform-specific optimization
+- Install-time generation replaces static agent files
+- Platform abstraction layer for Claude/Copilot compatibility
+- Version metadata in generated agents (template version, generation date, platform)
+- 13 agents converted to spec-as-template format in `specs/agents/`
+
+### Changed
+- Agents now generated from specs during installation (not copied from static files)
+- `--copilot` flag generates Copilot-optimized agents (array tools syntax, size-aware)
+- `--local`/`--global` flags generate Claude-optimized agents (string tools syntax)
+- `--all` flag applies platform-specific optimization to all detected CLIs
+- Agent split strategy: gsd-planner and gsd-debugger now have coordinator/specialist pairs for Copilot size limits
+
+### Technical
+- Template system modules: spec-parser, context-builder, engine, generator
+- Platform abstraction: tool-mapper, field-transformer, validators
+- 46 integration tests (100% pass rate across template system and platform layers)
+- Idempotent installation (safe re-runs overwrite cleanly)
+
+### Migration Notes
+- No user action required - agents generated automatically during install
+- Re-running install is safe (idempotent operation)
+- Existing orchestration system works unchanged
+- Agent size improvements: Copilot agents under 30KB (except 2 oversized)
+
 ## [1.8.0] - 2026-01-20
 
 ### Added
