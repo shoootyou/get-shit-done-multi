@@ -94,12 +94,39 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | Pending roadmap |
+| TMPL-01 | Phase 1 | Pending |
+| TMPL-02 | Phase 4 | Pending |
+| TMPL-03 | Phase 1 | Pending |
+| TMPL-04 | Phase 3 | Pending |
+| TMPL-05 | Phase 1 | Pending |
+| TMPL-06 | Phase 3 | Pending |
+| TMPL-07 | Phase 1 | Pending |
+| TMPL-08 | Phase 4 | Pending |
+| TMPL-09 | Phase 6 | Pending |
+| PLAT-01 | Phase 2 | Pending |
+| PLAT-02 | Phase 2 | Pending |
+| PLAT-03 | Phase 2 | Pending |
+| PLAT-04 | Phase 2 | Pending |
+| PLAT-05 | Phase 6 | Pending |
+| PLAT-06 | Phase 2 | Pending |
+| INST-01 | Phase 4 | Pending |
+| INST-02 | Phase 4 | Pending |
+| INST-03 | Phase 4 | Pending |
+| INST-04 | Phase 4 | Pending |
+| INST-05 | Phase 4 | Pending |
+| INST-06 | Phase 4 | Pending |
+| AGNT-01 | Phase 3 | Pending |
+| AGNT-02 | Phase 3 | Pending |
+| AGNT-03 | Phase 3 | Pending |
+| AGNT-04 | Phase 3 | Pending |
+| VERS-01 | Phase 4 | Pending |
+| VERS-02 | Phase 4 | Pending |
+| VERS-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 27 total
-- Mapped to phases: 0 (roadmap not yet created)
-- Unmapped: 27 ⚠️
+- Mapped to phases: 27 (100% ✓)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-21*
