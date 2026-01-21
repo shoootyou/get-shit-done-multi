@@ -63,6 +63,13 @@ Plans:
 
 **Requirements:** TMPL-04, TMPL-06, AGNT-01, AGNT-02, AGNT-03, AGNT-04
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Spec infrastructure & conversion utilities
+- [ ] 03-02-PLAN.md — Agent migration (pilot + bulk)
+- [ ] 03-03-PLAN.md — Platform generation & validation testing
+
 **Success Criteria:**
 1. All 11 GSD agents exist as single-source template files in `specs/agents/`
 2. Template rendering produces valid Claude agent format (YAML frontmatter + markdown)
@@ -127,7 +134,7 @@ Plans:
 |-------|--------|-----------|----------|
 | 1 - Template Engine Foundation | Complete | 2026-01-21 | ██████████ 100% |
 | 2 - Platform Abstraction Layer | Complete | 2026-01-21 | ██████████ 100% |
-| 3 - Spec Migration & Template Generation | Pending | — | ░░░░░░░░░░ 0% |
+| 3 - Spec Migration & Template Generation | Planning | — | ░░░░░░░░░░ 0% |
 | 4 - Installation Workflow Integration | Pending | — | ░░░░░░░░░░ 0% |
 | 5 - Cross-Platform Testing & Validation | Pending | — | ░░░░░░░░░░ 0% |
 | 6 - Documentation & Polish | Pending | — | ░░░░░░░░░░ 0% |
