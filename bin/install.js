@@ -449,6 +449,18 @@ function install(isGlobal) {
     failures.push('get-shit-done');
   }
 
+  // Copy lib-ghcc directory (needed for verification modules)
+  const libGhccSrc = path.join(src, 'lib-ghcc');
+  const libGhccDest = path.join(dirs.skills, 'lib-ghcc');
+  if (fs.existsSync(libGhccSrc)) {
+    copyWithPathReplacement(libGhccSrc, libGhccDest, claudeAdapter, 'skill');
+    if (verifyInstalled(libGhccDest, 'lib-ghcc')) {
+      console.log(`  ${green}✓${reset} Installed lib-ghcc`);
+    } else {
+      failures.push('lib-ghcc');
+    }
+  }
+
   // Copy agents to ~/.claude/agents (subagents must be at root level)
   // Only delete gsd-*.md files to preserve user's custom agents
   const agentsSrc = path.join(src, 'agents');
@@ -614,6 +626,18 @@ function installCopilot() {
     failures.push('skills/get-shit-done');
   }
 
+  // Copy lib-ghcc directory (needed for verification modules)
+  const libGhccSrc = path.join(src, 'lib-ghcc');
+  const libGhccDest = path.join(dirs.skills, 'lib-ghcc');
+  if (fs.existsSync(libGhccSrc)) {
+    copyWithPathReplacement(libGhccSrc, libGhccDest, copilotAdapter, 'skill');
+    if (verifyInstalled(libGhccDest, 'skills/lib-ghcc')) {
+      console.log(`  ${green}✓${reset} Installed lib-ghcc`);
+    } else {
+      failures.push('skills/lib-ghcc');
+    }
+  }
+
   // Copy commands into the skill directory
   const commandsSrc = path.join(src, 'commands', 'gsd');
   const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
@@ -753,6 +777,18 @@ function installCodex(isGlobal) {
     console.log(`  ${green}✓${reset} Installed skill resources`);
   } else {
     failures.push('skills/get-shit-done');
+  }
+
+  // Copy lib-ghcc directory (needed for verification modules)
+  const libGhccSrc = path.join(src, 'lib-ghcc');
+  const libGhccDest = path.join(dirs.skills, 'lib-ghcc');
+  if (fs.existsSync(libGhccSrc)) {
+    copyWithPathReplacement(libGhccSrc, libGhccDest, codexAdapter, 'skill');
+    if (verifyInstalled(libGhccDest, 'skills/lib-ghcc')) {
+      console.log(`  ${green}✓${reset} Installed lib-ghcc`);
+    } else {
+      failures.push('skills/lib-ghcc');
+    }
   }
 
   // Copy SKILL.md to the skill root (required for Codex skill recognition)
