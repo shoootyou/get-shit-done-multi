@@ -177,9 +177,10 @@ const ft = require('./field-transformer');
   assert.ok(result.metadata); // MUST have metadata object
   assert.strictEqual(result.metadata.platform, 'copilot'); // Inside metadata object (no underscore)
   assert.ok(result.metadata.generated); // Inside metadata object (no underscore)
-  assert.ok(result.metadata.generated.match(/^\d{4}-\d{2}-\d{2}T/)); // ISO format
+  assert.ok(result.metadata.generated.match(/^\d{4}-\d{2}-\d{2}$/)); // YYYY-MM-DD format
+  assert.ok(result.metadata.templateVersion); // Template version included
+  assert.strictEqual(result.metadata.templateVersion, '1.0.0'); // Template version is 1.0.0
   assert.strictEqual(result.metadata.projectName, 'get-shit-done-multi'); // Project name from package.json
-  assert.strictEqual(result.metadata.projectVersion, '1.8.0'); // Project version from package.json
   
   console.log('✓ Test 12: addPlatformMetadata - Copilot has nested metadata object');
 }
@@ -192,7 +193,6 @@ const ft = require('./field-transformer');
     tools: ['bash', 'read']
   };
   const result = ft.addPlatformMetadata(frontmatter, 'copilot', {
-    version: '1.8.1',
     specPath: '/path/to/spec.yml'
   });
   
@@ -201,10 +201,9 @@ const ft = require('./field-transformer');
   assert.deepStrictEqual(result.tools, ['bash', 'read']);
   assert.ok(result.metadata);
   assert.strictEqual(result.metadata.platform, 'copilot'); // No underscore
-  assert.strictEqual(result.metadata.templateVersion, '1.8.1'); // No underscore
+  assert.strictEqual(result.metadata.templateVersion, '1.0.0'); // Always included, no underscore
   assert.strictEqual(result.metadata.sourceSpec, '/path/to/spec.yml'); // No underscore
   assert.strictEqual(result.metadata.projectName, 'get-shit-done-multi'); // New field
-  assert.strictEqual(result.metadata.projectVersion, '1.8.0'); // New field
   
   console.log('✓ Test 13: addPlatformMetadata - Copilot preserves frontmatter, nests metadata');
 }

@@ -219,12 +219,13 @@ function addPlatformMetadata(frontmatter, platform, options = {}) {
   // Copilot: Metadata MUST be nested under 'metadata' object
   // Reference: https://docs.github.com/en/copilot/reference/custom-agents-configuration
   if (platform === 'copilot') {
+    const now = new Date();
     const metadata = {
       platform: platform,
-      generated: new Date().toISOString(),
+      generated: now.toISOString().split('T')[0], // YYYY-MM-DD format
+      templateVersion: '1.0.0', // Template system version
+      projectVersion: projectInfo.version, // Package version (e.g., 1.8.1)
       projectName: projectInfo.name,
-      projectVersion: projectInfo.version,
-      ...(options.version && { templateVersion: options.version }),
       ...(options.specPath && { sourceSpec: options.specPath })
     };
     
