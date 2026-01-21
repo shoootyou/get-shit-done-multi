@@ -32,7 +32,7 @@ const { AgentCapabilityTest } = require(path.join(gitRoot, 'lib-ghcc/verificatio
 const tests = [
   // CLI Installation Tests
   new CLIInstalledTest('Claude Code', 'claude'),
-  new CLIInstalledTest('GitHub Copilot CLI', 'gh'),
+  new CLIInstalledTest('GitHub Copilot CLI', 'copilot'),
   new CLIInstalledTest('Codex CLI', 'codex'),
   
   // Skill Registration Tests
@@ -88,66 +88,64 @@ If you cannot run the JavaScript diagnostic runner, perform these manual checks:
 
 **Claude Code:**
 ```bash
-claude --version
+claude --version && echo "✓ PASS: Claude Code is installed"
 ```
-- ✓ PASS: Shows version (e.g., "2.1.12 (Claude Code)")
-- ✗ FAIL: Command not found
+- ✓ PASS: Command succeeds (exit code 0) and displays version
+- ✗ FAIL: Command not found or exits with error
 - Install: https://claude.ai/download
 
 **GitHub Copilot CLI:**
 ```bash
-copilot --version
+copilot --version && echo "✓ PASS: GitHub Copilot CLI is installed"
 ```
-- ✓ PASS: Shows version (e.g., "copilot 1.x.x")
-- ✗ FAIL: Command not found
+- ✓ PASS: Command succeeds (exit code 0) and displays version
+- ✗ FAIL: Command not found or exits with error
 - Install: https://github.com/github/gh-copilot
 
 **Codex CLI:**
 ```bash
-codex --version
+codex --version && echo "✓ PASS: Codex CLI is installed"
 ```
-- ✓ PASS: Shows version (e.g., "codex-cli 0.87.0")
-- ✗ FAIL: Command not found
+- ✓ PASS: Command succeeds (exit code 0) and displays version
+- ✗ FAIL: Command not found or exits with error
 - Install: https://www.npmjs.com/package/codex-cli
 
 ### 2. Check GSD Skill Registration
 
 **Claude Code:**
 ```bash
-ls -la ~/Library/Application\ Support/Claude/.agent/get-shit-done/
+[ -f ~/Library/Application\ Support/Claude/.agent/get-shit-done/.agent.md ] && echo "✓ PASS: GSD registered in Claude Code" || echo "⊙ SKIP or ✗ FAIL"
 ```
-- ✓ PASS: Directory exists and contains SKILL.md
-- ⊙ SKIP: Directory doesn't exist but you don't use Claude Code
-- ✗ FAIL: Directory doesn't exist and you want to use Claude Code
+- ✓ PASS: Command exits 0 (file exists)
+- ⊙ SKIP: File doesn't exist but you don't use Claude Code
+- ✗ FAIL: File doesn't exist and you want to use Claude Code
 - Fix: `npx get-shit-done-multi --claude`
 
 **GitHub Copilot CLI:**
 ```bash
-git rev-parse --show-toplevel && ls -la .github/skills/get-shit-done/
+[ -f .github/skills/get-shit-done/SKILL.md ] && echo "✓ PASS: GSD registered in Copilot CLI" || echo "⊙ SKIP or ✗ FAIL"
 ```
-- ✓ PASS: Directory exists and contains SKILL.md
-- ⊙ SKIP: Directory doesn't exist but you don't use Copilot CLI
-- ✗ FAIL: Directory doesn't exist and you want to use Copilot CLI
+- ✓ PASS: Command exits 0 (file exists)
+- ⊙ SKIP: File doesn't exist but you don't use Copilot CLI
+- ✗ FAIL: File doesn't exist and you want to use Copilot CLI
 - Fix: `npx get-shit-done-multi --copilot`
 
 **Codex CLI:**
 ```bash
-ls -la ~/.codex/prompts/get-shit-done/
+[ -f ~/.codex/prompts/get-shit-done/PROMPT.md ] && echo "✓ PASS: GSD registered in Codex CLI" || echo "⊙ SKIP or ✗ FAIL"
 ```
-- ✓ PASS: Directory exists and contains PROMPT.md
-- ⊙ SKIP: Directory doesn't exist but you don't use Codex CLI
-- ✗ FAIL: Directory doesn't exist and you want to use Codex CLI
+- ✓ PASS: Command exits 0 (file exists)
+- ⊙ SKIP: File doesn't exist but you don't use Codex CLI
+- ✗ FAIL: File doesn't exist and you want to use Codex CLI
 - Fix: `npx get-shit-done-multi --codex`
 
 ### 3. Check GSD Commands Available
 
 ```bash
-git rev-parse --show-toplevel
-cd $(git rev-parse --show-toplevel)
-ls -1 .github/skills/get-shit-done/commands/gsd/*.md | wc -l
+cd $(git rev-parse --show-toplevel) && count=$(ls -1 .github/skills/get-shit-done/commands/gsd/*.md 2>/dev/null | wc -l | tr -d ' ') && [ "$count" -ge 29 ] && echo "✓ PASS: $count GSD commands found" || echo "✗ FAIL: Only $count commands found"
 ```
-- ✓ PASS: Shows 29 or more command files
-- ✗ FAIL: Shows fewer than 20 command files
+- ✓ PASS: Command exits 0 (29 or more command files found)
+- ✗ FAIL: Command exits 1 (fewer than 29 command files)
 - Fix: Reinstall GSD or check repository integrity
 
 **List all commands:**
@@ -158,12 +156,10 @@ ls -1 .github/skills/get-shit-done/commands/gsd/*.md | xargs -n1 basename
 ### 4. Check GSD Agents Available
 
 ```bash
-git rev-parse --show-toplevel
-cd $(git rev-parse --show-toplevel)
-ls -1 .github/agents/gsd-*.md 2>/dev/null | wc -l
+cd $(git rev-parse --show-toplevel) && count=$(ls -1 .github/agents/gsd-*.md 2>/dev/null | wc -l | tr -d ' ') && [ "$count" -eq 11 ] && echo "✓ PASS: All $count GSD agents found" || echo "⚠ WARN: Only $count agents found"
 ```
-- ✓ PASS: Shows 11 agent files
-- ⚠ WARN: Shows fewer than 11 agents
+- ✓ PASS: Command exits 0 (exactly 11 agent files found)
+- ⚠ WARN: Command exits 1 (fewer than 11 agent files found)
 - Fix: Check repository integrity
 
 **List all agents:**
