@@ -6,8 +6,8 @@ services:
       args:
         UBUNTU_VERSION: "24.04"
         USERNAME: "sandbox"
-        UID: "1000"
-        GID: "1000"
+        UID: "9999"
+        GID: "9999"
 
     container_name: ubuntu-ia-env
     working_dir: /workspace

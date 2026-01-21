@@ -26,8 +26,8 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 
 # Non-root user with passwordless sudo
 ARG USERNAME=sandbox
-ARG UID=1000
-ARG GID=1000
+ARG UID=9999
+ARG GID=9999
 
 # Create group/user robustly
 RUN set -eux; \
@@ -56,11 +56,11 @@ ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
 # Install Claude Code CLI
 # Docs: https://code.claude.com/docs/en/setup
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN sudo curl -fsSL https://claude.ai/install.sh | bash
 
 # Install GitHub Copilot CLI
 # Docs: https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli
-RUN curl -fsSL https://gh.io/copilot-install | bash
+RUN sudo curl -fsSL https://gh.io/copilot-install | bash
 
 # Return to root to finish setup
 USER root
