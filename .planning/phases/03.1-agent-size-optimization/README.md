@@ -109,12 +109,14 @@ Final agent names:
 - Commands spawn gsd-debugger (not gsd-debugger-investigator)
 - Zero breaking changes to existing workflows
 - Old references already updated to new names
+- **Internal references updated: coordinator/investigator specs updated to use final names (gsd-planner, gsd-debugger)**
 
 ### 3. Content Preservation
 - Original specs deleted ONLY after content verified in splits
 - 100% content preserved between original and split versions
 - All examples, tables, and methodology intact
 - Character count verification: splits ≈ original (±10%)
+- **After renaming, update internal self-references in split specs**
 
 ### 4. Clean Generation
 - test-output/ regenerated from scratch (remove old files first)
