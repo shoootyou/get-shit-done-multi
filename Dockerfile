@@ -56,11 +56,11 @@ ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 
 # Install Claude Code CLI
 # Docs: https://code.claude.com/docs/en/setup
-RUN sudo curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -fsSL https://claude.ai/install.sh | sudo bash
 
 # Install GitHub Copilot CLI
 # Docs: https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli
-RUN sudo curl -fsSL https://gh.io/copilot-install | bash
+RUN curl -fsSL https://gh.io/copilot-install | sudo bash
 
 # Return to root to finish setup
 USER root
