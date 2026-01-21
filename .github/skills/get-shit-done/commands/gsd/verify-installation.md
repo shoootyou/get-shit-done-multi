@@ -21,10 +21,12 @@ This command will check:
 ## Running Diagnostics
 
 ```javascript
-const { runDiagnostics } = require('../../lib-ghcc/verification/diagnostic-runner');
-const { CLIInstalledTest, SkillRegisteredTest } = require('../../lib-ghcc/verification/cli-detector');
-const { CommandAvailableTest } = require('../../lib-ghcc/verification/command-verifier');
-const { AgentCapabilityTest } = require('../../lib-ghcc/verification/agent-verifier');
+const path = require('path');
+const gitRoot = require('child_process').execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
+const { runDiagnostics } = require(path.join(gitRoot, 'lib-ghcc/verification/diagnostic-runner'));
+const { CLIInstalledTest, SkillRegisteredTest } = require(path.join(gitRoot, 'lib-ghcc/verification/cli-detector'));
+const { CommandAvailableTest } = require(path.join(gitRoot, 'lib-ghcc/verification/command-verifier'));
+const { AgentCapabilityTest } = require(path.join(gitRoot, 'lib-ghcc/verification/agent-verifier'));
 
 // Define all diagnostic tests
 const tests = [
@@ -78,10 +80,149 @@ runDiagnostics(tests).then(summary => {
 });
 ```
 
+## Manual Verification (If Diagnostic Runner Not Available)
+
+If you cannot run the JavaScript diagnostic runner, perform these manual checks:
+
+### 1. Check CLI Installations
+
+**Claude Code:**
+```bash
+claude --version
+```
+- ✓ PASS: Shows version (e.g., "2.1.12 (Claude Code)")
+- ✗ FAIL: Command not found
+- Install: https://claude.ai/download
+
+**GitHub Copilot CLI:**
+```bash
+copilot --version
+```
+- ✓ PASS: Shows version (e.g., "copilot 1.x.x")
+- ✗ FAIL: Command not found
+- Install: https://github.com/github/gh-copilot
+
+**Codex CLI:**
+```bash
+codex --version
+```
+- ✓ PASS: Shows version (e.g., "codex-cli 0.87.0")
+- ✗ FAIL: Command not found
+- Install: https://www.npmjs.com/package/codex-cli
+
+### 2. Check GSD Skill Registration
+
+**Claude Code:**
+```bash
+ls -la ~/Library/Application\ Support/Claude/.agent/get-shit-done/
+```
+- ✓ PASS: Directory exists and contains SKILL.md
+- ⊙ SKIP: Directory doesn't exist but you don't use Claude Code
+- ✗ FAIL: Directory doesn't exist and you want to use Claude Code
+- Fix: `npx get-shit-done-multi --claude`
+
+**GitHub Copilot CLI:**
+```bash
+git rev-parse --show-toplevel && ls -la .github/skills/get-shit-done/
+```
+- ✓ PASS: Directory exists and contains SKILL.md
+- ⊙ SKIP: Directory doesn't exist but you don't use Copilot CLI
+- ✗ FAIL: Directory doesn't exist and you want to use Copilot CLI
+- Fix: `npx get-shit-done-multi --copilot`
+
+**Codex CLI:**
+```bash
+ls -la ~/.codex/prompts/get-shit-done/
+```
+- ✓ PASS: Directory exists and contains PROMPT.md
+- ⊙ SKIP: Directory doesn't exist but you don't use Codex CLI
+- ✗ FAIL: Directory doesn't exist and you want to use Codex CLI
+- Fix: `npx get-shit-done-multi --codex`
+
+### 3. Check GSD Commands Available
+
+```bash
+git rev-parse --show-toplevel
+cd $(git rev-parse --show-toplevel)
+ls -1 .github/skills/get-shit-done/commands/gsd/*.md | wc -l
+```
+- ✓ PASS: Shows 29 or more command files
+- ✗ FAIL: Shows fewer than 20 command files
+- Fix: Reinstall GSD or check repository integrity
+
+**List all commands:**
+```bash
+ls -1 .github/skills/get-shit-done/commands/gsd/*.md | xargs -n1 basename
+```
+
+### 4. Check GSD Agents Available
+
+```bash
+git rev-parse --show-toplevel
+cd $(git rev-parse --show-toplevel)
+ls -1 .github/agents/gsd-*.md 2>/dev/null | wc -l
+```
+- ✓ PASS: Shows 11 agent files
+- ⚠ WARN: Shows fewer than 11 agents
+- Fix: Check repository integrity
+
+**List all agents:**
+```bash
+ls -1 .github/agents/gsd-*.md 2>/dev/null | xargs -n1 basename | sed 's/\.md$//'
+```
+
+**Expected agents:**
+- gsd-executor
+- gsd-planner
+- gsd-verifier
+- gsd-debugger
+- gsd-phase-researcher
+- gsd-plan-checker
+- gsd-codebase-mapper
+- gsd-project-researcher
+- gsd-research-synthesizer
+- gsd-roadmapper
+- gsd-integration-checker
+
+### 5. Check Current CLI Detection
+
+```bash
+# Detect which CLI you're currently using
+echo $COPILOT_CLI_VERSION  # Set if using GitHub Copilot CLI
+which claude codex copilot 2>/dev/null
+```
+
+### Summary of Manual Checks
+
+Run all checks and report results in this format:
+
+```
+═══════════════════════════════════════════════
+  VERIFICATION SUMMARY
+═══════════════════════════════════════════════
+
+CLI Installations:
+  ✓ Claude Code: installed (version X.X.X) / not installed
+  ✓ Copilot CLI: installed (version X.X.X) / not installed
+  ✓ Codex CLI: installed (version X.X.X) / not installed
+
+GSD Skill Registration:
+  ✓/⊙/✗ Claude Code: registered / skipped / not registered
+  ✓/⊙/✗ Copilot CLI: registered / skipped / not registered
+  ✓/⊙/✗ Codex CLI: registered / skipped / not registered
+
+GSD Components:
+  ✓ Commands: XX files found
+  ✓ Agents: XX files found
+
+═══════════════════════════════════════════════
+```
+
 ## Understanding Results
 
 **Status Icons:**
 - ✓ **Pass**: Feature works as expected
+- ⊙ **Skip**: Not applicable (CLI not used/configured)
 - ⚠ **Warn**: Feature works with limitations
 - ✗ **Fail**: Feature not available
 
