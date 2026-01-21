@@ -14,10 +14,10 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 ## Current Position
 
 **Phase:** 3 of 6 (Spec Migration & Template Generation)
-**Plan:** 01 of 03 - Just completed 03-01-PLAN.md
+**Plan:** 02 of 03 - Just completed 03-02-PLAN.md
 **Status:** In progress
-**Progress:** ████████░░ 39% (2/6 phases complete, 7/18 total plans)
-**Last activity:** 2026-01-21 - Completed 03-01: Spec Migration Template Generation
+**Progress:** ████████░░ 44% (2/6 phases complete, 8/18 total plans)
+**Last activity:** 2026-01-21 - Completed 03-02: Agent Migration to Spec-as-Template
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -30,6 +30,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
   - 02-03: Platform Adapter ✅
 - Phase 3: Spec Migration & Template Generation — **In Progress** 🚧 (2026-01-21)
   - 03-01: Template Generation System ✅
+  - 03-02: Agent Migration ✅
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -38,9 +39,9 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 
 ### Velocity
 - **Phases completed:** 2/6 (33%)
-- **Plans completed:** 7 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 1/3)
-- **Requirements delivered:** 12/27 (44%)
-- **Current phase progress:** 33% (Phase 3: 1/3 plans complete)
+- **Plans completed:** 8 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 2/3)
+- **Requirements delivered:** 14/27 (52%)
+- **Current phase progress:** 67% (Phase 3: 2/3 plans complete)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)
@@ -91,6 +92,11 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 | Section-based template architecture | Flexible, extensible, supports different rendering strategies | 2026-01-21 | 03-01 |
 | Validation-first approach in template system | Catch errors early with helpful messages for better DX | 2026-01-21 | 03-01 |
 | Atomic registry operations via state-io | Reuse existing infrastructure; prevent corruption during concurrent access | 2026-01-21 | 03-01 |
+| Skip validation during agent conversion | Template specs contain Mustache variables not valid YAML; validate after rendering | 2026-01-21 | 03-02 |
+| Pilot-then-bulk migration strategy | Test gsd-planner first to validate approach before automating remaining 10 agents | 2026-01-21 | 03-02 |
+| WebSearch tool treated as Claude-specific | Unknown tools default to Claude block for backward compatibility | 2026-01-21 | 03-02 |
+| Case-preserved tools for Claude, lowercase for Copilot | Claude case-sensitive, Copilot case-insensitive | 2026-01-21 | 03-02 |
+| Specs directory at project root (specs/agents/) | Parallel to agents/ directory for clear separation between templates and generated output | 2026-01-21 | 03-02 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -115,7 +121,11 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 - [x] Create template system entry point (03-01)
 - [x] Add verification tests (03-01)
 - [x] Document template system (03-01)
-- [ ] Continue Phase 3: Plans 03-02 and 03-03
+- [x] Create agent-converter utility (03-02)
+- [x] Convert pilot agent to spec-as-template (03-02)
+- [x] Create bulk migration script (03-02)
+- [x] Migrate all 11 agents to spec-as-template format (03-02)
+- [ ] Continue Phase 3: Plan 03-03
 
 ### Known Blockers
 *None currently*
@@ -165,9 +175,9 @@ Begin Phase 3: Spec Migration & Template Generation
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T17:46:00Z
-**Stopped at:** Completed 03-01-PLAN.md (Template Generation System)
-**Resume file:** None - Plan complete, ready for 03-02
+**Last session:** 2026-01-21T17:54:27Z
+**Stopped at:** Completed 03-02-PLAN.md (Agent Migration to Spec-as-Template)
+**Resume file:** None - Plan complete, ready for 03-03
 
 ---
 
