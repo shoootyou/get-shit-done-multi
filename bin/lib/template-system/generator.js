@@ -26,6 +26,13 @@ function serializeFrontmatter(frontmatter, platform) {
   // Clone to avoid mutating original
   const fm = JSON.parse(JSON.stringify(frontmatter));
   
+  // Extract metadata for special handling (Copilot only)
+  const metadata = fm.metadata;
+  const hasMetadata = platform === 'copilot' && metadata;
+  if (hasMetadata) {
+    delete fm.metadata;
+  }
+  
   if (platform === 'claude') {
     // Claude: tools as comma-separated string (not array)
     if (Array.isArray(fm.tools)) {
@@ -36,9 +43,10 @@ function serializeFrontmatter(frontmatter, platform) {
     // (handled by YAML options below)
   }
   
-  // YAML dump options for single-line formatting
+  // YAML dump options for formatting
   const yamlOptions = {
-    // flowLevel 1: objects as block, arrays as flow (single-line)
+    // flowLevel 1: top-level block, nested objects inline, arrays flow (single-line)
+    // This keeps tools: [read, write, bash] as single-line array
     flowLevel: 1,
     // Unlimited line width prevents wrapping
     lineWidth: -1,
@@ -46,7 +54,21 @@ function serializeFrontmatter(frontmatter, platform) {
     indent: 2
   };
   
-  return yaml.dump(fm, yamlOptions);
+  let result = yaml.dump(fm, yamlOptions);
+  
+  // For Copilot: manually append metadata in block style
+  if (hasMetadata) {
+    result += 'metadata:\n';
+    for (const [key, value] of Object.entries(metadata)) {
+      // Quote strings that contain special chars or look like dates
+      const needsQuotes = typeof value === 'string' && 
+        (value.includes(':') || value.includes('-') || /^\d{4}-/.test(value));
+      const formattedValue = needsQuotes ? `'${value}'` : value;
+      result += `  ${key}: ${formattedValue}\n`;
+    }
+  }
+  
+  return result;
 }
 
 /**
@@ -340,7 +362,7 @@ function generateAgent(specPath, platform, options = {}) {
     
     // Step 7: Combine output and check prompt length
     const frontmatterStr = serializeFrontmatter(finalFrontmatter, platform);
-    const output = `---\n${frontmatterStr}---\n\n${spec.body}`;
+    const output = `---\n${frontmatterStr}---\n${spec.body}`;
     
     try {
       const lengthCheck = checkPromptLength(output, platform);
