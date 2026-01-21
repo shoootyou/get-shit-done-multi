@@ -149,6 +149,7 @@ This version extends the original brilliant work to support three AI platforms w
 - **[All Commands](docs/commands/README.md)** — Every command with examples
 - **[CLI Comparison](docs/cli-comparison.md)** — Platform differences
 - **[Agent Capabilities](docs/agent-capabilities.md)** — What each agent does
+- **[Container Environment](docs/containers-readme.md)** — Docker/Podman setup for isolated development
 
 ### Help
 - **[Troubleshooting](docs/troubleshooting.md)** — Common issues
@@ -176,7 +177,23 @@ npx get-shit-done-multi@latest [--copilot|--codex]
 - **Copilot/Codex:** Try conversational: "Start a GSD project"
 - Run help command to verify: `/gsd:help` or `"Show GSD help"`
 
-**Docker/containers:**
+**Docker/Podman containers:**
+
+For isolated development environments with persistent caches:
+
+```bash
+# Using Docker
+make net           # Interactive shell with network
+make nonet         # Isolated shell without network
+
+# Using Podman (rootless alternative)
+make podman-net    # Interactive shell with network
+make podman-nonet  # Isolated shell without network
+```
+
+📖 **Container docs:** [docs/containers-readme.md](docs/containers-readme.md)
+
+**Other issues:**
 
 ```bash
 export CLAUDE_CONFIG_DIR=/home/user/.claude
