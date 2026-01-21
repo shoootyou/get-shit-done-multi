@@ -1,6 +1,6 @@
 # Platform Generation Validation Report
 
-**Generated:** 2026-01-21T22:00:47.571Z
+**Generated:** 2026-01-21T22:13:37.326Z
 **Agents tested:** 13
 
 ## Summary
@@ -14,12 +14,12 @@
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
-| gsd-planner-coordinator | ✓ | 22517 | ✓ | 0 |
+| gsd-planner | ✓ | 22493 | ✓ | 0 |
 | gsd-planner-strategist | ✓ | 22342 | ✓ | 0 |
 | gsd-executor | ✓ | 20560 | ✓ | 0 |
 | gsd-verifier | ✓ | 21670 | ✓ | 0 |
 | gsd-codebase-mapper | ✓ | 22123 | ✓ | 0 |
-| gsd-debugger-investigator | ✓ | 13028 | ✓ | 0 |
+| gsd-debugger | ✓ | 13001 | ✓ | 0 |
 | gsd-debugger-specialist | ✓ | 24369 | ✓ | 0 |
 | gsd-phase-researcher | ✓ | 17363 | ✓ | 0 |
 | gsd-plan-checker | ✓ | 19844 | ✓ | 0 |
@@ -32,12 +32,12 @@
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
-| gsd-planner-coordinator | ✓ | 22622 | ✓ | 0 |
+| gsd-planner | ✓ | 22598 | ✓ | 0 |
 | gsd-planner-strategist | ✓ | 22461 | ✓ | 0 |
 | gsd-executor | ✓ | 20693 | ✓ | 0 |
 | gsd-verifier | ✓ | 21803 | ✓ | 0 |
 | gsd-codebase-mapper | ✓ | 22256 | ✓ | 0 |
-| gsd-debugger-investigator | ✓ | 13150 | ✓ | 0 |
+| gsd-debugger | ✓ | 13123 | ✓ | 0 |
 | gsd-debugger-specialist | ✓ | 24502 | ✓ | 0 |
 | gsd-phase-researcher | ✓ | 17457 | ✓ | 0 |
 | gsd-plan-checker | ✓ | 19977 | ✓ | 0 |
@@ -53,14 +53,12 @@
 | Agent | Description | Tools | Metadata | Status |
 |-------|-------------|-------|----------|--------|
 | gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
-| gsd-debugger-investigator | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-debugger-specialist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-debugger | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
-| gsd-planner-coordinator | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-planner-strategist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-planner | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
@@ -73,14 +71,14 @@
 | Agent | Description | Tools | Metadata | Status |
 |-------|-------------|-------|----------|--------|
 | gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
-| gsd-debugger-investigator | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-debugger-specialist | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
-| gsd-planner-coordinator | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-planner-strategist | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-research-synthesizer | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-roadmapper | ✅ | ✅ | ✅ | ✅ Pass |

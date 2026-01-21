@@ -59,8 +59,8 @@ function validateFormat(content, platform) {
 }
 
 const agentNames = [
-  'gsd-planner-coordinator', 'gsd-planner-strategist', 'gsd-executor', 'gsd-verifier',
-  'gsd-codebase-mapper', 'gsd-debugger-investigator', 'gsd-debugger-specialist', 'gsd-phase-researcher',
+  'gsd-planner', 'gsd-planner-strategist', 'gsd-executor', 'gsd-verifier',
+  'gsd-codebase-mapper', 'gsd-debugger', 'gsd-debugger-specialist', 'gsd-phase-researcher',
   'gsd-plan-checker', 'gsd-project-researcher', 'gsd-research-synthesizer',
   'gsd-roadmapper', 'gsd-integration-checker'
 ];

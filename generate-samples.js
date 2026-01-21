@@ -5,14 +5,14 @@ const path = require('path');
 // All 13 agents to generate (11 original - 2 old + 4 new = 13)
 const AGENTS = [
   'gsd-codebase-mapper',
-  'gsd-debugger-investigator',      // NEW (split from gsd-debugger)
-  'gsd-debugger-specialist',        // NEW (split from gsd-debugger)
+  'gsd-debugger',                   // Primary (was gsd-debugger-investigator)
+  'gsd-debugger-specialist',        // NEW (split from original gsd-debugger)
   'gsd-executor',
   'gsd-integration-checker',
   'gsd-phase-researcher',
   'gsd-plan-checker',
-  'gsd-planner-coordinator',        // NEW (split from gsd-planner)
-  'gsd-planner-strategist',         // NEW (split from gsd-planner)
+  'gsd-planner',                    // Primary (was gsd-planner-coordinator)
+  'gsd-planner-strategist',         // NEW (split from original gsd-planner)
   'gsd-project-researcher',
   'gsd-research-synthesizer',
   'gsd-roadmapper',
