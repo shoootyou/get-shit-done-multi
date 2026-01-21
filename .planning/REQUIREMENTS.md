@@ -9,15 +9,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Template Foundation
 
-- [ ] **TMPL-01**: System uses variable substitution with {{variable}} syntax for platform-specific values
+- [x] **TMPL-01**: System uses variable substitution with {{variable}} syntax for platform-specific values
 - [ ] **TMPL-02**: Template system integrates with existing install flags (--copilot, --local, --global)
-- [ ] **TMPL-03**: Single source template file per agent (not platform-specific copies)
+- [x] **TMPL-03**: Single source template file per agent (not platform-specific copies)
 - [ ] **TMPL-04**: All 11 agents converted to template format
-- [ ] **TMPL-05**: Generated output validated against platform schemas (Claude and Copilot specs)
+- [x] **TMPL-05**: Generated output validated against platform schemas (Claude and Copilot specs)
 - [ ] **TMPL-06**: Files generated using existing adapter logic and folder structure
-- [ ] **TMPL-07**: Clear error messages when template invalid or platform unsupported
+- [x] **TMPL-07**: Clear error messages when template invalid or platform unsupported
 - [ ] **TMPL-08**: Re-running install overwrites safely (idempotency)
-- [ ] **TMPL-09**: Help documentation for template syntax available to users
+- [x] **TMPL-09**: Help documentation for template syntax available to users
 
 ### Platform Compliance
 
@@ -94,15 +94,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TMPL-01 | Phase 1 | Pending |
+| TMPL-01 | Phase 1 | Complete |
 | TMPL-02 | Phase 4 | Pending |
-| TMPL-03 | Phase 1 | Pending |
+| TMPL-03 | Phase 1 | Complete |
 | TMPL-04 | Phase 3 | Pending |
-| TMPL-05 | Phase 1 | Pending |
+| TMPL-05 | Phase 1 | Complete |
 | TMPL-06 | Phase 3 | Pending |
-| TMPL-07 | Phase 1 | Pending |
+| TMPL-07 | Phase 1 | Complete |
 | TMPL-08 | Phase 4 | Pending |
-| TMPL-09 | Phase 6 | Pending |
+| TMPL-09 | Phase 1 | Complete |
 | PLAT-01 | Phase 2 | Pending |
 | PLAT-02 | Phase 2 | Pending |
 | PLAT-03 | Phase 2 | Pending |
