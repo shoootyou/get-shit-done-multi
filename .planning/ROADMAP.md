@@ -80,27 +80,34 @@ Plans:
 ---
 
 ### Phase 3.1: Agent Size Optimization
-**Goal:** Split oversized agents into coordinator/specialist pairs to achieve 100% Copilot platform coverage (15/15 agents) while preserving ALL content with zero information loss
+**Goal:** Split oversized agents into coordinator/specialist pairs for 100% platform coverage
 
 **Dependencies:** Phase 3 (needs working generation pipeline)
 
-**Requirements:** AGNT-02 (platform compatibility), AGNT-04 (validation)
+**Requirements:** 
+- AGNT-02 (platform compatibility)
+- AGNT-04 (validation)
+- ARCH-01 (backward compatibility - use original names)
+- ARCH-02 (documentation naming conventions)
+- ARCH-03 (content preservation - zero loss)
+- ARCH-04 (clean generation - test-output regeneration)
 
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 03.1-01-PLAN.md — Document split pattern & split gsd-planner (coordinator + strategist)
-- [ ] 03.1-02-PLAN.md — Split gsd-debugger (investigator + specialist)
-- [ ] 03.1-03-PLAN.md — Update all command/orchestrator references to new coordinator names
-- [ ] 03.1-04-PLAN.md — Generate, validate, and verify 100% platform coverage
+- [x] 03.1-01-PLAN.md — Document pattern & split gsd-planner
+- [x] 03.1-02-PLAN.md — Split gsd-debugger
+- [x] 03.1-03-PLAN.md — Update references
+- [ ] 03.1-04-PLAN.md — Clean regeneration & validation (checkpoint)
 
 **Success Criteria:**
-1. gsd-planner-coordinator + gsd-planner-strategist both <30,000 characters (preserves all 41K original content)
-2. gsd-debugger-investigator + gsd-debugger-specialist both <30,000 characters (preserves all 35K original content)
-3. Zero content loss - all examples, tables, and patterns preserved through functional decomposition
-4. Coordinators can spawn specialists via task tool for complex scenarios
-5. All 15/15 agents working on both platforms (100% coverage)
-6. Commands/orchestrators reference new coordinator agents (no breaking changes)
+1. All 4 agents (2 split pairs) <30,000 characters each
+2. Zero content loss - all examples, details, methodology preserved
+3. Coordinator agents renamed to original names (gsd-planner, gsd-debugger) for backward compatibility
+4. Original oversized specs removed after content verified in splits
+5. Documentation follows naming conventions (lowercase-with-hyphens.md)
+6. Clean test-output regeneration with all 13/13 agents for both platforms
+7. All tests passing with updated agent names
 
 ---
 

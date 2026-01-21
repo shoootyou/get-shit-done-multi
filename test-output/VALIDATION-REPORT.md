@@ -1,24 +1,26 @@
 # Platform Generation Validation Report
 
-**Generated:** 2026-01-21T20:43:09.541Z
-**Agents tested:** 11
+**Generated:** 2026-01-21T22:00:47.571Z
+**Agents tested:** 13
 
 ## Summary
 
 | Platform | Generated | Valid | Success Rate |
 |----------|-----------|-------|--------------|
-| Claude | 11/11 | 11/11 | 100% |
-| Copilot | 9/11 | 9/9 | 82% |
+| Claude | 13/13 | 13/13 | 100% |
+| Copilot | 13/13 | 13/13 | 100% |
 
 ## Claude Generation Results
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
-| gsd-planner | ✓ | 41011 | ✓ | 0 |
+| gsd-planner-coordinator | ✓ | 22517 | ✓ | 0 |
+| gsd-planner-strategist | ✓ | 22342 | ✓ | 0 |
 | gsd-executor | ✓ | 20560 | ✓ | 0 |
 | gsd-verifier | ✓ | 21670 | ✓ | 0 |
 | gsd-codebase-mapper | ✓ | 22123 | ✓ | 0 |
-| gsd-debugger | ✓ | 35252 | ✓ | 0 |
+| gsd-debugger-investigator | ✓ | 13028 | ✓ | 0 |
+| gsd-debugger-specialist | ✓ | 24369 | ✓ | 0 |
 | gsd-phase-researcher | ✓ | 17363 | ✓ | 0 |
 | gsd-plan-checker | ✓ | 19844 | ✓ | 0 |
 | gsd-project-researcher | ✓ | 21665 | ✓ | 0 |
@@ -30,11 +32,13 @@
 
 | Agent | Status | Size | Valid | Issues |
 |-------|--------|------|-------|--------|
-| gsd-planner | ✗ | 0 | - | 1 (too large) |
+| gsd-planner-coordinator | ✓ | 22622 | ✓ | 0 |
+| gsd-planner-strategist | ✓ | 22461 | ✓ | 0 |
 | gsd-executor | ✓ | 20693 | ✓ | 0 |
 | gsd-verifier | ✓ | 21803 | ✓ | 0 |
 | gsd-codebase-mapper | ✓ | 22256 | ✓ | 0 |
-| gsd-debugger | ✗ | 0 | - | 1 (too large) |
+| gsd-debugger-investigator | ✓ | 13150 | ✓ | 0 |
+| gsd-debugger-specialist | ✓ | 24502 | ✓ | 0 |
 | gsd-phase-researcher | ✓ | 17457 | ✓ | 0 |
 | gsd-plan-checker | ✓ | 19977 | ✓ | 0 |
 | gsd-project-researcher | ✓ | 21759 | ✓ | 0 |
@@ -49,11 +53,15 @@
 | Agent | Description | Tools | Metadata | Status |
 |-------|-------------|-------|----------|--------|
 | gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger-investigator | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger-specialist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-debugger | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner-coordinator | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner-strategist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-planner | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-research-synthesizer | ✅ | ✅ | ✅ | ✅ Pass |
@@ -65,10 +73,14 @@
 | Agent | Description | Tools | Metadata | Status |
 |-------|-------------|-------|----------|--------|
 | gsd-codebase-mapper | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger-investigator | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-debugger-specialist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-executor | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-integration-checker | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-phase-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-plan-checker | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner-coordinator | ✅ | ✅ | ✅ | ✅ Pass |
+| gsd-planner-strategist | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-project-researcher | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-research-synthesizer | ✅ | ✅ | ✅ | ✅ Pass |
 | gsd-roadmapper | ✅ | ✅ | ✅ | ✅ Pass |
@@ -90,4 +102,4 @@
 - Excludes model, hooks, skills, disallowedTools fields
 - 30K character prompt limit
 
-**Note:** Some agents exceed Copilot's 30K limit (gsd-planner: 41KB, gsd-debugger: 35KB)
+**Phase 3.1 Success:** All agents now under 30K limit after coordinator/specialist split (gsd-planner → coordinator+strategist, gsd-debugger → investigator+specialist)

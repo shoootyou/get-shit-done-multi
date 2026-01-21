@@ -5,7 +5,7 @@ color: purple
 tools: [read, write, bash]
 metadata:
   platform: copilot
-  generated: '2026-01-21T20:42:09.860Z'
+  generated: '2026-01-21T21:59:46.503Z'
   projectName: 'get-shit-done-multi'
   projectVersion: 1.8.0
 ---
