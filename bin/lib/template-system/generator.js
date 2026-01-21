@@ -71,10 +71,34 @@ function generateAgent(specPath, platform, options = {}) {
   };
   
   try {
-    // Step 1: Parse spec file
+    // Step 1: Read raw spec file and render templates BEFORE parsing
     let spec;
     try {
-      spec = parseSpec(specPath);
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Read raw file content
+      const absolutePath = path.resolve(specPath);
+      if (!fs.existsSync(absolutePath)) {
+        throw new Error(`Spec file not found: ${absolutePath}`);
+      }
+      
+      const rawContent = fs.readFileSync(absolutePath, 'utf8');
+      
+      // Build context first so we can render templates
+      const context = buildContext(platform, {
+        workDir: options.workDir || process.cwd(),
+        paths: options.paths || {},
+        additionalVars: options.contextVars || {}
+      });
+      
+      // Render templates in the entire file (including frontmatter)
+      const renderedContent = render(rawContent, context);
+      
+      // Now parse the rendered content
+      spec = parseSpecString(renderedContent, absolutePath);
+      spec.path = absolutePath;
+      
     } catch (parseErr) {
       return {
         success: false,
@@ -89,7 +113,7 @@ function generateAgent(specPath, platform, options = {}) {
       };
     }
     
-    // If validation only, skip rendering
+    // If validation only, skip rest of pipeline
     if (options.validateOnly) {
       try {
         const frontmatterStr = yaml.dump(spec.frontmatter);
@@ -120,27 +144,8 @@ function generateAgent(specPath, platform, options = {}) {
       }
     }
     
-    // Step 2: Build platform context
-    let context;
-    try {
-      context = buildContext(platform, {
-        workDir: options.workDir || process.cwd(),
-        paths: options.paths || {},
-        additionalVars: options.contextVars || {}
-      });
-    } catch (contextErr) {
-      return {
-        success: false,
-        output: null,
-        errors: [{
-          stage: 'context',
-          message: `Failed to build context: ${contextErr.message}`,
-          stack: options.verbose ? contextErr.stack : undefined
-        }],
-        warnings: [],
-        metadata
-      };
-    }
+    // Note: context was already built above during template rendering
+    // Note: templates already rendered before parsing
     
     // Step 3: Transform tools to platform-specific names
     if (spec.frontmatter.tools && Array.isArray(spec.frontmatter.tools)) {
@@ -180,49 +185,10 @@ function generateAgent(specPath, platform, options = {}) {
       }
     }
     
-    // Step 4: Render frontmatter template
-    let renderedFrontmatter;
-    try {
-      const frontmatterStr = yaml.dump(spec.frontmatter);
-      renderedFrontmatter = render(frontmatterStr, context);
-    } catch (renderErr) {
-      return {
-        success: false,
-        output: null,
-        errors: [{
-          stage: 'render-frontmatter',
-          message: `Failed to render frontmatter: ${renderErr.message}`,
-          stack: options.verbose ? renderErr.stack : undefined
-        }],
-        warnings: warnings,
-        metadata
-      };
-    }
-    
-    // Step 5: Render body template
-    let renderedBody;
-    try {
-      renderedBody = render(spec.body, context);
-    } catch (renderErr) {
-      return {
-        success: false,
-        output: null,
-        errors: [{
-          stage: 'render-body',
-          message: `Failed to render body: ${renderErr.message}`,
-          stack: options.verbose ? renderErr.stack : undefined
-        }],
-        warnings: warnings,
-        metadata
-      };
-    }
-    
-    // Step 6: Transform fields for platform support
+    // Step 4: Transform fields for platform support
     let finalFrontmatter;
     try {
-      // Parse rendered frontmatter to object for transformation
-      const parsedFrontmatter = yaml.load(renderedFrontmatter);
-      const transformResult = transformFields(parsedFrontmatter, platform);
+      const transformResult = transformFields(spec.frontmatter, platform);
       
       // Add platform metadata
       finalFrontmatter = addPlatformMetadata(transformResult.transformed, platform);
@@ -238,9 +204,6 @@ function generateAgent(specPath, platform, options = {}) {
           });
         });
       }
-      
-      // Re-serialize to YAML string
-      renderedFrontmatter = yaml.dump(finalFrontmatter);
     } catch (transformErr) {
       return {
         success: false,
@@ -255,10 +218,11 @@ function generateAgent(specPath, platform, options = {}) {
       };
     }
     
-    // Step 7: Validate rendered frontmatter (YAML structure)
+    // Step 5: Validate frontmatter (YAML structure)
     let validation;
     try {
-      validation = validate(renderedFrontmatter);
+      const frontmatterStr = yaml.dump(finalFrontmatter);
+      validation = validate(frontmatterStr);
       
       if (!validation.valid) {
         return {
@@ -286,7 +250,7 @@ function generateAgent(specPath, platform, options = {}) {
       };
     }
     
-    // Step 8: Platform-specific validation
+    // Step 6: Platform-specific validation
     try {
       const platformValidation = validateSpec(finalFrontmatter, platform);
       metadata.validationPassed = platformValidation.valid;
@@ -337,8 +301,9 @@ function generateAgent(specPath, platform, options = {}) {
       };
     }
     
-    // Step 9: Combine output and check prompt length
-    const output = `---\n${renderedFrontmatter}---\n\n${renderedBody}`;
+    // Step 7: Combine output and check prompt length
+    const frontmatterStr = yaml.dump(finalFrontmatter);
+    const output = `---\n${frontmatterStr}---\n\n${spec.body}`;
     
     try {
       const lengthCheck = checkPromptLength(output, platform);

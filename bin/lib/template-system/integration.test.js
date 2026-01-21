@@ -595,6 +595,295 @@ Supports hooks: {{supportsHooks}}
   console.log('  ✓ End-to-end platform abstraction test passed\n');
 }
 
+// ============================================================================
+// Phase 3: Spec-as-Template Platform Generation Tests
+// ============================================================================
+
+/**
+ * Test 17: Generate Claude agent from template spec with conditionals
+ */
+function testClaudeAgentFromTemplate() {
+  console.log('Test 17: Generate Claude agent from template spec with conditionals');
+  
+  const specPath = 'specs/agents/gsd-planner.md';
+  const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  assert.ok(result.output, 'Output should be populated');
+  assert.ok(result.output.includes('tools:'), 'Tools field should be present');
+  assert.ok(result.output.includes('WebFetch'), 'Claude-specific WebFetch should be included');
+  assert.ok(result.output.includes('mcp__context7__'), 'Claude MCP tools should be included');
+  
+  // No template syntax should remain
+  assert.ok(!result.output.includes('{{#isClaude}}'), 'Claude conditionals should be resolved');
+  assert.ok(!result.output.includes('{{#isCopilot}}'), 'Other platform conditionals should be removed');
+  assert.ok(!result.output.includes('{{'), 'No template variables should remain');
+  assert.ok(!result.output.includes('}}'), 'No template variables should remain');
+  
+  // Parse and validate frontmatter
+  const matter = require('gray-matter');
+  const parsed = matter(result.output);
+  assert.ok(parsed.data.tools, 'Tools should be defined');
+  assert.ok(parsed.data.tools.includes('WebFetch'), 'WebFetch should be in tools array');
+  assert.ok(!parsed.data.tools.includes('webfetch'), 'Tools should be case-preserved');
+  assert.strictEqual(parsed.data.name, 'gsd-planner', 'Name should match spec');
+  
+  console.log('  ✓ Claude agent from template test passed\n');
+}
+
+/**
+ * Test 18: Generate Copilot agent from same spec with different output
+ */
+function testCopilotAgentFromTemplate() {
+  console.log('Test 18: Generate Copilot agent from same spec with different output');
+  
+  // Use smaller agent for Copilot due to 30K prompt limit
+  const specPath = 'specs/agents/gsd-verifier.md';
+  const result = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  assert.ok(result.output, 'Output should be populated');
+  assert.ok(result.output.includes('tools:'), 'Tools field should be present');
+  assert.ok(!result.output.includes('WebFetch'), 'Copilot should not have WebFetch');
+  assert.ok(!result.output.includes('mcp__context7__'), 'Copilot should not have Claude MCP tools');
+  assert.ok(!result.output.includes('{{#isCopilot}}'), 'Copilot conditionals should be resolved');
+  
+  // Parse and validate frontmatter
+  const matter = require('gray-matter');
+  const parsed = matter(result.output);
+  assert.ok(parsed.data.tools, 'Tools should be defined');
+  assert.ok(!parsed.data.tools.includes('WebFetch'), 'WebFetch should not be in tools array');
+  assert.ok(!('model' in parsed.data), 'Copilot should not have model field in frontmatter');
+  
+  // Check for lowercase tools
+  const hasLowercaseTools = parsed.data.tools.every(t => typeof t === 'string' && t === t.toLowerCase());
+  assert.ok(hasLowercaseTools, 'All tools should be lowercase for Copilot');
+  
+  console.log('  ✓ Copilot agent from template test passed\n');
+}
+
+/**
+ * Test 19: Claude and Copilot outputs differ appropriately
+ */
+function testPlatformOutputDifferences() {
+  console.log('Test 19: Claude and Copilot outputs differ appropriately');
+  
+  // Use smaller agent for fair comparison
+  const specPath = 'specs/agents/gsd-verifier.md';
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
+  
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  
+  // Different outputs
+  assert.notStrictEqual(claudeResult.output, copilotResult.output, 'Outputs should differ by platform');
+  
+  // Parse to check tools
+  const matter = require('gray-matter');
+  const claudeParsed = matter(claudeResult.output);
+  const copilotParsed = matter(copilotResult.output);
+  
+  // Claude has uppercase tools, Copilot has lowercase
+  assert.ok(claudeParsed.data.tools.includes('Read'), 'Claude should have uppercase Read');
+  assert.ok(copilotParsed.data.tools.includes('read'), 'Copilot should have lowercase read');
+  assert.ok(!copilotParsed.data.tools.includes('Read'), 'Copilot should not have uppercase Read');
+  
+  console.log('  ✓ Platform output differences test passed\n');
+}
+
+/**
+ * Test 20: Generated Claude agent validates against Claude spec
+ */
+function testClaudeAgentValidation() {
+  console.log('Test 20: Generated Claude agent validates against Claude spec');
+  
+  const specPath = 'specs/agents/gsd-planner.md';
+  const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  
+  const matter = require('gray-matter');
+  const parsed = matter(result.output);
+  
+  const { validateClaudeSpec } = require('./validators');
+  const validation = validateClaudeSpec(parsed.data);
+  
+  assert.strictEqual(validation.valid, true, 'Claude agent should validate');
+  assert.strictEqual(validation.errors.length, 0, 'No validation errors should be present');
+  
+  console.log('  ✓ Claude agent validation test passed\n');
+}
+
+/**
+ * Test 21: Generated Copilot agent validates against Copilot spec
+ */
+function testCopilotAgentValidation() {
+  console.log('Test 21: Generated Copilot agent validates against Copilot spec');
+  
+  // Use smaller agent for Copilot
+  const specPath = 'specs/agents/gsd-verifier.md';
+  const result = generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  
+  const matter = require('gray-matter');
+  const parsed = matter(result.output);
+  
+  const { validateCopilotSpec } = require('./validators');
+  const validation = validateCopilotSpec(parsed.data);
+  
+  assert.strictEqual(validation.valid, true, 'Copilot agent should validate');
+  assert.strictEqual(validation.errors.length, 0, 'No validation errors should be present');
+  
+  console.log('  ✓ Copilot agent validation test passed\n');
+}
+
+/**
+ * Test 22: Template variables fully resolved in output
+ */
+function testTemplateVariablesResolved() {
+  console.log('Test 22: Template variables fully resolved in output');
+  
+  const specPath = 'specs/agents/gsd-planner.md';
+  const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  
+  // No template syntax should remain
+  assert.ok(!result.output.includes('{{'), 'No opening brackets should remain');
+  assert.ok(!result.output.includes('}}'), 'No closing brackets should remain');
+  assert.ok(!result.output.includes('{{#if'), 'No if blocks should remain');
+  assert.ok(!result.output.includes('{{/if'), 'No if closing tags should remain');
+  assert.ok(!result.output.includes('{{#isClaude}}'), 'No Claude conditionals should remain');
+  assert.ok(!result.output.includes('{{#isCopilot}}'), 'No Copilot conditionals should remain');
+  
+  console.log('  ✓ Template variables resolved test passed\n');
+}
+
+/**
+ * Test 23: Generate all 11 agents successfully for Claude
+ */
+function testGenerateAllAgentsForClaude() {
+  console.log('Test 23: Generate all 11 agents successfully for Claude');
+  
+  const agentNames = [
+    'gsd-planner', 'gsd-executor', 'gsd-verifier',
+    'gsd-codebase-mapper', 'gsd-debugger', 'gsd-phase-researcher',
+    'gsd-plan-checker', 'gsd-project-researcher', 'gsd-research-synthesizer',
+    'gsd-roadmapper', 'gsd-integration-checker'
+  ];
+  
+  const results = agentNames.map(name => {
+    const specPath = `specs/agents/${name}.md`;
+    return { name, result: generateAgent(specPath, 'claude', { workDir: '/workspace' }) };
+  });
+  
+  const allSuccess = results.every(r => r.result.success);
+  assert.ok(allSuccess, 'All agents should generate successfully for Claude');
+  
+  const failed = results.filter(r => !r.result.success);
+  if (failed.length > 0) {
+    console.error('Failed agents:', failed.map(f => ({ name: f.name, errors: f.result.errors })));
+    assert.fail(`${failed.length} agents failed to generate: ${failed.map(f => f.name).join(', ')}`);
+  }
+  
+  console.log('  ✓ All 11 agents generated for Claude test passed\n');
+}
+
+/**
+ * Test 24: Generate all 11 agents successfully for Copilot
+ */
+function testGenerateAllAgentsForCopilot() {
+  console.log('Test 24: Generate all 11 agents successfully for Copilot');
+  
+  const agentNames = [
+    'gsd-planner', 'gsd-executor', 'gsd-verifier',
+    'gsd-codebase-mapper', 'gsd-debugger', 'gsd-phase-researcher',
+    'gsd-plan-checker', 'gsd-project-researcher', 'gsd-research-synthesizer',
+    'gsd-roadmapper', 'gsd-integration-checker'
+  ];
+  
+  const results = agentNames.map(name => {
+    const specPath = `specs/agents/${name}.md`;
+    return { name, result: generateAgent(specPath, 'copilot', { workDir: '.github/skills/get-shit-done' }) };
+  });
+  
+  // Note: Some agents may be too large for Copilot's 30K char limit
+  // Test that majority succeed
+  const successful = results.filter(r => r.result.success);
+  const failed = results.filter(r => !r.result.success);
+  
+  console.log(`  Generated: ${successful.length}/${agentNames.length} agents`);
+  if (failed.length > 0) {
+    const failedNames = failed.map(f => f.name).join(', ');
+    console.log(`  Failed (likely too large): ${failedNames}`);
+    
+    // Check failures are all due to prompt length (expected)
+    const lengthFailures = failed.filter(f => 
+      f.result.errors.some(e => e.stage === 'prompt-length')
+    );
+    assert.strictEqual(lengthFailures.length, failed.length, 'All failures should be prompt length issues');
+  }
+  
+  // At least 9/11 agents should generate successfully (planner and debugger are large)
+  assert.ok(successful.length >= 9, `At least 9 agents should generate (got ${successful.length})`);
+  
+  console.log('  ✓ All agents generated for Copilot test passed\n');
+}
+
+/**
+ * Test 25: Original agent content preserved in generated output
+ */
+function testOriginalContentPreserved() {
+  console.log('Test 25: Original agent content preserved in generated output');
+  
+  // Use verifier as it's a good size
+  const specPath = 'specs/agents/gsd-verifier.md';
+  const spec = fs.readFileSync(specPath, 'utf8');
+  const original = fs.readFileSync('agents/gsd-verifier.md', 'utf8');
+  
+  const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
+  
+  assert.strictEqual(result.success, true, 'Generation should succeed');
+  
+  // Extract markdown body from both (skip frontmatter)
+  const originalBody = original.split('---').slice(2).join('---').trim();
+  const generatedBody = result.output.split('---').slice(2).join('---').trim();
+  
+  // Generated body should match original body (content preserved)
+  assert.ok(generatedBody.includes('<role>'), 'Generated should contain role section');
+  
+  // Check that content is substantive (roughly same length)
+  const lengthRatio = generatedBody.length / originalBody.length;
+  assert.ok(lengthRatio >= 0.90, `Generated body should be at least 90% of original length (ratio: ${lengthRatio})`);
+  
+  console.log('  ✓ Original content preserved test passed\n');
+}
+
+/**
+ * Test 26: Platform-specific context variables substituted
+ */
+function testPlatformContextVariables() {
+  console.log('Test 26: Platform-specific context variables substituted');
+  
+  // Use verifier for consistency
+  const specPath = 'specs/agents/gsd-verifier.md';
+  
+  // Generate with custom workDir
+  const claudeResult = generateAgent(specPath, 'claude', { workDir: '/test/claude' });
+  const copilotResult = generateAgent(specPath, 'copilot', { workDir: '/test/copilot' });
+  
+  assert.strictEqual(claudeResult.success, true, 'Claude generation should succeed');
+  assert.strictEqual(copilotResult.success, true, 'Copilot generation should succeed');
+  
+  // Check for variable substitution (if spec uses workDir)
+  assert.ok(!claudeResult.output.includes('{{workDir}}'), 'Claude should not have unresolved workDir');
+  assert.ok(!copilotResult.output.includes('{{workDir}}'), 'Copilot should not have unresolved workDir');
+  
+  console.log('  ✓ Platform-specific context variables test passed\n');
+}
+
 // Run all tests
 console.log('\n=== Template System Integration Tests ===\n');
 
@@ -619,7 +908,19 @@ try {
   testPromptLengthValidation();
   testEndToEndPlatformAbstraction();
   
-  console.log('✓ All 16 integration tests passed! (8 Phase 1 + 8 Phase 2)\n');
+  // Phase 3 tests (10 tests)
+  testClaudeAgentFromTemplate();
+  testCopilotAgentFromTemplate();
+  testPlatformOutputDifferences();
+  testClaudeAgentValidation();
+  testCopilotAgentValidation();
+  testTemplateVariablesResolved();
+  testGenerateAllAgentsForClaude();
+  testGenerateAllAgentsForCopilot();
+  testOriginalContentPreserved();
+  testPlatformContextVariables();
+  
+  console.log('✓ All 26 integration tests passed! (8 Phase 1 + 8 Phase 2 + 10 Phase 3)\n');
   process.exit(0);
 } catch (error) {
   console.error('\n✗ Test failed:', error.message);

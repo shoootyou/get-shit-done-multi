@@ -6,8 +6,9 @@
 const yaml = require('js-yaml');
 
 /**
- * Render template with variable substitution
+ * Render template with variable substitution and conditionals
  * Replaces {{variable}} placeholders with values from context
+ * Supports Mustache-style conditionals: {{#varName}}...{{/varName}}
  * @param {string} template - Template string with {{variable}} placeholders
  * @param {Object} context - Object containing variable values
  * @returns {string} Rendered template with variables replaced
@@ -22,9 +23,28 @@ function render(template, context) {
     throw new Error('Context must be an object');
   }
 
-  // Replace {{variable}} with context values
+  let result = template;
+  
+  // First, process conditional blocks: {{#varName}}...{{/varName}}
+  // Matches: {{#variableName}}content{{/variableName}}
+  result = result.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, varName, content) => {
+    if (!(varName in context)) {
+      throw new Error(`Undefined variable in template: {{#${varName}}}`);
+    }
+    
+    const value = context[varName];
+    
+    // Include content if value is truthy
+    if (value) {
+      return content;
+    } else {
+      return '';
+    }
+  });
+  
+  // Then, replace simple {{variable}} with context values
   // Matches: {{ variableName }} or {{variableName}}
-  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, varName) => {
+  result = result.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, varName) => {
     if (!(varName in context)) {
       throw new Error(`Undefined variable in template: {{${varName}}}`);
     }
@@ -47,6 +67,8 @@ function render(template, context) {
     
     return String(value);
   });
+  
+  return result;
 }
 
 /**
