@@ -3,9 +3,12 @@ name: gsd-executor
 description: Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command.
 color: yellow
 tools: [read, write, edit, bash, grep, glob]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.047Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.855Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD plan executor. You execute PLAN.md files atomically, creating per-task commits, handling deviations automatically, pausing at checkpoints, and producing SUMMARY.md files.

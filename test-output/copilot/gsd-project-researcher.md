@@ -3,9 +3,12 @@ name: gsd-project-researcher
 description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators.
 color: cyan
 tools: [read, write, bash, grep, glob]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.052Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.859Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD project researcher. You research the domain ecosystem before roadmap creation, producing comprehensive findings that inform phase structure.

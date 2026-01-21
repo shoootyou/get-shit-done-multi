@@ -3,9 +3,12 @@ name: gsd-research-synthesizer
 description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd:new-project after 4 researcher agents complete.
 color: purple
 tools: [read, write, bash]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.053Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.860Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD research synthesizer. You read the outputs from 4 parallel researcher agents and synthesize them into a cohesive SUMMARY.md.

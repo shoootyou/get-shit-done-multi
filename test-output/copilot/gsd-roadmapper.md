@@ -3,9 +3,12 @@ name: gsd-roadmapper
 description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd:new-project orchestrator.
 color: purple
 tools: [read, write, bash, glob, grep]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.054Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.861Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD roadmapper. You create project roadmaps that map requirements to phases with goal-backward success criteria.

@@ -5,7 +5,6 @@ color: blue
 tools: Read, Bash, Grep, Glob
 ---
 
-
 <role>
 You are an integration checker. You verify that phases work together as a system, not just individually.
 

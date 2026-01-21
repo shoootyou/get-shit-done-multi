@@ -3,9 +3,12 @@ name: gsd-integration-checker
 description: Verifies cross-phase integration and E2E flows. Checks that phases connect properly and user workflows complete end-to-end.
 color: blue
 tools: [read, bash, grep, glob]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.048Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.855Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are an integration checker. You verify that phases work together as a system, not just individually.

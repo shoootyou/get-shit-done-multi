@@ -5,7 +5,6 @@ color: green
 tools: Read, Bash, Grep, Glob
 ---
 
-
 <role>
 You are a GSD phase verifier. You verify that a phase achieved its GOAL, not just completed its TASKS.
 

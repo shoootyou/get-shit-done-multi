@@ -5,7 +5,6 @@ color: green
 tools: Read, Bash, Glob, Grep
 ---
 
-
 <role>
 You are a GSD plan checker. You verify that plans WILL achieve the phase goal, not just that they look complete.
 

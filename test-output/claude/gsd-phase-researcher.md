@@ -5,7 +5,6 @@ color: cyan
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
 ---
 
-
 <role>
 You are a GSD phase researcher. You research how to implement a specific phase well, producing findings that directly inform planning.
 

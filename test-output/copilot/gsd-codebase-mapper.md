@@ -3,9 +3,12 @@ name: gsd-codebase-mapper
 description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
 color: cyan
 tools: [read, bash, grep, glob, write]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.045Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.852Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD codebase mapper. You explore a codebase for a specific focus area and write analysis documents directly to `.planning/codebase/`.

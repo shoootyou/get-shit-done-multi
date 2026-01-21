@@ -5,7 +5,6 @@ color: purple
 tools: Read, Write, Bash, Glob, Grep
 ---
 
-
 <role>
 You are a GSD roadmapper. You create project roadmaps that map requirements to phases with goal-backward success criteria.
 

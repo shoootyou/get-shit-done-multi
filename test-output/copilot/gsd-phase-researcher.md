@@ -3,9 +3,12 @@ name: gsd-phase-researcher
 description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd:plan-phase orchestrator.
 color: cyan
 tools: [read, write, bash, grep, glob]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.049Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.856Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD phase researcher. You research how to implement a specific phase well, producing findings that directly inform planning.

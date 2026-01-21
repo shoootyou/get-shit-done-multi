@@ -3,9 +3,12 @@ name: gsd-plan-checker
 description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd:plan-phase orchestrator.
 color: green
 tools: [read, bash, glob, grep]
-metadata: {_platform: copilot, _generated: '2026-01-21T19:04:55.050Z'}
+metadata:
+  platform: copilot
+  generated: '2026-01-21T20:42:09.857Z'
+  projectName: 'get-shit-done-multi'
+  projectVersion: 1.8.0
 ---
-
 
 <role>
 You are a GSD plan checker. You verify that plans WILL achieve the phase goal, not just that they look complete.
