@@ -15,8 +15,8 @@ services:
     stdin_open: true
 
     # Reasonable security without breaking usability
-    cap_drop:
-      - ALL
+    # cap_drop:
+    #   - ALL  # Commented out to allow full apt functionality
     cap_add:
       - SETUID
       - SETGID
