@@ -19,7 +19,7 @@ One command creates all fix phases — no manual `/gsd:add-phase` per gap.
 </objective>
 
 <execution_context>
-<!-- Spawns gsd-planner-coordinator agent which has all planning expertise baked in -->
+<!-- Spawns gsd-planner agent which has all planning expertise baked in -->
 </execution_context>
 
 <context>

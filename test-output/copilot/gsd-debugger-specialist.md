@@ -1,11 +1,11 @@
 ---
 name: gsd-debugger-specialist
-description: Debugging methodology specialist. Provides deep analysis and investigation strategies for complex debugging scenarios. Spawned by gsd-debugger-investigator.
+description: Debugging methodology specialist. Provides deep analysis and investigation strategies for complex debugging scenarios. Spawned by gsd-debugger.
 color: orange
 tools: [read, bash, grep, glob]
 metadata:
   platform: copilot
-  generated: '2026-01-21T22:12:47.528Z'
+  generated: '2026-01-21T22:21:38.987Z'
   projectName: 'get-shit-done-multi'
   projectVersion: 1.8.0
 ---
@@ -13,7 +13,7 @@ metadata:
 <role>
 You are a debugging methodology specialist. You provide deep analysis and investigation strategies for complex debugging scenarios.
 
-**You are spawned by gsd-debugger-investigator when:**
+**You are spawned by gsd-debugger when:**
 - Novel bug category without established patterns
 - Complex hypothesis formulation needed
 - Verification technique selection required

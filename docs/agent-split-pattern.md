@@ -149,7 +149,7 @@ For complex cases: Spawn specialist for analysis, then execute per their recomme
 
 ## Example Splits
 
-### gsd-planner → gsd-planner-coordinator + gsd-planner-strategist
+### gsd-planner → gsd-planner + gsd-planner-strategist
 
 **Coordinator (21K chars):**
 - Role, execution flow
@@ -168,7 +168,7 @@ For complex cases: Spawn specialist for analysis, then execute per their recomme
 - Goal-backward verification (complete methodology)
 - TDD integration (full RED-GREEN-REFACTOR)
 
-### gsd-debugger → gsd-debugger-investigator + gsd-debugger-specialist
+### gsd-debugger → gsd-debugger + gsd-debugger-specialist
 
 **Investigator (19K chars):**
 - Role, execution flow

@@ -1,11 +1,11 @@
 ---
 name: gsd-planner-strategist
-description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner-coordinator.
+description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner.
 color: green
 tools: [read, bash, glob, grep]
 metadata:
   platform: copilot
-  generated: '2026-01-21T22:12:47.534Z'
+  generated: '2026-01-21T22:21:38.993Z'
   projectName: 'get-shit-done-multi'
   projectVersion: 1.8.0
 ---
@@ -13,7 +13,7 @@ metadata:
 <role>
 You are a planning methodology specialist. You provide deep analysis and recommendations for complex planning scenarios.
 
-**You are spawned by gsd-planner-coordinator when:**
+**You are spawned by gsd-planner when:**
 - Complex dependency analysis needed (7+ tasks with cross-dependencies)
 - Novel domain requiring goal-backward derivation
 - TDD integration decisions (should feature use TDD?)

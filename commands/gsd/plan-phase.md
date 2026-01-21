@@ -2,7 +2,7 @@
 name: gsd:plan-phase
 description: Create detailed execution plan for a phase (PLAN.md) with verification loop
 argument-hint: "[phase] [--research] [--skip-research] [--gaps] [--skip-verify]"
-agent: gsd-planner-coordinator
+agent: gsd-planner
 allowed-tools:
   - Read
   - Write
@@ -23,7 +23,7 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 
 **Default flow:** Research (if needed) → Plan → Verify → Done
 
-**Orchestrator role:** Parse arguments, validate phase, research domain (unless skipped or exists), spawn gsd-planner-coordinator agent, verify plans with gsd-plan-checker, iterate until plans pass or max iterations reached, present results.
+**Orchestrator role:** Parse arguments, validate phase, research domain (unless skipped or exists), spawn gsd-planner agent, verify plans with gsd-plan-checker, iterate until plans pass or max iterations reached, present results.
 
 **Why subagents:** Research and planning burn context fast. Verification uses fresh context. User sees the flow between agents in main context.
 </objective>
@@ -222,7 +222,7 @@ VERIFICATION="${PHASE_DIR}/${PHASE}-VERIFICATION.md"
 UAT="${PHASE_DIR}/${PHASE}-UAT.md"
 ```
 
-## 8. Spawn gsd-planner-coordinator Agent
+## 8. Spawn gsd-planner Agent
 
 Display stage banner:
 ```
@@ -287,7 +287,7 @@ Before returning PLANNING COMPLETE:
 ```
 Task(
   prompt=filled_prompt,
-  subagent_type="gsd-planner-coordinator",
+  subagent_type="gsd-planner",
   description="Plan Phase {phase}"
 )
 ```
@@ -371,7 +371,7 @@ Track: `iteration_count` (starts at 1 after initial plan + check)
 
 Display: `Sending back to planner for revision... (iteration {N}/3)`
 
-Spawn gsd-planner-coordinator with revision prompt:
+Spawn gsd-planner with revision prompt:
 
 ```markdown
 <revision_context>
@@ -397,7 +397,7 @@ Return what changed.
 ```
 Task(
   prompt=revision_prompt,
-  subagent_type="gsd-planner-coordinator",
+  subagent_type="gsd-planner",
   description="Revise Phase {phase} plans"
 )
 ```
@@ -466,7 +466,7 @@ Verification: {Passed | Passed with override | Skipped}
 - [ ] Research completed (unless --skip-research or --gaps or exists)
 - [ ] gsd-phase-researcher spawned if research needed
 - [ ] Existing plans checked
-- [ ] gsd-planner-coordinator spawned with context (including RESEARCH.md if available)
+- [ ] gsd-planner spawned with context (including RESEARCH.md if available)
 - [ ] Plans created (PLANNING COMPLETE or CHECKPOINT handled)
 - [ ] gsd-plan-checker spawned (unless --skip-verify)
 - [ ] Verification passed OR user override OR max iterations with user decision

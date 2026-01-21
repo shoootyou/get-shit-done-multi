@@ -43,10 +43,10 @@ const tests = [
   
   // Agent Capability Tests (key agents)
   new AgentCapabilityTest('gsd-executor'),
-  new AgentCapabilityTest('gsd-planner-coordinator'),
+  new AgentCapabilityTest('gsd-planner'),
   new AgentCapabilityTest('gsd-planner-strategist'),
   new AgentCapabilityTest('gsd-verifier'),
-  new AgentCapabilityTest('gsd-debugger-investigator'),
+  new AgentCapabilityTest('gsd-debugger'),
   new AgentCapabilityTest('gsd-debugger-specialist'),
   new AgentCapabilityTest('gsd-phase-researcher'),
   new AgentCapabilityTest('gsd-plan-checker'),
