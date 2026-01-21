@@ -14,19 +14,19 @@ Phase 2: Platform Abstraction Layer — Building tool compatibility matrix and p
 ## Current Position
 
 **Phase:** 2 of 6 (Platform Abstraction Layer)
-**Plan:** 1 of 3 (just completed 02-01-PLAN.md)
+**Plan:** 2 of 3 (just completed 02-02-PLAN.md)
 **Status:** In progress
-**Progress:** ████░░░░░░ 22% (4/6 phase plans complete)
-**Last activity:** 2026-01-21 - Completed 02-01-PLAN.md (tool-mapper)
+**Progress:** ████░░░░░░ 28% (5/6 phase plans complete)
+**Last activity:** 2026-01-21 - Completed 02-02-PLAN.md (field-transformer)
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
   - 01-01: Spec Parser ✅
   - 01-02: Context Builder & Engine ✅
   - 01-03: Generator & Integration ✅
-- Phase 2: Platform Abstraction Layer — **In progress** (1/3 complete)
+- Phase 2: Platform Abstraction Layer — **In progress** (2/3 complete)
   - 02-01: Tool Mapper ✅
-  - 02-02: Field Transformer — Pending
+  - 02-02: Field Transformer ✅
   - 02-03: Platform Adapter — Pending
 - Phase 3: Spec Migration & Template Generation — Pending
 - Phase 4: Installation Workflow Integration — Pending
@@ -37,15 +37,15 @@ Phase 2: Platform Abstraction Layer — Building tool compatibility matrix and p
 
 ### Velocity
 - **Phases completed:** 1/6 (17%)
-- **Plans completed:** 4 total (Phase 1: 3/3, Phase 2: 1/3)
-- **Requirements delivered:** 6/27 (22%) - TMPL-01, TMPL-03, TMPL-05, TMPL-07, TMPL-09, ABST-01
-- **Current phase progress:** 33% (Phase 2: 1/3 plans complete)
+- **Plans completed:** 5 total (Phase 1: 3/3, Phase 2: 2/3)
+- **Requirements delivered:** 9/27 (33%) - TMPL-01, TMPL-03, TMPL-05, TMPL-07, TMPL-09, ABST-01, ABST-03, ABST-05, ABST-07
+- **Current phase progress:** 67% (Phase 2: 2/3 plans complete)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)
-- **Test coverage:** 88 tests passing (59 from Phase 1, 29 from 02-01)
-- **Platform parity:** Foundation complete, tool mapping complete
-- **Verification score:** Phase 1: 17/17 must-haves (100%), Phase 2 Plan 1: 4/4 must-haves (100%)
+- **Test coverage:** 127 tests passing (59 from Phase 1, 29 from 02-01, 39 from 02-02)
+- **Platform parity:** Foundation complete, tool mapping complete, field transformation complete
+- **Verification score:** Phase 1: 17/17 must-haves (100%), Phase 2 Plan 1: 4/4 (100%), Phase 2 Plan 2: 5/5 (100%)
 
 ### Efficiency
 - **Blockers resolved:** 0
@@ -75,9 +75,18 @@ Phase 2: Platform Abstraction Layer — Building tool compatibility matrix and p
 | Tool compatibility matrix defines 6 safe cross-platform tools | Based on PITFALLS.md, identified tools that exist on both platforms with compatible behavior | 2026-01-21 | 02-01 |
 | mapTools() filters unavailable tools | Graceful degradation - specs can include platform-specific tools, returns only available ones | 2026-01-21 | 02-01 |
 | Granular validation with warnings vs errors | Warnings for risky/unknown tools, errors for completely unavailable tools | 2026-01-21 | 02-01 |
+| FIELD_RULES constant maps all platform metadata differences | Single source of truth from PITFALLS.md research (model, hooks, skills, etc.) | 2026-01-21 | 02-02 |
+| transformFields returns {transformed, warnings} structure | Transparency - caller knows what was changed and why | 2026-01-21 | 02-02 |
+| Enhanced capabilities expanded from 6 to 8 flags | Added supportsDisallowedTools, toolCaseSensitive; renamed charLimit → maxPromptLength | 2026-01-21 | 02-02 |
+| Helper functions provide query interface | supportsField, getFieldWarning, getPlatformLimits for easier capability queries | 2026-01-21 | 02-02 |
+| Unknown fields preserved with warnings | Forward compatibility for future platform features | 2026-01-21 | 02-02 |
 
 ### Active Todos
-- [x] Begin Phase 1: Create template system modules
+- [x] Complete Phase 1 integration tests
+- [x] Begin Phase 2: Platform Abstraction Layer
+- [x] Create tool-mapper module (02-01)
+- [x] Create field-transformer module (02-02)
+- [ ] Create platform-adapter module (02-03)
 - [x] Implement spec-parser.js (YAML frontmatter parsing)
 - [x] Implement context-builder.js (platform context)
 - [x] Implement engine.js (template rendering and validation)
@@ -85,7 +94,7 @@ Phase 2: Platform Abstraction Layer — Building tool compatibility matrix and p
 - [x] Complete Phase 1 integration tests
 - [x] Begin Phase 2: Platform Abstraction Layer
 - [x] Implement tool-mapper.js (02-01)
-- [ ] Implement field-transformer.js (02-02)
+- [x] Implement field-transformer.js (02-02)
 - [ ] Implement platform-adapter.js (02-03)
 
 ### Known Blockers
@@ -103,22 +112,29 @@ Phase 2: Platform Abstraction Layer — Building tool compatibility matrix and p
 2. Check Active Todos for next action
 3. Phase 1 is **COMPLETE** ✅
 4. Phase 2 Plan 1 (tool-mapper) is **COMPLETE** ✅
-5. Review Phase 2 Plan 1 summary: 02-01-SUMMARY.md
-6. Reference ROADMAP.md Phase 2 for remaining plans (02-02, 02-03)
+5. Phase 2 Plan 2 (field-transformer) is **COMPLETE** ✅
+6. Review Phase 2 summaries: 02-01-SUMMARY.md, 02-02-SUMMARY.md
+7. Reference ROADMAP.md Phase 2 for remaining plan (02-03)
 
-**Phase 1 deliverables (complete):**
-- ✅ Template system modules: spec-parser.js, context-builder.js, engine.js, generator.js
-- ✅ Public API: index.js with high-level and low-level functions
+**Phase 2 deliverables so far:**
+- ✅ Tool mapper: tool-mapper.js with TOOL_MATRIX, mapTools(), validateTools()
+- ✅ Field transformer: field-transformer.js with FIELD_RULES, transformFields(), validateFieldSupport()
+- ✅ Enhanced context builder: 8 detailed capability flags per platform
+- ✅ Helper functions: supportsField(), getFieldWarning(), getPlatformLimits()
+- ✅ 68 tests passing (29 tool-mapper + 39 field-transformer/context-builder)
+
+**Next milestone:**
+Complete Phase 2 Plan 3 (platform-adapter) to finish Platform Abstraction Layer
 - ✅ Unit tests for all modules (51 tests passing)
 - ✅ Integration tests for end-to-end pipeline (8 tests passing)
 
-**Phase 2 progress (33% complete - 1/3 plans):**
+**Phase 2 progress (67% complete - 2/3 plans):**
 - ✅ 02-01: Tool mapper with canonical names and compatibility matrix (29 tests)
-- ⏳ 02-02: Field transformer (pending)
+- ✅ 02-02: Field transformer with FIELD_RULES and platform capabilities (39 tests)
 - ⏳ 02-03: Platform adapter (pending)
 
 **Next milestone:**
-Execute 02-02-PLAN.md: Field transformation layer for platform-specific frontmatter handling
+Execute 02-03-PLAN.md: Platform adapter for coordinating tool and field transformations
 
 ### Context Handoff
 
@@ -129,7 +145,9 @@ Execute 02-02-PLAN.md: Field transformation layer for platform-specific frontmat
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T16:56:37Z
+**Last session:** 2026-01-21T16:59:19Z
+**Stopped at:** Completed 02-02-PLAN.md (field-transformer complete)
+**Resume file:** .planning/ROADMAP.md (Phase 2 Plan 3 next)
 **Stopped at:** Completed 02-01-PLAN.md (tool mapper)
 **Resume file:** .planning/phases/02-platform-abstraction-layer/02-02-PLAN.md (next plan)
 
