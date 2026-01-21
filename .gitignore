@@ -13,3 +13,8 @@ CLAUDE.md
 
 # Personal scripts
 .scripts
+
+# Docker sandbox directories
+.sandbox-home/
+.sandbox-cache/
+.sandbox-rw/
