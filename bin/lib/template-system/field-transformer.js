@@ -4,6 +4,20 @@
  * Based on research/PITFALLS.md findings
  */
 
+const path = require('path');
+const fs = require('fs');
+
+// Read package.json for project metadata
+let projectInfo = { name: 'unknown', version: 'unknown' };
+try {
+  const pkgPath = path.join(__dirname, '../../../package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  projectInfo = { name: pkg.name, version: pkg.version };
+} catch (err) {
+  // Fallback if package.json not found
+  console.warn('Could not read package.json for metadata:', err.message);
+}
+
 /**
  * Platform-specific field support rules
  * Derived from PITFALLS.md research on Claude/Copilot differences
@@ -206,10 +220,12 @@ function addPlatformMetadata(frontmatter, platform, options = {}) {
   // Reference: https://docs.github.com/en/copilot/reference/custom-agents-configuration
   if (platform === 'copilot') {
     const metadata = {
-      _platform: platform,
-      _generated: new Date().toISOString(),
-      ...(options.version && { _templateVersion: options.version }),
-      ...(options.specPath && { _sourceSpec: options.specPath })
+      platform: platform,
+      generated: new Date().toISOString(),
+      projectName: projectInfo.name,
+      projectVersion: projectInfo.version,
+      ...(options.version && { templateVersion: options.version }),
+      ...(options.specPath && { sourceSpec: options.specPath })
     };
     
     return {
