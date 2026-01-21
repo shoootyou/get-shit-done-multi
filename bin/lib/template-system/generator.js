@@ -2,16 +2,32 @@
  * Generator Module - Template Pipeline Orchestrator
  * Coordinates spec-parser, context-builder, and engine to transform specs into agents
  * 
+ * Enhanced pipeline with platform abstraction:
+ * parse → context → transform-tools → render → transform-fields → validate → validate-platform
+ * 
  * @module template-system/generator
  */
 
 const { parseSpec, parseSpecString } = require('./spec-parser');
 const { buildContext } = require('./context-builder');
 const { render, validate } = require('./engine');
+const { mapTools, validateTools } = require('./tool-mapper');
+const { transformFields, addPlatformMetadata } = require('./field-transformer');
+const { validateSpec, checkPromptLength } = require('./validators');
 const yaml = require('js-yaml');
 
 /**
  * Generate agent from spec file
+ * 
+ * Pipeline stages:
+ * 1. Parse spec file (YAML frontmatter + body)
+ * 2. Build platform context
+ * 3. Transform tools to platform-specific names
+ * 4. Render templates with context
+ * 5. Transform fields for platform support
+ * 6. Validate YAML structure
+ * 7. Validate against platform spec requirements
+ * 8. Check prompt length limits
  * 
  * @param {string} specPath - Path to spec file
  * @param {string} platform - Target platform: 'claude' | 'copilot' | 'codex'
@@ -26,6 +42,12 @@ const yaml = require('js-yaml');
  * @returns {boolean} return.success - Whether generation succeeded
  * @returns {string} return.output - Generated agent content (null on failure)
  * @returns {Array} return.errors - Error details (empty on success)
+ * @returns {Array} return.warnings - Non-blocking warnings about transformations
+ * @returns {Object} return.metadata - Generation metadata
+ * @returns {string} return.metadata.platform - Target platform
+ * @returns {boolean} return.metadata.toolsTransformed - Whether tools were transformed
+ * @returns {boolean} return.metadata.fieldsTransformed - Whether fields were transformed
+ * @returns {boolean} return.metadata.validationPassed - Whether platform validation passed
  * 
  * @example
  * const result = generateAgent('./agents/gsd-planner.md', 'claude', {
@@ -33,12 +55,20 @@ const yaml = require('js-yaml');
  * });
  * if (result.success) {
  *   console.log('Generated:', result.output);
+ *   console.log('Warnings:', result.warnings);
  * } else {
  *   console.error('Errors:', result.errors);
  * }
  */
 function generateAgent(specPath, platform, options = {}) {
   const errors = [];
+  const warnings = [];
+  const metadata = {
+    platform: platform,
+    toolsTransformed: false,
+    fieldsTransformed: false,
+    validationPassed: false
+  };
   
   try {
     // Step 1: Parse spec file
@@ -53,7 +83,9 @@ function generateAgent(specPath, platform, options = {}) {
           stage: 'parse',
           message: `Failed to parse spec: ${parseErr.message}`,
           stack: options.verbose ? parseErr.stack : undefined
-        }]
+        }],
+        warnings: [],
+        metadata
       };
     }
     
@@ -69,7 +101,9 @@ function generateAgent(specPath, platform, options = {}) {
           errors: validation.valid ? [] : validation.errors.map(err => ({
             stage: 'validate',
             ...err
-          }))
+          })),
+          warnings: [],
+          metadata
         };
       } catch (validationErr) {
         return {
@@ -79,7 +113,9 @@ function generateAgent(specPath, platform, options = {}) {
             stage: 'validate',
             message: validationErr.message,
             stack: options.verbose ? validationErr.stack : undefined
-          }]
+          }],
+          warnings: [],
+          metadata
         };
       }
     }
@@ -100,11 +136,38 @@ function generateAgent(specPath, platform, options = {}) {
           stage: 'context',
           message: `Failed to build context: ${contextErr.message}`,
           stack: options.verbose ? contextErr.stack : undefined
-        }]
+        }],
+        warnings: [],
+        metadata
       };
     }
     
-    // Step 3: Render frontmatter template
+    // Step 3: Transform tools to platform-specific names
+    if (spec.frontmatter.tools && Array.isArray(spec.frontmatter.tools)) {
+      try {
+        const toolResult = mapTools(spec.frontmatter.tools, platform);
+        spec.frontmatter.tools = toolResult.mapped;
+        metadata.toolsTransformed = true;
+        
+        // Add tool mapping warnings
+        if (toolResult.warnings && toolResult.warnings.length > 0) {
+          toolResult.warnings.forEach(warning => {
+            warnings.push({
+              stage: 'tool-mapping',
+              message: warning.message || warning
+            });
+          });
+        }
+      } catch (toolErr) {
+        // Tool mapping errors are warnings, not blocking
+        warnings.push({
+          stage: 'tool-mapping',
+          message: `Tool mapping failed: ${toolErr.message}`
+        });
+      }
+    }
+    
+    // Step 4: Render frontmatter template
     let renderedFrontmatter;
     try {
       const frontmatterStr = yaml.dump(spec.frontmatter);
@@ -117,11 +180,13 @@ function generateAgent(specPath, platform, options = {}) {
           stage: 'render-frontmatter',
           message: `Failed to render frontmatter: ${renderErr.message}`,
           stack: options.verbose ? renderErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
-    // Step 4: Render body template
+    // Step 5: Render body template
     let renderedBody;
     try {
       renderedBody = render(spec.body, context);
@@ -133,11 +198,51 @@ function generateAgent(specPath, platform, options = {}) {
           stage: 'render-body',
           message: `Failed to render body: ${renderErr.message}`,
           stack: options.verbose ? renderErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
-    // Step 5: Validate rendered frontmatter
+    // Step 6: Transform fields for platform support
+    let finalFrontmatter;
+    try {
+      // Parse rendered frontmatter to object for transformation
+      const parsedFrontmatter = yaml.load(renderedFrontmatter);
+      const transformResult = transformFields(parsedFrontmatter, platform);
+      
+      // Add platform metadata
+      finalFrontmatter = addPlatformMetadata(transformResult.transformed, platform);
+      metadata.fieldsTransformed = true;
+      
+      // Add field transformation warnings
+      if (transformResult.warnings && transformResult.warnings.length > 0) {
+        transformResult.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'field-transform',
+            field: warning.field,
+            message: warning.reason || warning.message || String(warning)
+          });
+        });
+      }
+      
+      // Re-serialize to YAML string
+      renderedFrontmatter = yaml.dump(finalFrontmatter);
+    } catch (transformErr) {
+      return {
+        success: false,
+        output: null,
+        errors: [{
+          stage: 'field-transform',
+          message: `Failed to transform fields: ${transformErr.message}`,
+          stack: options.verbose ? transformErr.stack : undefined
+        }],
+        warnings: warnings,
+        metadata
+      };
+    }
+    
+    // Step 7: Validate rendered frontmatter (YAML structure)
     let validation;
     try {
       validation = validate(renderedFrontmatter);
@@ -149,7 +254,9 @@ function generateAgent(specPath, platform, options = {}) {
           errors: validation.errors.map(err => ({
             stage: 'validate',
             ...err
-          }))
+          })),
+          warnings: warnings,
+          metadata
         };
       }
     } catch (validationErr) {
@@ -160,17 +267,106 @@ function generateAgent(specPath, platform, options = {}) {
           stage: 'validate',
           message: `Validation failed: ${validationErr.message}`,
           stack: options.verbose ? validationErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
-    // Step 6: Combine output
+    // Step 8: Platform-specific validation
+    try {
+      const platformValidation = validateSpec(finalFrontmatter, platform);
+      metadata.validationPassed = platformValidation.valid;
+      
+      // Add platform validation errors
+      if (!platformValidation.valid) {
+        platformValidation.errors.forEach(err => {
+          errors.push({
+            stage: 'platform-validation',
+            field: err.field,
+            message: err.message
+          });
+        });
+      }
+      
+      // Add platform validation warnings
+      if (platformValidation.warnings && platformValidation.warnings.length > 0) {
+        platformValidation.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'platform-validation',
+            field: warning.field,
+            message: warning.message
+          });
+        });
+      }
+      
+      // If platform validation failed, return errors
+      if (!platformValidation.valid) {
+        return {
+          success: false,
+          output: null,
+          errors: errors,
+          warnings: warnings,
+          metadata
+        };
+      }
+    } catch (platformValidationErr) {
+      return {
+        success: false,
+        output: null,
+        errors: [{
+          stage: 'platform-validation',
+          message: `Platform validation failed: ${platformValidationErr.message}`,
+          stack: options.verbose ? platformValidationErr.stack : undefined
+        }],
+        warnings: warnings,
+        metadata
+      };
+    }
+    
+    // Step 9: Combine output and check prompt length
     const output = `---\n${renderedFrontmatter}---\n\n${renderedBody}`;
+    
+    try {
+      const lengthCheck = checkPromptLength(output, platform);
+      
+      if (lengthCheck.warnings && lengthCheck.warnings.length > 0) {
+        lengthCheck.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'prompt-length',
+            message: warning.message,
+            severity: warning.severity
+          });
+        });
+      }
+      
+      // Prompt length exceeding limit is an error
+      if (!lengthCheck.valid) {
+        return {
+          success: false,
+          output: output,
+          errors: [{
+            stage: 'prompt-length',
+            message: lengthCheck.warnings[0].message
+          }],
+          warnings: warnings,
+          metadata
+        };
+      }
+    } catch (lengthCheckErr) {
+      // Length check failure is a warning, not blocking
+      warnings.push({
+        stage: 'prompt-length',
+        message: `Length check failed: ${lengthCheckErr.message}`
+      });
+    }
     
     return {
       success: true,
       output: output,
-      errors: []
+      errors: [],
+      warnings: warnings,
+      metadata
     };
     
   } catch (err) {
@@ -182,7 +378,9 @@ function generateAgent(specPath, platform, options = {}) {
         stage: 'unknown',
         message: `Unexpected error: ${err.message}`,
         stack: options.verbose ? err.stack : undefined
-      }]
+      }],
+      warnings: warnings,
+      metadata
     };
   }
 }
@@ -203,6 +401,14 @@ function generateAgent(specPath, platform, options = {}) {
  * const result = generateFromSpec(spec, 'claude');
  */
 function generateFromSpec(specObject, platform, options = {}) {
+  const warnings = [];
+  const metadata = {
+    platform: platform,
+    toolsTransformed: false,
+    fieldsTransformed: false,
+    validationPassed: false
+  };
+  
   // Validate spec object structure
   if (!specObject || typeof specObject !== 'object') {
     return {
@@ -211,7 +417,9 @@ function generateFromSpec(specObject, platform, options = {}) {
       errors: [{
         stage: 'input',
         message: 'specObject must be an object with frontmatter and body properties'
-      }]
+      }],
+      warnings: [],
+      metadata
     };
   }
   
@@ -222,7 +430,9 @@ function generateFromSpec(specObject, platform, options = {}) {
       errors: [{
         stage: 'input',
         message: 'specObject.frontmatter must be an object'
-      }]
+      }],
+      warnings: [],
+      metadata
     };
   }
   
@@ -233,7 +443,9 @@ function generateFromSpec(specObject, platform, options = {}) {
       errors: [{
         stage: 'input',
         message: 'specObject.body must be a string'
-      }]
+      }],
+      warnings: [],
+      metadata
     };
   }
   
@@ -250,7 +462,9 @@ function generateFromSpec(specObject, platform, options = {}) {
           errors: validation.valid ? [] : validation.errors.map(err => ({
             stage: 'validate',
             ...err
-          }))
+          })),
+          warnings: [],
+          metadata
         };
       } catch (validationErr) {
         return {
@@ -260,7 +474,9 @@ function generateFromSpec(specObject, platform, options = {}) {
             stage: 'validate',
             message: validationErr.message,
             stack: options.verbose ? validationErr.stack : undefined
-          }]
+          }],
+          warnings: [],
+          metadata
         };
       }
     }
@@ -281,8 +497,33 @@ function generateFromSpec(specObject, platform, options = {}) {
           stage: 'context',
           message: `Failed to build context: ${contextErr.message}`,
           stack: options.verbose ? contextErr.stack : undefined
-        }]
+        }],
+        warnings: [],
+        metadata
       };
+    }
+    
+    // Transform tools to platform-specific names
+    if (specObject.frontmatter.tools && Array.isArray(specObject.frontmatter.tools)) {
+      try {
+        const toolResult = mapTools(specObject.frontmatter.tools, platform);
+        specObject.frontmatter.tools = toolResult.mapped;
+        metadata.toolsTransformed = true;
+        
+        if (toolResult.warnings && toolResult.warnings.length > 0) {
+          toolResult.warnings.forEach(warning => {
+            warnings.push({
+              stage: 'tool-mapping',
+              message: warning.message || warning
+            });
+          });
+        }
+      } catch (toolErr) {
+        warnings.push({
+          stage: 'tool-mapping',
+          message: `Tool mapping failed: ${toolErr.message}`
+        });
+      }
     }
     
     // Render frontmatter
@@ -298,7 +539,9 @@ function generateFromSpec(specObject, platform, options = {}) {
           stage: 'render-frontmatter',
           message: `Failed to render frontmatter: ${renderErr.message}`,
           stack: options.verbose ? renderErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
@@ -314,7 +557,43 @@ function generateFromSpec(specObject, platform, options = {}) {
           stage: 'render-body',
           message: `Failed to render body: ${renderErr.message}`,
           stack: options.verbose ? renderErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
+      };
+    }
+    
+    // Transform fields for platform support
+    let finalFrontmatter;
+    try {
+      const parsedFrontmatter = yaml.load(renderedFrontmatter);
+      const transformResult = transformFields(parsedFrontmatter, platform);
+      
+      finalFrontmatter = addPlatformMetadata(transformResult.transformed, platform);
+      metadata.fieldsTransformed = true;
+      
+      if (transformResult.warnings && transformResult.warnings.length > 0) {
+        transformResult.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'field-transform',
+            field: warning.field,
+            message: warning.reason || warning.message || String(warning)
+          });
+        });
+      }
+      
+      renderedFrontmatter = yaml.dump(finalFrontmatter);
+    } catch (transformErr) {
+      return {
+        success: false,
+        output: null,
+        errors: [{
+          stage: 'field-transform',
+          message: `Failed to transform fields: ${transformErr.message}`,
+          stack: options.verbose ? transformErr.stack : undefined
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
@@ -329,7 +608,9 @@ function generateFromSpec(specObject, platform, options = {}) {
           errors: validation.errors.map(err => ({
             stage: 'validate',
             ...err
-          }))
+          })),
+          warnings: warnings,
+          metadata
         };
       }
     } catch (validationErr) {
@@ -340,17 +621,111 @@ function generateFromSpec(specObject, platform, options = {}) {
           stage: 'validate',
           message: `Validation failed: ${validationErr.message}`,
           stack: options.verbose ? validationErr.stack : undefined
-        }]
+        }],
+        warnings: warnings,
+        metadata
       };
     }
     
-    // Combine output
+    // Platform-specific validation
+    try {
+      const platformValidation = validateSpec(finalFrontmatter, platform);
+      metadata.validationPassed = platformValidation.valid;
+      
+      if (!platformValidation.valid) {
+        platformValidation.errors.forEach(err => {
+          return {
+            success: false,
+            output: null,
+            errors: [{
+              stage: 'platform-validation',
+              field: err.field,
+              message: err.message
+            }],
+            warnings: warnings,
+            metadata
+          };
+        });
+      }
+      
+      if (platformValidation.warnings && platformValidation.warnings.length > 0) {
+        platformValidation.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'platform-validation',
+            field: warning.field,
+            message: warning.message
+          });
+        });
+      }
+      
+      if (!platformValidation.valid) {
+        return {
+          success: false,
+          output: null,
+          errors: platformValidation.errors.map(err => ({
+            stage: 'platform-validation',
+            field: err.field,
+            message: err.message
+          })),
+          warnings: warnings,
+          metadata
+        };
+      }
+    } catch (platformValidationErr) {
+      return {
+        success: false,
+        output: null,
+        errors: [{
+          stage: 'platform-validation',
+          message: `Platform validation failed: ${platformValidationErr.message}`,
+          stack: options.verbose ? platformValidationErr.stack : undefined
+        }],
+        warnings: warnings,
+        metadata
+      };
+    }
+    
+    // Combine output and check prompt length
     const output = `---\n${renderedFrontmatter}---\n\n${renderedBody}`;
+    
+    try {
+      const lengthCheck = checkPromptLength(output, platform);
+      
+      if (lengthCheck.warnings && lengthCheck.warnings.length > 0) {
+        lengthCheck.warnings.forEach(warning => {
+          warnings.push({
+            stage: 'prompt-length',
+            message: warning.message,
+            severity: warning.severity
+          });
+        });
+      }
+      
+      if (!lengthCheck.valid) {
+        return {
+          success: false,
+          output: output,
+          errors: [{
+            stage: 'prompt-length',
+            message: lengthCheck.warnings[0].message
+          }],
+          warnings: warnings,
+          metadata
+        };
+      }
+    } catch (lengthCheckErr) {
+      warnings.push({
+        stage: 'prompt-length',
+        message: `Length check failed: ${lengthCheckErr.message}`
+      });
+    }
     
     return {
       success: true,
       output: output,
-      errors: []
+      errors: [],
+      warnings: warnings,
+      metadata
     };
     
   } catch (err) {
@@ -361,7 +736,9 @@ function generateFromSpec(specObject, platform, options = {}) {
         stage: 'unknown',
         message: `Unexpected error: ${err.message}`,
         stack: options.verbose ? err.stack : undefined
-      }]
+      }],
+      warnings: warnings,
+      metadata
     };
   }
 }
