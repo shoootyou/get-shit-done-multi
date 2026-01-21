@@ -14,10 +14,10 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 ## Current Position
 
 **Phase:** 3 of 6 (Spec Migration & Template Generation)
-**Plan:** 06 of 06 - Just completed 03-06-PLAN.md (gap closure - complete validation)
+**Plan:** 07 of 07 - Just completed 03-07-PLAN.md (gap closure - metadata formatting)
 **Status:** Phase complete ✅
-**Progress:** ████████████ 67% (3/6 phases complete, 12/18 total plans)
-**Last activity:** 2026-01-21 - Completed 03-06: Complete Agent Generation & Validation (gap closure)
+**Progress:** ████████████ 72% (3/6 phases complete, 13/18 total plans)
+**Last activity:** 2026-01-21 - Completed 03-07: Metadata Field Naming and Formatting (gap closure)
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -35,6 +35,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
   - 03-04: YAML Frontmatter Format Fix ✅ (gap closure)
   - 03-05: Fix Metadata Field Structure ✅ (gap closure)
   - 03-06: Complete Agent Generation & Validation ✅ (gap closure)
+  - 03-07: Metadata Field Naming and Formatting ✅ (gap closure)
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -43,20 +44,20 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 
 ### Velocity
 - **Phases completed:** 3/6 (50%)
-- **Plans completed:** 12 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 6/6)
+- **Plans completed:** 13 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7)
 - **Requirements delivered:** 17/27 (63%)
-- **Current phase progress:** 100% (Phase 3: 6/6 plans complete including 3 gap closures)
+- **Current phase progress:** 100% (Phase 3: 7/7 plans complete including 4 gap closures)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)
 - **Test coverage:** 46 tests passing (20 field-transformer + 26 integration = 100% success rate)
 - **Platform parity:** Achieved - both platforms fully supported with compliant metadata
-- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 49/49 (100%)
+- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%)
 - **Format compliance:** Claude 11/11 (100%), Copilot 9/9 (100% of generated)
 
 ### Efficiency
 - **Blockers resolved:** 0
-- **Deviation rate:** 1 auto-fix in 03-06 (bug in validation script)
+- **Deviation rate:** 0 deviations (all gap closure plans executed as written)
 - **Rework incidents:** 0
 
 ## Accumulated Context
@@ -115,6 +116,10 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 | Tests use absolute paths for specs | Allows tests to run from any directory, prevents path resolution issues | 2026-01-21 | 03-05 |
 | Read existing files for validation | Validation script reads test-output/ instead of regenerating agents for faster execution | 2026-01-21 | 03-06 |
 | Accept Copilot size limit failures | gsd-planner (41KB) and gsd-debugger (35KB) exceed 30K - documented constraint, not bug | 2026-01-21 | 03-06 |
+| Clean metadata field names without underscores | Standard naming convention, more readable (platform vs _platform, generated vs _generated) | 2026-01-21 | 03-07 |
+| Add project metadata from package.json | Provides complete context (projectName, projectVersion) in generated agents | 2026-01-21 | 03-07 |
+| Manual metadata formatting for layout control | js-yaml flowLevel insufficient for mixed formatting needs (arrays single-line, objects block) | 2026-01-21 | 03-07 |
+| Single blank line after frontmatter | Standard markdown convention, cleaner than two blank lines | 2026-01-21 | 03-07 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -149,6 +154,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 - [x] Fix YAML frontmatter format (03-04 - gap closure)
 - [x] Fix metadata field structure (03-05 - gap closure)
 - [x] Generate all 11 agents and validate format compliance (03-06 - gap closure)
+- [x] Fix metadata field naming and formatting (03-07 - gap closure)
 - [ ] Begin Phase 4: Installation Workflow Integration
 
 ### Known Blockers
@@ -167,7 +173,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 3. **Phase 1 is COMPLETE** ✅ (Template Engine Foundation)
 4. **Phase 2 is COMPLETE** ✅ (Platform Abstraction Layer)
 5. **Phase 3 is COMPLETE** ✅ (Spec Migration & Template Generation)
-6. Review summaries: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md, 03-05-SUMMARY.md, 03-06-SUMMARY.md
+6. Review summaries: 03-01-SUMMARY.md through 03-07-SUMMARY.md
 7. Reference ROADMAP.md Phase 4 for next phase
 
 **Phase 3 deliverables (COMPLETE):**
@@ -178,8 +184,12 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 - ✅ 46 tests (20 field-transformer + 26 integration = 100% pass rate)
 - ✅ Platform generation validated: Claude 11/11, Copilot 9/11
 - ✅ All agents generated with 100% format compliance
-- ✅ Platform-specific YAML formatting (single-line tools and description)
+- ✅ Platform-specific YAML formatting (single-line tools arrays)
 - ✅ Platform-compliant metadata structure (Claude: none, Copilot: nested)
+- ✅ Clean metadata field names without underscores
+- ✅ Project metadata integration (projectName, projectVersion)
+- ✅ Multi-line YAML metadata formatting
+- ✅ Single blank line after frontmatter
 - ✅ Comprehensive validation report documenting format compliance
 
 **Next milestone:**
@@ -189,13 +199,14 @@ Begin Phase 4: Installation Workflow Integration
 - Generate agents at install time based on platform
 - Update documentation for new workflow
 
-**Phase 3 progress (100% complete - 6/6 plans):**
+**Phase 3 progress (100% complete - 7/7 plans):**
 - ✅ 03-01: Template generation system with validation and registry
 - ✅ 03-02: Migrated all 11 agents to spec-as-template format
 - ✅ 03-03: Platform generation testing and validation (26 tests passing)
 - ✅ 03-04: YAML frontmatter format fix (gap closure)
 - ✅ 03-05: Fix metadata field structure (gap closure)
 - ✅ 03-06: Complete agent generation and validation (gap closure)
+- ✅ 03-07: Metadata field naming and formatting (gap closure)
 
 ### Context Handoff
 
@@ -206,8 +217,8 @@ Begin Phase 4: Installation Workflow Integration
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T19:08:05Z
-**Stopped at:** Completed 03-06-PLAN.md (Complete Agent Generation & Validation - gap closure)
+**Last session:** 2026-01-21T20:44:25Z
+**Stopped at:** Completed 03-07-PLAN.md (Metadata Field Naming and Formatting - gap closure)
 **Resume file:** None - Phase 3 complete, ready for Phase 4
 
 ---
