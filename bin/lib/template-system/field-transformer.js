@@ -211,10 +211,10 @@ function addPlatformMetadata(frontmatter, platform, options = {}) {
 
 /**
  * Get all field rules for inspection
- * @returns {Object} Complete FIELD_RULES object
+ * @returns {Object} Complete FIELD_RULES object (deep copy)
  */
 function getFieldRules() {
-  return { ...FIELD_RULES };
+  return JSON.parse(JSON.stringify(FIELD_RULES));
 }
 
 /**
