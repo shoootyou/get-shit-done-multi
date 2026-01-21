@@ -1,7 +1,63 @@
 const fs = require('fs');
+const path = require('path');
 const { generateAgent } = require('./bin/lib/template-system/generator');
 const { validateClaudeSpec, validateCopilotSpec } = require('./bin/lib/template-system/validators');
 const matter = require('gray-matter');
+
+/**
+ * Validate YAML frontmatter format
+ * @param {string} content - Agent file content
+ * @param {string} platform - Platform name ('claude' or 'copilot')
+ * @returns {Object} Validation result
+ */
+function validateFormat(content, platform) {
+  const issues = [];
+  
+  // Extract frontmatter
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) {
+    return { valid: false, issues: ['No frontmatter found'] };
+  }
+  
+  const frontmatter = match[1];
+  
+  // Check 1: Description should be single-line (no >-)
+  if (frontmatter.includes('description: >-') || frontmatter.includes('description: |-')) {
+    issues.push('Description uses multi-line format (should be single-line)');
+  }
+  
+  // Check 2: Claude tools should be comma-separated string
+  if (platform === 'claude') {
+    // Look for tools: with array brackets
+    if (/tools:\s*\n\s*-/.test(frontmatter)) {
+      issues.push('Claude tools use array format (should be comma-separated string)');
+    }
+    // Check for metadata fields
+    if (frontmatter.includes('_platform:') || frontmatter.includes('_generated:')) {
+      issues.push('Claude has metadata fields at root (should have none)');
+    }
+    if (frontmatter.includes('metadata:')) {
+      issues.push('Claude has metadata object (should have none)');
+    }
+  }
+  
+  // Check 3: Copilot tools should be single-line array
+  if (platform === 'copilot') {
+    // Look for multi-line array
+    if (/tools:\s*\n\s*-/.test(frontmatter)) {
+      issues.push('Copilot tools use multi-line array (should be single-line array)');
+    }
+    // Check for metadata structure
+    if (frontmatter.includes('_platform:') && !frontmatter.includes('metadata:')) {
+      issues.push('Copilot has _platform at root (should be under metadata object)');
+    }
+  }
+  
+  return {
+    valid: issues.length === 0,
+    issues: issues
+  };
+}
 
 const agentNames = [
   'gsd-planner', 'gsd-executor', 'gsd-verifier',
@@ -109,6 +165,58 @@ for (const r of results.copilot) {
   const errorNote = !r.success && r.errors.some(e => e.stage === 'prompt-length') ? ' (too large)' : '';
   report.push(`| ${r.name} | ${status} | ${r.size} | ${valid} | ${issues}${errorNote} |`);
 }
+report.push('');
+
+// Format Compliance Section
+const OUTPUT_DIR = 'test-output';
+
+report.push('## Format Compliance');
+report.push('');
+report.push('### Claude Agents');
+report.push('');
+report.push('| Agent | Description | Tools | Metadata | Status |');
+report.push('|-------|-------------|-------|----------|--------|');
+
+const claudeDir = path.join(OUTPUT_DIR, 'claude');
+if (fs.existsSync(claudeDir)) {
+  const claudeFiles = fs.readdirSync(claudeDir).filter(f => f.endsWith('.md'));
+  for (const file of claudeFiles) {
+    const content = fs.readFileSync(path.join(claudeDir, file), 'utf8');
+    const validation = validateFormat(content, 'claude');
+    
+    const agentName = file.replace('.md', '');
+    const descOk = !validation.issues.some(i => i.includes('Description'));
+    const toolsOk = !validation.issues.some(i => i.includes('tools'));
+    const metadataOk = !validation.issues.some(i => i.includes('metadata'));
+    const status = validation.valid ? '✅ Pass' : '❌ Fail';
+    
+    report.push(`| ${agentName} | ${descOk ? '✅' : '❌'} | ${toolsOk ? '✅' : '❌'} | ${metadataOk ? '✅' : '❌'} | ${status} |`);
+  }
+}
+
+report.push('');
+report.push('### Copilot Agents');
+report.push('');
+report.push('| Agent | Description | Tools | Metadata | Status |');
+report.push('|-------|-------------|-------|----------|--------|');
+
+const copilotDir = path.join(OUTPUT_DIR, 'copilot');
+if (fs.existsSync(copilotDir)) {
+  const copilotFiles = fs.readdirSync(copilotDir).filter(f => f.endsWith('.md'));
+  for (const file of copilotFiles) {
+    const content = fs.readFileSync(path.join(copilotDir, file), 'utf8');
+    const validation = validateFormat(content, 'copilot');
+    
+    const agentName = file.replace('.md', '');
+    const descOk = !validation.issues.some(i => i.includes('Description'));
+    const toolsOk = !validation.issues.some(i => i.includes('tools'));
+    const metadataOk = !validation.issues.some(i => i.includes('metadata'));
+    const status = validation.valid ? '✅ Pass' : '❌ Fail';
+    
+    report.push(`| ${agentName} | ${descOk ? '✅' : '❌'} | ${toolsOk ? '✅' : '❌'} | ${metadataOk ? '✅' : '❌'} | ${status} |`);
+  }
+}
+
 report.push('');
 
 // Platform differences
