@@ -160,7 +160,7 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 3. **Phase 1 is COMPLETE** ✅ (Template Engine Foundation)
 4. **Phase 2 is COMPLETE** ✅ (Platform Abstraction Layer)
 5. **Phase 3 is COMPLETE** ✅ (Spec Migration & Template Generation)
-6. Review summaries: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md
+6. Review summaries: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md, 03-05-SUMMARY.md
 7. Reference ROADMAP.md Phase 4 for next phase
 
 **Phase 3 deliverables (COMPLETE):**
@@ -168,10 +168,11 @@ Phase 3: Spec Migration & Template Generation — Converting all existing agents
 - ✅ All 11 agents converted to spec-as-template format
 - ✅ Mustache conditional support for platform-specific sections
 - ✅ Render-first pipeline preventing YAML parse errors
-- ✅ 26 integration tests (Phase 1-3 coverage)
+- ✅ 46 tests (20 field-transformer + 26 integration = 100% pass rate)
 - ✅ Platform generation validated: Claude 11/11, Copilot 9/11
 - ✅ Sample agents and validation report demonstrating platform differences
 - ✅ Platform-specific YAML formatting (single-line tools and description)
+- ✅ Platform-compliant metadata structure (Claude: none, Copilot: nested)
 
 **Next milestone:**
 Begin Phase 4: Installation Workflow Integration
@@ -180,11 +181,12 @@ Begin Phase 4: Installation Workflow Integration
 - Generate agents at install time based on platform
 - Update documentation for new workflow
 
-**Phase 3 progress (100% complete - 4/4 plans):**
+**Phase 3 progress (100% complete - 5/5 plans):**
 - ✅ 03-01: Template generation system with validation and registry
 - ✅ 03-02: Migrated all 11 agents to spec-as-template format
 - ✅ 03-03: Platform generation testing and validation (26 tests passing)
 - ✅ 03-04: YAML frontmatter format fix (gap closure)
+- ✅ 03-05: Fix metadata field structure (gap closure)
 
 ### Context Handoff
 
@@ -195,8 +197,8 @@ Begin Phase 4: Installation Workflow Integration
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T18:59:38Z
-**Stopped at:** Completed 03-04-PLAN.md (YAML Frontmatter Format Fix - gap closure)
+**Last session:** 2026-01-21T19:00:02Z
+**Stopped at:** Completed 03-05-PLAN.md (Fix Metadata Field Structure - gap closure)
 **Resume file:** None - Phase 3 complete, ready for Phase 4
 
 ---
