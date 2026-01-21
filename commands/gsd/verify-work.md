@@ -47,7 +47,7 @@ Phase: $ARGUMENTS (optional)
 7. On completion: commit, present summary
 8. If issues found:
    - Spawn parallel debug agents to diagnose root causes
-   - Spawn gsd-planner in --gaps mode to create fix plans
+   - Spawn gsd-planner-coordinator in --gaps mode to create fix plans
    - Spawn gsd-plan-checker to verify fix plans
    - Iterate planner ↔ checker until plans pass (max 3)
    - Present ready status with `/clear` then `/gsd:execute-phase`
@@ -213,7 +213,7 @@ Review the issues above and either:
 - [ ] Batched writes: on issue, every 5 passes, or completion
 - [ ] Committed on completion
 - [ ] If issues: parallel debug agents diagnose root causes
-- [ ] If issues: gsd-planner creates fix plans from diagnosed gaps
+- [ ] If issues: gsd-planner-coordinator creates fix plans from diagnosed gaps
 - [ ] If issues: gsd-plan-checker verifies fix plans (max 3 iterations)
 - [ ] Ready for `/gsd:execute-phase` when complete
 </success_criteria>

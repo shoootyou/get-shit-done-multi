@@ -4,7 +4,7 @@ description: Invoke a GSD agent with a custom prompt across any CLI
 category: orchestration
 arguments:
   - name: agent
-    description: Agent name (e.g., gsd-executor, gsd-planner, gsd-verifier)
+    description: Agent name (e.g., gsd-executor, gsd-planner-coordinator, gsd-verifier)
     required: true
   - name: prompt
     description: Prompt to send to agent (quoted string)
@@ -12,8 +12,8 @@ arguments:
 examples:
   - command: "/gsd:invoke-agent gsd-executor 'Implement authentication'"
     description: Invoke executor agent with custom prompt
-  - command: "/gsd:invoke-agent gsd-planner 'Plan phase 3'"
-    description: Invoke planner agent for phase planning
+  - command: "/gsd:invoke-agent gsd-planner-coordinator 'Plan phase 3'"
+    description: Invoke planner coordinator for phase planning
 ---
 
 # Invoke Agent
