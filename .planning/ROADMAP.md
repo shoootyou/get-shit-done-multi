@@ -17,6 +17,13 @@ Transform the existing GSD agent system from single-platform (Claude-optimized) 
 
 **Requirements:** TMPL-01, TMPL-03, TMPL-05, TMPL-07, TMPL-09
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Dependencies & spec parser with gray-matter
+- [ ] 01-02-PLAN.md — Context builder & template engine with YAML validation
+- [ ] 01-03-PLAN.md — Generator orchestrator & integration tests
+
 **Success Criteria:**
 1. Template system parses YAML frontmatter from agent specs using gray-matter
 2. Variable substitution replaces `{{variable}}` placeholders with context values
