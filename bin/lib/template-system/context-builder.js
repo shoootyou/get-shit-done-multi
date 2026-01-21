@@ -92,48 +92,169 @@ function getSkillsPath(platform, configPaths) {
 /**
  * Get platform-specific capability flags
  * Based on research/PITFALLS.md and platform documentation
+ * Enhanced with detailed capability flags for fine-grained platform abstraction
  * @private
  */
 function getPlatformCapabilities(platform) {
-  // Claude capabilities
+  // Claude capabilities (from PITFALLS.md research)
   if (platform === 'claude') {
     return {
-      supportsModel: true,      // Claude: model selection in frontmatter
-      supportsHooks: true,       // Claude: lifecycle hooks (onStart, onFinish)
-      supportsMCP: true,         // Claude: MCP via skills system
-      supportsSkills: true,      // Claude: explicit skills system
-      charLimit: 200000,         // Claude: higher character limits
-      supportsWildcards: false   // Claude: no tool wildcards
+      // Pitfall 3: Model field support
+      supportsModel: true,            // Can use model field for optimization (haiku, sonnet, opus)
+      
+      // Pitfall 10: Hooks and Skills
+      supportsHooks: true,            // Lifecycle events available (on_create, on_finish, etc.)
+      supportsSkills: true,           // Content injection via skills system
+      
+      // Pitfall 8: MCP configuration
+      supportsMCP: true,              // Inherits from global MCP config (no frontmatter config)
+      
+      // Pitfall 4: Tool restrictions
+      supportsDisallowedTools: true,  // Denylist available (disallowedTools field)
+      
+      // Pitfall 9: Wildcards
+      supportsWildcards: false,       // No tools: ['*'] syntax (must list explicitly)
+      
+      // Pitfall 7: Character limits
+      maxPromptLength: 200000,        // 200k character limit for prompts
+      
+      // Pitfall 1: Tool name case sensitivity
+      toolCaseSensitive: true         // Exact case required (Bash not bash)
     };
   }
 
-  // Copilot capabilities
+  // Copilot capabilities (from PITFALLS.md research)
   if (platform === 'copilot') {
     return {
-      supportsModel: false,      // Copilot: no model selection
-      supportsHooks: false,      // Copilot: no lifecycle hooks
-      supportsMCP: true,         // Copilot: MCP in frontmatter
-      supportsSkills: true,      // Copilot: skills via @-references
-      charLimit: 30000,          // Copilot: 30k character limit
-      supportsWildcards: true    // Copilot: tool wildcards (e.g., "github-*")
+      // Pitfall 3: Model field ignored
+      supportsModel: false,           // Model field ignored - uses main conversation model
+      
+      // Pitfall 10: No hooks or skills
+      supportsHooks: false,           // No lifecycle events
+      supportsSkills: false,          // No skills system (use @-references in prompt instead)
+      
+      // Pitfall 8: MCP in frontmatter
+      supportsMCP: true,              // Org/enterprise: mcp-servers in frontmatter. Repo: inherits
+      
+      // Pitfall 4: Only allowlist
+      supportsDisallowedTools: false, // Only allowlist via tools field (no denylist)
+      
+      // Pitfall 9: Wildcards supported
+      supportsWildcards: true,        // tools: ["*"] means all tools
+      
+      // Pitfall 7: Lower character limit
+      maxPromptLength: 30000,         // 30k character limit per PITFALLS.md
+      
+      // Pitfall 1: Case insensitive
+      toolCaseSensitive: false        // Case-insensitive tool names (bash = Bash = BASH)
     };
   }
 
-  // Codex capabilities (placeholder - adjust based on actual capabilities)
+  // Codex capabilities (placeholder - to be refined based on Codex specifications)
   if (platform === 'codex') {
     return {
-      supportsModel: true,       // Codex: model selection (assumed similar to Claude)
-      supportsHooks: false,      // Codex: no lifecycle hooks (assumed)
-      supportsMCP: true,         // Codex: MCP support (assumed)
-      supportsSkills: true,      // Codex: skills system (assumed)
-      charLimit: 100000,         // Codex: character limit (assumed)
-      supportsWildcards: false   // Codex: no wildcards (assumed)
+      supportsModel: true,            // Assumed similar to Claude
+      supportsHooks: false,           // Assumed no lifecycle hooks
+      supportsSkills: true,           // Assumed skills system exists
+      supportsMCP: true,              // Assumed MCP support
+      supportsDisallowedTools: false, // To be determined
+      supportsWildcards: false,       // To be determined
+      maxPromptLength: 100000,        // Assumed character limit
+      toolCaseSensitive: true         // Assumed case-sensitive
+      // NOTE: To be refined based on Codex specifications
     };
   }
 
   return {};
 }
 
+/**
+ * Check if a specific field is supported on a platform
+ * @param {string} platform - Target platform
+ * @param {string} fieldName - Field name to check
+ * @returns {boolean|null} True if supported, false if not, null if unknown
+ */
+function supportsField(platform, fieldName) {
+  const capabilities = getPlatformCapabilities(platform);
+  
+  // Map field names to capability flags
+  const fieldCapabilityMap = {
+    'model': 'supportsModel',
+    'hooks': 'supportsHooks',
+    'skills': 'supportsSkills',
+    'mcp-servers': 'supportsMCP',
+    'disallowedTools': 'supportsDisallowedTools'
+  };
+  
+  const capabilityKey = fieldCapabilityMap[fieldName];
+  
+  if (capabilityKey && capabilityKey in capabilities) {
+    return capabilities[capabilityKey];
+  }
+  
+  // Common fields assumed supported on all platforms
+  const commonFields = ['name', 'description', 'tools', 'location'];
+  if (commonFields.includes(fieldName)) {
+    return true;
+  }
+  
+  return null; // Unknown field
+}
+
+/**
+ * Get warning message for unsupported field
+ * @param {string} platform - Target platform
+ * @param {string} fieldName - Field name
+ * @returns {string|null} Warning message or null if supported
+ */
+function getFieldWarning(platform, fieldName) {
+  const supported = supportsField(platform, fieldName);
+  
+  if (supported === null) {
+    return `Unknown field "${fieldName}" - verify platform support`;
+  }
+  
+  if (supported === true) {
+    return null; // No warning needed
+  }
+  
+  // Generate helpful warning messages
+  const warnings = {
+    claude: {
+      'mcp-servers': 'Claude inherits MCP from global config - mcp-servers field not used in agent frontmatter',
+      'skills': 'Skills not supported on Claude (should not reach here - skills ARE supported)',
+    },
+    copilot: {
+      'model': 'Copilot ignores model field - uses main conversation model. Remove for clarity.',
+      'hooks': 'Copilot does not support lifecycle hooks - use prompt text for initialization',
+      'skills': 'Copilot does not support skills system - embed content directly in prompt',
+      'disallowedTools': 'Copilot only supports allowlist (tools field) - use tools array instead of disallowedTools',
+      'mcp-servers': 'Copilot requires mcp-servers in frontmatter (org/enterprise only)'
+    }
+  };
+  
+  return warnings[platform]?.[fieldName] || `Field "${fieldName}" not supported on ${platform}`;
+}
+
+/**
+ * Get platform-specific limits and constraints
+ * @param {string} platform - Target platform
+ * @returns {Object} Limits object with maxPromptLength, toolCaseSensitive, etc.
+ */
+function getPlatformLimits(platform) {
+  const capabilities = getPlatformCapabilities(platform);
+  
+  return {
+    maxPromptLength: capabilities.maxPromptLength || 30000, // Default to lowest common denominator
+    toolCaseSensitive: capabilities.toolCaseSensitive !== false, // Default to true (safer)
+    supportsWildcards: capabilities.supportsWildcards === true,
+    platform
+  };
+}
+
 module.exports = {
-  buildContext
+  buildContext,
+  supportsField,
+  getFieldWarning,
+  getPlatformLimits
 };

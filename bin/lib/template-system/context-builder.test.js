@@ -23,7 +23,7 @@ const { buildContext } = require('./context-builder');
   assert.strictEqual(ctx.supportsModel, false, 'Copilot should not support model selection');
   assert.strictEqual(ctx.supportsHooks, false, 'Copilot should not support hooks');
   assert.strictEqual(ctx.supportsWildcards, true, 'Copilot should support tool wildcards');
-  assert.strictEqual(ctx.charLimit, 30000, 'Copilot character limit should be 30000');
+  assert.strictEqual(ctx.maxPromptLength, 30000, 'Copilot character limit should be 30000');
   console.log('✓ Test 2: Copilot context has correct capabilities');
 }
 
@@ -33,7 +33,7 @@ const { buildContext } = require('./context-builder');
   assert.strictEqual(ctx.supportsModel, true, 'Claude should support model selection');
   assert.strictEqual(ctx.supportsHooks, true, 'Claude should support hooks');
   assert.strictEqual(ctx.supportsWildcards, false, 'Claude should not support tool wildcards');
-  assert.strictEqual(ctx.charLimit, 200000, 'Claude character limit should be 200000');
+  assert.strictEqual(ctx.maxPromptLength, 200000, 'Claude character limit should be 200000');
   console.log('✓ Test 3: Claude context has correct capabilities');
 }
 
