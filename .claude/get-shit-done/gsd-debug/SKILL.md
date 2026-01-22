@@ -3,24 +3,9 @@ name: gsd-debug
 description: Structured debugging workflow with session persistence and investigation tracking
 skill_version: 1.9.1
 requires_version: 1.9.0+
-platforms:
-  - claude
-  - copilot
-  - codex
-{{#isClaude}}
-tools: [Task, Read, Write, Bash, AskUserQuestion]
-{{/isClaude}}
-{{#isCopilot}}
-tools: [task, read, write, bash, askuserquestion]
-{{/isCopilot}}
-{{#isCodex}}
-tools: [Task, Read, Write, Bash, AskUserQuestion]
-{{/isCodex}}
-arguments:
-  - name: issue
-    type: string
-    required: false
-    description: Issue description (if omitted, shows active sessions for resume)
+platforms: [claude, copilot, codex]
+tools: Task, Read, Write, Bash, AskUserQuestion
+arguments: [{name: issue, type: string, required: false, description: 'Issue description (if omitted, shows active sessions for resume)'}]
 ---
 
 <objective>
