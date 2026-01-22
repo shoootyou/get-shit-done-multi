@@ -187,18 +187,26 @@ Plans:
 ---
 
 ### Phase 6: Documentation & Polish
-**Goal:** Users can successfully install, use, and troubleshoot template system
+**Goal:** Documentation complete and ready for 2.0.0 release with architecture docs, migration guide, and updated README
 
-**Dependencies:** Phase 5 (documentation based on tested examples)
+**Dependencies:** Phase 5 (documentation based on tested implementation)
 
 **Requirements:** PLAT-05, TMPL-09 (help documentation)
 
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 06-01-PLAN.md — Technical documentation (ARCHITECTURE.md + CONTRIBUTING.md)
+- [ ] 06-02-PLAN.md — Migration guide (MIGRATION-V2.md for v1.x → v2.0 upgrade)
+- [ ] 06-03-PLAN.md — README & release prep (README.md update + CHANGELOG.md + version bump to 2.0.0)
+
 **Success Criteria:**
-1. README documents installation with `--copilot` and `--local`/`--global` flags
-2. Migration guide explains how existing agent authors update to template format
-3. Platform support matrix shows which features work on Claude vs Copilot
-4. Troubleshooting guide covers common errors with solutions
-5. Examples generated from actual template output (no documentation drift)
+1. ARCHITECTURE.md documents template system and platform abstraction with design decisions
+2. CONTRIBUTING.md explains how to add agents, modify templates, and run tests
+3. MIGRATION-V2.md provides v1.x → v2.0 upgrade guide with breaking changes and benefits
+4. README.md updated with multi-platform architecture section and documentation references
+5. CHANGELOG.md has complete 2.0.0 entry documenting all Phase 1-5 changes
+6. package.json version bumped to 2.0.0 (major release for breaking changes)
 
 ---
 
