@@ -121,8 +121,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Install integration (generation in install/installCopilot/installCodex)
-- [ ] 04-02-PLAN.md — Version metadata & documentation (field-transformer, package.json, CHANGELOG)
+- [x] 04-01-PLAN.md — Install integration (generation in install/installCopilot/installCodex)
+- [x] 04-02-PLAN.md — Version metadata & documentation (field-transformer, package.json, CHANGELOG)
 
 **Success Criteria:**
 1. `--copilot` flag generates optimized agents to `.github/copilot/agents/`
