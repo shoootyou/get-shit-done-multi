@@ -9,15 +9,15 @@
 Agent definitions use native platform capabilities—Claude and Copilot each get configurations that leverage their specific features through declarative frontmatter, not interpretation.
 
 ### Current Focus
-Phase 5: Cross-Platform Testing & Validation — End-to-end validation through actual installation and invocation.
+Phase 6: Documentation & Polish — Comprehensive documentation for v2.0 release with migration guides and architecture docs.
 
 ## Current Position
 
-**Phase:** 5 of 7 (Cross-Platform Testing & Validation)
-**Plan:** 3 of 3 complete
-**Status:** Phase complete
-**Progress:** ███████████████ 96% (Phase 5: 3/3 plans complete, 25/26 total plans)
-**Last activity:** 2026-01-22 - Completed 05-03: E2E orchestrator & documentation
+**Phase:** 6 of 7 (Documentation & Polish)
+**Plan:** 2 of 3 complete
+**Status:** In progress
+**Progress:** ████████████████ 90% (Phase 6: 2/3 plans complete, 26/29 total plans)
+**Last activity:** 2026-01-22 - Completed 06-02: Migration guide (v1.x → v2.0)
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -51,15 +51,18 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
   - 05-01: Generation & installation testing ✅
   - 05-02: Invocation smoke tests ✅
   - 05-03: E2E orchestrator & documentation ✅
-- Phase 6: Documentation & Polish — Pending
+- Phase 6: Documentation & Polish — In progress
+  - 06-01: Technical documentation ✅
+  - 06-02: Migration guide ✅
+  - 06-03: README & release prep — Pending
 
 ## Performance Metrics
 
 ### Velocity
 - **Phases completed:** 5/7 (71%)
-- **Plans completed:** 25 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 4/4, Phase 5: 3/3)
+- **Plans completed:** 26 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 4/4, Phase 5: 3/3, Phase 6: 2/3)
 - **Requirements delivered:** 30/30 (100% - all requirements validated through runtime testing)
-- **Current phase progress:** 100% (Phase 5: 3/3 plans complete)
+- **Current phase progress:** 67% (Phase 6: 2/3 plans complete)
 
 ### Quality
 - **Requirements coverage:** 30/30 mapped (100%)
@@ -166,6 +169,11 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 | npm script organization | Four test scripts (test, test:generation, test:installation, test:invocation) | 2026-01-22 | 05-03 |
 | Test runner working directory | Don't change cwd when spawning (tests expect project root) | 2026-01-22 | 05-03 |
 | Documentation scope | Comprehensive guide covering workflow, architecture, troubleshooting, CI | 2026-01-22 | 05-03 |
+| Migration guide structure | 7-section structure (What's New, Breaking, Benefits, Upgrade, Preserved, Custom, FAQ) | 2026-01-22 | 06-02 |
+| Breaking changes presentation | Before/after comparison tables for clarity | 2026-01-22 | 06-02 |
+| Upgrade steps format | Exact bash commands with expected output | 2026-01-22 | 06-02 |
+| Custom agent migration pattern | Three-step (copy → edit → regenerate) | 2026-01-22 | 06-02 |
+| State preservation emphasis | Highlight .planning/ safety throughout document | 2026-01-22 | 06-02 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -267,9 +275,9 @@ Phase 4: Installation Workflow Integration OR Phase 6: Documentation & Polish
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-22T13:03:22Z
-**Stopped at:** Completed 05-03-PLAN.md (E2E orchestrator & documentation)
-**Resume file:** None - Phase 5 complete, ready for Phase 4 or Phase 6
+**Last session:** 2026-01-22T13:43:36Z
+**Stopped at:** Completed 06-02-PLAN.md (Migration guide)
+**Resume file:** None - Phase 6 plan 3 pending
 
 ---
 
