@@ -572,7 +572,7 @@ model: claude-sonnet-4.5
 metadata:
   platform: copilot
   projectName: lib-ghcc
-  projectVersion: 1.8.1
+  projectVersion: 1.9.0
   generated: 2026-01-22T13:41:13Z
 ---
 

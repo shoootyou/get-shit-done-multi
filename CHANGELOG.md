@@ -6,85 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [1.9.0] - 2026-01-22
 
-**Internal Optimization:** Template-based agent generation for platform-specific optimization. From user perspective, agent behavior is identical.
+### For Users
 
-### Added
-- Template-based agent generation system with platform-specific optimization
-- Platform abstraction layer (tool-mapper, field-transformer, validators)
-- Bidirectional tool mapping accepting all tool name variants
-- PRIMARY Copilot aliases (execute, edit, search, agent) for spec compliance
-- Zero-warnings installation workflow validation
-- Comprehensive test suite (208 tests: 64 tool-mapper, 20 field-transformer, 32 validators, 26 integration, 22 generation, 5 installation, smoke tests)
-- E2E test orchestration (generation → installation → invocation)
-- npm test scripts (test, test:generation, test:installation, test:invocation)
-- Documentation: architecture.md, contributing.md, troubleshooting.md
-- Agent splitting pattern for Copilot 30K size limit (gsd-planner, gsd-debugger)
-
-### Changed
-- Agents generated from specs/agents/ templates at install time (previously static files)
-- Tool references use platform-specific names (Bash for Claude, execute for Copilot)
-- Copilot agents use PRIMARY aliases (execute, edit, search, agent) not compatible aliases
-- Claude agents use string tools format ("Bash, Read, Edit, Grep, Glob, Task")
-- Copilot agents use array tools format ([execute, edit, search, agent])
-- Metadata structure platform-specific (Claude: none, Copilot: nested under metadata object)
-- Re-running install is idempotent (safely overwrites generated agents)
+- **Zero installation warnings** - Clean install across all platforms
+- **Better GitHub Copilot compatibility** - Agents optimized for Copilot's size limits and tool requirements
+- **No action required** - Agents regenerate automatically on install/upgrade, behavior unchanged
+- **Idempotent installation** - Safe to re-run install multiple times
 
 ### Technical
-- Spec-as-template format with Mustache conditionals for platform sections
-- Generation pipeline: parse → render → transform → validate → write
-- Platform capability flags control conditional rendering
-- REVERSE_INDEX for bidirectional tool name lookup
-- Validation against official platform specs (Claude and Copilot)
-- Cross-platform testing with actual CLI invocation
 
-### User Impact
-- **No action required** - agents regenerated automatically on install/upgrade
-- Agent behavior unchanged (output identical, only internal format optimized)
-- Existing .planning/ state preserved
-- Custom agents: Edit specs/agents/ instead of agents/ directory
+Internal optimization release focused on platform-specific agent generation:
 
-### Documentation
-- [docs/architecture.md](docs/architecture.md) — Template system and platform abstraction design
-- [docs/contributing.md](docs/contributing.md) — How to add agents and contribute
-- [docs/troubleshooting.md](docs/troubleshooting.md) — Common errors and solutions
-- [docs/TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) — Testing workflow
-- [docs/AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) — Size optimization pattern
-
-### Acknowledgments
-This release represents 5 phases of work:
-- Phase 1: Template Engine Foundation (gray-matter + Mustache)
-- Phase 2: Platform Abstraction Layer (tool-mapper, field-transformer, validators)
-- Phase 3: Spec Migration (11 agents → spec-as-template format)
-- Phase 4: Installation Integration (zero-warnings workflow)
-- Phase 5: Cross-Platform Testing (208 tests, E2E validation)
-
-## [1.8.1] - 2026-01-21
-
-### Added
-- Template-based agent generation system for platform-specific optimization
-- Install-time generation replaces static agent files
-- Platform abstraction layer for Claude/Copilot compatibility
-- Version metadata in generated agents (template version, generation date, platform)
-- 13 agents converted to spec-as-template format in `specs/agents/`
-
-### Changed
-- Agents now generated from specs during installation (not copied from static files)
-- `--copilot` flag generates Copilot-optimized agents (array tools syntax, size-aware)
-- `--local`/`--global` flags generate Claude-optimized agents (string tools syntax)
-- `--all` flag applies platform-specific optimization to all detected CLIs
-- Agent split strategy: gsd-planner and gsd-debugger now have coordinator/specialist pairs for Copilot size limits
-
-### Technical
-- Template system modules: spec-parser, context-builder, engine, generator
-- Platform abstraction: tool-mapper, field-transformer, validators
-- 46 integration tests (100% pass rate across template system and platform layers)
-- Idempotent installation (safe re-runs overwrite cleanly)
-
-### Migration Notes
-- No user action required - agents generated automatically during install
-- Re-running install is safe (idempotent operation)
-- Existing orchestration system works unchanged
-- Agent size improvements: Copilot agents under 30KB (except 2 oversized)
+- Template-based generation system replacing static agent files
+- Platform abstraction layer for Claude/Copilot compatibility (bidirectional tool mapping)
+- Agent splitting pattern for large agents (gsd-planner, gsd-debugger now coordinator/specialist pairs)
+- Comprehensive test suite with 208 tests covering generation, installation, and invocation
+- Documentation: [architecture.md](docs/architecture.md), [contributing.md](docs/contributing.md), [troubleshooting.md](docs/troubleshooting.md)
 
 ## [1.8.0] - 2026-01-20
 
