@@ -144,9 +144,10 @@ Plans:
 **Plans:** 3 plans in 2 waves
 
 Plans:
-- [ ] 04.1-01-PLAN.md — Bidirectional tool mapper + Copilot PRIMARY aliases
-- [ ] 04.1-02-PLAN.md — Update tool references in prompts with Mustache conditionals
-- [ ] 04.1-03-PLAN.md — Zero warnings validation (Wave 2, checkpoint)
+- [x] 04.1-01-PLAN.md — Bidirectional tool mapper + Copilot PRIMARY aliases
+- [x] 04.1-02-PLAN.md — Update tool references in prompts with Mustache conditionals
+- [x] 04.1-03-PLAN.md — Zero warnings validation (Wave 2, checkpoint)
+- [x] 04.1-04-PLAN.md — Fix test expectations (gap closure)
 
 **Success Criteria:**
 1. Tool mapper recognizes uppercase, lowercase, and all aliases bidirectionally
