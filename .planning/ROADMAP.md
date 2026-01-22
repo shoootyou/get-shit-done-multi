@@ -12,7 +12,7 @@ Transform 29 GSD commands from legacy format to unified multi-platform specs in 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Schema** - Establish spec structure and prove architecture
+- [x] **Phase 1: Foundation & Schema** - Establish spec structure and prove architecture
 - [ ] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
 - [ ] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands

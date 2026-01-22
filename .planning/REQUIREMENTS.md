@@ -119,16 +119,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUN-01 | Phase 1 | Pending |
-| FOUN-02 | Phase 1 | Pending |
+| FOUN-01 | Phase 1 | Complete|
+| FOUN-02 | Phase 1 | Complete|
 | FOUN-03 | Phase 2 | Pending |
-| FOUN-04 | Phase 1 | Pending |
-| FOUN-05 | Phase 1 | Pending |
+| FOUN-04 | Phase 1 | Complete|
+| FOUN-05 | Phase 1 | Complete|
 | FOUN-06 | Phase 7 | Pending |
 | FOUN-07 | Phase 2 | Pending |
 | FOUN-08 | Phase 2 | Pending |
 | MIGR-01 | Phase 3 | Pending |
-| MIGR-02 | Phase 1 | Pending |
+| MIGR-02 | Phase 1 | Complete|
 | MIGR-03 | Phase 5 | Pending |
 | MIGR-04 | Phase 4 | Pending |
 | MIGR-05 | Phase 3 | Pending |

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Specs in /specs/skills/ must be single source of truth for GSD commands across 3 platforms (Copilot, Claude, Codex)
-**Current focus:** Phase 1 - Foundation & Schema
+**Current focus:** Phase 2 - Template Engine Integration
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation & Schema)
-Plan: 2 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-22 — Completed 01-02-PLAN.md (Test Migration - gsd-help)
+Phase: 2 of 8 (Template Engine Integration)
+Plan: Ready for planning
+Status: Phase 1 complete, Phase 2 next
+Last activity: 2026-01-22 — Completed Phase 1 (Foundation & Schema) ✓
 
-Progress: [██░░░░░░░░] ~20%
+Progress: [██░░░░░░░░] ~12% (1/8 phases)
 
 ## Performance Metrics
 
