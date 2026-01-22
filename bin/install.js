@@ -1082,6 +1082,23 @@ function installCodex(isGlobal) {
     }
   }
 
+  // Generate skills from specs
+  const skillSpecsDir = path.join(src, 'specs', 'skills');
+  if (fs.existsSync(skillSpecsDir)) {
+    // Skills go to .codex/skills/ (parent of dirs.skills which is .codex/skills/get-shit-done/)
+    const skillDestDir = path.join(codexDir, 'skills');
+    fs.mkdirSync(skillDestDir, { recursive: true });
+    
+    const skillGenResult = generateSkillsFromSpecs(skillSpecsDir, skillDestDir, 'codex');
+    
+    if (skillGenResult.failed > 0) {
+      console.log(`  ${yellow}⚠${reset} Skills: ${skillGenResult.generated} generated, ${skillGenResult.failed} failed`);
+      failures.push(`skills (${skillGenResult.failed} generation failures)`);
+    } else if (skillGenResult.generated > 0) {
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+    }
+  }
+
   // Verify installation with detailed reporting
   const verifyResult = codexAdapter.verify(dirs);
   if (verifyResult.success) {
