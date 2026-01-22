@@ -112,9 +112,16 @@ Explore the codebase thoroughly for your focus area. **Apply exclusion patterns 
 The workflow provides: **EXCLUDE these directories:** [list]
 
 Use this list in ALL tool calls:
+{{#isClaude}}
 - Grep tool: `--exclude-dir={dirs from list}`
 - Glob tool: Verify results don't include excluded paths
 - Bash tool: Add `-not -path '*/DIR/*'` for each excluded dir
+{{/isClaude}}
+{{#isCopilot}}
+- search tool: `--exclude-dir={dirs from list}`
+- search tool: Verify results don't include excluded paths (note: search combines grep + glob)
+- execute tool: Add `-not -path '*/DIR/*'` for each excluded dir
+{{/isCopilot}}
 
 Example exclusions: .claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage
 
