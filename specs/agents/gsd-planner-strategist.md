@@ -1,7 +1,6 @@
 ---
 name: gsd-planner-strategist
 description: "Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner."
-color: green
 
 {{#isClaude}}
 tools: [Read, Bash, Glob, Grep]

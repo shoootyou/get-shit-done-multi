@@ -1,13 +1,12 @@
 ---
 name: gsd-planner
 description: "Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files."
-color: green
 
 {{#isClaude}}
 tools: [Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*, Task]
 {{/isClaude}}
 {{#isCopilot}}
-tools: [read, write, bash, glob, grep, task]
+tools: [read, edit, bash, glob, grep, task]
 {{/isCopilot}}
 ---
 

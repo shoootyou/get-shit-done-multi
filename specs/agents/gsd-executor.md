@@ -1,13 +1,12 @@
 ---
 name: gsd-executor
 description: "Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command."
-color: yellow
 
 {{#isClaude}}
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 {{/isClaude}}
 {{#isCopilot}}
-tools: [read, write, edit, bash, grep, glob]
+tools: [read, edit, edit, bash, grep, glob]
 {{/isCopilot}}
 ---
 

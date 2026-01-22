@@ -1,13 +1,12 @@
 ---
 name: gsd-debugger
 description: "Primary orchestrator for debugging sessions. Manages investigation flow, debug file state, and spawns gsd-debugger-specialist for complex scenarios."
-color: orange
 
 {{#isClaude}}
 tools: [Read, Write, Edit, Bash, Grep, Glob, WebSearch]
 {{/isClaude}}
 {{#isCopilot}}
-tools: [read, write, edit, bash, grep, glob]
+tools: [read, edit, edit, bash, grep, glob]
 {{/isCopilot}}
 ---
 
