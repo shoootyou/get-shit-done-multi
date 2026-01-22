@@ -8,33 +8,17 @@ platforms:
   - copilot
   - codex
 tools:
-  - name: task
-    required: true
-    reason: Spawn researchers, synthesizer, and roadmapper agents in parallel
-  - name: read
-    required: true
-    reason: Load existing project context and validate milestones/
-  - name: write
-    required: true
-    reason: Create milestone directory and update project state
-  - name: bash
-    required: true
-    reason: Git operations, directory validation, milestone numbering
-  - name: AskUserQuestion
-    required: true
-    reason: Collect milestone details, approval gates, revision requests
-  - name: glob
-    required: true
-    reason: Find existing phase directories for milestone numbering
+  - task
+  - read
+  - write
+  - bash
+  - glob
+  - AskUserQuestion
 arguments:
   - name: milestone
     type: string
     required: false
     description: Milestone number or description
-metadata:
-  generated: {{generated}}
-  platform: {{platform}}
-  version: {{version}}
 ---
 
 <objective>

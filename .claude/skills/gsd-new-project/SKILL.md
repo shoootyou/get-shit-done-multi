@@ -3,21 +3,9 @@ name: gsd-new-project
 description: Orchestrate project initialization with parallel research and roadmap creation
 skill_version: 1.9.1
 requires_version: 1.9.0+
-platforms:
-  - claude
-  - copilot
-  - codex
-tools:
-  - task
-  - read
-  - write
-  - bash
-  - AskUserQuestion
-arguments:
-  - name: domain
-    type: string
-    required: false
-    description: Project domain for research context
+platforms: [claude, copilot, codex]
+tools: Task, Read, Write, Bash, AskUserQuestion
+arguments: [{name: domain, type: string, required: false, description: Project domain for research context}]
 ---
 
 <objective>
