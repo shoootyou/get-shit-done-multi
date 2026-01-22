@@ -166,16 +166,23 @@ Plans:
 ### Phase 5: Cross-Platform Testing & Validation
 **Goal:** Every agent verified through actual installation and invocation on both CLIs
 
-**Dependencies:** Phase 4 (needs integrated installation workflow)
+**Dependencies:** Phase 4.1 (needs zero-warnings installation workflow)
 
 **Requirements:** (Validates all previous requirements through runtime testing)
 
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 05-01-PLAN.md — Generation & installation testing
+- [ ] 05-02-PLAN.md — Invocation smoke tests (checkpoint)
+- [ ] 05-03-PLAN.md — E2E orchestrator & documentation
+
 **Success Criteria:**
-1. CI pipeline installs generated agents on both Claude and Copilot platforms
-2. Smoke tests invoke each agent with simple task on both platforms
-3. Test logs verify tools execute correctly (Bash runs, Read accesses files, etc.)
-4. Round-trip validation confirms template → agent → functional behavior
-5. Platform-specific features verified (model selection on Claude, MCP on Copilot)
+1. Generation tests validate all 11 agents render correctly for both platforms
+2. Installation tests validate files land in correct platform directories with correct formatting
+3. Invocation smoke tests call agents via CLI and verify tool execution
+4. E2E test runner orchestrates: generation → installation → invocation → report
+5. Platform-specific features verified (tools string vs array, metadata presence)
 
 ---
 
