@@ -7,11 +7,11 @@
 
 | Test Suite | Tests | Status |
 |------------|-------|--------|
-| tool-mapper | 69 | ✅ PASS |
+| tool-mapper | 64 | ✅ PASS |
 | field-transformer | 20 | ✅ PASS |
-| platform-adapter | 46 | ✅ PASS |
-| integration | 46 | ✅ PASS |
-| **Total** | **181** | **✅ PASS** |
+| validators | 32 | ✅ PASS |
+| integration | 26 | ✅ PASS |
+| **Total** | **142** | **✅ PASS** |
 
 ## Copilot Spec Compliance
 
