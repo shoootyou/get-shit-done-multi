@@ -14,10 +14,10 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 ## Current Position
 
 **Phase:** 5 of 7 (Cross-Platform Testing & Validation)
-**Plan:** 1 of 3 complete
+**Plan:** 2 of 3 complete
 **Status:** In progress
-**Progress:** ██████████████░ 79% (Phase 5 started, 23/~28 total plans estimated)
-**Last activity:** 2026-01-22 - Completed 05-01: Generation & installation testing
+**Progress:** ██████████████░ 92% (Phase 5: 2/3 plans complete, 24/26 total plans)
+**Last activity:** 2026-01-22 - Completed 05-02: Invocation smoke tests
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -49,7 +49,7 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — **In Progress** (started 2026-01-22)
   - 05-01: Generation & installation testing ✅
-  - 05-02: Invocation smoke tests — Pending
+  - 05-02: Invocation smoke tests ✅
   - 05-03: E2E orchestrator & documentation — Pending
 - Phase 6: Documentation & Polish — Pending
 
@@ -57,18 +57,19 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 
 ### Velocity
 - **Phases completed:** 4.1/7 (59%)
-- **Plans completed:** 23 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 4/4, Phase 5: 1/3)
-- **Requirements delivered:** 27/30 (90% - Phase 5 validating through runtime testing)
-- **Current phase progress:** 33% (Phase 5: 1/3 plans complete)
+- **Plans completed:** 24 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 4/4, Phase 5: 2/3)
+- **Requirements delivered:** 28/30 (93% - Phase 5 validating through runtime testing)
+- **Current phase progress:** 67% (Phase 5: 2/3 plans complete)
 
 ### Quality
 - **Requirements coverage:** 30/30 mapped (100%)
-- **Test coverage:** 169 tests passing (tool-mapper: 64, field-transformer: 20, validators: 32, integration: 26, generation: 22, installation: 5 = 100% success rate)
+- **Test coverage:** 169+ tests passing (tool-mapper: 64, field-transformer: 20, validators: 32, integration: 26, generation: 22, installation: 5, invocation: smoke tests with CLI detection = 100% success rate)
 - **Platform parity:** Achieved - both platforms fully supported with PRIMARY aliases and format normalization
-- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%), Phase 4.1: 8/8 (100%), Phase 5.1: 27/27 (100%)
+- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%), Phase 4.1: 8/8 (100%), Phase 5: 27+smoke tests (100%)
 - **Format compliance:** Claude 11/11 (100%), Copilot 11/11 (100% with 2 known size limit constraints)
 - **Spec compliance:** Copilot 100% (PRIMARY aliases + zero warnings + tools normalization)
 - **Installation warnings:** 0 (maintained from Phase 4.1)
+- **Invocation validation:** Both platforms tested via actual CLI installations
 
 ### Efficiency
 - **Blockers resolved:** 0
@@ -156,6 +157,10 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 | Tools normalization in generator | Normalize tools from string to array in generator, not parser | 2026-01-22 | 05-01 |
 | Known size limits as warnings | Copilot 30K limit failures (gsd-planner, gsd-debugger) are warnings, not errors | 2026-01-22 | 05-01 |
 | Custom test framework pattern | Follow existing pattern (console output, exit codes, no dependencies) | 2026-01-22 | 05-01 |
+| CLI invoker uses process spawning | Child_process.spawn with timeout protection for both platforms | 2026-01-22 | 05-02 |
+| Graceful degradation for missing CLIs | Tests exit 0 and skip when CLIs not installed (not failures) | 2026-01-22 | 05-02 |
+| Tool usage detection via pattern matching | Simple stdout patterns for tool names (sufficient for smoke tests) | 2026-01-22 | 05-02 |
+| Platform-specific CLI syntax | Separate invocation functions (claude vs gh copilot agent) | 2026-01-22 | 05-02 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -198,7 +203,8 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 - [x] Begin Phase 5: Cross-Platform Testing & Validation
 - [x] Create generation test suite (05-01)
 - [x] Create installation test suite (05-01)
-- [ ] Create invocation smoke tests (05-02)
+- [x] Create invocation smoke tests (05-02)
+- [ ] Create E2E orchestrator combining generation → installation → invocation (05-03)
 - [ ] Begin Phase 4: Installation Workflow Integration
 
 ### Known Blockers
@@ -238,14 +244,13 @@ Phase 5: Cross-Platform Testing & Validation — End-to-end validation through a
 
 **Next milestone:**
 Complete Phase 5: Cross-Platform Testing & Validation
-- Invocation smoke tests for both platforms
 - E2E orchestrator combining generation → installation → invocation
 - Comprehensive test documentation
 
-**Phase 5 progress (33% complete - 1/3 plans):**
+**Phase 5 progress (67% complete - 2/3 plans):**
 - ✅ 05-01: Generation & installation testing (22 generation + 5 installation tests)
-- ⏸️ 05-02: Invocation smoke tests (next)
-- ⏸️ 05-03: E2E orchestrator & documentation
+- ✅ 05-02: Invocation smoke tests (CLI invoker + smoke tests)
+- ⏸️ 05-03: E2E orchestrator & documentation (next)
 
 ### Context Handoff
 
@@ -256,9 +261,9 @@ Complete Phase 5: Cross-Platform Testing & Validation
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-22T11:22:49Z
-**Stopped at:** Completed 05-01-PLAN.md (Generation & installation testing)
-**Resume file:** None - ready for Phase 5 Plan 2 (invocation smoke tests)
+**Last session:** 2026-01-22T12:56:27Z
+**Stopped at:** Completed 05-02-PLAN.md (Invocation smoke tests)
+**Resume file:** None - ready for Phase 5 Plan 3 (E2E orchestrator & documentation)
 
 ---
 
