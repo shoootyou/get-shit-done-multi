@@ -7,28 +7,15 @@ platforms:
   - claude
   - copilot
   - codex
-tools:
-  - name: task
-    required: true
-    reason: Spawn gsd-phase-researcher agent for ecosystem research
-  - name: read
-    required: true
-    reason: Load phase context and existing research files
-  - name: write
-    required: false
-    reason: Optional - agents write RESEARCH.md directly
-  - name: bash
-    required: true
-    reason: Phase normalization, directory validation, file checks
-arguments:
-  - name: phase
-    type: string
-    required: true
-    description: Phase number or name to research
-metadata:
-  generated: {{generated}}
-  platform: {{platform}}
-  version: {{version}}
+{{#isClaude}}
+tools: [Task, Read, Write, Bash]
+{{/isClaude}}
+{{#isCopilot}}
+tools: [task, read, write, bash]
+{{/isCopilot}}
+{{#isCodex}}
+tools: [Task, Read, Write, Bash]
+{{/isCodex}}
 ---
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
