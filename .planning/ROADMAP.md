@@ -50,13 +50,14 @@ Plans:
   4. Metadata fields auto-generate with correct timestamps and version numbers
   5. All 3 platform adapters (Claude, Copilot, Codex) integrated with skill generation
   6. Test skill (gsd-help) installs successfully on at least one platform
-**Plans**: 4 plans in 3 waves
+**Plans**: 5 plans in 4 waves
 
 Plans:
 - [ ] 02-01-PLAN.md — Create generateSkillsFromSpecs() function (Wave 1)
 - [ ] 02-02-PLAN.md — Implement frontmatter inheritance with _shared.yml (Wave 1)
 - [ ] 02-03-PLAN.md — Integrate skill generation into all 3 platform installers (Wave 2)
 - [ ] 02-04-PLAN.md — End-to-end verification with gsd-help test case (Wave 3 - checkpoint)
+- [ ] 02-05-PLAN.md — Fix skill output structure and safe testing (Wave 4 - gap closure)
 
 ### Phase 3: High-Complexity Orchestrators
 **Goal**: Migrate critical orchestration commands with multi-agent spawning
