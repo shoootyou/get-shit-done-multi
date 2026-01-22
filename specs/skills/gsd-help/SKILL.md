@@ -1,16 +1,6 @@
 ---
 name: gsd-help
 description: Show available GSD commands and usage guide
-
-{{#isClaude}}
-tools: [Read, Bash, Glob]
-{{/isClaude}}
-{{#isCopilot}}
-tools: [file_read, shell_execute, glob]
-{{/isCopilot}}
-{{#isCodex}}
-tools: [read, bash, glob]
-{{/isCodex}}
 ---
 
 <objective>

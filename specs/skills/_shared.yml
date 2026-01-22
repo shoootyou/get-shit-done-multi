@@ -1,13 +1,11 @@
 # Shared frontmatter for GSD skills
 # Skills can inherit these blocks and override specific fields
 
-# Common tools used by most GSD commands
-tools:
-  claude: [Read, Bash, Glob]
-  copilot: [file_read, shell_execute, glob]
-  codex: [read, bash, glob]
-
 # Common metadata (skills can override)
 metadata:
   category: gsd-command
   system: get-shit-done
+
+# NOTE: Tools are NOT included in shared frontmatter
+# Each skill must explicitly declare required tools (principle of least privilege)
+# Most GSD commands are reference/documentation only and need no tools
