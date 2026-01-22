@@ -876,6 +876,23 @@ function installCopilot() {
     failures.push('agents');
   }
 
+  // Generate skills from specs
+  const skillSpecsDir = path.join(src, 'specs', 'skills');
+  const dotGithubDir = path.join(projectDir, '.github');
+  const skillDestDir = path.join(dotGithubDir, 'copilot', 'skills');
+  if (fs.existsSync(skillSpecsDir)) {
+    fs.mkdirSync(skillDestDir, { recursive: true });
+    
+    const skillGenResult = generateSkillsFromSpecs(skillSpecsDir, skillDestDir, 'copilot');
+    
+    if (skillGenResult.failed > 0) {
+      console.log(`  ${yellow}⚠${reset} Skills: ${skillGenResult.generated} generated, ${skillGenResult.failed} failed`);
+      failures.push(`skills (${skillGenResult.failed} generation failures)`);
+    } else if (skillGenResult.generated > 0) {
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+    }
+  }
+
   // Install copilot-instructions.md if none exists
   const instructionsSrc = path.join(src, 'lib-ghcc', 'copilot-instructions.md');
   const instructionsDest = path.join(githubDir, 'copilot-instructions.md');
