@@ -206,11 +206,20 @@ function generateAgent(specPath, platform, options = {}) {
     // Note: context was already built above during template rendering
     // Note: templates already rendered before parsing
     
-    // Step 3: Transform tools to platform-specific names
-    if (spec.frontmatter.tools && Array.isArray(spec.frontmatter.tools)) {
-      try {
-        // Validate tools first to get warnings
-        const toolValidation = validateToolList(spec.frontmatter.tools, platform);
+    // Step 3: Normalize and transform tools to platform-specific names
+    if (spec.frontmatter.tools) {
+      // Normalize tools to array format if it's a string
+      if (typeof spec.frontmatter.tools === 'string') {
+        spec.frontmatter.tools = spec.frontmatter.tools
+          .split(',')
+          .map(t => t.trim())
+          .filter(t => t.length > 0);
+      }
+      
+      if (Array.isArray(spec.frontmatter.tools)) {
+        try {
+          // Validate tools first to get warnings
+          const toolValidation = validateToolList(spec.frontmatter.tools, platform);
         
         // Add validation warnings
         if (toolValidation.warnings && toolValidation.warnings.length > 0) {
@@ -243,6 +252,7 @@ function generateAgent(specPath, platform, options = {}) {
         });
       }
     }
+  }
     
     // Step 4: Transform fields for platform support
     let finalFrontmatter;
