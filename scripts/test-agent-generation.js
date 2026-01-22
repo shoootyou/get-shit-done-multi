@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { generateAgent } = require('./lib/template-system/generator');
+const { generateAgent } = require('../bin/lib/template-system/generator');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');

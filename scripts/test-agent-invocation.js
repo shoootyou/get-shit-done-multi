@@ -6,7 +6,7 @@ const {
   invokeCopilot,
   isClaudeAvailable,
   isCopilotAvailable
-} = require('./lib/test-helpers/cli-invoker');
+} = require('../bin/lib/test-helpers/cli-invoker');
 
 async function runTests() {
   let passed = 0;
