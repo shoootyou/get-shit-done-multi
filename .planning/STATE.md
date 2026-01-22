@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 2 of 8 (Template Engine Integration)
-Plan: Ready for planning
-Status: Phase 1 complete, Phase 2 next
-Last activity: 2026-01-22 — Completed Phase 1 (Foundation & Schema) ✓
+Plan: 2 of 4 (Frontmatter Inheritance)
+Status: Phase 2 in progress
+Last activity: 2026-01-22 — Completed 02-02-PLAN.md
 
-Progress: [██░░░░░░░░] ~12% (1/8 phases)
+Progress: [███░░░░░░░] ~25% (2/8 phases, 4/6 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 12.1 min
-- Total execution time: 0.4 hours
+- Total plans completed: 4
+- Average duration: 8.8 min
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-schema | 2 | 24.3 min | 12.1 min |
+| 02-template-engine-integration | 2 | 6.0 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.3 min, 21.0 min
-- Trend: Building momentum
+- Last 5 plans: 3.3 min, 21.0 min, 2.0 min, 4.0 min
+- Trend: Accelerating (phase 2 plans averaging 3 min vs phase 1 12 min)
 
 *Updated after each plan completion*
 
@@ -55,6 +56,12 @@ Recent decisions affecting current work:
 - **[01-02]** gsd-help as test case (LOW complexity validates architecture without orchestration)
 - **[01-02]** Human verification for first migration (validates schema interpretation and feature parity)
 - **[01-02]** Complete body content preservation (maintains exact feature parity with legacy)
+- **[02-01]** Reuse generateAgent() from template system (proven pattern, 208 passing tests)
+- **[02-01]** Directory scanning for gsd-* folders (matches folder-per-skill pattern)
+- **[02-01]** Folder name becomes output filename (gsd-help → gsd-help.md)
+- **[02-02]** Use _shared.yml with Object.assign() merge (simpler than YAML anchors)
+- **[02-02]** Skill-specific values override shared (clear merge precedence)
+- **[02-02]** Deep merge for objects, array replacement for tools (prevents bloat)
 
 ### Pending Todos
 
@@ -66,6 +73,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-22T19:59:12Z
-Stopped at: Completed 02-01-PLAN.md execution
+Last session: 2026-01-22T19:59:46Z
+Stopped at: Completed 02-02-PLAN.md execution
 Resume file: None
