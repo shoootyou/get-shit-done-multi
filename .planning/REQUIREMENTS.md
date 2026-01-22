@@ -1,92 +1,117 @@
-# Requirements: Multi-Platform Agent Optimization
+# Requirements: GSD Skills Standardization
 
-**Defined:** 2026-01-21
-**Core Value:** Agent definitions use native platform capabilities—Claude and Copilot each get configurations that leverage their specific features through declarative frontmatter, not interpretation.
+**Defined:** 2026-01-22
+**Core Value:** Specs in /specs/skills/ must be single source of truth for GSD commands across 3 platforms (Copilot, Claude, Codex)
 
 ## v1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+Requirements for v1.9.1 release. Each maps to roadmap phases.
 
-### Template Foundation
+### Foundation & Schema
 
-- [x] **TMPL-01**: System uses variable substitution with {{variable}} syntax for platform-specific values
-- [ ] **TMPL-02**: Template system integrates with existing install flags (--copilot, --local, --global)
-- [x] **TMPL-03**: Single source template file per agent (not platform-specific copies)
-- [ ] **TMPL-04**: All 11 agents converted to template format
-- [x] **TMPL-05**: Generated output validated against platform schemas (Claude and Copilot specs)
-- [ ] **TMPL-06**: Files generated using existing adapter logic and folder structure
-- [x] **TMPL-07**: Clear error messages when template invalid or platform unsupported
-- [ ] **TMPL-08**: Re-running install overwrites safely (idempotency)
-- [x] **TMPL-09**: Help documentation for template syntax available to users
+- [ ] **FOUN-01**: Create /specs/skills/ directory structure with README
+- [ ] **FOUN-02**: Define canonical frontmatter schema (name, description, tools, metadata)
+- [ ] **FOUN-03**: Implement conditional syntax support ({{#isClaude}}, {{#isCopilot}}, {{#isCodex}})
+- [ ] **FOUN-04**: Create metadata template with platform, versions, generated fields
+- [ ] **FOUN-05**: Implement folder-per-skill structure (/specs/skills/gsd-[command]/SKILL.md)
+- [ ] **FOUN-06**: Add schema validation with error messages
+- [ ] **FOUN-07**: Support frontmatter inheritance for DRY
+- [ ] **FOUN-08**: Auto-generate metadata fields (timestamps, versions)
 
-### Platform Compliance
+### Command Migration
 
-- [x] **PLAT-01**: Claude agent format validated using https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
-- [x] **PLAT-02**: Copilot agent format generated using https://docs.github.com/en/copilot/reference/custom-agents-configuration
-- [x] **PLAT-03**: Both platforms have equal optimization priority (no compromise)
-- [x] **PLAT-04**: Tool names use correct case sensitivity (Bash, Read, Edit, Grep)
-- [ ] **PLAT-05**: Platform-specific features documented (model, hooks for Claude; mcp-servers for Copilot)
-- [x] **PLAT-06**: Generated agents use YAML frontmatter for both platforms
+- [ ] **MIGR-01**: Audit all 29 commands for dependencies and @-references
+- [ ] **MIGR-02**: Create command name mapping table (gsd: → gsd-)
+- [ ] **MIGR-03**: Migrate 3 LOW complexity commands (help, progress, add-todo)
+- [ ] **MIGR-04**: Migrate 4 MEDIUM complexity commands (plan-phase, research-phase, debug, map-codebase)
+- [ ] **MIGR-05**: Migrate 3 HIGH complexity commands (new-project, execute-phase, new-milestone)
+- [ ] **MIGR-06**: Migrate remaining 19 commands in batch
+- [ ] **MIGR-07**: Preserve @-references functionality across all commands
+- [ ] **MIGR-08**: Maintain multi-section XML structure in all specs
+- [ ] **MIGR-09**: Create batch migration tool for simple commands
+- [ ] **MIGR-10**: Build validation suite (legacy vs new comparison)
+- [ ] **MIGR-11**: Generate migration guide with examples
 
-### Installation Integration
+### Multi-Platform Support
 
-- [ ] **INST-01**: Template system extends existing bin/install.js (not rewrite)
-- [ ] **INST-02**: Template generation respects existing install flags: --copilot (GitHub Copilot to ./.github), --local (Claude to ./.claude), --global (Claude to ~/.claude)
-- [ ] **INST-03**: --all flag reuses other parameters to install optimized agents for all detected CLIs
-- [ ] **INST-04**: Uses existing adapter logic (claudeAdapter, copilotAdapter) for platform-specific paths
-- [ ] **INST-05**: No external dependencies beyond Node.js and existing packages (gray-matter, js-yaml)
-- [ ] **INST-06**: Works with existing CLI detection and adapter system
+- [ ] **PLAT-01**: Add generateSkillsFromSpecs() function to install.js
+- [ ] **PLAT-02**: Integrate skill generation into installClaude()
+- [ ] **PLAT-03**: Integrate skill generation into installCopilot()
+- [ ] **PLAT-04**: Integrate skill generation into installCodex()
+- [ ] **PLAT-05**: Implement tool mapping (Claude tools → platform equivalents)
+- [ ] **PLAT-06**: Support platform-specific content via conditionals
+- [ ] **PLAT-07**: Test installation on Claude Code
+- [ ] **PLAT-08**: Test installation on GitHub Copilot CLI
+- [ ] **PLAT-09**: Test installation on Codex CLI
+- [ ] **PLAT-10**: Add platform detection with graceful fallbacks
+- [ ] **PLAT-11**: Create platform capability matrix documentation
 
-### Agent Preservation
+### Orchestration & Subagents
 
-- [ ] **AGNT-01**: Agent functionality unchanged—only metadata/config optimized
-- [ ] **AGNT-02**: All existing agent capabilities preserved in templates
-- [ ] **AGNT-03**: Agent behavior identical across Claude and Copilot platforms
-- [ ] **AGNT-04**: Existing orchestration system continues to work with generated agents
+- [ ] **ORCH-01**: Verify Task tool spawning works in new format
+- [ ] **ORCH-02**: Test subagent spawning with gsd-project-researcher
+- [ ] **ORCH-03**: Test subagent spawning with gsd-roadmapper
+- [ ] **ORCH-04**: Test subagent spawning with gsd-executor
+- [ ] **ORCH-05**: Test subagent spawning with gsd-planner
+- [ ] **ORCH-06**: Validate structured return parsing in orchestrators
+- [ ] **ORCH-07**: Support agent context passing via @-references
+- [ ] **ORCH-08**: Test parallel subagent spawning (new-project scenario)
 
-### Versioning
+### Testing & Validation
 
-- [ ] **VERS-01**: Package version bumped to 1.8.1 (patch release per semantic versioning)
-- [ ] **VERS-02**: Version metadata embedded in generated agents
-- [ ] **VERS-03**: Changelog documents optimization changes
+- [ ] **TEST-01**: Create Jest test suite for spec parsing
+- [ ] **TEST-02**: Add tests for conditional rendering
+- [ ] **TEST-03**: Add tests for frontmatter validation
+- [ ] **TEST-04**: Add tests for metadata generation
+- [ ] **TEST-05**: Create integration tests for all 3 platforms
+- [ ] **TEST-06**: Test --all flag with parallel installation
+- [ ] **TEST-07**: Test legacy fallback when spec missing
+- [ ] **TEST-08**: Add regression tests for 29 commands
+- [ ] **TEST-09**: Test @-reference resolution with variable interpolation
+- [ ] **TEST-10**: Validate YAML parser compatibility across platforms
+
+### Documentation & Migration
+
+- [ ] **DOCS-01**: Create /specs/skills/README.md with structure explanation
+- [ ] **DOCS-02**: Document frontmatter schema with examples
+- [ ] **DOCS-03**: Document conditional syntax usage
+- [ ] **DOCS-04**: Create migration guide for future commands
+- [ ] **DOCS-05**: Update main README.md with new structure
+- [ ] **DOCS-06**: Document install.js changes
+- [ ] **DOCS-07**: Create troubleshooting guide for common issues
+- [ ] **DOCS-08**: Update CHANGELOG.md with v1.9.1 changes
+- [ ] **DOCS-09**: Document legacy → new spec transition strategy
+- [ ] **DOCS-10**: Create command reference comparison (old vs new)
 
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
-### Enhanced Generation
-
-- **TMPL-10**: Conditional logic for platform-specific sections ({% if platform == "copilot" %})
-- **TMPL-11**: Metadata transformation between YAML and JSON formats
-
-### User Experience
-
-- **UX-01**: Dry-run/preview mode to see output before writing files
-- **UX-02**: Interactive prompts ask user for platform if not specified
-- **UX-03**: Auto-detection of platform from environment
-- **UX-04**: Diff view showing changes from current to new version
-
 ### Advanced Features
 
-- **ADV-01**: Migration tools to convert existing agents to templates
-- **ADV-02**: Template validation linting at development time
-- **ADV-03**: Template inheritance for shared base patterns
-- **ADV-04**: Bidirectional support (update template from modified agent)
+- **ADV-01**: Hot-reload skills without reinstalling
+- **ADV-02**: Skill versioning with compatibility checks
+- **ADV-03**: Skill marketplace/registry support
+- **ADV-04**: Interactive skill tester/debugger
+- **ADV-05**: Skill analytics (usage tracking, performance)
+
+### Automation
+
+- **AUTO-01**: Auto-migration script for legacy commands
+- **AUTO-02**: CI/CD pipeline for spec validation
+- **AUTO-03**: Automated platform testing matrix
+- **AUTO-04**: Auto-sync specs to installed locations
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
 | Feature | Reason |
 |---------|--------|
-| Codex optimization | Deferred to future phase per project scope |
-| Runtime platform detection | Violates "platform-agnostic agent" principle; transform at install-time |
-| Custom template DSL | Learning curve friction; use existing templating patterns |
-| Per-platform template files | Creates maintenance burden (11 agents × 2 platforms = 22 files to sync) |
-| GUI/Interactive editor | CLI-first approach; templates are text files in git |
-| Auto-update of agents | Silent updates without consent; requires explicit user action |
-| Breaking changes | Must remain backward compatible; patch release only |
-| Build step requirement | Preserve simplicity—pure JavaScript, no compilation |
+| Modifying legacy ./commands/gsd/ structure | Coexistence strategy, legacy remains unchanged |
+| Backward compatibility for old installations | New structure is opt-in via fresh install |
+| Skill dependency management | Single-level structure sufficient for v1 |
+| Dynamic skill loading at runtime | Installation-time generation is proven pattern |
+| Graphical skill editor | CLI-first project, text files are primary interface |
+| Support for non-GSD skills | Focused on GSD command migration only |
 
 ## Traceability
 
@@ -94,40 +119,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TMPL-01 | Phase 1 | Complete |
-| TMPL-02 | Phase 4 | Pending |
-| TMPL-03 | Phase 1 | Complete |
-| TMPL-04 | Phase 3 | Pending |
-| TMPL-05 | Phase 1 | Complete |
-| TMPL-06 | Phase 3 | Pending |
-| TMPL-07 | Phase 1 | Complete |
-| TMPL-08 | Phase 4 | Pending |
-| TMPL-09 | Phase 1 | Complete |
-| PLAT-01 | Phase 2 | Complete |
-| PLAT-02 | Phase 2 | Complete |
-| PLAT-03 | Phase 2 | Complete |
-| PLAT-04 | Phase 2 | Complete |
-| PLAT-05 | Phase 6 | Pending |
-| PLAT-06 | Phase 2 | Complete |
-| INST-01 | Phase 4 | Pending |
-| INST-02 | Phase 4 | Pending |
-| INST-03 | Phase 4 | Pending |
-| INST-04 | Phase 4 | Pending |
-| INST-05 | Phase 4 | Pending |
-| INST-06 | Phase 4 | Pending |
-| AGNT-01 | Phase 3 | Pending |
-| AGNT-02 | Phase 3 | Pending |
-| AGNT-03 | Phase 3 | Pending |
-| AGNT-04 | Phase 3 | Pending |
-| VERS-01 | Phase 4 | Pending |
-| VERS-02 | Phase 4 | Pending |
-| VERS-03 | Phase 4 | Pending |
+| (To be filled by roadmapper) | | |
 
 **Coverage:**
-- v1 requirements: 27 total
-- Mapped to phases: 27 (100% ✓)
-- Unmapped: 0
+- v1 requirements: 59 total
+- Mapped to phases: 0 (pending roadmap creation)
+- Unmapped: 59 ⚠️
 
 ---
-*Requirements defined: 2026-01-21*
-*Last updated: 2026-01-21 after initialization*
+*Requirements defined: 2026-01-22*
+*Last updated: 2026-01-22 after initial definition*
