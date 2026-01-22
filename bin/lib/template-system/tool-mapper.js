@@ -37,37 +37,37 @@ const CANONICAL_TOOLS = [
 const TOOL_COMPATIBILITY_MATRIX = {
   'Bash': {
     claude: 'Bash',
-    copilot: 'bash',
-    aliases: ['execute', 'shell', 'Bash', 'powershell'],
+    copilot: 'execute',  // PRIMARY alias (was: 'bash')
+    aliases: ['execute', 'bash', 'shell', 'Bash', 'powershell'],
     safe: true,
   },
   'Read': {
     claude: 'Read',
-    copilot: 'read',
-    aliases: ['Read', 'view', 'NotebookRead'],
+    copilot: 'read',  // Already PRIMARY
+    aliases: ['Read', 'read', 'view', 'NotebookRead'],
     safe: true,
   },
   'Edit': {
     claude: 'Edit',
-    copilot: 'edit',
-    aliases: ['Edit', 'edit', 'Write', 'MultiEdit', 'create'],
+    copilot: 'edit',  // PRIMARY alias (replaces 'write')
+    aliases: ['Edit', 'edit', 'Write', 'write', 'MultiEdit', 'create'],
     safe: true,
   },
   'Grep': {
     claude: 'Grep',
-    copilot: 'grep',
+    copilot: 'search',  // PRIMARY alias (was: 'grep')
     aliases: ['Grep', 'grep', 'search'],
     safe: true,
   },
   'Glob': {
     claude: 'Glob',
-    copilot: 'glob',
+    copilot: 'search',  // PRIMARY - DEDUPLICATES with Grep
     aliases: ['Glob', 'glob'],
     safe: true,
   },
   'Task': {
     claude: 'Task',
-    copilot: 'task',
+    copilot: 'agent',  // PRIMARY alias (was: 'task')
     aliases: ['Task', 'task', 'agent', 'custom-agent'],
     safe: true,
     warning: 'Task invocation may have different agent types available per platform',
@@ -96,19 +96,62 @@ const TOOL_COMPATIBILITY_MATRIX = {
 };
 
 /**
- * Maps an array of canonical tool names to platform-specific format.
+ * Reverse index mapping all tool name variants to canonical names.
+ * Built at module load time from TOOL_COMPATIBILITY_MATRIX.
+ * Enables bidirectional lookup: accepts uppercase, lowercase, aliases → returns canonical.
  * 
- * @param {string[]} toolArray - Array of canonical tool names
+ * @constant {Object.<string, string>}
+ */
+const REVERSE_TOOL_INDEX = {};
+
+// Build reverse index at module load time
+for (const [canonical, config] of Object.entries(TOOL_COMPATIBILITY_MATRIX)) {
+  // Canonical name itself (uppercase and lowercase)
+  REVERSE_TOOL_INDEX[canonical] = canonical;
+  REVERSE_TOOL_INDEX[canonical.toLowerCase()] = canonical;
+  
+  // Claude name (case-sensitive)
+  if (config.claude) {
+    REVERSE_TOOL_INDEX[config.claude] = canonical;
+    REVERSE_TOOL_INDEX[config.claude.toLowerCase()] = canonical;
+  }
+  
+  // Copilot name (case-insensitive)
+  if (config.copilot) {
+    REVERSE_TOOL_INDEX[config.copilot] = canonical;
+    REVERSE_TOOL_INDEX[config.copilot.toLowerCase()] = canonical;
+  }
+  
+  // All aliases (case-insensitive)
+  config.aliases.forEach(alias => {
+    REVERSE_TOOL_INDEX[alias] = canonical;
+    REVERSE_TOOL_INDEX[alias.toLowerCase()] = canonical;
+  });
+}
+
+/**
+ * Maps an array of tool names (canonical, aliases, any case) to platform-specific format.
+ * 
+ * Uses REVERSE_TOOL_INDEX for bidirectional lookup:
+ * 1. Resolve input tool name (any variant) to canonical name
+ * 2. Map canonical to platform-specific PRIMARY name
+ * 3. Deduplicate for Copilot (Grep+Glob both → 'search')
+ * 
+ * @param {string[]} toolArray - Array of tool names (any variant: canonical, alias, any case)
  * @param {'claude'|'copilot'} platform - Target platform
- * @returns {string[]} Array of platform-specific tool names
+ * @returns {string[]} Array of platform-specific tool names (PRIMARY aliases for Copilot)
  * 
  * @example
  * mapTools(['Bash', 'Read', 'Edit'], 'claude')
  * // Returns: ['Bash', 'Read', 'Edit']
  * 
  * @example
- * mapTools(['Bash', 'Read', 'Edit'], 'copilot')
- * // Returns: ['bash', 'read', 'edit']
+ * mapTools(['bash', 'read', 'edit'], 'copilot')
+ * // Returns: ['execute', 'read', 'edit']
+ * 
+ * @example
+ * mapTools(['Grep', 'Glob'], 'copilot')
+ * // Returns: ['search'] (deduplicated)
  */
 function mapTools(toolArray, platform) {
   if (!Array.isArray(toolArray)) {
@@ -119,17 +162,27 @@ function mapTools(toolArray, platform) {
     throw new Error('platform must be "claude" or "copilot"');
   }
   
-  return toolArray.map(tool => {
-    const compatibility = TOOL_COMPATIBILITY_MATRIX[tool];
+  const mapped = toolArray.map(tool => {
+    // 1. Resolve to canonical name via REVERSE_INDEX
+    const canonical = REVERSE_TOOL_INDEX[tool];
     
-    if (!compatibility) {
+    if (!canonical) {
       // Unknown tool - pass through unchanged with warning
       console.warn(`Warning: Unknown tool "${tool}" - passing through unchanged`);
       return tool;
     }
     
+    // 2. Map canonical to platform-specific PRIMARY name
+    const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
     return platform === 'claude' ? compatibility.claude : compatibility.copilot;
   }).filter(tool => tool !== null); // Remove tools not available on platform
+  
+  // 3. Deduplicate for Copilot (Grep + Glob both → 'search')
+  if (platform === 'copilot') {
+    return [...new Set(mapped)];
+  }
+  
+  return mapped;
 }
 
 /**
@@ -240,6 +293,7 @@ function validateToolList(tools, platform) {
 module.exports = {
   CANONICAL_TOOLS,
   TOOL_COMPATIBILITY_MATRIX,
+  REVERSE_TOOL_INDEX,
   mapTools,
   getToolCompatibility,
   validateToolList,
