@@ -8,6 +8,56 @@
 const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
+const yaml = require('js-yaml');
+
+/**
+ * Load shared frontmatter from _shared.yml if it exists
+ * @param {string} specPath - Path to the spec file
+ * @returns {object|null} Shared frontmatter or null if not found
+ */
+function loadSharedFrontmatter(specPath) {
+  // Look for _shared.yml in spec's parent directory
+  const parentDir = path.dirname(path.dirname(specPath)); // Go up to specs/skills/
+  const sharedPath = path.join(parentDir, '_shared.yml');
+  
+  if (fs.existsSync(sharedPath)) {
+    try {
+      const content = fs.readFileSync(sharedPath, 'utf8');
+      return yaml.load(content);
+    } catch (err) {
+      // Silently ignore parse errors in _shared.yml
+      console.warn(`Warning: Failed to parse _shared.yml: ${err.message}`);
+      return null;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Merge shared frontmatter with skill-specific frontmatter
+ * Skill-specific values override shared values (deep merge for objects)
+ * @param {object} shared - Shared frontmatter from _shared.yml
+ * @param {object} specific - Skill-specific frontmatter
+ * @returns {object} Merged frontmatter
+ */
+function mergeFrontmatter(shared, specific) {
+  if (!shared) return specific;
+  
+  const merged = { ...shared };
+  
+  // Deep merge for nested objects (like metadata)
+  for (const key in specific) {
+    if (specific[key] && typeof specific[key] === 'object' && !Array.isArray(specific[key])) {
+      merged[key] = { ...(merged[key] || {}), ...specific[key] };
+    } else {
+      // Direct override for primitives and arrays
+      merged[key] = specific[key];
+    }
+  }
+  
+  return merged;
+}
 
 /**
  * Parse a spec file from filesystem path
@@ -38,8 +88,12 @@ function parseSpec(filePath) {
     // Use gray-matter to read and parse file
     const result = matter.read(absolutePath);
     
+    // Load and merge shared frontmatter
+    const shared = loadSharedFrontmatter(absolutePath);
+    const frontmatter = mergeFrontmatter(shared, result.data);
+    
     return {
-      frontmatter: result.data,
+      frontmatter,  // Use merged frontmatter instead of result.data
       body: result.content,
       path: absolutePath
     };
