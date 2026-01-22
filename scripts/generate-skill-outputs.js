@@ -154,12 +154,16 @@ function generateOutput(specPath, platform) {
   // Build clean frontmatter
   const cleanFrontmatter = [
     'name: ' + name,
-    'description: ' + description,
-    'tools: [' + tools.join(', ') + ']'
-  ].join('\n');
+    'description: ' + description
+  ];
+  
+  // Only add tools if they exist
+  if (tools && tools.length > 0) {
+    cleanFrontmatter.push('tools: [' + tools.join(', ') + ']');
+  }
   
   // Combine
-  return `---\n${cleanFrontmatter}\n---\n${processedBody}`;
+  return `---\n${cleanFrontmatter.join('\n')}\n---\n${processedBody}`;
 }
 
 /**
@@ -187,7 +191,8 @@ function generateSkill(skillName) {
         'test-output', 
         platform.name, 
         'skills',
-        `${skillName}.md`
+        skillName,
+        'SKILL.md'
       );
       
       // Ensure directory exists
