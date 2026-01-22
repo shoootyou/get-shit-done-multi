@@ -6,7 +6,7 @@ metadata:
   platform: copilot
   generated: '2026-01-22'
   templateVersion: 1.0.0
-  projectVersion: 1.8.1
+  projectVersion: 1.9.0
   projectName: 'get-shit-done-multi'
 ---
 

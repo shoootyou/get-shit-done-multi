@@ -8,7 +8,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### For Users
 
-- **Zero installation warnings** - Clean install across all platforms
 - **Better GitHub Copilot compatibility** - Agents optimized for Copilot's size limits and tool requirements
 - **No action required** - Agents regenerate automatically on install/upgrade, behavior unchanged
 - **Idempotent installation** - Safe to re-run install multiple times
@@ -20,7 +19,6 @@ Internal optimization release focused on platform-specific agent generation:
 - Template-based generation system replacing static agent files
 - Platform abstraction layer for Claude/Copilot compatibility (bidirectional tool mapping)
 - Agent splitting pattern for large agents (gsd-planner, gsd-debugger now coordinator/specialist pairs)
-- Comprehensive test suite with 208 tests covering generation, installation, and invocation
 - Documentation: [architecture.md](docs/architecture.md), [contributing.md](docs/contributing.md), [troubleshooting.md](docs/troubleshooting.md)
 
 ## [1.8.0] - 2026-01-20
