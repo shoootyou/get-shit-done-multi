@@ -484,12 +484,10 @@ tools: ['bash', 'read']
   const specPath = path.join(testDir, 'test-spec-14.md');
   fs.writeFileSync(specPath, specContent);
   
-  // Lowercase tools should fail Claude validation
+  // Lowercase tools should be accepted via REVERSE_INDEX mapping
   const result = generateAgent(specPath, 'claude', { workDir: '/workspace' });
-  assert.strictEqual(result.success, false, 'Lowercase tools should fail Claude validation');
-  assert.ok(result.errors.some(e => 
-    e.field === 'tools' && e.message.includes('case')
-  ), 'Should error about tool case');
+  assert.strictEqual(result.success, true, 'REVERSE_INDEX should accept lowercase and map to uppercase');
+  assert.strictEqual(result.errors.length, 0, 'Should have no errors');
   
   console.log('  ✓ Field validation integration test passed\n');
 }
