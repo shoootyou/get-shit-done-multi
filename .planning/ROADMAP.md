@@ -33,10 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Metadata template exists with platform, versions, generated timestamp fields
   4. Test skill (gsd-help) successfully migrated to folder structure `/specs/skills/gsd-help/SKILL.md`
   5. Command name mapping table created documenting all 29 commands (gsd: → gsd-)
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 01-01-PLAN.md — Foundation structure, canonical schema, command mapping (Wave 1)
+- [ ] 01-02-PLAN.md — Test migration of gsd-help with human verification (Wave 2)
 
 ### Phase 2: Template Engine Integration
 **Goal**: Extend install.js to generate skills from specs using existing template system
