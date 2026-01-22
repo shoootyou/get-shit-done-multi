@@ -295,6 +295,80 @@ function generateAgentsFromSpecs(specsDir, outputDir, platform) {
 }
 
 /**
+ * Generate skills from /specs/skills/ directory (folder-per-skill structure)
+ * 
+ * Each skill is a directory matching the pattern gsd-* containing SKILL.md
+ * Example: specs/skills/gsd-help/SKILL.md
+ * 
+ * @param {string} specsDir - Path to specs/skills directory
+ * @param {string} outputDir - Output directory for generated skills
+ * @param {string} platform - Target platform (claude|copilot|codex)
+ * @returns {Object} { generated: number, failed: number, errors: Array }
+ */
+function generateSkillsFromSpecs(specsDir, outputDir, platform) {
+  const errors = [];
+  let generated = 0;
+  let failed = 0;
+
+  try {
+    // Ensure output directory exists
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    // Read all skill directories (folder-per-skill pattern)
+    const skillDirs = fs.readdirSync(specsDir)
+      .filter(name => {
+        const fullPath = path.join(specsDir, name);
+        return fs.statSync(fullPath).isDirectory() && name.startsWith('gsd-');
+      });
+
+    for (const skillDir of skillDirs) {
+      const specPath = path.join(specsDir, skillDir, 'SKILL.md');
+      
+      if (!fs.existsSync(specPath)) {
+        console.log(`  ${yellow}⚠${reset} Skipping ${skillDir}: no SKILL.md found`);
+        continue;
+      }
+      
+      try {
+        // Generate skill using template system (reuses existing generateAgent)
+        const result = generateAgent(specPath, platform);
+        
+        if (result.success) {
+          // Output name: gsd-help.md (folder name + .md)
+          const outputName = `${skillDir}.md`;
+          const outputPath = path.join(outputDir, outputName);
+          fs.writeFileSync(outputPath, result.output, 'utf8');
+          generated++;
+          
+          // Log warnings if any
+          if (result.warnings && result.warnings.length > 0) {
+            result.warnings.forEach(warning => {
+              console.log(`  ${yellow}⚠${reset} ${skillDir}: ${warning.message || warning}`);
+            });
+          }
+        } else {
+          failed++;
+          const errorMsg = result.errors && result.errors.length > 0
+            ? result.errors.map(e => e.message).join(', ')
+            : 'Unknown error';
+          errors.push({ file: skillDir, error: errorMsg });
+          console.error(`  ${yellow}✗${reset} Failed to generate ${skillDir}: ${errorMsg}`);
+        }
+      } catch (err) {
+        failed++;
+        errors.push({ file: skillDir, error: err.message });
+        console.error(`  ${yellow}✗${reset} Error generating ${skillDir}: ${err.message}`);
+      }
+    }
+  } catch (err) {
+    errors.push({ error: `Failed to read specs directory: ${err.message}` });
+    console.error(`  ${yellow}✗${reset} Failed to read specs directory: ${err.message}`);
+  }
+
+  return { generated, failed, errors };
+}
+
+/**
  * Clean up orphaned files from previous GSD versions
  */
 function cleanupOrphanedFiles(claudeDir) {
