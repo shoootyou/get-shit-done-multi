@@ -81,6 +81,10 @@ Recent decisions affecting current work:
 - **[03-01]** STATE.md is most critical dependency (16 command references - breaking it cascades failures)
 - **[03-01]** Orchestrators can migrate before their subagents (subagents are separate specs, not in Phase 3)
 - **[03-01]** Validation script skips variable references but reports missing files (14 legacy structure refs expected)
+- **[03-02]** Claude platform doesn't support metadata fields in frontmatter (unlike Copilot)
+- **[03-02]** Tools must be simple arrays, not object arrays with name/required/reason
+- **[03-02]** Platform-specific tool conditionals using {{#isClaude}}/{{#isCopilot}}/{{#isCodex}}
+- **[03-02]** Skills directory is .claude/skills/ not .claude/ root
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-22T21:32:40Z
-Stopped at: Completed 03-01-PLAN.md (dependency audit)
+Last session: 2026-01-22T21:33:06Z
+Stopped at: Completed 03-02-PLAN.md (execute-phase migration)
 Resume file: None
