@@ -243,7 +243,22 @@ function mapTools(toolArray, platform) {
  * // Returns: { isCanonical: true, claudeName: 'Bash', copilotName: 'bash', safe: true, ... }
  */
 function getToolCompatibility(toolName) {
-  const compatibility = TOOL_COMPATIBILITY_MATRIX[toolName];
+  // Resolve tool name to canonical via REVERSE_INDEX (handles any case, aliases)
+  const canonical = REVERSE_TOOL_INDEX[toolName];
+  
+  if (!canonical) {
+    return {
+      isCanonical: false,
+      claudeName: null,
+      copilotName: null,
+      safe: false,
+      aliases: [],
+      warning: `Unknown tool: "${toolName}" is not in the compatibility matrix`,
+    };
+  }
+  
+  // Look up canonical name in compatibility matrix
+  const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
   
   if (!compatibility) {
     return {
@@ -257,7 +272,7 @@ function getToolCompatibility(toolName) {
   }
   
   return {
-    isCanonical: CANONICAL_TOOLS.includes(toolName),
+    isCanonical: CANONICAL_TOOLS.includes(canonical),
     claudeName: compatibility.claude,
     copilotName: compatibility.copilot,
     safe: compatibility.safe,
@@ -305,7 +320,16 @@ function validateToolList(tools, platform) {
   const errors = [];
   
   tools.forEach(tool => {
-    const compatibility = TOOL_COMPATIBILITY_MATRIX[tool];
+    // Resolve tool name to canonical via REVERSE_INDEX (handles any case, aliases)
+    const canonical = REVERSE_TOOL_INDEX[tool];
+    
+    if (!canonical) {
+      warnings.push(`Unknown tool: "${tool}" is not in the compatibility matrix`);
+      return;
+    }
+    
+    // Now look up canonical name in compatibility matrix
+    const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
     
     if (!compatibility) {
       warnings.push(`Unknown tool: "${tool}" is not in the compatibility matrix`);
