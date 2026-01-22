@@ -88,10 +88,14 @@ Plans:
   3. Argument handling preserved (--research, --gaps-only, etc.)
   4. Process subsections (<phase>, <step>) maintained in structure
   5. Embedded bash validation blocks preserved and functional
-**Plans**: TBD
+**Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 04-01-PLAN.md — Migrate research-phase (checkpoint continuation pattern)
+- [ ] 04-02-PLAN.md — Migrate map-codebase (prose → explicit parallel spawns)
+- [ ] 04-03-PLAN.md — Migrate debug (session persistence)
+- [ ] 04-04-PLAN.md — Migrate plan-phase (verification loop, 4 flags, most complex)
+- [ ] 04-05-PLAN.md — E2E verification checkpoint (test all 4 commands)
 
 ### Phase 5: Simple Command Migration
 **Goal**: Bulk migrate remaining 19 single-stage commands with no orchestration
