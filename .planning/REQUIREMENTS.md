@@ -119,13 +119,70 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| FOUN-01 | Phase 1 | Pending |
+| FOUN-02 | Phase 1 | Pending |
+| FOUN-03 | Phase 2 | Pending |
+| FOUN-04 | Phase 1 | Pending |
+| FOUN-05 | Phase 1 | Pending |
+| FOUN-06 | Phase 7 | Pending |
+| FOUN-07 | Phase 2 | Pending |
+| FOUN-08 | Phase 2 | Pending |
+| MIGR-01 | Phase 3 | Pending |
+| MIGR-02 | Phase 1 | Pending |
+| MIGR-03 | Phase 5 | Pending |
+| MIGR-04 | Phase 4 | Pending |
+| MIGR-05 | Phase 3 | Pending |
+| MIGR-06 | Phase 5 | Pending |
+| MIGR-07 | Phase 3, 4, 5 | Pending |
+| MIGR-08 | Phase 3, 4, 5 | Pending |
+| MIGR-09 | Phase 5 | Pending |
+| MIGR-10 | Phase 6 | Pending |
+| MIGR-11 | Phase 8 | Pending |
+| PLAT-01 | Phase 2 | Pending |
+| PLAT-02 | Phase 2 | Pending |
+| PLAT-03 | Phase 2 | Pending |
+| PLAT-04 | Phase 2 | Pending |
+| PLAT-05 | Phase 7 | Pending |
+| PLAT-06 | Phase 7 | Pending |
+| PLAT-07 | Phase 7 | Pending |
+| PLAT-08 | Phase 7 | Pending |
+| PLAT-09 | Phase 7 | Pending |
+| PLAT-10 | Phase 7 | Pending |
+| PLAT-11 | Phase 7 | Pending |
+| ORCH-01 | Phase 3 | Pending |
+| ORCH-02 | Phase 3 | Pending |
+| ORCH-03 | Phase 3 | Pending |
+| ORCH-04 | Phase 3 | Pending |
+| ORCH-05 | Phase 3 | Pending |
+| ORCH-06 | Phase 4, 6 | Pending |
+| ORCH-07 | Phase 4 | Pending |
+| ORCH-08 | Phase 6 | Pending |
+| TEST-01 | Phase 7 | Pending |
+| TEST-02 | Phase 7 | Pending |
+| TEST-03 | Phase 7 | Pending |
+| TEST-04 | Phase 7 | Pending |
+| TEST-05 | Phase 7 | Pending |
+| TEST-06 | Phase 7 | Pending |
+| TEST-07 | Phase 7 | Pending |
+| TEST-08 | Phase 7 | Pending |
+| TEST-09 | Phase 6 | Pending |
+| TEST-10 | Phase 7 | Pending |
+| DOCS-01 | Phase 8 | Pending |
+| DOCS-02 | Phase 8 | Pending |
+| DOCS-03 | Phase 8 | Pending |
+| DOCS-04 | Phase 8 | Pending |
+| DOCS-05 | Phase 8 | Pending |
+| DOCS-06 | Phase 8 | Pending |
+| DOCS-07 | Phase 8 | Pending |
+| DOCS-08 | Phase 8 | Pending |
+| DOCS-09 | Phase 8 | Pending |
+| DOCS-10 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 59 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 59 ⚠️
+- Mapped to phases: 59 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-22 after initial definition*
+*Last updated: 2026-01-22 after roadmap creation - all 59 requirements mapped to phases*
