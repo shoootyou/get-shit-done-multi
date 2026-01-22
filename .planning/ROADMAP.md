@@ -13,7 +13,7 @@ Transform 29 GSD commands from legacy format to unified multi-platform specs in 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Schema** - Establish spec structure and prove architecture
-- [ ] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
+- [x] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
 - [ ] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
 - [ ] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
@@ -53,11 +53,11 @@ Plans:
 **Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Create generateSkillsFromSpecs() function (Wave 1)
-- [ ] 02-02-PLAN.md — Implement frontmatter inheritance with _shared.yml (Wave 1)
-- [ ] 02-03-PLAN.md — Integrate skill generation into all 3 platform installers (Wave 2)
-- [ ] 02-04-PLAN.md — End-to-end verification with gsd-help test case (Wave 3 - checkpoint)
-- [ ] 02-05-PLAN.md — Fix skill output structure and safe testing (Wave 4 - gap closure)
+- [x] 02-01-PLAN.md — Create generateSkillsFromSpecs() function (Wave 1)
+- [x] 02-02-PLAN.md — Implement frontmatter inheritance with _shared.yml (Wave 1)
+- [x] 02-03-PLAN.md — Integrate skill generation into all 3 platform installers (Wave 2)
+- [x] 02-04-PLAN.md — End-to-end verification with gsd-help test case (Wave 3 - checkpoint)
+- [x] 02-05-PLAN.md — Fix skill output structure and safe testing (Wave 4 - gap closure)
 
 ### Phase 3: High-Complexity Orchestrators
 **Goal**: Migrate critical orchestration commands with multi-agent spawning

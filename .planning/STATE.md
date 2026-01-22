@@ -19,20 +19,20 @@ Progress: [███░░░░░░░] ~32% (2/8 phases, 6/6 plans total)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 6.8 min
-- Total execution time: 0.7 hours
+- Total plans completed: 7
+- Average duration: 5.4 min
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-schema | 2 | 24.3 min | 12.1 min |
-| 02-template-engine-integration | 4 | 11.1 min | 2.8 min |
+| 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 2.0 min, 4.0 min, 2.1 min, 3.0 min (02-05)
-- Trend: Accelerating (phase 2 plans averaging 2.8 min vs phase 1 12.1 min)
+- Last 5 plans: 2.0 min, 4.0 min, 2.1 min, 3.0 min, 3.0 min (02-05)
+- Trend: Efficient execution with gap closure
 
 *Updated after each plan completion*
 
@@ -56,6 +56,13 @@ Recent decisions affecting current work:
 - **[01-02]** gsd-help as test case (LOW complexity validates architecture without orchestration)
 - **[01-02]** Human verification for first migration (validates schema interpretation and feature parity)
 - **[01-02]** Complete body content preservation (maintains exact feature parity with legacy)
+- **[02-01]** generateSkillsFromSpecs() reuses generateAgent() (proven pattern, no duplication)
+- **[02-01]** Fail-soft skill generation (errors don't block installation)
+- **[02-02]** Frontmatter inheritance with _shared.yml (eliminates duplication across 29 specs)
+- **[02-02]** Skill-specific values override shared (correct merge precedence)
+- **[02-04]** Codex platform requires full support (added to template system)
+- **[02-05]** Folder/SKILL.md structure is mandatory (follows Claude documentation spec)
+- **[02-05]** Testing must use test-output/ only (never modify protected directories)
 - **[02-01]** Reuse generateAgent() from template system (proven pattern, 208 passing tests)
 - **[02-01]** Directory scanning for gsd-* folders (matches folder-per-skill pattern)
 - **[02-01]** Folder name becomes output filename (gsd-help → gsd-help.md)

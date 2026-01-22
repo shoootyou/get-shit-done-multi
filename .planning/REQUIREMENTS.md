@@ -121,12 +121,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | FOUN-01 | Phase 1 | Complete|
 | FOUN-02 | Phase 1 | Complete|
-| FOUN-03 | Phase 2 | Pending |
+| FOUN-03 | Phase 2 | Complete|
 | FOUN-04 | Phase 1 | Complete|
 | FOUN-05 | Phase 1 | Complete|
 | FOUN-06 | Phase 7 | Pending |
-| FOUN-07 | Phase 2 | Pending |
-| FOUN-08 | Phase 2 | Pending |
+| FOUN-07 | Phase 2 | Complete|
+| FOUN-08 | Phase 2 | Complete|
 | MIGR-01 | Phase 3 | Pending |
 | MIGR-02 | Phase 1 | Complete|
 | MIGR-03 | Phase 5 | Pending |
@@ -138,10 +138,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIGR-09 | Phase 5 | Pending |
 | MIGR-10 | Phase 6 | Pending |
 | MIGR-11 | Phase 8 | Pending |
-| PLAT-01 | Phase 2 | Pending |
-| PLAT-02 | Phase 2 | Pending |
-| PLAT-03 | Phase 2 | Pending |
-| PLAT-04 | Phase 2 | Pending |
+| PLAT-01 | Phase 2 | Complete|
+| PLAT-02 | Phase 2 | Complete|
+| PLAT-03 | Phase 2 | Complete|
+| PLAT-04 | Phase 2 | Complete|
 | PLAT-05 | Phase 7 | Pending |
 | PLAT-06 | Phase 7 | Pending |
 | PLAT-07 | Phase 7 | Pending |
