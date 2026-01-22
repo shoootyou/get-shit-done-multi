@@ -208,6 +208,12 @@ function mapTools(toolArray, platform) {
     const canonical = REVERSE_TOOL_INDEX[tool];
     
     if (!canonical) {
+      // Check if it's an MCP tool pattern (mcp__*__*)
+      if (tool.startsWith('mcp__') && tool.includes('__', 5)) {
+        // MCP tools are dynamic and platform-specific, pass through silently
+        return tool;
+      }
+      
       // Unknown tool - pass through unchanged with warning
       console.warn(`Warning: Unknown tool "${tool}" - passing through unchanged`);
       return tool;
@@ -324,6 +330,12 @@ function validateToolList(tools, platform) {
     const canonical = REVERSE_TOOL_INDEX[tool];
     
     if (!canonical) {
+      // Check if it's an MCP tool pattern (mcp__*__*)
+      if (tool.startsWith('mcp__') && tool.includes('__', 5)) {
+        // MCP tools are dynamic and platform-specific, don't warn
+        return;
+      }
+      
       warnings.push(`Unknown tool: "${tool}" is not in the compatibility matrix`);
       return;
     }
@@ -343,8 +355,23 @@ function validateToolList(tools, platform) {
       return;
     }
     
+    // Only warn about cross-platform compatibility if warning is relevant:
+    // - When generating for Claude: Don't warn about "Claude-specific" or "Claude-only" tools
+    // - When generating for Copilot: Don't warn about "Copilot-specific" tools
+    // - Always warn about cross-platform compatibility suggestions
     if (!compatibility.safe && compatibility.warning) {
-      warnings.push(`${tool}: ${compatibility.warning}`);
+      const warningLower = compatibility.warning.toLowerCase();
+      
+      // Skip warning if it's about the CURRENT platform's limitations
+      // (e.g., don't warn "Claude-only" when generating FOR Claude)
+      const isCurrentPlatformWarning = 
+        (platform === 'claude' && (warningLower.includes('claude-specific') || warningLower.includes('claude-only') || warningLower.includes('claude is'))) ||
+        (platform === 'copilot' && (warningLower.includes('copilot-specific') || warningLower.includes('copilot-only')));
+      
+      // Only add warning if it's NOT about the current platform
+      if (!isCurrentPlatformWarning) {
+        warnings.push(`${tool}: ${compatibility.warning}`);
+      }
     }
   });
   

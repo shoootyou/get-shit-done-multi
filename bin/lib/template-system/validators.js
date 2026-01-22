@@ -85,6 +85,11 @@ function validateClaudeSpec(frontmatter) {
 
       // Validate tool names are case-correct (Pitfall 1)
       toolsArray.forEach(tool => {
+        // Skip MCP tool patterns (mcp__*__*) - these are dynamic and platform-specific
+        if (tool.startsWith('mcp__') && tool.includes('__', 5)) {
+          return;
+        }
+        
         const toolInfo = TOOL_COMPATIBILITY_MATRIX[tool];
         
         if (!toolInfo) {
@@ -110,13 +115,9 @@ function validateClaudeSpec(frontmatter) {
             field: 'tools', 
             message: `Tool name "${tool}" incorrect. Use "${toolInfo.claude}" for Claude.` 
           });
-        } else if (toolInfo.safe === false && toolInfo.copilot === null) {
-          // Claude-only tool
-          warnings.push({ 
-            field: 'tools', 
-            message: `Tool "${tool}" is Claude-only. ${toolInfo.warning || ''}` 
-          });
         }
+        // Don't warn about Claude-only tools when generating FOR Claude
+        // The warning "Tool is Claude-only" is for Copilot users, not Claude users
       });
     }
   }

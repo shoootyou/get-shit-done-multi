@@ -161,11 +161,24 @@ test('validateToolList errors for Claude-only tools on Copilot', () => {
   assert.ok(result.errors[0].includes('not available on copilot'));
 });
 
-test('validateToolList warns for risky tools', () => {
-  const result = validateToolList(['Write'], 'claude');
-  assert.strictEqual(result.valid, true); // Valid but warned
+test('validateToolList warns for risky tools on wrong platform', () => {
+  // When using Write (Claude-specific) to generate for Copilot, should warn
+  const result = validateToolList(['write'], 'copilot');
+  assert.strictEqual(result.valid, true); // Valid but warned (Write maps to Edit on Copilot)
   assert.ok(result.warnings.length > 0);
-  assert.ok(result.warnings[0].includes('Claude-specific'));
+  assert.ok(result.warnings[0].includes('Claude-specific') || result.warnings[0].includes('cross-platform'));
+});
+
+test('validateToolList does NOT warn about platform-specific tools on their own platform', () => {
+  // When using Write on Claude (where it's native), should NOT warn
+  const resultClaude = validateToolList(['Write'], 'claude');
+  assert.strictEqual(resultClaude.valid, true);
+  assert.strictEqual(resultClaude.warnings.length, 0); // No warnings on native platform
+  
+  // When using Read on Copilot (where it's native), should NOT warn
+  const resultCopilot = validateToolList(['read'], 'copilot');
+  assert.strictEqual(resultCopilot.valid, true);
+  assert.strictEqual(resultCopilot.warnings.length, 0); // No warnings for standard tools
 });
 
 test('validateToolList warns for unknown tools', () => {
