@@ -790,8 +790,8 @@ gh copilot agent my-agent --model gpt-4o "prompt"
 
 Before filing an issue, review these resources:
 
-1. **[ARCHITECTURE.md](../ARCHITECTURE.md)** - Technical design and implementation details
-2. **[CONTRIBUTING.md](../CONTRIBUTING.md)** - How to add agents and run tests
+1. **[architecture.md](architecture.md)** - Technical design and implementation details
+2. **[contributing.md](contributing.md)** - How to add agents and run tests
 3. **[TESTING-CROSS-PLATFORM.md](TESTING-CROSS-PLATFORM.md)** - Test suite documentation
 4. **[AGENT-SPLIT-PATTERN.md](AGENT-SPLIT-PATTERN.md)** - Size optimization pattern
 5. **[README.md](../README.md)** - Project overview and quick start

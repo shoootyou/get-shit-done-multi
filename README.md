@@ -8,7 +8,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/get-shit-done-multi?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-multi)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-**v2.0 Multi-Platform:** Template-based optimization for Claude Code · GitHub Copilot CLI · Codex CLI
+**Multi-Platform:** Template-based optimization for Claude Code · GitHub Copilot CLI · Codex CLI
 
 **Original project by:** [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done)
 
@@ -29,9 +29,9 @@ GSD transforms vibecoding chaos into reliable, reproducible development:
 
 ---
 
-## What's New in v2.0 🚀
+## What's New in v1.9 ✨
 
-**Major Release:** Template-based multi-platform optimization
+**Internal Optimization:** Template-based agent generation for better platform support
 
 - **Platform Optimization** — Each CLI gets agents optimized for its spec (Claude: string tools, Copilot: array tools + PRIMARY aliases)
 - **Single Source of Truth** — Agents generated from specs/agents/ templates (no drift between platforms)
@@ -39,7 +39,7 @@ GSD transforms vibecoding chaos into reliable, reproducible development:
 - **Complete Testing** — 208 tests validate generation, installation, and invocation
 - **Better Maintainability** — Edit one spec, generate optimized agents for all platforms
 
-**Breaking Change:** Agents now generated during installation. See [MIGRATION-V2.md](docs/MIGRATION-V2.md) if upgrading from v1.x.
+**Note:** Agents are now generated during installation. Re-run install to regenerate agents. Agent behavior is identical - this is an internal optimization only.
 
 ---
 
@@ -60,7 +60,7 @@ npx get-shit-done-multi --copilot
 npx get-shit-done-multi --codex
 ```
 
-**New in v2.0:** Agents are generated from templates with platform-specific optimization. Re-run install to regenerate agents.
+**Note:** Agents are generated from templates with platform-specific optimization. Re-run install to regenerate agents.
 
 ### First Project
 
@@ -101,9 +101,8 @@ GSD uses template-based generation to optimize agents for each platform:
 - **Platform Abstraction** — Tool mapping, field transformation, validation
 - **Install-Time Generation** — No runtime overhead, each CLI gets optimal format
 
-**Technical Details:** See [ARCHITECTURE.md](ARCHITECTURE.md)  
-**Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md)  
-**Upgrading from v1.x:** See [MIGRATION-V2.md](docs/MIGRATION-V2.md)
+**Technical Details:** See [docs/architecture.md](docs/architecture.md)  
+**Contributing:** See [docs/contributing.md](docs/contributing.md)
 
 ---
 
@@ -170,10 +169,9 @@ This version extends the original brilliant work to support three AI platforms w
 
 ## Documentation
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) — Technical design and platform abstraction
-- [CONTRIBUTING.md](CONTRIBUTING.md) — How to add agents and contribute
-- [MIGRATION-V2.md](docs/MIGRATION-V2.md) — Upgrading from v1.x to v2.0
-- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — Common errors and solutions
+- [docs/architecture.md](docs/architecture.md) — Technical design and platform abstraction
+- [docs/contributing.md](docs/contributing.md) — How to add agents and contribute
+- [docs/troubleshooting.md](docs/troubleshooting.md) — Common errors and solutions
 - [CHANGELOG.md](CHANGELOG.md) — Version history and release notes
 - [docs/TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) — Testing workflow
 - [docs/AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) — Size optimization pattern

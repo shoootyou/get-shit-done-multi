@@ -4,9 +4,9 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [2.0.0] - 2026-01-22
+## [1.9.0] - 2026-01-22
 
-**BREAKING CHANGES:** Agents now generated from templates during installation. See [MIGRATION-V2.md](docs/MIGRATION-V2.md) for upgrade guide.
+**Internal Optimization:** Template-based agent generation for platform-specific optimization. From user perspective, agent behavior is identical.
 
 ### Added
 - Template-based agent generation system with platform-specific optimization
@@ -17,15 +17,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Comprehensive test suite (208 tests: 64 tool-mapper, 20 field-transformer, 32 validators, 26 integration, 22 generation, 5 installation, smoke tests)
 - E2E test orchestration (generation → installation → invocation)
 - npm test scripts (test, test:generation, test:installation, test:invocation)
-- ARCHITECTURE.md documenting template system and platform abstraction
-- CONTRIBUTING.md with agent creation workflow and testing guide
-- MIGRATION-V2.md for v1.x → v2.0 upgrade path
-- TROUBLESHOOTING.md with error diagnosis and solutions
+- Documentation: architecture.md, contributing.md, troubleshooting.md
 - Agent splitting pattern for Copilot 30K size limit (gsd-planner, gsd-debugger)
 
 ### Changed
-- **BREAKING:** Agents generated from specs/agents/ templates (not static files)
-- **BREAKING:** Custom agent edits must be made in specs/agents/ (not agents/)
+- Agents generated from specs/agents/ templates at install time (previously static files)
 - Tool references use platform-specific names (Bash for Claude, execute for Copilot)
 - Copilot agents use PRIMARY aliases (execute, edit, search, agent) not compatible aliases
 - Claude agents use string tools format ("Bash, Read, Edit, Grep, Glob, Task")
@@ -41,18 +37,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Validation against official platform specs (Claude and Copilot)
 - Cross-platform testing with actual CLI invocation
 
-### Migration Notes
-- **Action Required:** Existing v1.x users must regenerate agents
-- Run `npx get-shit-done-multi` to regenerate (preserves .planning/ state)
-- Custom agents: Move edits from agents/ to specs/agents/ and regenerate
-- Agent functionality unchanged (behavior identical, only format optimized)
-- See [MIGRATION-V2.md](docs/MIGRATION-V2.md) for detailed upgrade guide
+### User Impact
+- **No action required** - agents regenerated automatically on install/upgrade
+- Agent behavior unchanged (output identical, only internal format optimized)
+- Existing .planning/ state preserved
+- Custom agents: Edit specs/agents/ instead of agents/ directory
 
 ### Documentation
-- [ARCHITECTURE.md](ARCHITECTURE.md) — Template system and platform abstraction design
-- [CONTRIBUTING.md](CONTRIBUTING.md) — How to add agents and contribute
-- [MIGRATION-V2.md](docs/MIGRATION-V2.md) — v1.x → v2.0 upgrade guide
-- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — Common errors and solutions
+- [docs/architecture.md](docs/architecture.md) — Template system and platform abstraction design
+- [docs/contributing.md](docs/contributing.md) — How to add agents and contribute
+- [docs/troubleshooting.md](docs/troubleshooting.md) — Common errors and solutions
 - [docs/TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) — Testing workflow
 - [docs/AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) — Size optimization pattern
 

@@ -585,8 +585,8 @@ Add helpful comments for complex logic:
    ```
 
 4. **Update documentation if needed:**
-   - ARCHITECTURE.md for design changes
-   - CONTRIBUTING.md for workflow changes
+   - architecture.md for design changes
+   - contributing.md for workflow changes
    - README.md for user-facing changes
 
 ### Commit Message Format
@@ -676,7 +676,7 @@ Before requesting review:
 
 ### Documentation Resources
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Technical design and implementation
+- [architecture.md](architecture.md) - Technical design and implementation
 - [TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) - Test suite details
 - [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) - Size optimization pattern
 - [README.md](README.md) - Project overview and quick start
