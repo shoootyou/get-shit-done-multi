@@ -4,6 +4,66 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-01-22
+
+**BREAKING CHANGES:** Agents now generated from templates during installation. See [MIGRATION-V2.md](docs/MIGRATION-V2.md) for upgrade guide.
+
+### Added
+- Template-based agent generation system with platform-specific optimization
+- Platform abstraction layer (tool-mapper, field-transformer, validators)
+- Bidirectional tool mapping accepting all tool name variants
+- PRIMARY Copilot aliases (execute, edit, search, agent) for spec compliance
+- Zero-warnings installation workflow validation
+- Comprehensive test suite (208 tests: 64 tool-mapper, 20 field-transformer, 32 validators, 26 integration, 22 generation, 5 installation, smoke tests)
+- E2E test orchestration (generation → installation → invocation)
+- npm test scripts (test, test:generation, test:installation, test:invocation)
+- ARCHITECTURE.md documenting template system and platform abstraction
+- CONTRIBUTING.md with agent creation workflow and testing guide
+- MIGRATION-V2.md for v1.x → v2.0 upgrade path
+- TROUBLESHOOTING.md with error diagnosis and solutions
+- Agent splitting pattern for Copilot 30K size limit (gsd-planner, gsd-debugger)
+
+### Changed
+- **BREAKING:** Agents generated from specs/agents/ templates (not static files)
+- **BREAKING:** Custom agent edits must be made in specs/agents/ (not agents/)
+- Tool references use platform-specific names (Bash for Claude, execute for Copilot)
+- Copilot agents use PRIMARY aliases (execute, edit, search, agent) not compatible aliases
+- Claude agents use string tools format ("Bash, Read, Edit, Grep, Glob, Task")
+- Copilot agents use array tools format ([execute, edit, search, agent])
+- Metadata structure platform-specific (Claude: none, Copilot: nested under metadata object)
+- Re-running install is idempotent (safely overwrites generated agents)
+
+### Technical
+- Spec-as-template format with Mustache conditionals for platform sections
+- Generation pipeline: parse → render → transform → validate → write
+- Platform capability flags control conditional rendering
+- REVERSE_INDEX for bidirectional tool name lookup
+- Validation against official platform specs (Claude and Copilot)
+- Cross-platform testing with actual CLI invocation
+
+### Migration Notes
+- **Action Required:** Existing v1.x users must regenerate agents
+- Run `npx get-shit-done-multi` to regenerate (preserves .planning/ state)
+- Custom agents: Move edits from agents/ to specs/agents/ and regenerate
+- Agent functionality unchanged (behavior identical, only format optimized)
+- See [MIGRATION-V2.md](docs/MIGRATION-V2.md) for detailed upgrade guide
+
+### Documentation
+- [ARCHITECTURE.md](ARCHITECTURE.md) — Template system and platform abstraction design
+- [CONTRIBUTING.md](CONTRIBUTING.md) — How to add agents and contribute
+- [MIGRATION-V2.md](docs/MIGRATION-V2.md) — v1.x → v2.0 upgrade guide
+- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — Common errors and solutions
+- [docs/TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) — Testing workflow
+- [docs/AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) — Size optimization pattern
+
+### Acknowledgments
+This release represents 5 phases of work:
+- Phase 1: Template Engine Foundation (gray-matter + Mustache)
+- Phase 2: Platform Abstraction Layer (tool-mapper, field-transformer, validators)
+- Phase 3: Spec Migration (11 agents → spec-as-template format)
+- Phase 4: Installation Integration (zero-warnings workflow)
+- Phase 5: Cross-Platform Testing (208 tests, E2E validation)
+
 ## [1.8.1] - 2026-01-21
 
 ### Added
