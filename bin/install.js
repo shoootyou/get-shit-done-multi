@@ -641,6 +641,25 @@ function install(isGlobal) {
     }
   }
 
+  // Generate skills from specs
+  const skillSpecsDir = path.join(src, 'specs', 'skills');
+  if (fs.existsSync(skillSpecsDir)) {
+    const skillGenResult = generateSkillsFromSpecs(skillSpecsDir, dirs.skills, 'claude');
+    
+    if (skillGenResult.failed > 0) {
+      console.log(`  ${yellow}⚠${reset} Skills: ${skillGenResult.generated} generated, ${skillGenResult.failed} failed`);
+      // Log specific errors if any
+      if (skillGenResult.errors.length > 0) {
+        skillGenResult.errors.forEach(err => {
+          console.log(`    ${yellow}✗${reset} ${err.file || 'Unknown'}: ${err.error}`);
+        });
+      }
+      failures.push(`skills (${skillGenResult.failed} generation failures)`);
+    } else if (skillGenResult.generated > 0) {
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+    }
+  }
+
   // Copy agents to ~/.claude/agents (subagents must be at root level)
   // Keep as fallback for any agents not in specs/
   const agentsSrc = path.join(src, 'agents');
