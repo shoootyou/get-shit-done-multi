@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 4 of 8.5 (Mid-Complexity Commands)
-Plan: 1 of 5 (04-02 complete - map-codebase)
-Status: Phase 4 Wave 1 in progress
-Last activity: 2026-01-22 — Completed 04-02-PLAN.md (map-codebase migration)
+Plan: 2 of 5 (04-01 and 04-02 complete - Wave 1 finished)
+Status: Phase 4 Wave 1 complete, Wave 2 ready
+Last activity: 2026-01-22 — Completed 04-01-PLAN.md (research-phase migration)
 
-Progress: [████░░░░░░] ~47% (4/8.5 phases, 15/? plans total)
+Progress: [████░░░░░░] ~48% (4/8.5 phases, 16/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 6.0 min
-- Total execution time: 1.5 hours
+- Total execution time: 1.6 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████░░░░░░] ~47% (4/8.5 phases, 15/? plans total)
 | 01-foundation-schema | 2 | 24.3 min | 12.1 min |
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
-| 04-mid-complexity-commands | 1 | 3.6 min | 3.6 min |
+| 04-mid-complexity-commands | 2 | 9.6 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.0 min, 4.8 min (03-01), 5.0 min (03-02), 9.5 min (03-03), 3.6 min (04-02)
-- Trend: Phase 4 starts strong (simpler commands, established patterns)
+- Last 5 plans: 4.8 min (03-01), 5.0 min (03-02), 9.5 min (03-03), 3.6 min (04-02), 6.0 min (04-01)
+- Trend: Phase 4 averaging ~5min (simpler commands, established patterns)
 
 *Updated after each plan completion*
 
@@ -90,6 +90,9 @@ Recent decisions affecting current work:
 - **[03-03]** High-complexity orchestrators (900+ lines) migrate successfully
 - **[03-03]** Parallel Task spawning preserved through spec → generated output
 - **[03-03]** Template system handles complex orchestrators without modification
+- **[04-01]** Claude skills output to .claude/get-shit-done/ per claudeAdapter.getTargetDirs()
+- **[04-01]** Checkpoint continuation pattern: spawn → checkpoint → respawn with @-reference to prior state
+- **[04-01]** Sequential spawning documented (NOT parallel like Phase 3 orchestrators)
 - **[04-02]** Prose spawn descriptions converted to explicit Task() calls (enables validation of spawn count and focus)
 - **[04-02]** Focus parameter differentiation preferred over multiple agent types (single gsd-codebase-mapper with <focus>)
 - **[04-02]** @-references to workflow files preserved through template system
@@ -104,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-22T23:10:54Z
-Stopped at: Completed 04-02-PLAN.md (map-codebase migration with explicit Task() spawns)
+Last session: 2026-01-22T23:13:23Z
+Stopped at: Completed 04-01-PLAN.md (research-phase migration, Wave 1 complete)
 Resume file: None
