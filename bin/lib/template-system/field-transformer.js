@@ -31,6 +31,14 @@ const FIELD_RULES = {
     suggestion: 'Remove model field for Copilot agents'
   },
   
+  // Pitfall: Color field for agent UI customization (Claude-only)
+  color: { 
+    claude: true, 
+    copilot: false,
+    reason: 'Copilot does not support color field in agent frontmatter',
+    suggestion: 'Remove color field for Copilot agents'
+  },
+  
   // Pitfall 10: Lifecycle hooks (Claude-only)
   hooks: { 
     claude: true, 
