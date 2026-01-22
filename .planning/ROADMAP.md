@@ -134,6 +134,34 @@ Plans:
 
 ---
 
+### Phase 4.1: Installation Quality & Copilot Spec Compliance
+**Goal:** Fix critical tool mapping issues and ensure Copilot agents use primary aliases with zero warnings
+
+**Dependencies:** Phase 4 (discovered during installation testing)
+
+**Requirements:** SPEC-01, SPEC-02, SPEC-03 (Copilot spec compliance), INST-07 (zero warnings)
+
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 04.1-01-PLAN.md — Bidirectional tool mapper + Copilot PRIMARY aliases
+- [ ] 04.1-02-PLAN.md — Update tool references in prompts with Mustache conditionals
+- [ ] 04.1-03-PLAN.md — Zero warnings validation (Wave 2, checkpoint)
+
+**Success Criteria:**
+1. Tool mapper recognizes uppercase, lowercase, and all aliases bidirectionally
+2. Copilot agents use PRIMARY aliases (execute, edit, search, agent) not compatible aliases
+3. Claude agents continue using uppercase names (Bash, Read, Edit, Grep, Glob, Task)
+4. Color field filtered from Copilot agent frontmatter
+5. Tool references in agent prompt content use platform-specific names
+6. Install.js runs with ZERO warnings on all platforms (--copilot, --local, --all)
+7. Grep+Glob deduplicated to single 'search' tool in Copilot
+8. All 181 tests passing (141 existing + 40 new tool mapper tests)
+9. Validation report shows 100% spec compliance for both platforms
+
+---
+
+
 ### Phase 5: Cross-Platform Testing & Validation
 **Goal:** Every agent verified through actual installation and invocation on both CLIs
 
