@@ -63,6 +63,7 @@ Recent decisions affecting current work:
 - **[02-04]** Codex platform requires full support (added to template system)
 - **[02-05]** Folder/SKILL.md structure is mandatory (follows Claude documentation spec)
 - **[02-05]** Testing must use test-output/ only (never modify protected directories)
+- **[02-post]** Tools NOT in _shared.yml (principle of least privilege - each skill declares explicitly)
 - **[02-01]** Reuse generateAgent() from template system (proven pattern, 208 passing tests)
 - **[02-01]** Directory scanning for gsd-* folders (matches folder-per-skill pattern)
 - **[02-01]** Folder name becomes output filename (gsd-help → gsd-help.md)
