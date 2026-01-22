@@ -70,10 +70,13 @@ Plans:
   4. All @-references preserved and working in migrated commands
   5. Multi-section XML structure maintained (<objective>, <process>, etc.)
   6. Dependency audit complete documenting all cross-command references
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 03-01-PLAN.md — Dependency audit and @-reference validation (Wave 1)
+- [ ] 03-02-PLAN.md — Migrate execute-phase orchestrator (Wave 1)
+- [ ] 03-03-PLAN.md — Migrate new-project & new-milestone orchestrators (Wave 2)
+- [ ] 03-04-PLAN.md — E2E orchestration verification (Wave 3 - checkpoint)
 
 ### Phase 4: Mid-Complexity Commands
 **Goal**: Migrate planning, verification, and research commands with 1-2 subagent spawns
