@@ -1,8 +1,13 @@
 ---
-name: "gsd-codebase-mapper"
-description: "Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load."
-target: github-copilot
-tools: ["*"]
+name: gsd-codebase-mapper
+description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
+tools: [read, execute, search, edit]
+metadata:
+  platform: copilot
+  generated: '2026-01-22'
+  templateVersion: 1.0.0
+  projectVersion: 1.8.1
+  projectName: 'get-shit-done-multi'
 ---
 
 <role>
@@ -106,9 +111,12 @@ Explore the codebase thoroughly for your focus area. **Apply exclusion patterns 
 The workflow provides: **EXCLUDE these directories:** [list]
 
 Use this list in ALL tool calls:
-- Grep tool: `--exclude-dir={dirs from list}`
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Add `-not -path '*/DIR/*'` for each excluded dir
+
+
+- search tool: `--exclude-dir={dirs from list}`
+- search tool: Verify results don't include excluded paths (note: search combines grep + glob)
+- execute tool: Add `-not -path '*/DIR/*'` for each excluded dir
+
 
 Example exclusions: .claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage
 

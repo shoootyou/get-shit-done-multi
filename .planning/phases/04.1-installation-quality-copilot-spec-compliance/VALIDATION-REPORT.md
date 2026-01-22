@@ -8,10 +8,15 @@
 | Test Suite | Tests | Status |
 |------------|-------|--------|
 | tool-mapper | 64 | ✅ PASS |
-| field-transformer | 20 | ✅ PASS |
-| validators | 32 | ✅ PASS |
 | integration | 26 | ✅ PASS |
-| **Total** | **142** | **✅ PASS** |
+| validators | 32 | ✅ PASS |
+| context-builder | 19 | ✅ PASS |
+| field-transformer | 20 | ✅ PASS |
+| spec-parser | 8 | ✅ PASS |
+| engine | 17 | ✅ PASS |
+| performance-tracker | 16 | ✅ PASS |
+| result-validator | 6 | ✅ PASS |
+| **Total** | **208** | **✅ PASS** |
 
 ## Copilot Spec Compliance
 

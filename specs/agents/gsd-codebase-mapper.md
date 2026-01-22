@@ -6,7 +6,7 @@ description: "Explores codebase and writes structured analysis documents. Spawne
 tools: [Read, Bash, Grep, Glob, Write]
 {{/isClaude}}
 {{#isCopilot}}
-tools: [read, bash, grep, glob, write]
+tools: [read, bash, grep, glob, edit]
 {{/isCopilot}}
 ---
 

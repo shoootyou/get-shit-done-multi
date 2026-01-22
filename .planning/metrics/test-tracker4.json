@@ -1,0 +1,20 @@
+[
+  {
+    "agent": "persist-agent",
+    "cli": "copilot",
+    "duration": 30.428750000000036,
+    "timestamp": "2026-01-22T10:29:32.324Z"
+  },
+  {
+    "agent": "persist-agent",
+    "cli": "copilot",
+    "duration": 26.505708000000027,
+    "timestamp": "2026-01-22T10:29:52.007Z"
+  },
+  {
+    "agent": "persist-agent",
+    "cli": "copilot",
+    "duration": 28.847624999999994,
+    "timestamp": "2026-01-22T10:29:57.966Z"
+  }
+]

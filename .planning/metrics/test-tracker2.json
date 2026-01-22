@@ -1,0 +1,20 @@
+[
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 51.684957999999995,
+    "timestamp": "2026-01-22T10:29:32.064Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 52.041,
+    "timestamp": "2026-01-22T10:29:51.737Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 51.054334,
+    "timestamp": "2026-01-22T10:29:57.691Z"
+  }
+]
