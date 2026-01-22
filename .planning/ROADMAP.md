@@ -196,9 +196,9 @@ Plans:
 **Plans:** 3 plans in 2 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — Technical documentation (ARCHITECTURE.md + CONTRIBUTING.md)
-- [ ] 06-02-PLAN.md — Migration guide (MIGRATION-V2.md for v1.x → v2.0 upgrade)
-- [ ] 06-03-PLAN.md — README & release prep (README.md update + CHANGELOG.md + version bump to 2.0.0)
+- [x] 06-01-PLAN.md — Technical documentation (ARCHITECTURE.md + CONTRIBUTING.md)
+- [x] 06-02-PLAN.md — Migration guide (MIGRATION-V2.md for v1.x → v2.0 upgrade)
+- [x] 06-03-PLAN.md — README & release prep (README.md update + CHANGELOG.md + version bump to 2.0.0)
 
 **Success Criteria:**
 1. ARCHITECTURE.md documents template system and platform abstraction with design decisions
