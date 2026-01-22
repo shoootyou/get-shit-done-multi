@@ -334,9 +334,10 @@ function generateSkillsFromSpecs(specsDir, outputDir, platform) {
         const result = generateAgent(specPath, platform);
         
         if (result.success) {
-          // Output name: gsd-help.md (folder name + .md)
-          const outputName = `${skillDir}.md`;
-          const outputPath = path.join(outputDir, outputName);
+          // Output structure: gsd-help/SKILL.md (folder per skill)
+          const skillOutputDir = path.join(outputDir, skillDir);
+          fs.mkdirSync(skillOutputDir, { recursive: true });
+          const outputPath = path.join(skillOutputDir, 'SKILL.md');
           fs.writeFileSync(outputPath, result.output, 'utf8');
           generated++;
           
