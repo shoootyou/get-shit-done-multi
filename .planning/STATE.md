@@ -14,10 +14,10 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 ## Current Position
 
 **Phase:** 4.1 of 7 (Installation Quality & Copilot Spec Compliance)
-**Plan:** 2 of ~3
+**Plan:** 1 of 3 complete
 **Status:** In progress
-**Progress:** █████████████ 70% (4/7 phases complete, 18/~25 total plans estimated)
-**Last activity:** 2026-01-22 - Completed 04.1-02: Platform-specific tool references in prompts
+**Progress:** █████████████░ 71% (4/7 phases complete, 19/~28 total plans estimated)
+**Last activity:** 2026-01-22 - Completed 04.1-01: Bidirectional tool mapper + Copilot PRIMARY aliases
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -42,9 +42,9 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
   - 03.1-03: Update references ✅
   - 03.1-04: Clean regeneration & validation ✅
 - Phase 4.1: Installation Quality & Copilot Spec Compliance — **In Progress** 🔄 (2026-01-22)
-  - 04.1-01: Fix tool case sensitivity issues (planned)
-  - 04.1-02: Update tool references in prompts ✅
-  - 04.1-03: Installation verification (planned)
+  - 04.1-01: Bidirectional tool mapper + PRIMARY aliases ✅
+  - 04.1-02: Update tool references in prompts (planned)
+  - 04.1-03: Zero warnings validation (planned)
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -53,16 +53,17 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 
 ### Velocity
 - **Phases completed:** 4/7 (57%)
-- **Plans completed:** 18 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 1/~3)
-- **Requirements delivered:** 21/27 (78%)
-- **Current phase progress:** 33% (Phase 4.1: 1 of ~3 plans complete)
+- **Plans completed:** 19 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 1/3)
+- **Requirements delivered:** 24/30 (80% - SPEC-01, SPEC-02, SPEC-03 from Phase 4.1)
+- **Current phase progress:** 33% (Phase 4.1: 1 of 3 plans complete)
 
 ### Quality
-- **Requirements coverage:** 27/27 mapped (100%)
-- **Test coverage:** 46 tests passing (20 field-transformer + 26 integration = 100% success rate)
-- **Platform parity:** Achieved - both platforms fully supported with compliant metadata
-- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%)
-- **Format compliance:** Claude 11/11 (100%), Copilot 9/9 (100% of generated)
+- **Requirements coverage:** 30/30 mapped (100%)
+- **Test coverage:** 83 tests passing (63 tool-mapper + 20 field-transformer = 100% success rate)
+- **Platform parity:** Achieved - both platforms fully supported with Copilot PRIMARY aliases
+- **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%), Phase 4.1: 3/3 (100%)
+- **Format compliance:** Claude 13/13 (100%), Copilot 13/13 (100% with PRIMARY aliases)
+- **Spec compliance:** Copilot agents use PRIMARY aliases (execute, edit, search, agent)
 
 ### Efficiency
 - **Blockers resolved:** 0
@@ -129,6 +130,12 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 | Add project metadata from package.json | Provides complete context (projectName, projectVersion) in generated agents | 2026-01-21 | 03-07 |
 | Manual metadata formatting for layout control | js-yaml flowLevel insufficient for mixed formatting needs (arrays single-line, objects block) | 2026-01-21 | 03-07 |
 | Single blank line after frontmatter | Standard markdown convention, cleaner than two blank lines | 2026-01-21 | 03-07 |
+| REVERSE_TOOL_INDEX for bidirectional lookup | Accepts all variants (uppercase, lowercase, aliases) → canonical name | 2026-01-22 | 04.1-01 |
+| Two-pass REVERSE_INDEX building | Non-canonical first, canonical second ensures canonical tools override conflicts (Edit vs Write) | 2026-01-22 | 04.1-01 |
+| PRIMARY Copilot aliases | Use official PRIMARY names (execute, edit, search, agent) not compatible (bash, write, grep, task) | 2026-01-22 | 04.1-01 |
+| Deduplication for Copilot via Set | Grep+Glob both map to 'search', deduplicate with new Set() | 2026-01-22 | 04.1-01 |
+| Color field filtered for Copilot | Not in official Copilot spec, filter with warning | 2026-01-22 | 04.1-01 |
+| Case-insensitive tool lookup | Add both toLowerCase() and toUpperCase() variants to REVERSE_INDEX | 2026-01-22 | 04.1-01 |
 | Mustache conditionals in agent prompt content | Enable platform-specific tool references (Bash/execute, Grep/Glob/search) in prose | 2026-01-22 | 04.1-02 |
 | Tool reference clarity in prompts | Match PRIMARY aliases per platform (Copilot "search" deduplicates grep+glob) | 2026-01-22 | 04.1-02 |
 | Block vs inline conditionals | Block conditionals for multi-line sections, inline for single references | 2026-01-22 | 04.1-02 |
@@ -208,12 +215,12 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 
 **Next milestone:**
 Complete Phase 4.1: Installation Quality & Copilot Spec Compliance
-- ✅ 04.1-02: Platform-specific tool references in agent prompts
-- Next: 04.1-03: Verify installation produces zero warnings
-- Then: Begin Phase 4 (Installation Workflow Integration)
+- ✅ 04.1-01: Bidirectional tool mapper + Copilot PRIMARY aliases
+- Next: 04.1-02: Update tool references in agent prompts with Mustache conditionals
+- Then: 04.1-03: Zero warnings validation
 
-**Phase 4.1 progress (33% complete - 1/~3 plans):**
-- ✅ 04.1-02: Update tool references in agent prompts with Mustache conditionals
+**Phase 4.1 progress (33% complete - 1/3 plans):**
+- ✅ 04.1-01: Bidirectional tool mapper + PRIMARY aliases + color field filtering
 
 ### Context Handoff
 
@@ -224,9 +231,9 @@ Complete Phase 4.1: Installation Quality & Copilot Spec Compliance
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-22T09:40:37Z
-**Stopped at:** Completed 04.1-02-PLAN.md (Update tool references in agent prompts)
-**Resume file:** None - Phase 4.1 in progress, ready for 04.1-03
+**Last session:** 2026-01-22T09:46:11Z
+**Stopped at:** Completed 04.1-01-PLAN.md (Bidirectional tool mapper + Copilot PRIMARY aliases)
+**Resume file:** None - ready for 04.1-02
 
 ---
 
