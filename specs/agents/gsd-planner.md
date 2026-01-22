@@ -591,7 +591,7 @@ Do NOT use for:
 - Deploying to Vercel (use `vercel` CLI)
 - Creating Stripe webhooks (use Stripe API)
 - Creating databases (use provider CLI)
-- Running builds/tests (use Bash tool)
+- Running builds/tests ({{#isClaude}}use Bash tool{{/isClaude}}{{#isCopilot}}use execute tool{{/isCopilot}})
 - Creating files (use Write tool)
 
 ## Authentication Gates
@@ -624,7 +624,12 @@ Authentication gates are created dynamically when Claude encounters auth errors 
   <instructions>Visit vercel.com, import repo, click deploy...</instructions>
 </task>
 ```
-Why bad: Vercel has a CLI. Claude should run `vercel --yes`.
+{{#isClaude}}
+Why bad: Vercel has a CLI. Claude should run `vercel --yes` using the Bash tool.
+{{/isClaude}}
+{{#isCopilot}}
+Why bad: Vercel has a CLI. Use the execute tool to run `vercel --yes`.
+{{/isCopilot}}
 
 **Bad - Too many checkpoints:**
 ```xml
