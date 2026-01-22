@@ -150,16 +150,15 @@ test('validateClaudeSpec: unknown hook generates warning', () => {
     'Should warn about unknown hook');
 });
 
-test('validateClaudeSpec: Claude-only tool generates warning', () => {
+test('validateClaudeSpec: Claude-only tool no warning for Claude', () => {
   const result = validateClaudeSpec({
     name: 'test-agent',
     description: 'Test description',
-    tools: ['Bash', 'WebFetch'],  // WebFetch is Claude-only
+    tools: ['Bash', 'WebFetch'],  // WebFetch is Claude-only, but valid for Claude
   });
   
   assert.strictEqual(result.valid, true, 'Should be valid');
-  assert.ok(result.warnings.some(w => w.field === 'tools' && w.message.includes('WebFetch')), 
-    'Should warn about Claude-only tool');
+  assert.strictEqual(result.warnings.length, 0, 'No warning when validating Claude-only tool FOR Claude');
 });
 
 // ============================================================================
@@ -369,15 +368,15 @@ test('validateCopilotSpec: null frontmatter fails gracefully', () => {
     'Should error about invalid frontmatter');
 });
 
-test('validateClaudeSpec: tools not array fails', () => {
+test('validateClaudeSpec: tools string format accepted', () => {
   const result = validateClaudeSpec({
     name: 'test',
     description: 'test',
-    tools: 'Bash',  // Should be array
+    tools: 'Bash',  // Claude accepts both string and array format
   });
   
-  assert.strictEqual(result.valid, false, 'Should be invalid');
-  assert.ok(result.errors.some(e => e.field === 'tools'), 'Should error about tools type');
+  assert.strictEqual(result.valid, true, 'Should be valid - Claude accepts string format');
+  assert.strictEqual(result.errors.length, 0, 'Should have no errors');
 });
 
 test('validateCopilotSpec: tools not array fails', () => {
