@@ -1,6 +1,6 @@
 {
   "name": "get-shit-done-multi",
-  "version": "1.8.1",
+  "version": "2.0.0",
   "description": "A meta-prompting, context engineering and spec-driven development system for AI coding assistants. Multi-CLI version by shoootyou, based on original work by TÂCHES.",
   "keywords": [
     "claude",
