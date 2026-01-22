@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 4 of 8.5 (Mid-Complexity Commands)
-Plan: 2 of 5 (04-01 and 04-02 complete - Wave 1 finished)
-Status: Phase 4 Wave 1 complete, Wave 2 ready
-Last activity: 2026-01-22 — Completed 04-01-PLAN.md (research-phase migration)
+Plan: 3 of 5 (04-01, 04-02, 04-03 complete - Waves 1-2 finished)
+Status: Phase 4 Wave 2 complete, Wave 3 ready
+Last activity: 2026-01-22 — Completed 04-03-PLAN.md (debug migration)
 
-Progress: [████░░░░░░] ~48% (4/8.5 phases, 16/? plans total)
+Progress: [████░░░░░░] ~48% (4/8.5 phases, 17/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 6.0 min
-- Total execution time: 1.6 hours
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [████░░░░░░] ~48% (4/8.5 phases, 16/? plans total)
 | 01-foundation-schema | 2 | 24.3 min | 12.1 min |
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
-| 04-mid-complexity-commands | 2 | 9.6 min | 4.8 min |
+| 04-mid-complexity-commands | 3 | 15.8 min | 5.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4.8 min (03-01), 5.0 min (03-02), 9.5 min (03-03), 3.6 min (04-02), 6.0 min (04-01)
+- Last 5 plans: 5.0 min (03-02), 9.5 min (03-03), 3.6 min (04-02), 6.0 min (04-01), 6.2 min (04-03)
 - Trend: Phase 4 averaging ~5min (simpler commands, established patterns)
 
 *Updated after each plan completion*
@@ -96,6 +96,9 @@ Recent decisions affecting current work:
 - **[04-02]** Prose spawn descriptions converted to explicit Task() calls (enables validation of spawn count and focus)
 - **[04-02]** Focus parameter differentiation preferred over multiple agent types (single gsd-codebase-mapper with <focus>)
 - **[04-02]** @-references to workflow files preserved through template system
+- **[04-03]** Frontmatter metadata section removed from skills (Claude doesn't support, per 03-02)
+- **[04-03]** Tools must use platform conditionals with simple arrays (NOT object arrays with name/required/reason)
+- **[04-03]** Side fixes for blocking issues acceptable when same root cause (gsd-map-codebase fixed with gsd-debug)
 
 ### Pending Todos
 
@@ -107,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-22T23:13:23Z
-Stopped at: Completed 04-01-PLAN.md (research-phase migration, Wave 1 complete)
+Last session: 2026-01-22T23:22:04Z
+Stopped at: Completed 04-03-PLAN.md (debug migration, Wave 2 complete)
 Resume file: None
