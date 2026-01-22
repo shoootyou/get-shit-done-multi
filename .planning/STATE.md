@@ -1,6 +1,6 @@
 # Project State: Multi-Platform Agent Optimization
 
-**Last Updated:** 2026-01-21
+**Last Updated:** 2026-01-22
 **Version:** 1.8.0 → 1.8.1 (patch release)
 
 ## Project Reference
@@ -9,15 +9,15 @@
 Agent definitions use native platform capabilities—Claude and Copilot each get configurations that leverage their specific features through declarative frontmatter, not interpretation.
 
 ### Current Focus
-Phase 4: Installation Workflow Integration — Integrating template generation into install.js with platform flags.
+Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated agents match official Copilot specifications.
 
 ## Current Position
 
-**Phase:** 4 of 7 (Installation Workflow Integration)
-**Plan:** Ready for planning
-**Status:** Ready to plan
-**Progress:** █████████████ 68% (4/7 phases complete, 17/~25 total plans estimated)
-**Last activity:** 2026-01-21 - Phase 3.1 complete: Agent splits with 100% platform coverage
+**Phase:** 4.1 of 7 (Installation Quality & Copilot Spec Compliance)
+**Plan:** 2 of ~3
+**Status:** In progress
+**Progress:** █████████████ 70% (4/7 phases complete, 18/~25 total plans estimated)
+**Last activity:** 2026-01-22 - Completed 04.1-02: Platform-specific tool references in prompts
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -41,7 +41,11 @@ Phase 4: Installation Workflow Integration — Integrating template generation i
   - 03.1-02: Split gsd-debugger ✅
   - 03.1-03: Update references ✅
   - 03.1-04: Clean regeneration & validation ✅
-- Phase 4: Installation Workflow Integration — Ready to plan
+- Phase 4.1: Installation Quality & Copilot Spec Compliance — **In Progress** 🔄 (2026-01-22)
+  - 04.1-01: Fix tool case sensitivity issues (planned)
+  - 04.1-02: Update tool references in prompts ✅
+  - 04.1-03: Installation verification (planned)
+- Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
 
@@ -49,9 +53,9 @@ Phase 4: Installation Workflow Integration — Integrating template generation i
 
 ### Velocity
 - **Phases completed:** 4/7 (57%)
-- **Plans completed:** 17 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4)
+- **Plans completed:** 18 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 1/~3)
 - **Requirements delivered:** 21/27 (78%)
-- **Current phase progress:** 0% (Phase 4: Ready to plan)
+- **Current phase progress:** 33% (Phase 4.1: 1 of ~3 plans complete)
 
 ### Quality
 - **Requirements coverage:** 27/27 mapped (100%)
@@ -125,6 +129,9 @@ Phase 4: Installation Workflow Integration — Integrating template generation i
 | Add project metadata from package.json | Provides complete context (projectName, projectVersion) in generated agents | 2026-01-21 | 03-07 |
 | Manual metadata formatting for layout control | js-yaml flowLevel insufficient for mixed formatting needs (arrays single-line, objects block) | 2026-01-21 | 03-07 |
 | Single blank line after frontmatter | Standard markdown convention, cleaner than two blank lines | 2026-01-21 | 03-07 |
+| Mustache conditionals in agent prompt content | Enable platform-specific tool references (Bash/execute, Grep/Glob/search) in prose | 2026-01-22 | 04.1-02 |
+| Tool reference clarity in prompts | Match PRIMARY aliases per platform (Copilot "search" deduplicates grep+glob) | 2026-01-22 | 04.1-02 |
+| Block vs inline conditionals | Block conditionals for multi-line sections, inline for single references | 2026-01-22 | 04.1-02 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -160,7 +167,9 @@ Phase 4: Installation Workflow Integration — Integrating template generation i
 - [x] Fix metadata field structure (03-05 - gap closure)
 - [x] Generate all 11 agents and validate format compliance (03-06 - gap closure)
 - [x] Fix metadata field naming and formatting (03-07 - gap closure)
-- [ ] Begin Phase 4: Installation Workflow Integration
+- [x] Begin Phase 4.1: Installation Quality & Copilot Spec Compliance
+- [x] Update tool references in agent prompts with Mustache conditionals (04.1-02)
+- [ ] Verify installation produces zero warnings (04.1-03)
 
 ### Known Blockers
 *None currently*
@@ -198,20 +207,13 @@ Phase 4: Installation Workflow Integration — Integrating template generation i
 - ✅ Comprehensive validation report documenting format compliance
 
 **Next milestone:**
-Begin Phase 4: Installation Workflow Integration
-- Integrate template generation into installation process
-- Add --copilot flag for platform selection
-- Generate agents at install time based on platform
-- Update documentation for new workflow
+Complete Phase 4.1: Installation Quality & Copilot Spec Compliance
+- ✅ 04.1-02: Platform-specific tool references in agent prompts
+- Next: 04.1-03: Verify installation produces zero warnings
+- Then: Begin Phase 4 (Installation Workflow Integration)
 
-**Phase 3 progress (100% complete - 7/7 plans):**
-- ✅ 03-01: Template generation system with validation and registry
-- ✅ 03-02: Migrated all 11 agents to spec-as-template format
-- ✅ 03-03: Platform generation testing and validation (26 tests passing)
-- ✅ 03-04: YAML frontmatter format fix (gap closure)
-- ✅ 03-05: Fix metadata field structure (gap closure)
-- ✅ 03-06: Complete agent generation and validation (gap closure)
-- ✅ 03-07: Metadata field naming and formatting (gap closure)
+**Phase 4.1 progress (33% complete - 1/~3 plans):**
+- ✅ 04.1-02: Update tool references in agent prompts with Mustache conditionals
 
 ### Context Handoff
 
@@ -222,9 +224,9 @@ Begin Phase 4: Installation Workflow Integration
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-21T20:44:25Z
-**Stopped at:** Completed 03-07-PLAN.md (Metadata Field Naming and Formatting - gap closure)
-**Resume file:** None - Phase 3 complete, ready for Phase 4
+**Last session:** 2026-01-22T09:40:37Z
+**Stopped at:** Completed 04.1-02-PLAN.md (Update tool references in agent prompts)
+**Resume file:** None - Phase 4.1 in progress, ready for 04.1-03
 
 ---
 
