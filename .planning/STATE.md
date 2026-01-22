@@ -14,10 +14,10 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 ## Current Position
 
 **Phase:** 4.1 of 7 (Installation Quality & Copilot Spec Compliance)
-**Plan:** 3 of 3 complete
+**Plan:** 4 of 4 complete
 **Status:** Phase complete ✅
-**Progress:** ██████████████ 75% (4.1 complete, 21/~28 total plans estimated)
-**Last activity:** 2026-01-22 - Completed 04.1-03: Zero warnings validation
+**Progress:** ██████████████ 76% (4.1 complete, 22/~28 total plans estimated)
+**Last activity:** 2026-01-22 - Completed 04.1-04: Fix test expectations (gap closure)
 
 ### Phase Status
 - Phase 1: Template Engine Foundation — **Complete** ✅ (2026-01-21)
@@ -45,6 +45,7 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
   - 04.1-01: Bidirectional tool mapper + PRIMARY aliases ✅
   - 04.1-02: Update tool references in prompts ✅
   - 04.1-03: Zero warnings validation ✅
+  - 04.1-04: Fix test expectations ✅ (gap closure)
 - Phase 4: Installation Workflow Integration — Pending
 - Phase 5: Cross-Platform Testing & Validation — Pending
 - Phase 6: Documentation & Polish — Pending
@@ -53,13 +54,13 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 
 ### Velocity
 - **Phases completed:** 4.1/7 (59%)
-- **Plans completed:** 21 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 3/3)
+- **Plans completed:** 22 total (Phase 1: 3/3, Phase 2: 3/3, Phase 3: 7/7, Phase 3.1: 4/4, Phase 4.1: 4/4)
 - **Requirements delivered:** 27/30 (90% - SPEC-01, SPEC-02, SPEC-03 delivered in Phase 4.1)
 - **Current phase progress:** 100% (Phase 4.1 complete)
 
 ### Quality
 - **Requirements coverage:** 30/30 mapped (100%)
-- **Test coverage:** 181 tests passing (tool-mapper: 69, field-transformer: 20, platform-adapter: 46, integration: 46 = 100% success rate)
+- **Test coverage:** 142 tests passing (tool-mapper: 64, field-transformer: 20, validators: 32, integration: 26 = 100% success rate)
 - **Platform parity:** Achieved - both platforms fully supported with Copilot PRIMARY aliases
 - **Verification score:** Phase 1: 17/17 (100%), Phase 2: 15/15 (100%), Phase 3: 53/53 (100%), Phase 4.1: 8/8 (100%)
 - **Format compliance:** Claude 13/13 (100%), Copilot 13/13 (100% with PRIMARY aliases)
@@ -145,6 +146,10 @@ Phase 4.1: Installation Quality & Copilot Spec Compliance — Ensuring generated
 | Edit vs Write capitalization | Copilot spec uses "Edit" (capitalized) for consistency | 2026-01-22 | 04.1-03 |
 | Color field removal from specs | Not in official Copilot spec, removed from all agent frontmatter | 2026-01-22 | 04.1-03 |
 | REVERSE_INDEX validation | Always resolve tool names through REVERSE_INDEX before warning | 2026-01-22 | 04.1-03 |
+| REVERSE_INDEX accepting lowercase is correct | Bidirectional mapping accepts all variants; tests were wrong, not code | 2026-01-22 | 04.1-04 |
+| Claude accepts string tools format | Official Claude spec allows both string and array format for tools field | 2026-01-22 | 04.1-04 |
+| No warnings for platform-native tools | Claude-only tools don't warn when validating FOR Claude; warnings for cross-platform only | 2026-01-22 | 04.1-04 |
+| Test names reflect behavior | Test names should describe actual behavior, not outdated assumptions | 2026-01-22 | 04.1-04 |
 
 ### Active Todos
 - [x] Complete Phase 1 integration tests
@@ -227,10 +232,11 @@ Complete Phase 4: Installation Workflow Integration
 - Platform detection and configuration
 - Testing across all platforms
 
-**Phase 4.1 progress (100% complete - 3/3 plans):**
+**Phase 4.1 progress (100% complete - 4/4 plans):**
 - ✅ 04.1-01: Bidirectional tool mapper + PRIMARY aliases + color field filtering
 - ✅ 04.1-02: Platform-specific tool references in agent content
 - ✅ 04.1-03: Zero warnings validation + comprehensive validation report
+- ✅ 04.1-04: Fix test expectations for REVERSE_INDEX behavior (gap closure)
 
 ### Context Handoff
 
@@ -241,8 +247,8 @@ Complete Phase 4: Installation Workflow Integration
 - **Tech stack:** Node.js CommonJS, no build step, existing packages (gray-matter, js-yaml)
 - **Critical constraint:** Backward compatibility required (patch release only)
 
-**Last session:** 2026-01-22T10:06:02Z
-**Stopped at:** Completed 04.1-03-PLAN.md (Zero warnings validation)
+**Last session:** 2026-01-22T10:26:15Z
+**Stopped at:** Completed 04.1-04-PLAN.md (Fix test expectations - gap closure)
 **Resume file:** None - Phase 4.1 complete, ready for Phase 4 or Phase 5
 
 ---
