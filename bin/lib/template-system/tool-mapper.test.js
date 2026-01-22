@@ -9,6 +9,7 @@ const assert = require('assert');
 const {
   CANONICAL_TOOLS,
   TOOL_COMPATIBILITY_MATRIX,
+  REVERSE_TOOL_INDEX,
   mapTools,
   getToolCompatibility,
   validateToolList,
@@ -51,9 +52,9 @@ test('mapTools preserves exact case for Claude', () => {
   assert.deepStrictEqual(result, ['Bash', 'Read', 'Edit']);
 });
 
-test('mapTools converts to lowercase for Copilot', () => {
+test('mapTools uses PRIMARY aliases for Copilot', () => {
   const result = mapTools(['Bash', 'Read', 'Edit'], 'copilot');
-  assert.deepStrictEqual(result, ['bash', 'read', 'edit']);
+  assert.deepStrictEqual(result, ['execute', 'read', 'edit']);
 });
 
 test('mapTools handles all canonical tools for Claude', () => {
@@ -65,14 +66,15 @@ test('mapTools handles all canonical tools for Claude', () => {
 
 test('mapTools handles all canonical tools for Copilot', () => {
   const result = mapTools(CANONICAL_TOOLS, 'copilot');
-  assert.strictEqual(result.length, CANONICAL_TOOLS.length);
-  assert.ok(result.includes('bash'));
-  assert.ok(result.includes('task'));
+  // Grep+Glob both map to 'search', so result is deduplicated: 5 not 6
+  assert.strictEqual(result.length, 5);
+  assert.ok(result.includes('execute'));
+  assert.ok(result.includes('agent'));
 });
 
 test('mapTools filters out platform-unavailable tools', () => {
   const result = mapTools(['Bash', 'WebFetch'], 'copilot');
-  assert.deepStrictEqual(result, ['bash']); // WebFetch not available on Copilot
+  assert.deepStrictEqual(result, ['execute']); // WebFetch not available on Copilot
 });
 
 test('mapTools handles empty array', () => {
@@ -100,7 +102,7 @@ test('getToolCompatibility identifies Bash as canonical and safe', () => {
   const result = getToolCompatibility('Bash');
   assert.strictEqual(result.isCanonical, true);
   assert.strictEqual(result.claudeName, 'Bash');
-  assert.strictEqual(result.copilotName, 'bash');
+  assert.strictEqual(result.copilotName, 'execute');
   assert.strictEqual(result.safe, true);
   assert.ok(Array.isArray(result.aliases));
 });
@@ -205,9 +207,10 @@ test('Case sensitivity scenario from Pitfall 1 - Claude requires exact case', ()
   assert.ok(claudeTools.every(t => t[0] === t[0].toUpperCase()), 'Claude tools should preserve uppercase');
 });
 
-test('Aliasing scenario from Pitfall 2 - Copilot accepts lowercase', () => {
+test('Aliasing scenario from Pitfall 2 - Copilot uses PRIMARY aliases', () => {
   const copilotTools = mapTools(['Bash', 'Read', 'Edit'], 'copilot');
-  assert.ok(copilotTools.every(t => t === t.toLowerCase()), 'Copilot tools should be lowercase');
+  // PRIMARY aliases: execute, read, edit
+  assert.deepStrictEqual(copilotTools, ['execute', 'read', 'edit']);
 });
 
 test('Tool matrix coverage - all PITFALLS.md tools present', () => {
@@ -232,6 +235,207 @@ test('Platform-specific tool identification', () => {
     assert.strictEqual(compat.safe, false, `${tool} should not be safe (Claude-only)`);
     assert.strictEqual(compat.copilotName, null, `${tool} should not have Copilot name`);
   });
+});
+
+// ==================== REVERSE_TOOL_INDEX TESTS ====================
+
+test('REVERSE_TOOL_INDEX exists and is an object', () => {
+  assert.ok(typeof REVERSE_TOOL_INDEX === 'object');
+  assert.ok(Object.keys(REVERSE_TOOL_INDEX).length > 0);
+});
+
+test('REVERSE_TOOL_INDEX maps uppercase canonical to itself', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['Bash'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Read'], 'Read');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Edit'], 'Edit');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Grep'], 'Grep');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Glob'], 'Glob');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Task'], 'Task');
+});
+
+test('REVERSE_TOOL_INDEX maps lowercase canonical to uppercase', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['bash'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['read'], 'Read');
+  assert.strictEqual(REVERSE_TOOL_INDEX['edit'], 'Edit');
+  assert.strictEqual(REVERSE_TOOL_INDEX['grep'], 'Grep');
+  assert.strictEqual(REVERSE_TOOL_INDEX['glob'], 'Glob');
+  assert.strictEqual(REVERSE_TOOL_INDEX['task'], 'Task');
+});
+
+test('REVERSE_TOOL_INDEX maps Bash aliases to Bash', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['execute'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['shell'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['powershell'], 'Bash');
+});
+
+test('REVERSE_TOOL_INDEX maps Edit aliases to Edit', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['edit'], 'Edit');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Edit'], 'Edit');
+  assert.strictEqual(REVERSE_TOOL_INDEX['create'], 'Edit');
+  assert.strictEqual(REVERSE_TOOL_INDEX['MultiEdit'], 'Edit');
+});
+
+test('REVERSE_TOOL_INDEX maps Grep aliases to Grep', () => {
+  // Note: 'search' is ambiguous - both Grep and Glob map to 'search' on Copilot
+  // So we don't test 'search' here
+  assert.strictEqual(REVERSE_TOOL_INDEX['grep'], 'Grep');
+  assert.strictEqual(REVERSE_TOOL_INDEX['Grep'], 'Grep');
+});
+
+test('REVERSE_TOOL_INDEX maps Task aliases to Task', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['agent'], 'Task');
+  assert.strictEqual(REVERSE_TOOL_INDEX['custom-agent'], 'Task');
+});
+
+test('REVERSE_TOOL_INDEX is case-insensitive for aliases', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['BASH'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['bash'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['execute'], 'Bash');
+  assert.strictEqual(REVERSE_TOOL_INDEX['EXECUTE'], 'Bash');
+});
+
+test('REVERSE_TOOL_INDEX returns undefined for unknown tools', () => {
+  assert.strictEqual(REVERSE_TOOL_INDEX['UnknownTool'], undefined);
+  assert.strictEqual(REVERSE_TOOL_INDEX['xyz'], undefined);
+});
+
+// ==================== PRIMARY ALIAS TESTS ====================
+
+test('mapTools outputs PRIMARY execute for Bash on Copilot', () => {
+  const result = mapTools(['Bash'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+});
+
+test('mapTools outputs PRIMARY read for Read on Copilot', () => {
+  const result = mapTools(['Read'], 'copilot');
+  assert.deepStrictEqual(result, ['read']);
+});
+
+test('mapTools outputs PRIMARY edit for Edit on Copilot', () => {
+  const result = mapTools(['Edit'], 'copilot');
+  assert.deepStrictEqual(result, ['edit']);
+});
+
+test('mapTools outputs PRIMARY search for Grep on Copilot', () => {
+  const result = mapTools(['Grep'], 'copilot');
+  assert.deepStrictEqual(result, ['search']);
+});
+
+test('mapTools outputs PRIMARY search for Glob on Copilot', () => {
+  const result = mapTools(['Glob'], 'copilot');
+  assert.deepStrictEqual(result, ['search']);
+});
+
+test('mapTools outputs PRIMARY agent for Task on Copilot', () => {
+  const result = mapTools(['Task'], 'copilot');
+  assert.deepStrictEqual(result, ['agent']);
+});
+
+test('mapTools accepts lowercase bash and outputs PRIMARY execute', () => {
+  const result = mapTools(['bash'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+});
+
+test('mapTools accepts alias execute and outputs PRIMARY execute', () => {
+  const result = mapTools(['execute'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+});
+
+test('mapTools accepts alias shell and outputs PRIMARY execute', () => {
+  const result = mapTools(['shell'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+});
+
+test('mapTools accepts alias create and outputs PRIMARY edit', () => {
+  const result = mapTools(['create'], 'copilot');
+  assert.deepStrictEqual(result, ['edit']);
+});
+
+test('mapTools accepts alias grep and outputs PRIMARY search', () => {
+  const result = mapTools(['grep'], 'copilot');
+  assert.deepStrictEqual(result, ['search']);
+});
+
+test('mapTools accepts alias agent and outputs PRIMARY agent', () => {
+  const result = mapTools(['agent'], 'copilot');
+  assert.deepStrictEqual(result, ['agent']);
+});
+
+test('Claude continues using uppercase names', () => {
+  const result = mapTools(['Bash', 'Read', 'Edit', 'Grep', 'Glob', 'Task'], 'claude');
+  assert.deepStrictEqual(result, ['Bash', 'Read', 'Edit', 'Grep', 'Glob', 'Task']);
+});
+
+test('PRIMARY aliases work with mixed case input', () => {
+  const result = mapTools(['BASH', 'read', 'Edit', 'grep'], 'copilot');
+  assert.deepStrictEqual(result, ['execute', 'read', 'edit', 'search']);
+});
+
+test('TOOL_COMPATIBILITY_MATRIX uses PRIMARY names in copilot field', () => {
+  assert.strictEqual(TOOL_COMPATIBILITY_MATRIX['Bash'].copilot, 'execute');
+  assert.strictEqual(TOOL_COMPATIBILITY_MATRIX['Edit'].copilot, 'edit');
+  assert.strictEqual(TOOL_COMPATIBILITY_MATRIX['Grep'].copilot, 'search');
+  assert.strictEqual(TOOL_COMPATIBILITY_MATRIX['Glob'].copilot, 'search');
+  assert.strictEqual(TOOL_COMPATIBILITY_MATRIX['Task'].copilot, 'agent');
+});
+
+// ==================== DEDUPLICATION TESTS ====================
+
+test('mapTools deduplicates Grep+Glob to single search on Copilot', () => {
+  const result = mapTools(['Grep', 'Glob'], 'copilot');
+  assert.deepStrictEqual(result, ['search']);
+  assert.strictEqual(result.length, 1);
+});
+
+test('mapTools deduplicates duplicate Bash on Copilot', () => {
+  const result = mapTools(['Bash', 'Bash'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+  assert.strictEqual(result.length, 1);
+});
+
+test('mapTools deduplicates aliases that map to same tool on Copilot', () => {
+  const result = mapTools(['bash', 'execute', 'shell'], 'copilot');
+  assert.deepStrictEqual(result, ['execute']);
+  assert.strictEqual(result.length, 1);
+});
+
+test('mapTools preserves order for unique tools on Copilot', () => {
+  const result = mapTools(['Bash', 'Read', 'Edit'], 'copilot');
+  assert.deepStrictEqual(result, ['execute', 'read', 'edit']);
+});
+
+test('mapTools preserves order for first occurrence when deduplicating', () => {
+  const result = mapTools(['Grep', 'Read', 'Glob'], 'copilot');
+  assert.deepStrictEqual(result, ['search', 'read']);
+  // search appears at position 0 (from Grep), Glob duplicate removed
+});
+
+test('Claude does NOT deduplicate Grep and Glob', () => {
+  const result = mapTools(['Grep', 'Glob'], 'claude');
+  assert.deepStrictEqual(result, ['Grep', 'Glob']);
+  assert.strictEqual(result.length, 2);
+});
+
+test('Deduplication works with all canonical tools on Copilot', () => {
+  const result = mapTools(['Bash', 'Read', 'Edit', 'Grep', 'Glob', 'Task'], 'copilot');
+  assert.deepStrictEqual(result, ['execute', 'read', 'edit', 'search', 'agent']);
+  assert.strictEqual(result.length, 5); // 6 tools → 5 after Grep+Glob dedup
+});
+
+test('Deduplication handles multiple duplicates correctly', () => {
+  const result = mapTools(['Bash', 'Grep', 'Bash', 'Glob', 'Grep'], 'copilot');
+  assert.deepStrictEqual(result, ['execute', 'search']);
+  assert.strictEqual(result.length, 2);
+});
+
+test('Deduplication preserves non-duplicate tools', () => {
+  const result = mapTools(['Read', 'Grep', 'Glob', 'Edit'], 'copilot');
+  assert.deepStrictEqual(result, ['read', 'search', 'edit']);
+});
+
+test('Empty array remains empty after deduplication', () => {
+  const result = mapTools([], 'copilot');
+  assert.deepStrictEqual(result, []);
 });
 
 // ==================== SUMMARY ====================

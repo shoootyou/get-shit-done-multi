@@ -50,7 +50,7 @@ const TOOL_COMPATIBILITY_MATRIX = {
   'Edit': {
     claude: 'Edit',
     copilot: 'edit',  // PRIMARY alias (replaces 'write')
-    aliases: ['Edit', 'edit', 'Write', 'write', 'MultiEdit', 'create'],
+    aliases: ['Edit', 'edit', 'MultiEdit', 'create'],
     safe: true,
   },
   'Grep': {
@@ -89,7 +89,7 @@ const TOOL_COMPATIBILITY_MATRIX = {
   'Write': {
     claude: 'Write',
     copilot: 'edit',  // Maps to edit on Copilot
-    aliases: ['edit', 'Edit', 'Write', 'MultiEdit'],
+    aliases: ['Write', 'MultiEdit'],
     safe: false,
     warning: 'Write is Claude-specific. Use Edit for cross-platform compatibility.',
   },
@@ -100,32 +100,73 @@ const TOOL_COMPATIBILITY_MATRIX = {
  * Built at module load time from TOOL_COMPATIBILITY_MATRIX.
  * Enables bidirectional lookup: accepts uppercase, lowercase, aliases → returns canonical.
  * 
+ * Build order: Non-canonical tools first, then canonical tools.
+ * This ensures canonical tools take precedence when there are conflicts.
+ * 
  * @constant {Object.<string, string>}
  */
 const REVERSE_TOOL_INDEX = {};
 
 // Build reverse index at module load time
+// Pass 1: Non-canonical tools first
 for (const [canonical, config] of Object.entries(TOOL_COMPATIBILITY_MATRIX)) {
-  // Canonical name itself (uppercase and lowercase)
+  if (CANONICAL_TOOLS.includes(canonical)) continue; // Skip canonical tools in pass 1
+  
+  // Canonical name itself (any case)
   REVERSE_TOOL_INDEX[canonical] = canonical;
   REVERSE_TOOL_INDEX[canonical.toLowerCase()] = canonical;
+  REVERSE_TOOL_INDEX[canonical.toUpperCase()] = canonical;
   
-  // Claude name (case-sensitive)
+  // Claude name (any case)
   if (config.claude) {
     REVERSE_TOOL_INDEX[config.claude] = canonical;
     REVERSE_TOOL_INDEX[config.claude.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[config.claude.toUpperCase()] = canonical;
   }
   
-  // Copilot name (case-insensitive)
+  // Copilot name (any case)
   if (config.copilot) {
     REVERSE_TOOL_INDEX[config.copilot] = canonical;
     REVERSE_TOOL_INDEX[config.copilot.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[config.copilot.toUpperCase()] = canonical;
   }
   
-  // All aliases (case-insensitive)
+  // All aliases (any case)
   config.aliases.forEach(alias => {
     REVERSE_TOOL_INDEX[alias] = canonical;
     REVERSE_TOOL_INDEX[alias.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[alias.toUpperCase()] = canonical;
+  });
+}
+
+// Pass 2: Canonical tools override non-canonical mappings
+for (const [canonical, config] of Object.entries(TOOL_COMPATIBILITY_MATRIX)) {
+  if (!CANONICAL_TOOLS.includes(canonical)) continue; // Skip non-canonical in pass 2
+  
+  // Canonical name itself (any case)
+  REVERSE_TOOL_INDEX[canonical] = canonical;
+  REVERSE_TOOL_INDEX[canonical.toLowerCase()] = canonical;
+  REVERSE_TOOL_INDEX[canonical.toUpperCase()] = canonical;
+  
+  // Claude name (any case)
+  if (config.claude) {
+    REVERSE_TOOL_INDEX[config.claude] = canonical;
+    REVERSE_TOOL_INDEX[config.claude.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[config.claude.toUpperCase()] = canonical;
+  }
+  
+  // Copilot name (any case)
+  if (config.copilot) {
+    REVERSE_TOOL_INDEX[config.copilot] = canonical;
+    REVERSE_TOOL_INDEX[config.copilot.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[config.copilot.toUpperCase()] = canonical;
+  }
+  
+  // All aliases (any case)
+  config.aliases.forEach(alias => {
+    REVERSE_TOOL_INDEX[alias] = canonical;
+    REVERSE_TOOL_INDEX[alias.toLowerCase()] = canonical;
+    REVERSE_TOOL_INDEX[alias.toUpperCase()] = canonical;
   });
 }
 
