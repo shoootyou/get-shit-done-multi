@@ -23,42 +23,47 @@ try {
  * Derived from PITFALLS.md research on Claude/Copilot differences
  */
 const FIELD_RULES = {
-  // Pitfall 3: Model field for optimization (Claude-only)
+  // Pitfall 3: Model field for optimization (Claude/Codex support)
   model: { 
     claude: true, 
     copilot: false,
+    codex: true,
     reason: 'Copilot ignores model field - uses main conversation model',
     suggestion: 'Remove model field for Copilot agents'
   },
   
-  // Pitfall: Color field for agent UI customization (Claude-only)
+  // Pitfall: Color field for agent UI customization (Claude/Codex support)
   color: { 
     claude: true, 
     copilot: false,
+    codex: true,
     reason: 'Copilot does not support color field in agent frontmatter',
     suggestion: 'Remove color field for Copilot agents'
   },
   
-  // Pitfall 10: Lifecycle hooks (Claude-only)
+  // Pitfall 10: Lifecycle hooks (Claude/Codex support)
   hooks: { 
     claude: true, 
     copilot: false,
+    codex: true,
     reason: 'Copilot does not support lifecycle hooks',
     suggestion: 'Use prompt text for initialization instead of hooks'
   },
   
-  // Pitfall 10: Skills system (Claude-only)
+  // Pitfall 10: Skills system (Claude/Codex support)
   skills: { 
     claude: true, 
     copilot: false,
+    codex: true,
     reason: 'Copilot does not support skills system',
     suggestion: 'Embed skill content directly in prompt text'
   },
   
-  // Pitfall 4: Denylist tool restrictions (Claude-only)
+  // Pitfall 4: Denylist tool restrictions (Claude/Codex support)
   disallowedTools: { 
     claude: true, 
     copilot: false,
+    codex: true,
     reason: 'Copilot only supports allowlist (tools field)',
     suggestion: 'Use tools allowlist instead of disallowedTools denylist'
   },
@@ -67,33 +72,38 @@ const FIELD_RULES = {
   'mcp-servers': { 
     claude: false,  // Claude inherits from global MCP config
     copilot: true,  // Copilot supports mcp-servers in frontmatter (org/enterprise)
-    reason: 'Claude inherits MCP from global config, Copilot uses frontmatter',
-    suggestion: 'For Claude, configure MCP globally. For Copilot, use mcp-servers field'
+    codex: false,   // Codex inherits from global config like Claude
+    reason: 'Claude/Codex inherit MCP from global config, Copilot uses frontmatter',
+    suggestion: 'For Claude/Codex, configure MCP globally. For Copilot, use mcp-servers field'
   },
   
-  // Common fields supported on both platforms
+  // Common fields supported on all platforms
   tools: { 
     claude: true, 
-    copilot: true 
+    copilot: true,
+    codex: true
   },
   description: { 
     claude: true, 
-    copilot: true 
+    copilot: true,
+    codex: true
   },
   name: { 
     claude: true, 
-    copilot: true 
+    copilot: true,
+    codex: true
   },
   location: {
     claude: true,
-    copilot: true
+    copilot: true,
+    codex: true
   }
 };
 
 /**
  * Transform frontmatter fields for target platform
  * @param {Object} frontmatter - Raw frontmatter from spec file
- * @param {string} platform - Target platform ('claude' or 'copilot')
+ * @param {string} platform - Target platform ('claude', 'copilot', or 'codex')
  * @returns {Object} Transformed frontmatter with warnings
  */
 function transformFields(frontmatter, platform) {
@@ -109,12 +119,12 @@ function transformFields(frontmatter, platform) {
     };
   }
 
-  if (!platform || (platform !== 'claude' && platform !== 'copilot')) {
+  if (!platform || (platform !== 'claude' && platform !== 'copilot' && platform !== 'codex')) {
     return { 
       transformed: frontmatter, 
       warnings: [{ 
         field: 'platform', 
-        reason: `Unsupported platform: ${platform}`, 
+        reason: `Unsupported platform: ${platform}. Must be 'claude', 'copilot', or 'codex'`, 
         impact: 'No transformation applied' 
       }] 
     };
@@ -161,7 +171,7 @@ function transformFields(frontmatter, platform) {
 /**
  * Validate field support for a specific platform
  * @param {string} fieldName - Name of the field to check
- * @param {string} platform - Target platform ('claude' or 'copilot')
+ * @param {string} platform - Target platform ('claude', 'copilot', or 'codex')
  * @returns {Object} Validation result with support status and warnings
  */
 function validateFieldSupport(fieldName, platform) {
@@ -207,7 +217,7 @@ function validateFieldSupport(fieldName, platform) {
 /**
  * Add platform-specific generation metadata to frontmatter
  * @param {Object} frontmatter - Transformed frontmatter object
- * @param {string} platform - Target platform ('claude' or 'copilot')
+ * @param {string} platform - Target platform ('claude', 'copilot', or 'codex')
  * @param {Object} options - Generation options
  * @param {string} options.specPath - Path to source spec file
  * @param {string} options.version - Template system version
@@ -221,6 +231,11 @@ function addPlatformMetadata(frontmatter, platform, options = {}) {
   // Claude: NO metadata fields (not in official spec)
   // Reference: https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
   if (platform === 'claude') {
+    return frontmatter;  // Return unchanged
+  }
+
+  // Codex: Similar to Claude, no metadata fields
+  if (platform === 'codex') {
     return frontmatter;  // Return unchanged
   }
 

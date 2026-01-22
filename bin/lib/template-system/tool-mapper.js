@@ -28,6 +28,7 @@ const CANONICAL_TOOLS = [
  * Structure:
  * - claude: Exact case-sensitive name for Claude
  * - copilot: Primary name for Copilot (often lowercase)
+ * - codex: Primary name for Codex (lowercase, similar to Copilot)
  * - aliases: Array of alternative names Copilot accepts
  * - safe: Whether the tool behaves consistently across platforms
  * - warning: Optional warning message for platform-specific behavior
@@ -38,36 +39,42 @@ const TOOL_COMPATIBILITY_MATRIX = {
   'Bash': {
     claude: 'Bash',
     copilot: 'execute',  // PRIMARY alias (was: 'bash')
+    codex: 'bash',       // Codex uses lowercase
     aliases: ['execute', 'bash', 'shell', 'Bash', 'powershell'],
     safe: true,
   },
   'Read': {
     claude: 'Read',
     copilot: 'read',  // Already PRIMARY
+    codex: 'read',    // Codex uses lowercase
     aliases: ['Read', 'read', 'view', 'NotebookRead'],
     safe: true,
   },
   'Edit': {
     claude: 'Edit',
     copilot: 'edit',  // PRIMARY alias (replaces 'write')
+    codex: 'edit',    // Codex uses lowercase
     aliases: ['Edit', 'edit', 'MultiEdit', 'create'],
     safe: true,
   },
   'Grep': {
     claude: 'Grep',
     copilot: 'search',  // PRIMARY alias (was: 'grep')
+    codex: 'grep',      // Codex uses lowercase
     aliases: ['Grep', 'grep', 'search'],
     safe: true,
   },
   'Glob': {
     claude: 'Glob',
     copilot: 'search',  // PRIMARY - DEDUPLICATES with Grep
+    codex: 'glob',      // Codex uses lowercase
     aliases: ['Glob', 'glob'],
     safe: true,
   },
   'Task': {
     claude: 'Task',
     copilot: 'agent',  // PRIMARY alias (was: 'task')
+    codex: 'task',     // Codex uses lowercase
     aliases: ['Task', 'task', 'agent', 'custom-agent'],
     safe: true,
     warning: 'Task invocation may have different agent types available per platform',
@@ -75,20 +82,23 @@ const TOOL_COMPATIBILITY_MATRIX = {
   'WebFetch': {
     claude: 'WebFetch',
     copilot: null,  // Not available on Copilot coding agent
+    codex: null,    // Not available on Codex
     aliases: [],
     safe: false,
-    warning: 'WebFetch is Claude-only. Not available on Copilot coding agent.',
+    warning: 'WebFetch is Claude-only. Not available on Copilot or Codex.',
   },
   'WebSearch': {
     claude: 'WebSearch',
     copilot: null,  // Not available on Copilot coding agent
+    codex: null,    // Not available on Codex
     aliases: [],
     safe: false,
-    warning: 'WebSearch is Claude-only. Not available on Copilot coding agent.',
+    warning: 'WebSearch is Claude-only. Not available on Copilot or Codex.',
   },
   'Write': {
     claude: 'Write',
     copilot: 'edit',  // Maps to edit on Copilot
+    codex: 'write',   // Codex uses lowercase
     aliases: ['Write', 'MultiEdit'],
     safe: false,
     warning: 'Write is Claude-specific. Use Edit for cross-platform compatibility.',
@@ -199,8 +209,8 @@ function mapTools(toolArray, platform) {
     throw new Error('toolArray must be an array');
   }
   
-  if (platform !== 'claude' && platform !== 'copilot') {
-    throw new Error('platform must be "claude" or "copilot"');
+  if (platform !== 'claude' && platform !== 'copilot' && platform !== 'codex') {
+    throw new Error('platform must be "claude", "copilot", or "codex"');
   }
   
   const mapped = toolArray.map(tool => {
@@ -221,7 +231,13 @@ function mapTools(toolArray, platform) {
     
     // 2. Map canonical to platform-specific PRIMARY name
     const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
-    return platform === 'claude' ? compatibility.claude : compatibility.copilot;
+    if (platform === 'claude') {
+      return compatibility.claude;
+    } else if (platform === 'copilot') {
+      return compatibility.copilot;
+    } else if (platform === 'codex') {
+      return compatibility.codex;
+    }
   }).filter(tool => tool !== null); // Remove tools not available on platform
   
   // 3. Deduplicate for Copilot (Grep + Glob both → 'search')
@@ -314,11 +330,11 @@ function validateToolList(tools, platform) {
     };
   }
   
-  if (platform !== 'claude' && platform !== 'copilot') {
+  if (platform !== 'claude' && platform !== 'copilot' && platform !== 'codex') {
     return {
       valid: false,
       warnings: [],
-      errors: ['platform must be "claude" or "copilot"'],
+      errors: ['platform must be "claude", "copilot", or "codex"'],
     };
   }
   

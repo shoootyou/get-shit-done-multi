@@ -289,10 +289,107 @@ function validateCopilotSpec(frontmatter) {
 }
 
 /**
+ * Validate agent/skill spec frontmatter for Codex platform
+ * 
+ * Codex is similar to Claude but uses lowercase tool names.
+ * 
+ * @param {Object} frontmatter - Parsed frontmatter from spec
+ * @returns {Object} Validation result
+ * @returns {boolean} return.valid - Whether spec is valid
+ * @returns {Array} return.errors - Blocking errors
+ * @returns {Array} return.warnings - Non-blocking warnings
+ */
+function validateCodexSpec(frontmatter) {
+  const errors = [];
+  const warnings = [];
+
+  if (!frontmatter || typeof frontmatter !== 'object') {
+    return {
+      valid: false,
+      errors: [{ field: 'frontmatter', message: 'Frontmatter must be a valid object' }],
+      warnings: []
+    };
+  }
+
+  // Required fields
+  if (!frontmatter.name || typeof frontmatter.name !== 'string' || frontmatter.name.trim() === '') {
+    errors.push({ field: 'name', message: 'name is required and must be a non-empty string' });
+  }
+
+  if (!frontmatter.description || typeof frontmatter.description !== 'string' || frontmatter.description.trim() === '') {
+    errors.push({ field: 'description', message: 'description is required and must be a non-empty string' });
+  }
+
+  // Tools validation (Codex uses lowercase tool names)
+  if (frontmatter.tools) {
+    // Codex accepts both string format and array format
+    let toolsArray;
+    if (typeof frontmatter.tools === 'string') {
+      // Parse comma-separated string
+      toolsArray = frontmatter.tools.split(',').map(t => t.trim());
+    } else if (Array.isArray(frontmatter.tools)) {
+      toolsArray = frontmatter.tools;
+    } else {
+      errors.push({ field: 'tools', message: 'tools must be either a comma-separated string or an array' });
+      toolsArray = [];
+    }
+    
+    if (toolsArray.length > 0) {
+      // Validate tool names against codex format (lowercase)
+      toolsArray.forEach(tool => {
+        // Skip MCP tool patterns
+        if (tool.startsWith('mcp__') && tool.includes('__', 5)) {
+          return;
+        }
+        
+        // Find canonical tool in matrix
+        const canonicalTool = Object.keys(TOOL_COMPATIBILITY_MATRIX).find(
+          canonical => TOOL_COMPATIBILITY_MATRIX[canonical].codex === tool
+        );
+        
+        if (!canonicalTool) {
+          // Check if it's an incorrectly cased version
+          const correctCase = Object.keys(TOOL_COMPATIBILITY_MATRIX).find(
+            canonical => {
+              const codexName = TOOL_COMPATIBILITY_MATRIX[canonical].codex;
+              return codexName && codexName.toLowerCase() === tool.toLowerCase();
+            }
+          );
+          
+          if (correctCase) {
+            const expectedName = TOOL_COMPATIBILITY_MATRIX[correctCase].codex;
+            errors.push({ 
+              field: 'tools', 
+              message: `Tool name "${tool}" has incorrect case. Codex requires: "${expectedName}"` 
+            });
+          } else {
+            warnings.push({ 
+              field: 'tools', 
+              message: `Unknown tool "${tool}". Verify this tool exists on Codex.` 
+            });
+          }
+        }
+      });
+    }
+  }
+
+  // Color validation
+  if (frontmatter.color !== undefined && typeof frontmatter.color !== 'string') {
+    warnings.push({ field: 'color', message: 'color should be a string' });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
  * Validate spec for target platform
  * 
  * @param {Object} frontmatter - Parsed frontmatter
- * @param {string} platform - Target platform ('claude' | 'copilot')
+ * @param {string} platform - Target platform ('claude' | 'copilot' | 'codex')
  * @returns {Object} Validation result
  */
 function validateSpec(frontmatter, platform) {
@@ -300,12 +397,14 @@ function validateSpec(frontmatter, platform) {
     return validateClaudeSpec(frontmatter);
   } else if (platform === 'copilot') {
     return validateCopilotSpec(frontmatter);
+  } else if (platform === 'codex') {
+    return validateCodexSpec(frontmatter);
   } else {
     return {
       valid: false,
       errors: [{ 
         field: 'platform', 
-        message: `Unsupported platform: ${platform}. Must be 'claude' or 'copilot'` 
+        message: `Unsupported platform: ${platform}. Must be 'claude', 'copilot', or 'codex'` 
       }],
       warnings: []
     };
@@ -355,6 +454,7 @@ function checkPromptLength(promptText, platform) {
 module.exports = {
   validateClaudeSpec,
   validateCopilotSpec,
+  validateCodexSpec,
   validateSpec,
   checkPromptLength,
   CLAUDE_MODELS,
