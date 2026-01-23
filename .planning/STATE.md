@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 4 of 8.5 (Mid-Complexity Commands)
-Plan: 4 of 5 (04-01, 04-02, 04-03, 04-04 complete - Waves 1-3 finished)
-Status: Phase 4 Wave 3 complete, Wave 4 ready (E2E verification checkpoint)
-Last activity: 2026-01-22 — Completed 04-04-PLAN.md (plan-phase anchor command)
+Phase: 5 of 8.5 (Simple Command Migration)
+Plan: 1 of 4+ (05-01 complete - Wave 1 finished)
+Status: Phase 5 Wave 1 complete, Wave 2 ready (Batch 2: Status/utility commands)
+Last activity: 2026-01-23 — Completed 05-01-PLAN.md (reference commands batch)
 
-Progress: [████░░░░░░] ~50% (4/8.5 phases, 18/? plans total)
+Progress: [█████░░░░░] ~54% (5/8.5 phases, 19/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 5.9 min
-- Total execution time: 1.8 hours
+- Total execution time: 1.9 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [████░░░░░░] ~50% (4/8.5 phases, 18/? plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
+| 05-simple-command-migration | 1 | 5.7 min | 5.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 9.5 min (03-03), 3.6 min (04-02), 6.0 min (04-01), 6.2 min (04-03), 5.4 min (04-04)
-- Trend: Phase 4 maintaining ~5min average (established patterns working well)
+- Last 5 plans: 3.6 min (04-02), 6.0 min (04-01), 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01)
+- Trend: Consistent ~5-6min per plan (established patterns working efficiently)
 
 *Updated after each plan completion*
 
@@ -102,6 +103,9 @@ Recent decisions affecting current work:
 - **[04-04]** plan-phase anchor command migration: ALL 8 CRITICAL validations must pass (13 downstream dependencies)
 - **[04-04]** Verification loop preserved exactly (3-iteration max, user intervention, return patterns)
 - **[04-04]** Flag matrix preserved (4 flags: --research, --skip-research, --gaps, --skip-verify)
+- **[05-01]** Reference-only commands ideal for Wave 1 (no dependencies, validate migration tooling)
+- **[05-01]** Tools must be simple arrays for Claude compatibility (not objects with name/required/reason)
+- **[05-01]** Metadata section removed from frontmatter (Claude platform doesn't support)
 
 ### Pending Todos
 
@@ -109,15 +113,10 @@ None yet.
 
 ### Blockers/Concerns
 
-**Manual testing required before Phase 5:**
-- plan-phase is anchor command (13 downstream dependencies)
-- Must test all 4 flags individually
-- Must verify verification loop (max 3 iterations)
-- Must test phase normalization (integers, decimals, padding)
-- Testing will be addressed in 04-05 E2E verification checkpoint
+None - Phase 4 complete, Phase 5 progressing well (4/21 commands migrated).
 
 ## Session Continuity
 
-Last session: 2026-01-22T23:30:34Z
-Stopped at: Completed 04-04-PLAN.md (plan-phase anchor command, Wave 3 complete)
+Last session: 2026-01-23T10:24:54Z
+Stopped at: Completed 05-01-PLAN.md (reference commands batch, Wave 1 complete)
 Resume file: None
