@@ -11,7 +11,7 @@ description: Structured spec-driven workflow for planning and executing software
 {{#isCodex}}- Automatically loaded when user types `$get-shit-done`{{/isCodex}}
 
 ## How to run commands
-{{#isCopilot}}GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd:` or `gsd:` as command invocations.
+{{#isCopilot}}GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `{{cmdPrefix}}` or `gsd:` as command invocations.
 
 Commands are installed as individual skills in `{{skillsPath}}/`. Load the corresponding skill:
 
@@ -42,15 +42,15 @@ The skill name is `get-shit-done` (NOT `gsd`). All commands are passed as argume
 
 ## Command definitions
 Each command loads its definition from individual skills in `{{skillsPath}}/gsd-<command>/`.
-{{/isCodex}}{{#isClaude}}Commands are invoked with `/gsd:<command>` syntax.
+{{/isCodex}}{{#isClaude}}Commands are invoked with `{{cmdPrefix}}<command>` syntax.
 
 Commands are installed as individual skills in `{{skillsPath}}/`. Load the corresponding skill:
 
 `{{skillsPath}}/gsd-<command>/SKILL.md`
 
 Example:
-- `/gsd:new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
-- `/gsd:help` -> `{{skillsPath}}/gsd-help/SKILL.md`
+- `{{cmdPrefix}}new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
+- `{{cmdPrefix}}help` -> `{{skillsPath}}/gsd-help/SKILL.md`
 {{/isClaude}}
 
 ## File references

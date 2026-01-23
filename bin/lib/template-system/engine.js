@@ -11,10 +11,12 @@ const yaml = require('js-yaml');
  * Supports Mustache-style conditionals: {{#varName}}...{{/varName}}
  * @param {string} template - Template string with {{variable}} placeholders
  * @param {Object} context - Object containing variable values
+ * @param {Object} options - Rendering options
+ * @param {boolean} options.lenient - If true, preserve undefined variables as-is (default: false)
  * @returns {string} Rendered template with variables replaced
- * @throws {Error} If template references undefined variable
+ * @throws {Error} If template references undefined variable (unless lenient=true)
  */
-function render(template, context) {
+function render(template, context, options = {}) {
   if (typeof template !== 'string') {
     throw new Error('Template must be a string');
   }
@@ -22,6 +24,8 @@ function render(template, context) {
   if (!context || typeof context !== 'object') {
     throw new Error('Context must be an object');
   }
+  
+  const lenient = options.lenient || false;
 
   let result = template;
   
@@ -29,6 +33,9 @@ function render(template, context) {
   // Matches: {{#variableName}}content{{/variableName}}
   result = result.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (match, varName, content) => {
     if (!(varName in context)) {
+      if (lenient) {
+        return match; // Preserve the original conditional block
+      }
       throw new Error(`Undefined variable in template: {{#${varName}}}`);
     }
     
@@ -46,6 +53,9 @@ function render(template, context) {
   // Matches: {{ variableName }} or {{variableName}}
   result = result.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, varName) => {
     if (!(varName in context)) {
+      if (lenient) {
+        return match; // Preserve the original variable placeholder
+      }
       throw new Error(`Undefined variable in template: {{${varName}}}`);
     }
     

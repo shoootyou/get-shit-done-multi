@@ -586,8 +586,8 @@ All must-haves verified. Phase goal achieved. Ready to proceed.
 ### Next Steps
 
 With phase complete, consider:
-1. `$get-shit-done verify-milestone` - Verify entire milestone is complete
-2. `$get-shit-done archive-milestone` - Archive completed milestone for clean slate
+1. `$gsd-verify-milestone` - Verify entire milestone is complete
+2. `$gsd-archive-milestone` - Archive completed milestone for clean slate
 
 {If gaps_found:}
 ### Gaps Found

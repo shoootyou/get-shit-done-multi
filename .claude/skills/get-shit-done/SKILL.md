@@ -11,15 +11,15 @@ description: Structured spec-driven workflow for planning and executing software
 
 
 ## How to run commands
-Commands are invoked with `/gsd:<command>` syntax.
+Commands are invoked with `/gsd-<command>` syntax.
 
 Commands are installed as individual skills in `/home/sandbox/Library/Application Support/Claude/skills/`. Load the corresponding skill:
 
 `/home/sandbox/Library/Application Support/Claude/skills/gsd-<command>/SKILL.md`
 
 Example:
-- `/gsd:new-project` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-new-project/SKILL.md`
-- `/gsd:help` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-help/SKILL.md`
+- `/gsd-new-project` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-new-project/SKILL.md`
+- `/gsd-help` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-help/SKILL.md`
 
 
 ## File references

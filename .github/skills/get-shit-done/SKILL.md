@@ -11,7 +11,7 @@ description: Structured spec-driven workflow for planning and executing software
 
 
 ## How to run commands
-GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd:` or `gsd:` as command invocations.
+GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd-` or `gsd:` as command invocations.
 
 Commands are installed as individual skills in `/workspace/.github/copilot/skills/`. Load the corresponding skill:
 

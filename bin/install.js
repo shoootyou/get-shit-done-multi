@@ -13,6 +13,8 @@ const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
 const { generateAgent } = require('./lib/template-system/generator');
+const { buildContext } = require('./lib/template-system/context-builder');
+const { render } = require('./lib/template-system/engine');
 
 // Colors
 const cyan = '\x1b[36m';
@@ -223,8 +225,9 @@ function writeSettings(settingsPath, settings) {
 /**
  * Recursively copy directory, replacing paths in .md files using adapter
  * Deletes existing destDir first to remove orphaned files from previous versions
+ * Also renders template variables ({{cmdPrefix}}, etc.) for markdown files
  */
-function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill') {
+function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill', platform = 'claude') {
   // Clean install: remove existing destination to prevent orphaned files
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true });
@@ -243,10 +246,18 @@ function copyWithPathReplacement(srcDir, destDir, adapter, contentType = 'skill'
     }
 
     if (entry.isDirectory()) {
-      copyWithPathReplacement(srcPath, destPath, adapter, contentType);
+      copyWithPathReplacement(srcPath, destPath, adapter, contentType, platform);
     } else if (entry.name.endsWith('.md')) {
       let content = fs.readFileSync(srcPath, 'utf8');
+      
+      // Render template variables ({{cmdPrefix}}, {{gsdPath}}, etc.)
+      // Use lenient mode to preserve placeholders like {{PHASE_NAME}} in template files
+      const context = buildContext(platform);
+      content = render(content, context, { lenient: true });
+      
+      // Apply adapter-specific path replacements
       content = adapter.convertContent(content, contentType);
+      
       fs.writeFileSync(destPath, content);
     } else {
       fs.copyFileSync(srcPath, destPath);
@@ -632,7 +643,7 @@ function install(isGlobal) {
     const srcPath = path.join(gsdSrc, dir);
     const destPath = path.join(dirs.gsd, dir);
     if (fs.existsSync(srcPath)) {
-      copyWithPathReplacement(srcPath, destPath, claudeAdapter, 'skill');
+      copyWithPathReplacement(srcPath, destPath, claudeAdapter, 'skill', 'claude');
     }
   }
   
@@ -890,7 +901,7 @@ function installCopilot(projectDir = process.cwd()) {
     const srcPath = path.join(gsdSrc, dir);
     const destPath = path.join(dirs.gsd, dir);
     if (fs.existsSync(srcPath)) {
-      copyWithPathReplacement(srcPath, destPath, copilotAdapter, 'skill');
+      copyWithPathReplacement(srcPath, destPath, copilotAdapter, 'skill', 'copilot');
     }
   }
   
@@ -1075,7 +1086,7 @@ function installCodex(isGlobal) {
     const srcPath = path.join(gsdSrc, dir);
     const destPath = path.join(dirs.gsd, dir);
     if (fs.existsSync(srcPath)) {
-      copyWithPathReplacement(srcPath, destPath, codexAdapter, 'skill');
+      copyWithPathReplacement(srcPath, destPath, codexAdapter, 'skill', 'codex');
     }
   }
   

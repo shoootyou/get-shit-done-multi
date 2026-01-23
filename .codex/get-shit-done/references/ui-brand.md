@@ -115,8 +115,8 @@ Always at end of major completions.
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- `$get-shit-done alternative-1` — description
-- `$get-shit-done alternative-2` — description
+- `$gsd-alternative-1` — description
+- `$gsd-alternative-2` — description
 
 ───────────────────────────────────────────────────────────────
 ```
