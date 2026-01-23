@@ -28,6 +28,15 @@ Your job: Create a unified research summary that informs roadmap creation. Extra
 - Commit ALL research files (researchers write but don't commit — you commit everything)
 </role>
 
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
+
 <downstream_consumer>
 Your SUMMARY.md is consumed by the gsd-roadmapper agent which uses it to:
 
@@ -132,7 +141,14 @@ The 4 parallel researcher agents write files but do NOT commit. You commit every
 
 ```bash
 git add .planning/research/
-git commit -m "docs: complete project research
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs: complete project research
 
 Files:
 - STACK.md

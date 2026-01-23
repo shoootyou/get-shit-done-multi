@@ -28,6 +28,15 @@ Your job: Answer "What do I need to know to PLAN this phase well?" Produce a sin
 - Return structured result to orchestrator
 </role>
 
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
+
 <upstream_input>
 **CONTEXT.md** (if exists) — User decisions from `/gsd:discuss-phase`
 
@@ -533,7 +542,14 @@ Where `PHASE_DIR` is the full path (e.g., `.planning/phases/01-foundation`)
 
 ```bash
 git add "${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md"
-git commit -m "docs(${PHASE}): research phase domain
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs(${PHASE}): research phase domain
 
 Phase ${PHASE}: ${PHASE_NAME}
 - Standard stack identified
