@@ -1,0 +1,26 @@
+{
+  "scenarios": [
+    {
+      "name": "gsd-new-project parallel spawning",
+      "command": "gsd-new-project",
+      "expectedAgents": [
+        "gsd-project-researcher:stack",
+        "gsd-project-researcher:features",
+        "gsd-project-researcher:architecture",
+        "gsd-project-researcher:pitfalls"
+      ],
+      "testPrompt": "Create project: Todo app with React",
+      "minParallelism": 0.7
+    },
+    {
+      "name": "gsd-new-milestone parallel spawning",
+      "command": "gsd-new-milestone",
+      "expectedAgents": [
+        "gsd-project-researcher:requirements",
+        "gsd-project-researcher:constraints"
+      ],
+      "testPrompt": "Create milestone: User authentication",
+      "minParallelism": 0.7
+    }
+  ]
+}

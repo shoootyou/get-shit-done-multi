@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "name": "gsd-execute-phase @-references",
+      "command": "gsd-execute-phase",
+      "expectedReferences": [
+        "@.planning/STATE.md",
+        "@.planning/ROADMAP.md",
+        "@{plan_path}"
+      ],
+      "variableSubstitution": {
+        "plan_path": ".planning/phases/01-foundation/01-01-PLAN.md"
+      }
+    },
+    {
+      "name": "gsd-new-project @-references",
+      "command": "gsd-new-project",
+      "expectedReferences": [
+        "@.planning/STATE.md",
+        "@specs/skills/_shared.yml"
+      ],
+      "variableSubstitution": {}
+    }
+  ]
+}

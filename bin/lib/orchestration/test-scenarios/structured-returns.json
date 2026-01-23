@@ -1,0 +1,25 @@
+{
+  "scenarios": [
+    {
+      "name": "gsd-phase-researcher return format",
+      "command": "gsd-phase-researcher",
+      "expectedStatus": "research_complete",
+      "expectedHeaders": ["## RESEARCH COMPLETE"],
+      "requiredFields": ["Phase:", "Confidence:", "File Created:"]
+    },
+    {
+      "name": "gsd-planner return format",
+      "command": "gsd-planner",
+      "expectedStatus": "plan_complete",
+      "expectedHeaders": ["## PLANNING COMPLETE"],
+      "requiredFields": ["Plans:", "Wave Structure:", "Next Steps:"]
+    },
+    {
+      "name": "gsd-executor return format",
+      "command": "gsd-executor",
+      "expectedStatus": "execution_complete",
+      "expectedHeaders": ["## EXECUTION COMPLETE"],
+      "requiredFields": ["Plan:", "Tasks:", "Status:"]
+    }
+  ]
+}

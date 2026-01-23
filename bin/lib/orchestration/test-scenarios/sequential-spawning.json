@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "name": "gsd-research-phase checkpoint continuation",
+      "command": "gsd-research-phase",
+      "checkpointPattern": ".continue-here.md",
+      "expectedRespawn": true,
+      "testPrompt": "Research phase 1"
+    },
+    {
+      "name": "gsd-plan-phase with verification loop",
+      "command": "gsd-plan-phase",
+      "checkpointPattern": "PLAN.md",
+      "expectedRespawn": false,
+      "testPrompt": "Plan phase 1"
+    }
+  ]
+}
