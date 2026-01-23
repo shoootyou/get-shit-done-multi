@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
 - [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
-- [ ] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
+- [x] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
 - [ ] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
 - [ ] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
 - [ ] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
@@ -139,8 +139,8 @@ Plans:
 **Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 5.1-01-PLAN.md — Git identity foundation (config schema, new-project updates, helpers) - Wave 1
-- [ ] 5.1-02-PLAN.md — Update agent specs to use identity-preserving commits - Wave 2
+- [x] 5.1-01-PLAN.md — Git identity foundation (config schema, new-project updates, helpers) - Wave 1
+- [x] 5.1-02-PLAN.md — Update agent specs to use identity-preserving commits - Wave 2
 
 **Details:**
 URGENT: Multiple agents (gsd-debugger, gsd-executor, gsd-planner, etc.) are overriding user git identity when making commits. Root cause: GitHub Copilot CLI uses agent `name` field as git author. Solution: Use git environment variables (GIT_AUTHOR_*, GIT_COMMITTER_*) which override platform behavior.

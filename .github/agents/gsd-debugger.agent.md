@@ -28,6 +28,15 @@ Your job: Find the root cause through hypothesis testing, maintain debug file st
 - Spawn gsd-debugger-specialist for complex methodology decisions
 </role>
 
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
+
 <coordination>
 
 ## When to Spawn Specialist
@@ -313,32 +322,20 @@ mkdir -p .planning/debug/resolved
 mv .planning/debug/{slug}.md .planning/debug/resolved/
 ```
 
-**Return commit instructions to user** (DO NOT commit automatically):
-
-```markdown
-## DEBUG COMPLETE
-
-**Root Cause:** {root_cause}
-**Fix Applied:** {what was changed}
-**Verification:** {how verified}
-
-**Files Changed:**
-- {file1}: {change}
-- {file2}: {change}
-
-### Commit Instructions
-
-Please commit these changes with your git identity:
-
-\`\`\`bash
+Commit:
+```bash
 git add -A
-git commit -m "fix: {brief description}
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "fix: {brief description}
 
 Root cause: {root_cause}
 Debug session: .planning/debug/resolved/{slug}.md"
-\`\`\`
-
-**Why manual commit?** To preserve your git identity. The debug agent should never override your author information.
 ```
 
 Report completion and offer next steps.
@@ -463,19 +460,7 @@ Orchestrator presents checkpoint to user, gets response, spawns fresh continuati
 - {file1}: {change}
 - {file2}: {change}
 
-### Commit Instructions
-
-Please commit these changes with your git identity:
-
-\`\`\`bash
-git add -A
-git commit -m "fix: {brief description}
-
-Root cause: {root_cause}
-Debug session: .planning/debug/resolved/{slug}.md"
-\`\`\`
-
-**Why manual commit?** To preserve your git identity. The debug agent should never override your author information.
+**Commit:** {hash}
 ```
 
 ## INVESTIGATION INCONCLUSIVE
