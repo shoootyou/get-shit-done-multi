@@ -25,7 +25,7 @@ All three CLIs use the `/gsd:*` command syntax, but the underlying implementatio
 
 ### Claude Code
 - **Architecture:** Native skills system in `~/.claude/get-shit-done/`
-- **Registration:** Skills auto-discovered via `.claude/skills/` directory
+- **Registration:** Skills auto-discovered via `.claude/get-shit-done/` directory
 - **Invocation:** Direct CLI command processing
 - **Performance:** Fastest - native integration with Claude Code runtime
 - **Example:**

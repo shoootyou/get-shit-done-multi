@@ -679,7 +679,27 @@ function install(isGlobal) {
       }
       failures.push(`skills (${skillGenResult.failed} generation failures)`);
     } else if (skillGenResult.generated > 0) {
-      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated at ${cyan}${dirs.skills}${reset}`);
+      
+      // List each skill created (similar to Copilot installation)
+      try {
+        const skillDirs = fs.readdirSync(dirs.skills)
+          .filter(name => {
+            const fullPath = path.join(dirs.skills, name);
+            return name.startsWith('gsd-') && fs.statSync(fullPath).isDirectory();
+          });
+        
+        skillDirs.forEach(skillName => {
+          const skillPath = path.join(dirs.skills, skillName, 'SKILL.md');
+          if (fs.existsSync(skillPath)) {
+            const stats = fs.statSync(skillPath);
+            const sizeKB = (stats.size / 1024).toFixed(1);
+            console.log(`    ${green}✓${reset} ${skillName}/ (${sizeKB} KB)`);
+          }
+        });
+      } catch (err) {
+        // Silently skip listing if there's an error
+      }
     }
   }
 
@@ -1168,7 +1188,7 @@ function installCodex(isGlobal) {
   }
 
   console.log(`
-  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}$get-shit-done help${reset} for guidance.
+  ${green}Done!${reset} Start Codex CLI in this ${isGlobal ? 'session' : 'repo'} and use ${cyan}$gsd-help${reset} for guidance.
 `);
 }
 
@@ -1317,7 +1337,7 @@ function installAll() {
   console.log(`  Invoke commands with your CLI's syntax:`);
   console.log(`    • Claude Code:       ${cyan}/gsd:help${reset}`);
   console.log(`    • GitHub Copilot:    ${cyan}gsd:help${reset}`);
-  console.log(`    • Codex CLI:         ${cyan}$get-shit-done help${reset}\n`);
+  console.log(`    • Codex CLI:         ${cyan}$gsd-help${reset}\n`);
 }
 
 /**
@@ -1340,8 +1360,9 @@ function handleStatusline(settings, isInteractive, callback) {
 
   // Has existing, non-interactive mode - skip
   if (!isInteractive) {
-    console.log(`  ${yellow}⚠${reset} Skipping statusline (already configured)`);
-    console.log(`    Use ${cyan}--force-statusline${reset} to replace\n`);
+    console.log(`  ${yellow}⚠${reset} Statusline already configured in settings.json`);
+    console.log(`    ${dim}The statusline shows project status and updates in your terminal prompt.${reset}`);
+    console.log(`    Current config preserved. Use ${cyan}--force-statusline${reset} to replace.\n`);
     callback(false);
     return;
   }
