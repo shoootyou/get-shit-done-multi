@@ -896,7 +896,24 @@ function generateFromSpec(specObject, platform, options = {}) {
   }
 }
 
+/**
+ * Generate content from a template string (for simple templates without frontmatter)
+ * @param {string} templateContent - Template content with Mustache-style variables
+ * @param {string} platform - Target platform ('claude', 'copilot', 'codex')
+ * @returns {string} Generated content with variables replaced
+ */
+function generateFromTemplate(templateContent, platform) {
+  // Build context for the platform
+  const context = buildContext(platform);
+  
+  // Render template using the engine
+  const rendered = render(templateContent, context);
+  
+  return rendered;
+}
+
 module.exports = {
   generateAgent,
-  generateFromSpec
+  generateFromSpec,
+  generateFromTemplate
 };

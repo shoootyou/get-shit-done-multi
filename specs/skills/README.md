@@ -451,8 +451,8 @@ Spawns gsd-planner agent with isolated context for deep planning.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/references/planning-principles.md
-@~/.claude/get-shit-done/templates/plan.md
+@{{gsdPath}}/references/planning-principles.md
+@{{gsdPath}}/templates/plan.md
 </execution_context>
 
 <process>
@@ -501,10 +501,10 @@ After this command: Run /gsd-plan-phase 1 to start execution.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/references/questioning.md
-@~/.claude/get-shit-done/references/ui-brand.md
-@~/.claude/get-shit-done/templates/project.md
-@~/.claude/get-shit-done/templates/requirements.md
+@{{gsdPath}}/references/questioning.md
+@{{gsdPath}}/references/ui-brand.md
+@{{gsdPath}}/templates/project.md
+@{{gsdPath}}/templates/requirements.md
 </execution_context>
 
 <process>
@@ -594,7 +594,7 @@ Template system generates platform-specific files:
 
 ```bash
 # For Claude
-~/.claude/get-shit-done/skills/gsd-help.md
+{{gsdPath}}/skills/gsd-help.md
 
 # For GitHub Copilot  
 ~/.copilot/gsd/skills/gsd-help.md
@@ -616,7 +616,7 @@ Template system generates platform-specific files:
 - **Agent specs:** `/specs/agents/*.md` - Working examples of template system
 - **Template system:** `bin/lib/template-system/` - Implementation with 208 passing tests
 - **Legacy commands:** `/commands/gsd/*.md` - Original command specifications
-- **Planning templates:** `~/.claude/get-shit-done/templates/` - Reference templates
+- **Planning templates:** `{{gsdPath}}/templates/` - Reference templates
 
 ## Future Expansion
 

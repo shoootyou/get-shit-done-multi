@@ -878,21 +878,22 @@ function installCopilot(projectDir = process.cwd()) {
   // Ensure skills directory exists for SKILL.md and commands
   fs.mkdirSync(dirs.skills, { recursive: true });
 
-  // Copy SKILL.md template for Copilot
-  const skillTemplateSrc = path.join(src, 'get-shit-done', 'SKILL-copilot.md');
+  // Generate SKILL.md from template for Copilot
+  const skillTemplateSrc = path.join(src, 'get-shit-done', 'SKILL.md');
   const skillTemplateDest = path.join(dirs.skills, 'SKILL.md');
   if (fs.existsSync(skillTemplateSrc)) {
-    const skillContent = fs.readFileSync(skillTemplateSrc, 'utf8');
-    // Apply path replacement through adapter
-    const convertedContent = copilotAdapter.convertContent(skillContent, 'skill');
-    fs.writeFileSync(skillTemplateDest, convertedContent);
+    const skillTemplate = fs.readFileSync(skillTemplateSrc, 'utf8');
+    // Generate platform-specific version using template system
+    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const skillContent = generateFromTemplate(skillTemplate, 'copilot');
+    fs.writeFileSync(skillTemplateDest, skillContent);
     if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
       console.log(`  ${green}✓${reset} Installed SKILL.md`);
     } else {
       failures.push('skills/get-shit-done/SKILL.md');
     }
   } else {
-    failures.push('get-shit-done/SKILL-copilot.md (source missing)');
+    failures.push('get-shit-done/SKILL.md (source missing)');
   }
 
   // Copy CHANGELOG.md and VERSION
@@ -1059,13 +1060,15 @@ function installCodex(isGlobal) {
     failures.push('get-shit-done resources');
   }
 
-  // Copy SKILL.md to the skill root (required for Codex skill recognition)
-  const skillMdSrc = path.join(src, 'get-shit-done', 'SKILL-codex.md');
+  // Generate SKILL.md from template for Codex (required for Codex skill recognition)
+  const skillMdSrc = path.join(src, 'get-shit-done', 'SKILL.md');
   const skillMdDest = path.join(dirs.gsd, 'SKILL.md');
   if (fs.existsSync(skillMdSrc)) {
-    const skillContent = fs.readFileSync(skillMdSrc, 'utf8');
-    const convertedContent = codexAdapter.convertContent(skillContent, 'skill');
-    fs.writeFileSync(skillMdDest, convertedContent);
+    const skillTemplate = fs.readFileSync(skillMdSrc, 'utf8');
+    // Generate platform-specific version using template system
+    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const skillContent = generateFromTemplate(skillTemplate, 'codex');
+    fs.writeFileSync(skillMdDest, skillContent);
     console.log(`  ${green}✓${reset} Installed SKILL.md`);
   }
 

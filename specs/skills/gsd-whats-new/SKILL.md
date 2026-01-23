@@ -22,7 +22,7 @@ Shows version comparison, changelog entries for missed versions, and update inst
 Read installed version from VERSION file:
 
 ```bash
-cat ~/.claude/get-shit-done/VERSION 2>/dev/null
+cat {{gsdPath}}/VERSION 2>/dev/null
 ```
 
 **If VERSION file missing:**
@@ -51,7 +51,7 @@ Use WebFetch tool with:
 **If fetch fails:**
 Fall back to local changelog:
 ```bash
-cat ~/.claude/get-shit-done/CHANGELOG.md 2>/dev/null
+cat {{gsdPath}}/CHANGELOG.md 2>/dev/null
 ```
 
 Note to user: "Couldn't check for updates (offline or GitHub unavailable). Showing local changelog."
