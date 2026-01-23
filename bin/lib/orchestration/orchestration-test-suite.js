@@ -214,10 +214,16 @@ async function testParallelSpawn(scenario) {
     // Simulate parallel execution (all agents start at nearly same time)
     const agentPromises = expectedAgents.map(async (agent) => {
       await new Promise(resolve => setTimeout(resolve, 100)); // 100ms per agent
-      return { agent, completed: true };
+      return agent;
     });
     
-    return await Promise.all(agentPromises);
+    const results = await Promise.all(agentPromises);
+    
+    // Return in format expected by validator
+    return {
+      agents: results,
+      completed: true
+    };
   };
 
   // Calculate sequential estimate (if ran one after another)

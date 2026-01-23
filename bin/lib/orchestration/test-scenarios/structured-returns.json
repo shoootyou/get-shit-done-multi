@@ -11,7 +11,7 @@
       "name": "gsd-planner return format",
       "command": "gsd-planner",
       "expectedStatus": "plan_complete",
-      "expectedHeaders": ["## PLANNING COMPLETE"],
+      "expectedHeaders": ["## PLAN COMPLETE"],
       "requiredFields": ["Plans:", "Wave Structure:", "Next Steps:"]
     },
     {
