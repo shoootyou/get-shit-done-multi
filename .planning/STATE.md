@@ -109,10 +109,11 @@ Recent decisions affecting current work:
 - **[05-02]** Workflow @-references preserved to ~/.claude/get-shit-done/workflows/ (enables reuse across commands)
 - **[05-02]** Handoff file path: .planning/phases/XX-name/.continue-here.md (session continuity pattern)
 - **[05-02]** Workflow delegation pattern: Commands reference external .md files for detailed process logic
-- **[05-03]** insert-phase and remove-phase as phase management commands (distinct from add-phase which creates new phases)
-- **[05-03]** Roadmap order enforcement before phase insertion (prevents corruption)
-- **[05-04]** Todo management as two separate commands (add-todo for capture, check-todos for selection/routing)
-- **[05-04]** Interactive selection with AskUserQuestion (natural UX for complex routing decisions)
+- **[05-03]** Decimal phase numbering preserved (72 → 72.1, 72.1 → 72.2) for urgent work insertion
+- **[05-03]** (INSERTED) marker maintained for decimal phases (documentation, no behavioral difference)
+- **[05-03]** Renumbering includes directories and files (18-dashboard → 17-dashboard, 18-01-PLAN.md → 17-01-PLAN.md)
+- **[05-03]** Git commit as historical record for removals (no STATE.md "Roadmap Evolution" notes)
+- **[05-03]** Validation prevents removing completed work (checks for SUMMARY.md files)
 
 ### Pending Todos
 
@@ -120,10 +121,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5 progressing well (11/21 commands migrated, 52% complete).
+None - Phase 5 progressing well (9/21 commands migrated, 43% complete).
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:32:41Z
-Stopped at: Completed 05-04-PLAN.md (todo management commands, Batch 4 complete)
+Last session: 2026-01-23T10:33:18Z
+Stopped at: Completed 05-03-PLAN.md (phase management commands, Batch 3 complete)
 Resume file: None
