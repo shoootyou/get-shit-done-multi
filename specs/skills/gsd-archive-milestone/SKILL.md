@@ -24,18 +24,23 @@ Output: Milestone moved to history/, updated MILESTONES.md registry.
 
 <process>
 <step name="verify_milestone_exists">
-Check milestone exists in .planning/milestones/v{{version}}/
+Check milestone exists:
+
+```bash
+version="$1"
+milestone_dir=".planning/milestones/v${version}"
+```
 
 If not found:
-  Error: "Milestone v{{version}} not found in milestones/"
-  Hint: "Did you mean to complete it first? /gsd:complete-milestone {{version}}"
+  Error: "Milestone v{version} not found in milestones/"
+  Hint: "Did you mean to complete it first? /gsd:complete-milestone {version}"
 </step>
 
 <step name="create_history_directory">
 Create history directory structure:
 
 ```bash
-mkdir -p .planning/history/v{{version}}
+mkdir -p ".planning/history/v${version}"
 ```
 </step>
 
@@ -44,11 +49,11 @@ Move milestone directory to history:
 
 ```bash
 # Move entire milestone directory
-mv .planning/milestones/v{{version}}/* .planning/history/v{{version}}/
-rmdir .planning/milestones/v{{version}}
+mv ".planning/milestones/v${version}/"* ".planning/history/v${version}/"
+rmdir ".planning/milestones/v${version}"
 
 # Verify move
-ls -la .planning/history/v{{version}}/
+ls -la ".planning/history/v${version}/"
 ```
 </step>
 
@@ -57,21 +62,21 @@ Update MILESTONES.md registry with archive status:
 
 ```bash
 # Update status from "Completed" to "Archived"
-sed -i "s|Location: .planning/milestones/v{{version}}/|Location: .planning/history/v{{version}}/|" .planning/MILESTONES.md
+sed -i "s|Location: .planning/milestones/v${version}/|Location: .planning/history/v${version}/|" .planning/MILESTONES.md
 sed -i "s|Status: Completed|Status: Archived|" .planning/MILESTONES.md
 
 # Add archive timestamp
-SECTION_LINE=$(grep -n "^## v{{version}}" .planning/MILESTONES.md | cut -d: -f1)
+SECTION_LINE=$(grep -n "^## v${version}" .planning/MILESTONES.md | cut -d: -f1)
 sed -i "${SECTION_LINE}a\- **Archived:** $(date +%Y-%m-%d)" .planning/MILESTONES.md
 ```
 </step>
 
 <step name="commit">
 ```bash
-git add .planning/history/v{{version}}/
+git add ".planning/history/v${version}/"
 git add .planning/MILESTONES.md
-git rm -r .planning/milestones/v{{version}}/
-git commit -m "milestone: archive v{{version}} to history/
+git rm -r ".planning/milestones/v${version}/"
+git commit -m "milestone: archive v${version} to history/
 
 Moved to long-term storage for historical record."
 ```
@@ -79,9 +84,9 @@ Moved to long-term storage for historical record."
 
 <step name="present_summary">
 ```
-## MILESTONE ARCHIVED: v{{version}}
+## MILESTONE ARCHIVED: v{version}
 
-**Archived to:** .planning/history/v{{version}}/
+**Archived to:** .planning/history/v{version}/
 **Status:** Archived (long-term storage)
 
 Files preserved:
@@ -91,7 +96,7 @@ Files preserved:
 
 ### Recovery
 
-To restore: /gsd:restore-milestone {{version}}
+To restore: /gsd:restore-milestone {version}
 ```
 </step>
 </process>

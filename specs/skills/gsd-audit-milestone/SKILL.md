@@ -20,7 +20,7 @@ arguments:
 Check cross-phase integration and end-to-end flows before milestone completion.
 
 Purpose: Verify phases connect properly and user workflows complete end-to-end.
-Output: v{{version}}-MILESTONE-AUDIT.md with status (passed/gaps_found).
+Output: v{version}-MILESTONE-AUDIT.md with status (passed/gaps_found) where version is the milestone argument.
 </objective>
 
 <process>
@@ -42,7 +42,12 @@ find .planning/phases -name "*-SUMMARY.md" | sort
 <step name="check_existing_audit">
 Check for existing audit:
 
-If .planning/v{{version}}-MILESTONE-AUDIT.md exists:
+```bash
+version="$1"
+audit_file=".planning/v${version}-MILESTONE-AUDIT.md"
+```
+
+If audit file exists:
   Display current status
   Ask: "Re-audit or view existing? (re-audit/view)"
   If view: display and exit
@@ -58,7 +63,7 @@ task({
   description: "Audit milestone E2E flows",
   prompt: `
 <objective>
-Audit milestone {{version}} for cross-phase integration and E2E flow completion.
+Audit milestone ${version} for cross-phase integration and E2E flow completion.
 </objective>
 
 <requirements>
@@ -66,11 +71,11 @@ Audit milestone {{version}} for cross-phase integration and E2E flow completion.
 </requirements>
 
 <verification_files>
-${allVerificationMdFiles.map(f => \`@\${f}\`).join('\\n')}
+\${allVerificationMdFiles.map(f => \`@\${f}\`).join('\\n')}
 </verification_files>
 
 <summaries>
-${allSummaryFiles.map(f => \`@\${f}\`).join('\\n')}
+\${allSummaryFiles.map(f => \`@\${f}\`).join('\\n')}
 </summaries>
 
 <tasks>
@@ -82,11 +87,11 @@ ${allSummaryFiles.map(f => \`@\${f}\`).join('\\n')}
 </tasks>
 
 <output>
-Write: .planning/v{{version}}-MILESTONE-AUDIT.md
+Write: .planning/v\${version}-MILESTONE-AUDIT.md
 
 Frontmatter:
 ---
-milestone: {{version}}
+milestone: \${version}
 audited: {timestamp}
 status: passed|gaps_found
 gaps_count: {number}
@@ -116,14 +121,17 @@ gaps_count: {number}
 <step name="present_audit_results">
 After checker completes:
 
-Read .planning/v{{version}}-MILESTONE-AUDIT.md
+```bash
+cat ".planning/v${version}-MILESTONE-AUDIT.md"
+```
+
 Display status prominently
 
 If status: passed:
-  "✓ Milestone ready for completion: /gsd:complete-milestone {{version}}"
+  "✓ Milestone ready for completion: /gsd:complete-milestone {version}"
 
 If status: gaps_found:
   "⚠ Gaps found: {count} integration issues
-   Next: /gsd:plan-milestone-gaps {{version}} (creates fix phases)"
+   Next: /gsd:plan-milestone-gaps {version} (creates fix phases)"
 </step>
 </process>

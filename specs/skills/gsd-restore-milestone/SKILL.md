@@ -24,19 +24,31 @@ Output: Milestone restored to milestones/, updated registry.
 
 <process>
 <step name="verify_archived_exists">
-Check milestone exists in .planning/history/v{{version}}/
+Check milestone exists in history:
+
+```bash
+version="$1"
+history_dir=".planning/history/v${version}"
+```
 
 If not found:
-  Error: "Milestone v{{version}} not found in history/"
+  Error: "Milestone v{version} not found in history/"
   List available: ls .planning/history/
 </step>
 
 <step name="check_not_already_active">
 Check if milestone already exists in milestones/:
 
+```bash
+if [ -d ".planning/milestones/v${version}" ]; then
+  echo "Error: Milestone v${version} already active"
+  exit 1
+fi
+```
+
 If exists:
-  Error: "Milestone v{{version}} already active in milestones/"
-  Hint: "Archive it first if you want to replace: /gsd:archive-milestone {{version}}"
+  Error: "Milestone v{version} already active in milestones/"
+  Hint: "Archive it first if you want to replace: /gsd:archive-milestone {version}"
 </step>
 
 <step name="restore_milestone_files">
@@ -44,14 +56,14 @@ Move milestone from history back to milestones:
 
 ```bash
 # Create target directory
-mkdir -p .planning/milestones/v{{version}}
+mkdir -p ".planning/milestones/v${version}"
 
 # Move files
-mv .planning/history/v{{version}}/* .planning/milestones/v{{version}}/
-rmdir .planning/history/v{{version}}
+mv ".planning/history/v${version}/"* ".planning/milestones/v${version}/"
+rmdir ".planning/history/v${version}"
 
 # Verify restore
-ls -la .planning/milestones/v{{version}}/
+ls -la ".planning/milestones/v${version}/"
 ```
 </step>
 
@@ -60,21 +72,21 @@ Update MILESTONES.md registry with restored status:
 
 ```bash
 # Update location and status
-sed -i "s|Location: .planning/history/v{{version}}/|Location: .planning/milestones/v{{version}}/|" .planning/MILESTONES.md
+sed -i "s|Location: .planning/history/v${version}/|Location: .planning/milestones/v${version}/|" .planning/MILESTONES.md
 sed -i "s|Status: Archived|Status: Restored (Active)|" .planning/MILESTONES.md
 
 # Add restore timestamp
-SECTION_LINE=$(grep -n "^## v{{version}}" .planning/MILESTONES.md | cut -d: -f1)
+SECTION_LINE=$(grep -n "^## v${version}" .planning/MILESTONES.md | cut -d: -f1)
 sed -i "${SECTION_LINE}a\- **Restored:** $(date +%Y-%m-%d)" .planning/MILESTONES.md
 ```
 </step>
 
 <step name="commit">
 ```bash
-git add .planning/milestones/v{{version}}/
+git add ".planning/milestones/v${version}/"
 git add .planning/MILESTONES.md
-git rm -r .planning/history/v{{version}}/
-git commit -m "milestone: restore v{{version}} from archive
+git rm -r ".planning/history/v${version}/"
+git commit -m "milestone: restore v${version} from archive
 
 Moved from history/ back to active workspace."
 ```
@@ -82,9 +94,9 @@ Moved from history/ back to active workspace."
 
 <step name="present_summary">
 ```
-## MILESTONE RESTORED: v{{version}}
+## MILESTONE RESTORED: v{version}
 
-**Restored to:** .planning/milestones/v{{version}}/
+**Restored to:** .planning/milestones/v{version}/
 **Status:** Active (available for reference)
 
 Files restored:
@@ -94,8 +106,8 @@ Files restored:
 
 ### Next Steps
 
-- Review milestone: cat .planning/milestones/v{{version}}/ROADMAP.md
-- Archive again: /gsd:archive-milestone {{version}}
+- Review milestone: cat .planning/milestones/v{version}/ROADMAP.md
+- Archive again: /gsd:archive-milestone {version}
 ```
 </step>
 </process>

@@ -25,7 +25,13 @@ Output: New phases in ROADMAP.md addressing audit gaps.
 
 <process>
 <step name="load_audit">
-Load .planning/v{{version}}-MILESTONE-AUDIT.md
+Load milestone audit:
+
+```bash
+version="$1"
+audit_file=".planning/v${version}-MILESTONE-AUDIT.md"
+cat "$audit_file"
+```
 
 Verify status: gaps_found
 If status: passed, exit with: "No gaps to plan - audit passed"
@@ -44,11 +50,11 @@ task({
   description: "Plan gap closure phases",
   prompt: `
 <objective>
-Create gap closure phases for milestone {{version}} audit gaps.
+Create gap closure phases for milestone \${version} audit gaps.
 </objective>
 
 <audit_report>
-@.planning/v{{version}}-MILESTONE-AUDIT.md
+@.planning/v\${version}-MILESTONE-AUDIT.md
 </audit_report>
 
 <current_roadmap>
@@ -56,7 +62,7 @@ Create gap closure phases for milestone {{version}} audit gaps.
 </current_roadmap>
 
 <gaps>
-${gaps.map(g => \`
+\${gaps.map(g => \`
 Gap: \${g.description}
 Affected: \${g.affected}
 Fix needed: \${g.fix}
@@ -107,8 +113,8 @@ Present gap closure plan:
 ### Next Steps
 
 1. Execute gap closure phases: /gsd:progress (will route to execution)
-2. After gaps fixed: /gsd:audit-milestone {{version}} (re-audit)
-3. If audit passes: /gsd:complete-milestone {{version}}
+2. After gaps fixed: /gsd:audit-milestone {version} (re-audit)
+3. If audit passes: /gsd:complete-milestone {version}
 
 **Estimated time:** {phase_count} × ~1 day = {total} days
 ```
