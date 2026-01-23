@@ -129,13 +129,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-08 | Phase 2 | Complete|
 | MIGR-01 | Phase 3 | Pending |
 | MIGR-02 | Phase 1 | Complete|
-| MIGR-03 | Phase 5 | Pending |
+| MIGR-03 | Phase 5 | Complete |
 | MIGR-04 | Phase 4 | Pending |
 | MIGR-05 | Phase 3 | Pending |
-| MIGR-06 | Phase 5 | Pending |
-| MIGR-07 | Phase 3, 4, 5 | Pending |
-| MIGR-08 | Phase 3, 4, 5 | Pending |
-| MIGR-09 | Phase 5 | Pending |
+| MIGR-06 | Phase 5 | Complete |
+| MIGR-07 | Phase 3, 4, 5 | Complete |
+| MIGR-08 | Phase 3, 4, 5 | Complete |
+| MIGR-09 | Phase 5 | Complete |
 | MIGR-10 | Phase 6 | Pending |
 | MIGR-11 | Phase 8 | Pending |
 | PLAT-01 | Phase 2 | Complete|

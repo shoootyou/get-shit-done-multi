@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
 - [ ] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
-- [ ] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
+- [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
 - [ ] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
 - [ ] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
 - [ ] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
@@ -113,15 +113,15 @@ Plans:
 **Plans**: 9 plans in 5 waves
 
 Plans:
-- [ ] 05-01-PLAN.md — Batch 1: Reference commands (help, verify-installation, list-milestones) - Wave 1
-- [ ] 05-02-PLAN.md — Batch 2: Status/utility commands (whats-new, list-phase-assumptions, resume-work) - Wave 1
-- [ ] 05-03-PLAN.md — Batch 3: Phase management (add-phase, insert-phase, remove-phase) - Wave 2
-- [ ] 05-04-PLAN.md — Batch 4: Todo management (add-todo, check-todos) - Wave 2
-- [ ] 05-05-PLAN.md — Batch 5: Verification suite (verify-work, discuss-phase) - Wave 3
-- [ ] 05-06-PLAN.md — Batch 6: Milestone lifecycle (complete, audit, plan-gaps, archive, restore) - Wave 3
-- [ ] 05-07-PLAN.md — Batch 7: Update command - Wave 3
-- [ ] 05-08-PLAN.md — Batch 8: Progress routing hub (MUST GO LAST) - Wave 4
-- [ ] 05-09-PLAN.md — E2E verification checkpoint - Wave 5
+- [x] 05-01-PLAN.md — Batch 1: Reference commands (help, verify-installation, list-milestones, whats-new) - Wave 1
+- [x] 05-02-PLAN.md — Batch 2: Status/utility commands (pause-work, resume-work, list-phase-assumptions) - Wave 1
+- [x] 05-03-PLAN.md — Batch 3: Phase management (add-phase, insert-phase, remove-phase) - Wave 2
+- [x] 05-04-PLAN.md — Batch 4: Todo management (add-todo, check-todos) - Wave 2
+- [x] 05-05-PLAN.md — Batch 5: Verification suite (verify-work, discuss-phase) - Wave 3
+- [x] 05-06-PLAN.md — Batch 6: Milestone lifecycle (complete, audit, plan-gaps, archive, restore) - Wave 3
+- [x] 05-07-PLAN.md — Batch 7: Update command - Wave 3
+- [x] 05-08-PLAN.md — Batch 8: Progress routing hub (MUST GO LAST) - Wave 4
+- [x] 05-09-PLAN.md — E2E verification checkpoint - Wave 5
 
 ### Phase 6: Orchestration Validation
 **Goal**: Verify subagent spawning, structured returns, and cross-command invocation work end-to-end
