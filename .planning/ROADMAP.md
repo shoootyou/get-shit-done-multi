@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
 - [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
 - [x] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
-- [ ] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
+- [x] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
 - [ ] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
 - [ ] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
 
@@ -158,9 +158,9 @@ URGENT: Multiple agents (gsd-debugger, gsd-executor, gsd-planner, etc.) are over
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — Structured Returns + Parallel Spawning (Wave 1)
-- [ ] 06-02-PLAN.md — Sequential Spawning + @-References (Wave 2)
-- [ ] 06-03-PLAN.md — Integration Suite + Report (Wave 3)
+- [x] 06-01-PLAN.md — Structured Returns + Parallel Spawning (Wave 1)
+- [x] 06-02-PLAN.md — Sequential Spawning + @-References (Wave 2)
+- [x] 06-03-PLAN.md — Integration Suite + Report (Wave 3)
 
 ### Phase 7: Multi-Platform Testing
 **Goal**: Test installation and execution on all 3 platforms with comprehensive coverage

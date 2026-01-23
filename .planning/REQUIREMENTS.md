@@ -136,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIGR-07 | Phase 3, 4, 5 | Complete |
 | MIGR-08 | Phase 3, 4, 5 | Complete |
 | MIGR-09 | Phase 5 | Complete |
-| MIGR-10 | Phase 6 | Pending |
+| MIGR-10 | Phase 6 | Complete |
 | MIGR-11 | Phase 8 | Pending |
 | PLAT-01 | Phase 2 | Complete|
 | PLAT-02 | Phase 2 | Complete|
@@ -154,9 +154,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORCH-03 | Phase 3 | Pending |
 | ORCH-04 | Phase 3 | Pending |
 | ORCH-05 | Phase 3 | Pending |
-| ORCH-06 | Phase 4, 6 | Pending |
+| ORCH-06 | Phase 4, 6 | Complete |
 | ORCH-07 | Phase 4 | Pending |
-| ORCH-08 | Phase 6 | Pending |
+| ORCH-08 | Phase 6 | Complete |
 | TEST-01 | Phase 7 | Pending |
 | TEST-02 | Phase 7 | Pending |
 | TEST-03 | Phase 7 | Pending |
@@ -165,7 +165,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-06 | Phase 7 | Pending |
 | TEST-07 | Phase 7 | Pending |
 | TEST-08 | Phase 7 | Pending |
-| TEST-09 | Phase 6 | Pending |
+| TEST-09 | Phase 6 | Complete |
 | TEST-10 | Phase 7 | Pending |
 | DOCS-01 | Phase 8 | Pending |
 | DOCS-02 | Phase 8 | Pending |
