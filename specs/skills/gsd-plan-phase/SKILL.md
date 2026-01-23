@@ -40,7 +40,7 @@ arguments:
 ---
 
 <execution_context>
-@~/.claude/get-shit-done/references/ui-brand.md
+{{gsdPathRef}}/references/ui-brand.md
 </execution_context>
 
 <objective>

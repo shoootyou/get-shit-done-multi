@@ -31,6 +31,7 @@ function buildContext(platform, options = {}) {
   const agentsPath = options.paths?.agents || getAgentsPath(platform, configPaths);
   const skillsPath = options.paths?.skills || getSkillsPath(platform, configPaths);
   const gsdPath = options.paths?.gsd || getGsdPath(platform, configPaths);
+  const gsdPathRef = options.paths?.gsdRef || getGsdPathRef(platform);
   const workDir = options.workDir || process.cwd();
 
   // Platform flags (for conditional sections in templates)
@@ -53,6 +54,7 @@ function buildContext(platform, options = {}) {
     agentsPath,
     skillsPath,
     gsdPath,
+    gsdPathRef,
     workDir,
     
     // Capabilities
@@ -102,6 +104,20 @@ function getGsdPath(platform, configPaths) {
     codex: path.join(configPaths.global, 'skills', 'get-shit-done')
   };
   return gsdPaths[platform];
+}
+
+/**
+ * Get platform-specific reference path for @ references in skills
+ * This is the path used in @~/.claude/get-shit-done type references
+ * @private
+ */
+function getGsdPathRef(platform) {
+  const gsdPathRefs = {
+    claude: '@~/.claude/get-shit-done',
+    copilot: '@.github/get-shit-done',
+    codex: '@~/.codex/skills/get-shit-done'
+  };
+  return gsdPathRefs[platform];
 }
 
 /**

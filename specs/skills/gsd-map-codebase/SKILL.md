@@ -32,7 +32,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+{{gsdPathRef}}/workflows/map-codebase.md
 </execution_context>
 
 <context>
@@ -83,7 +83,7 @@ Map codebase technology stack and integrations
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+{{gsdPathRef}}/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -107,7 +107,7 @@ Map codebase architecture and structure
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+{{gsdPathRef}}/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -131,7 +131,7 @@ Map codebase conventions and testing practices
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+{{gsdPathRef}}/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -154,7 +154,7 @@ Identify codebase concerns and issues
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+{{gsdPathRef}}/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",

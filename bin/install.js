@@ -622,22 +622,24 @@ function install(isGlobal) {
   // Clean up orphaned files from previous versions
   cleanupOrphanedFiles(claudeDir);
 
-  // Copy commands/gsd with path replacement
-  const gsdSrc = path.join(src, 'commands', 'gsd');
-  copyWithPathReplacement(gsdSrc, dirs.commands, claudeAdapter, 'command');
-  if (verifyInstalled(dirs.commands, 'commands/gsd')) {
-    console.log(`  ${green}✓${reset} Installed commands/gsd`);
-  } else {
-    failures.push('commands/gsd');
+  // Copy workflows, templates, and references to .claude/get-shit-done/
+  const gsdSrc = path.join(src, 'get-shit-done');
+  const gsdDirs = ['workflows', 'templates', 'references'];
+  
+  fs.mkdirSync(dirs.gsd, { recursive: true });
+  
+  for (const dir of gsdDirs) {
+    const srcPath = path.join(gsdSrc, dir);
+    const destPath = path.join(dirs.gsd, dir);
+    if (fs.existsSync(srcPath)) {
+      copyWithPathReplacement(srcPath, destPath, claudeAdapter, 'skill');
+    }
   }
-
-  // Copy get-shit-done skill with path replacement
-  const skillSrc = path.join(src, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, dirs.skills, claudeAdapter, 'skill');
-  if (verifyInstalled(dirs.skills, 'get-shit-done')) {
-    console.log(`  ${green}✓${reset} Installed get-shit-done`);
+  
+  if (fs.existsSync(dirs.gsd) && fs.readdirSync(dirs.gsd).length > 0) {
+    console.log(`  ${green}✓${reset} Installed get-shit-done resources (workflows, templates, references)`);
   } else {
-    failures.push('get-shit-done');
+    failures.push('get-shit-done resources');
   }
 
   // Generate agents from specs using template system
@@ -876,16 +878,6 @@ function installCopilot(projectDir = process.cwd()) {
   // Ensure skills directory exists for SKILL.md and commands
   fs.mkdirSync(dirs.skills, { recursive: true });
 
-  // Copy commands into the skill directory
-  const commandsSrc = path.join(src, 'commands', 'gsd');
-  const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
-  copyWithPathReplacement(commandsSrc, commandsDest, copilotAdapter, 'command');
-  if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
-    console.log(`  ${green}✓${reset} Installed command definitions`);
-  } else {
-    failures.push('skills/get-shit-done/commands/gsd');
-  }
-
   // Copy SKILL.md template for Copilot
   const skillTemplateSrc = path.join(src, 'get-shit-done', 'SKILL-copilot.md');
   const skillTemplateDest = path.join(dirs.skills, 'SKILL.md');
@@ -1047,32 +1039,34 @@ function installCodex(isGlobal) {
 
   const failures = [];
 
-  // Copy core GSD resources into the skill directory
-  const skillSrc = path.join(src, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, dirs.skills, codexAdapter, 'skill');
-  if (verifyInstalled(dirs.skills, 'skills/get-shit-done')) {
-    console.log(`  ${green}✓${reset} Installed skill resources`);
+  // Copy workflows, templates, and references to skills/get-shit-done/
+  const gsdSrc = path.join(src, 'get-shit-done');
+  const gsdDirs = ['workflows', 'templates', 'references'];
+  
+  fs.mkdirSync(dirs.gsd, { recursive: true });
+  
+  for (const dir of gsdDirs) {
+    const srcPath = path.join(gsdSrc, dir);
+    const destPath = path.join(dirs.gsd, dir);
+    if (fs.existsSync(srcPath)) {
+      copyWithPathReplacement(srcPath, destPath, codexAdapter, 'skill');
+    }
+  }
+  
+  if (fs.existsSync(dirs.gsd) && fs.readdirSync(dirs.gsd).length > 0) {
+    console.log(`  ${green}✓${reset} Installed get-shit-done resources (workflows, templates, references)`);
   } else {
-    failures.push('skills/get-shit-done');
+    failures.push('get-shit-done resources');
   }
 
   // Copy SKILL.md to the skill root (required for Codex skill recognition)
   const skillMdSrc = path.join(src, 'get-shit-done', 'SKILL-codex.md');
-  const skillMdDest = path.join(dirs.skills, 'SKILL.md');
+  const skillMdDest = path.join(dirs.gsd, 'SKILL.md');
   if (fs.existsSync(skillMdSrc)) {
     const skillContent = fs.readFileSync(skillMdSrc, 'utf8');
     const convertedContent = codexAdapter.convertContent(skillContent, 'skill');
     fs.writeFileSync(skillMdDest, convertedContent);
-  }
-
-  // Copy commands into the skill directory (commands embedded in skills for Codex)
-  const commandsSrc = path.join(src, 'commands', 'gsd');
-  const commandsDest = path.join(dirs.skills, 'commands', 'gsd');
-  copyWithPathReplacement(commandsSrc, commandsDest, codexAdapter, 'command');
-  if (verifyInstalled(commandsDest, 'skills/get-shit-done/commands/gsd')) {
-    console.log(`  ${green}✓${reset} Installed command definitions`);
-  } else {
-    failures.push('skills/get-shit-done/commands/gsd');
+    console.log(`  ${green}✓${reset} Installed SKILL.md`);
   }
 
   // For global Codex, commands are embedded in skills (not separate prompts)
@@ -1081,7 +1075,7 @@ function installCodex(isGlobal) {
 
   // Copy CHANGELOG.md and VERSION
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(dirs.skills, 'CHANGELOG.md');
+  const changelogDest = path.join(dirs.gsd, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
@@ -1091,7 +1085,7 @@ function installCodex(isGlobal) {
     }
   }
 
-  const versionDest = path.join(dirs.skills, 'VERSION');
+  const versionDest = path.join(dirs.gsd, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);

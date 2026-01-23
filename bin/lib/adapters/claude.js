@@ -27,9 +27,10 @@ function getTargetDirs(isGlobal) {
   const basePath = isGlobal ? global : local;
   
   return {
-    skills: path.join(basePath, 'get-shit-done'),
+    skills: path.join(basePath, 'skills'),
     agents: path.join(basePath, 'agents'),
-    commands: path.join(basePath, 'commands', 'gsd')
+    gsd: path.join(basePath, 'get-shit-done'), // workflows, templates, references
+    commands: null // Commands removed - embedded in skills
   };
 }
 

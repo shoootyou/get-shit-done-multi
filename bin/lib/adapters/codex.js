@@ -37,8 +37,9 @@ function getTargetDirs(isGlobal) {
   const skillsPath = path.join(basePath, 'skills', 'get-shit-done');
   
   return {
-    skills: skillsPath,
+    skills: path.join(basePath, 'skills'),
     agents: path.join(skillsPath, 'agents'), // Agents nested in skills for Codex
+    gsd: path.join(basePath, 'skills', 'get-shit-done'), // workflows, templates, references
     commands: null // Commands embedded in skills, invoked with $get-shit-done
   };
 }

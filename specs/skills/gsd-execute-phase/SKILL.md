@@ -27,8 +27,8 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/references/ui-brand.md
-@~/.claude/get-shit-done/workflows/execute-phase.md
+{{gsdPathRef}}/references/ui-brand.md
+{{gsdPathRef}}/workflows/execute-phase.md
 </execution_context>
 
 <context>
@@ -251,7 +251,7 @@ Plans with `autonomous: false` have checkpoints. The execute-phase.md workflow h
 - Orchestrator presents to user, collects response
 - Spawns fresh continuation agent (not resume)
 
-See `@~/.claude/get-shit-done/workflows/execute-phase.md` step `checkpoint_handling` for complete details.
+See `{{gsdPathRef}}/workflows/execute-phase.md` step `checkpoint_handling` for complete details.
 </checkpoint_handling>
 
 <deviation_rules>
