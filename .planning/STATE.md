@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 2 of 4+ (05-01, 05-02 complete - Wave 1 finished)
-Status: Phase 5 Wave 1 complete, Batch 2 complete, Wave 2 ready
-Last activity: 2026-01-23 — Completed 05-02-PLAN.md (workflow delegation commands)
+Plan: 3 of 4+ (05-01, 05-02, 05-03 complete - Batches 1-3 finished)
+Status: Phase 5 Wave 2 in progress, 9/21 commands migrated
+Last activity: 2026-01-23 — Completed 05-03-PLAN.md (phase management commands)
 
-Progress: [█████░░░░░] ~56% (5/8.5 phases, 20/? plans total)
+Progress: [█████░░░░░] ~56% (5/8.5 phases, 21/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 5.9 min
-- Total execution time: 1.95 hours
+- Total plans completed: 21
+- Average duration: 5.6 min
+- Total execution time: 1.97 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [█████░░░░░] ~56% (5/8.5 phases, 20/? plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
-| 05-simple-command-migration | 2 | 11.7 min | 5.9 min |
+| 05-simple-command-migration | 3 | 17.3 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 6.0 min (04-01), 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01), 6.0 min (05-02)
+- Last 5 plans: 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01), 6.0 min (05-02), 5.4 min (05-03)
 - Trend: Consistent ~5-6min per plan (established patterns working efficiently)
 
 *Updated after each plan completion*
@@ -109,6 +109,10 @@ Recent decisions affecting current work:
 - **[05-02]** Workflow @-references preserved to ~/.claude/get-shit-done/workflows/ (enables reuse across commands)
 - **[05-02]** Handoff file path: .planning/phases/XX-name/.continue-here.md (session continuity pattern)
 - **[05-02]** Workflow delegation pattern: Commands reference external .md files for detailed process logic
+- **[05-03]** insert-phase and remove-phase as phase management commands (distinct from add-phase which creates new phases)
+- **[05-03]** Roadmap order enforcement before phase insertion (prevents corruption)
+- **[05-04]** Todo management as two separate commands (add-todo for capture, check-todos for selection/routing)
+- **[05-04]** Interactive selection with AskUserQuestion (natural UX for complex routing decisions)
 
 ### Pending Todos
 
@@ -116,10 +120,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5 progressing well (6/21 commands migrated, 29% complete).
+None - Phase 5 progressing well (11/21 commands migrated, 52% complete).
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:26:10Z
-Stopped at: Completed 05-02-PLAN.md (workflow delegation commands, Batch 2 complete)
+Last session: 2026-01-23T10:32:41Z
+Stopped at: Completed 05-04-PLAN.md (todo management commands, Batch 4 complete)
 Resume file: None
