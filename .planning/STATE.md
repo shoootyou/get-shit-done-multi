@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 6 of 9 (05-01 through 05-05, 05-07 complete - Wave 3 finished)
-Status: Phase 5 progressing well, 13/21 commands migrated (62% of phase)
-Last activity: 2026-01-23 — Completed 05-05-PLAN.md (verification suite: verify-work, discuss-phase)
+Plan: 7 of 9 (05-01 through 05-07 complete - Waves 1-3 finished)
+Status: Phase 5 Wave 3 complete, 14/21 commands migrated (67% of phase)
+Last activity: 2026-01-23 — Completed 05-06-PLAN.md (milestone lifecycle: complete, audit, plan-gaps, archive, restore)
 
-Progress: [█████░░░░░] ~59% (5/8.5 phases, 22 plans total)
+Progress: [█████░░░░░] ~60% (5/8.5 phases, 23 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
-- Average duration: 5.8 min
-- Total execution time: 2.15 hours
+- Total plans completed: 23
+- Average duration: 5.7 min
+- Total execution time: 2.22 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████░░░░░] ~59% (5/8.5 phases, 22 plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 5 | 38.8 min | 7.8 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
-| 05-simple-command-migration | 6 | 31.3 min | 5.2 min |
+| 05-simple-command-migration | 7 | 38.3 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5.4 min (05-03), 4.7 min (05-04), 5.8 min (05-05), 3.7 min (05-07), [pending]
-- Trend: Consistent ~5min per plan, Phase 5 maintaining efficiency
+- Last 5 plans: 4.7 min (05-04), 5.8 min (05-05), 7.0 min (05-06), 3.7 min (05-07), [pending]
+- Trend: Consistent ~5min per plan, Wave 3 batch work efficient
 
 *Updated after each plan completion*
 
@@ -118,6 +118,10 @@ Recent decisions affecting current work:
 - **[05-05]** Conversational UAT: one test at a time, plain text responses, severity inferred from description
 - **[05-05]** discuss-phase references external workflow and template files via @-references
 - **[05-05]** Domain-aware gray areas: analyze phase goal to generate specific discussion topics (not generic)
+- **[05-06]** Bash variable syntax (\${version}) instead of Mustache ({{version}}) to avoid template engine conflicts
+- **[05-06]** Milestone lifecycle dependency chain: audit must pass before completion (enforced via status checks)
+- **[05-06]** Spawning with full context: Pass @-references to all relevant files for spawned agents (requirements, summaries, verification)
+- **[05-06]** Archive/restore cycle: milestones/ for active, history/ for long-term storage with recovery option
 - **[05-07]** Git-based update workflow (fetch, compare versions, pull) instead of npm-based
 - **[05-07]** Tools format must be simple string arrays for Claude compatibility (not object arrays with name field)
 
@@ -127,10 +131,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5 progressing well (13/21 commands migrated, 62% complete).
+None - Phase 5 Wave 3 complete (14/21 commands migrated, 67% complete). Wave 4 (progress routing) can now proceed.
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:41:24Z
-Stopped at: Completed 05-05-PLAN.md (verification suite: verify-work, discuss-phase)
+Last session: 2026-01-23T10:45:00Z
+Stopped at: Completed 05-06-PLAN.md (milestone lifecycle commands, Wave 3 complete)
 Resume file: None
