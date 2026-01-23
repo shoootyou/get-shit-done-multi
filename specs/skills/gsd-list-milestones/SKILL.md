@@ -33,7 +33,7 @@ Provides visibility into what has been archived and enables milestone discovery 
 ls .planning/MILESTONES.md 2>/dev/null
 ```
 
-If missing: Display "No milestones archived yet. Archive your first milestone with /gsd:archive-milestone"
+If missing: Display "No milestones archived yet. Archive your first milestone with {{cmdPrefix}}archive-milestone"
 
 If exists: Parse and display milestone table from registry.
 
@@ -47,7 +47,7 @@ Verify `.planning/MILESTONES.md` exists:
 
 ```bash
 if [ ! -f .planning/MILESTONES.md ]; then
-  echo "No milestones archived yet. Archive your first milestone with /gsd:archive-milestone"
+  echo "No milestones archived yet. Archive your first milestone with {{cmdPrefix}}archive-milestone"
   exit 0
 fi
 ```
@@ -88,7 +88,7 @@ Present workflow output showing all archived milestones in table format.
 
 List all archived milestones:
 ```
-/gsd:list-milestones
+{{cmdPrefix}}list-milestones
 ```
 
 Expected output (when milestones exist):
@@ -103,12 +103,12 @@ Archived Milestones
 
 Total: 2 milestone(s) archived
 
-Restore a milestone: /gsd:restore-milestone [name]
+Restore a milestone: {{cmdPrefix}}restore-milestone [name]
 ```
 
 Expected output (when no milestones):
 ```
-No milestones archived yet. Archive your first milestone with /gsd:archive-milestone
+No milestones archived yet. Archive your first milestone with {{cmdPrefix}}archive-milestone
 ```
 
 ## Prerequisites
@@ -130,9 +130,9 @@ No milestones archived yet. Archive your first milestone with /gsd:archive-miles
 
 ## Related Commands
 
-- `/gsd:archive-milestone` - Archive a completed milestone
-- `/gsd:restore-milestone` - Restore an archived milestone (future)
-- `/gsd:new-milestone` - Start planning a new milestone
+- `{{cmdPrefix}}archive-milestone` - Archive a completed milestone
+- `{{cmdPrefix}}restore-milestone` - Restore an archived milestone (future)
+- `{{cmdPrefix}}new-milestone` - Start planning a new milestone
 
 ## Implementation
 

@@ -39,7 +39,7 @@ Parse the command arguments:
 - First argument: integer phase number to insert after
 - Remaining arguments: phase description
 
-Example: `/gsd:insert-phase 72 Fix critical auth bug`
+Example: `{{cmdPrefix}}insert-phase 72 Fix critical auth bug`
 → after = 72
 → description = "Fix critical auth bug"
 
@@ -48,8 +48,8 @@ Validation:
 ```bash
 if [ $# -lt 2 ]; then
   echo "ERROR: Both phase number and description required"
-  echo "Usage: /gsd:insert-phase <after> <description>"
-  echo "Example: /gsd:insert-phase 72 Fix critical auth bug"
+  echo "Usage: {{cmdPrefix}}insert-phase <after> <description>"
+  echo "Example: {{cmdPrefix}}insert-phase 72 Fix critical auth bug"
   exit 1
 fi
 ```
@@ -154,7 +154,7 @@ Insert the new phase entry into the roadmap:
    **Plans:** 0 plans
 
    Plans:
-   - [ ] TBD (run /gsd:plan-phase {decimal_phase} to break down)
+   - [ ] TBD (run {{cmdPrefix}}plan-phase {decimal_phase} to break down)
 
    **Details:**
    [To be added during planning]
@@ -200,7 +200,7 @@ Project state updated: .planning/STATE.md
 
 **Phase {decimal_phase}: {description}** — urgent insertion
 
-`/gsd:plan-phase {decimal_phase}`
+`{{cmdPrefix}}plan-phase {decimal_phase}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -218,11 +218,11 @@ Project state updated: .planning/STATE.md
 
 <anti_patterns>
 
-- Don't use this for planned work at end of milestone (use /gsd:add-phase)
+- Don't use this for planned work at end of milestone (use {{cmdPrefix}}add-phase)
 - Don't insert before Phase 1 (decimal 0.1 makes no sense)
 - Don't renumber existing phases
 - Don't modify the target phase content
-- Don't create plans yet (that's /gsd:plan-phase)
+- Don't create plans yet (that's {{cmdPrefix}}plan-phase)
 - Don't commit changes (user decides when to commit)
   </anti_patterns>
 

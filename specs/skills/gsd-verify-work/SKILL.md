@@ -21,7 +21,7 @@ Validate built features through conversational testing with persistent state.
 
 Purpose: Confirm what Claude built actually works from user's perspective. One test at a time, plain text responses, no interrogation. When issues are found, automatically diagnose, plan fixes, and prepare for execution.
 
-Output: {phase}-UAT.md tracking all test results. If issues found: diagnosed gaps, verified fix plans ready for /gsd:execute-phase
+Output: {phase}-UAT.md tracking all test results. If issues found: diagnosed gaps, verified fix plans ready for {{cmdPrefix}}execute-phase
 </objective>
 
 <execution_context>
@@ -303,15 +303,15 @@ UAT complete ✓
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-/gsd:discuss-phase {Z+1} — gather context and clarify approach
+{{cmdPrefix}}discuss-phase {Z+1} — gather context and clarify approach
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:plan-phase {Z+1} — skip discussion, plan directly
-- /gsd:execute-phase {Z+1} — skip to execution (if already planned)
+- {{cmdPrefix}}plan-phase {Z+1} — skip discussion, plan directly
+- {{cmdPrefix}}execute-phase {Z+1} — skip to execution (if already planned)
 
 ───────────────────────────────────────────────────────────────
 
@@ -334,14 +334,14 @@ Final phase verified ✓
 
 **Audit milestone** — verify requirements, cross-phase integration, E2E flows
 
-/gsd:audit-milestone
+{{cmdPrefix}}audit-milestone
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:complete-milestone — skip audit, archive directly
+- {{cmdPrefix}}complete-milestone — skip audit, archive directly
 
 ───────────────────────────────────────────────────────────────
 
@@ -369,7 +369,7 @@ Fix plans verified ✓
 
 **Execute fix plans** — run diagnosed fixes
 
-/gsd:execute-phase {Z} --gaps-only
+{{cmdPrefix}}execute-phase {Z} --gaps-only
 
 <sub>/clear first → fresh context window</sub>
 
@@ -377,7 +377,7 @@ Fix plans verified ✓
 
 **Also available:**
 - cat .planning/phases/{phase_dir}/*-PLAN.md — review fix plans
-- /gsd:plan-phase {Z} --gaps — regenerate fix plans
+- {{cmdPrefix}}plan-phase {Z} --gaps — regenerate fix plans
 
 ───────────────────────────────────────────────────────────────
 
@@ -412,8 +412,8 @@ Review the issues above and either:
 ───────────────────────────────────────────────────────────────
 
 **Options:**
-- /gsd:plan-phase {Z} --gaps — retry fix planning with guidance
-- /gsd:discuss-phase {Z} — gather more context before replanning
+- {{cmdPrefix}}plan-phase {Z} --gaps — retry fix planning with guidance
+- {{cmdPrefix}}discuss-phase {Z} — gather more context before replanning
 
 ───────────────────────────────────────────────────────────────
 </offer_next>
@@ -436,5 +436,5 @@ Review the issues above and either:
 - [ ] If issues: parallel debug agents diagnose root causes
 - [ ] If issues: gsd-planner creates fix plans from diagnosed gaps
 - [ ] If issues: gsd-plan-checker verifies fix plans (max 3 iterations)
-- [ ] Ready for `/gsd:execute-phase` when complete
+- [ ] Ready for `{{cmdPrefix}}execute-phase` when complete
 </success_criteria>

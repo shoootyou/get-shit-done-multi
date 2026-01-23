@@ -42,6 +42,9 @@ function buildContext(platform, options = {}) {
   // Platform capabilities (based on research/PITFALLS.md findings)
   const capabilities = getPlatformCapabilities(platform);
 
+  // Command prefix for each platform
+  const cmdPrefix = getCommandPrefix(platform);
+
   // Build final context object
   const context = {
     // Platform identification
@@ -49,6 +52,9 @@ function buildContext(platform, options = {}) {
     isClaude,
     isCopilot,
     isCodex,
+    
+    // Command prefix
+    cmdPrefix,
     
     // Paths
     agentsPath,
@@ -289,3 +295,19 @@ module.exports = {
   getFieldWarning,
   getPlatformLimits
 };
+
+/**
+ * Get command prefix for platform
+ * Used for skill commands (e.g., /gsd-add-phase or $gsd-add-phase)
+ * @private
+ * @param {string} platform - Target platform
+ * @returns {string} Command prefix
+ */
+function getCommandPrefix(platform) {
+  const prefixes = {
+    claude: '/gsd-',
+    copilot: '/gsd-',
+    codex: '$gsd-'
+  };
+  return prefixes[platform] || '/gsd-';
+}

@@ -34,7 +34,7 @@ This is the brownfield equivalent of new-project. The project exists, PROJECT.md
 - `.planning/ROADMAP.md` — phase structure
 - `.planning/STATE.md` — updated project memory
 
-**After this command:** Run `/gsd:plan-phase [N]` to start execution.
+**After this command:** Run `{{cmdPrefix}}plan-phase [N]` to start execution.
 
 </objective>
 
@@ -67,7 +67,7 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 
 1. **Verify project exists:**
    ```bash
-   [ -f .planning/PROJECT.md ] || { echo "ERROR: No PROJECT.md. Run /gsd:new-project first."; exit 1; }
+   [ -f .planning/PROJECT.md ] || { echo "ERROR: No PROJECT.md. Run {{cmdPrefix}}new-project first."; exit 1; }
    ```
 
 2. **Check for active milestone (ROADMAP.md exists):**
@@ -80,10 +80,10 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided)
    - header: "Active Milestone"
    - question: "A milestone is in progress. What would you like to do?"
    - options:
-     - "Complete current first" — Run /gsd:complete-milestone
+     - "Complete current first" — Run {{cmdPrefix}}complete-milestone
      - "Continue anyway" — Start new milestone (will archive current)
 
-   If "Complete current first": Exit with routing to `/gsd:complete-milestone`
+   If "Complete current first": Exit with routing to `{{cmdPrefix}}complete-milestone`
    If "Continue anyway": Continue to Phase 2
 
 3. **Load previous milestone context:**
@@ -679,14 +679,14 @@ Present completion with next steps:
 
 **Phase [N]: [Phase Name]** — [Goal from ROADMAP.md]
 
-`/gsd:discuss-phase [N]` — gather context and clarify approach
+`{{cmdPrefix}}discuss-phase [N]` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase [N]` — skip discussion, plan directly
+- `{{cmdPrefix}}plan-phase [N]` — skip discussion, plan directly
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -722,6 +722,6 @@ Present completion with next steps:
 - [ ] Roadmap files written immediately
 - [ ] User feedback incorporated (if any)
 - [ ] ROADMAP.md, STATE.md → **committed**
-- [ ] User knows next step is `/gsd:plan-phase [N]`
+- [ ] User knows next step is `{{cmdPrefix}}plan-phase [N]`
 
 </success_criteria>

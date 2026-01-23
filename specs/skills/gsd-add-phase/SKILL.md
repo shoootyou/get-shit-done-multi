@@ -33,15 +33,15 @@ Purpose: Add planned work discovered during execution that belongs at the end of
 <step name="parse_arguments">
 Parse the command arguments:
 - All arguments become the phase description
-- Example: `/gsd:add-phase Add authentication` → description = "Add authentication"
-- Example: `/gsd:add-phase Fix critical performance issues` → description = "Fix critical performance issues"
+- Example: `{{cmdPrefix}}add-phase Add authentication` → description = "Add authentication"
+- Example: `{{cmdPrefix}}add-phase Fix critical performance issues` → description = "Fix critical performance issues"
 
 If no arguments provided:
 
 ```
 ERROR: Phase description required
-Usage: /gsd:add-phase <description>
-Example: /gsd:add-phase Add authentication system
+Usage: {{cmdPrefix}}add-phase <description>
+Example: {{cmdPrefix}}add-phase Add authentication system
 ```
 
 Exit.
@@ -135,7 +135,7 @@ Add the new phase entry to the roadmap:
    **Plans:** 0 plans
 
    Plans:
-   - [ ] TBD (run /gsd:plan-phase {N} to break down)
+   - [ ] TBD (run {{cmdPrefix}}plan-phase {N} to break down)
 
    **Details:**
    [To be added during planning]
@@ -177,14 +177,14 @@ Project state updated: .planning/STATE.md
 
 **Phase {N}: {description}**
 
-`/gsd:plan-phase {N}`
+`{{cmdPrefix}}plan-phase {N}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:add-phase <description>` — add another phase
+- `{{cmdPrefix}}add-phase <description>` — add another phase
 - Review roadmap
 
 ---
@@ -197,8 +197,8 @@ Project state updated: .planning/STATE.md
 
 - Don't modify phases outside current milestone
 - Don't renumber existing phases
-- Don't use decimal numbering (that's /gsd:insert-phase)
-- Don't create plans yet (that's /gsd:plan-phase)
+- Don't use decimal numbering (that's {{cmdPrefix}}insert-phase)
+- Don't create plans yet (that's {{cmdPrefix}}plan-phase)
 - Don't commit changes (user decides when to commit)
   </anti_patterns>
 

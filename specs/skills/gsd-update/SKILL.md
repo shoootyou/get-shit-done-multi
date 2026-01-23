@@ -240,7 +240,7 @@ Present update summary:
 ### Next Steps
 
 1. Review changelog above for new features
-2. Test critical workflows (e.g., /gsd:progress)
+2. Test critical workflows (e.g., {{cmdPrefix}}progress)
 3. Report any issues on GitHub
 
 **Note:** Skills and agents were not regenerated. Run installation 

@@ -48,7 +48,7 @@ fi
 
 If exists:
   Error: "Milestone v{version} already active in milestones/"
-  Hint: "Archive it first if you want to replace: /gsd:archive-milestone {version}"
+  Hint: "Archive it first if you want to replace: {{cmdPrefix}}archive-milestone {version}"
 </step>
 
 <step name="restore_milestone_files">
@@ -107,7 +107,7 @@ Files restored:
 ### Next Steps
 
 - Review milestone: cat .planning/milestones/v{version}/ROADMAP.md
-- Archive again: /gsd:archive-milestone {version}
+- Archive again: {{cmdPrefix}}archive-milestone {version}
 ```
 </step>
 </process>

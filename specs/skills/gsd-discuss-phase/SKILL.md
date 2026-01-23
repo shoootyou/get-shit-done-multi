@@ -220,14 +220,14 @@ Decisions: {count} captured in CONTEXT.md
 
 **Research phase** — investigate open questions and validate approach
 
-/gsd:research-phase {phase}
+{{cmdPrefix}}research-phase {phase}
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:plan-phase {phase} — skip research, plan directly (if confident)
+- {{cmdPrefix}}plan-phase {phase} — skip research, plan directly (if confident)
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -247,14 +247,14 @@ Research may need refresh if decisions changed significantly.
 
 **Plan phase** — create execution plans with updated context
 
-/gsd:plan-phase {phase}
+{{cmdPrefix}}plan-phase {phase}
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:research-phase {phase} --refresh — re-research with new context
+- {{cmdPrefix}}research-phase {phase} --refresh — re-research with new context
 - cat .planning/phases/{phase_dir}/*-CONTEXT.md — review decisions
 
 ───────────────────────────────────────────────────────────────

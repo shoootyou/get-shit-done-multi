@@ -26,14 +26,14 @@ Provides situational awareness before continuing work. Routes to 11 different co
 if [ ! -d ".planning" ]; then
   echo "No planning structure found."
   echo ""
-  echo "Run /gsd:new-project to start a new project."
+  echo "Run {{cmdPrefix}}new-project to start a new project."
   exit 0
 fi
 
 if [ ! -f ".planning/STATE.md" ]; then
   echo "Planning structure incomplete - missing STATE.md"
   echo ""
-  echo "Run /gsd:new-project to start a new project."
+  echo "Run {{cmdPrefix}}new-project to start a new project."
   exit 0
 fi
 
@@ -45,14 +45,14 @@ if [ ! -f ".planning/ROADMAP.md" ] && [ -f ".planning/PROJECT.md" ]; then
   echo ""
   echo "**Start Next Milestone** — questioning → research → requirements → roadmap"
   echo ""
-  echo "/gsd:new-milestone"
+  echo "{{cmdPrefix}}new-milestone"
   exit 0
 fi
 
 if [ ! -f ".planning/ROADMAP.md" ]; then
   echo "Planning structure incomplete - missing ROADMAP.md"
   echo ""
-  echo "Run /gsd:new-project to start a new project."
+  echo "Run {{cmdPrefix}}new-project to start a new project."
   exit 0
 fi
 ```
@@ -195,9 +195,9 @@ Plans: ${SUMMARY_COUNT}/${PLAN_COUNT} complete
 ## Blockers/Concerns
 [Extract from STATE.md Blockers/Concerns section]
 
-${TODO_COUNT > 0 ? "## Pending Todos\n- ${TODO_COUNT} pending — /gsd:check-todos to review\n" : ""}
+${TODO_COUNT > 0 ? "## Pending Todos\n- ${TODO_COUNT} pending — {{cmdPrefix}}check-todos to review\n" : ""}
 
-${DEBUG_COUNT > 0 ? "## Active Debug Sessions\n- ${DEBUG_COUNT} active — /gsd:debug to continue\n" : ""}
+${DEBUG_COUNT > 0 ? "## Active Debug Sessions\n- ${DEBUG_COUNT} active — {{cmdPrefix}}debug to continue\n" : ""}
 
 ## What's Next
 [Determined by routing logic below]
@@ -230,12 +230,12 @@ if [ "$UAT_WITH_GAPS" -gt 0 ]; then
   
   Phase ${CURRENT_PHASE} has ${UAT_WITH_GAPS} UAT file(s) with diagnosed gaps.
   
-  /gsd:plan-phase ${CURRENT_PHASE} --gaps
+  {{cmdPrefix}}plan-phase ${CURRENT_PHASE} --gaps
   
   ---
   Also available:
-  - /gsd:execute-phase ${CURRENT_PHASE} — execute existing plans  
-  - /gsd:verify-work ${CURRENT_PHASE} — run more UAT testing
+  - {{cmdPrefix}}execute-phase ${CURRENT_PHASE} — execute existing plans  
+  - {{cmdPrefix}}verify-work ${CURRENT_PHASE} — run more UAT testing
   
   Exit
 fi
@@ -262,7 +262,7 @@ if [ "$SUMMARY_COUNT" -lt "$PLAN_COUNT" ] && [ "$PLAN_COUNT" -gt 0 ]; then
   
   ${CURRENT_PHASE}-${NEXT_PLAN_PADDED}: ${PLAN_OBJECTIVE}
   
-  /gsd:execute-phase ${CURRENT_PHASE}
+  {{cmdPrefix}}execute-phase ${CURRENT_PHASE}
   
   <sub>/clear first → fresh context window</sub>
   ---
@@ -289,13 +289,13 @@ if [ "$SUMMARY_COUNT" -eq "$PLAN_COUNT" ] && [ "$PLAN_COUNT" -gt 0 ]; then
     
     Complete Milestone — archive and prepare for next
     
-    /gsd:complete-milestone
+    {{cmdPrefix}}complete-milestone
     
     <sub>/clear first → fresh context window</sub>
     ---
     
     Also available:
-    - /gsd:verify-work — user acceptance test before completing
+    - {{cmdPrefix}}verify-work — user acceptance test before completing
     
     Exit
   else
@@ -312,15 +312,15 @@ if [ "$SUMMARY_COUNT" -eq "$PLAN_COUNT" ] && [ "$PLAN_COUNT" -gt 0 ]; then
     
     Phase ${NEXT_PHASE_NUM}: ${NEXT_PHASE_NAME}
     
-    /gsd:discuss-phase ${NEXT_PHASE_NUM}
+    {{cmdPrefix}}discuss-phase ${NEXT_PHASE_NUM}
     
     <sub>/clear first → fresh context window</sub>
     ---
     
     Also available:
-    - /gsd:plan-phase ${NEXT_PHASE_NUM} — skip discussion, plan directly
-    - /gsd:research-phase ${NEXT_PHASE_NUM} — research-heavy planning
-    - /gsd:verify-work ${CURRENT_PHASE} — user acceptance test before continuing
+    - {{cmdPrefix}}plan-phase ${NEXT_PHASE_NUM} — skip discussion, plan directly
+    - {{cmdPrefix}}research-phase ${NEXT_PHASE_NUM} — research-heavy planning
+    - {{cmdPrefix}}verify-work ${CURRENT_PHASE} — user acceptance test before continuing
     
     Exit
   fi
@@ -345,7 +345,7 @@ if [ "$PLAN_COUNT" -eq 0 ]; then
     
     <sub>✓ Context gathered, ready to plan</sub>
     
-    /gsd:plan-phase ${CURRENT_PHASE}
+    {{cmdPrefix}}plan-phase ${CURRENT_PHASE}
     
     <sub>/clear first → fresh context window</sub>
     ---
@@ -359,14 +359,14 @@ if [ "$PLAN_COUNT" -eq 0 ]; then
     
     Phase ${CURRENT_PHASE}: ${PHASE_NAME} — ${PHASE_GOAL}
     
-    /gsd:discuss-phase ${CURRENT_PHASE}
+    {{cmdPrefix}}discuss-phase ${CURRENT_PHASE}
     
     <sub>/clear first → fresh context window</sub>
     ---
     
     Also available:
-    - /gsd:plan-phase ${CURRENT_PHASE} — skip discussion, plan directly
-    - /gsd:list-phase-assumptions ${CURRENT_PHASE} — see Claude's assumptions
+    - {{cmdPrefix}}plan-phase ${CURRENT_PHASE} — skip discussion, plan directly
+    - {{cmdPrefix}}list-phase-assumptions ${CURRENT_PHASE} — see Claude's assumptions
     ---
     
     Exit
@@ -386,7 +386,7 @@ if [ "$TODO_COUNT" -gt 0 ]; then
   
   Review Pending Todos — ${TODO_COUNT} todo(s) need attention
   
-  /gsd:check-todos
+  {{cmdPrefix}}check-todos
   ---
   
   Exit
@@ -405,7 +405,7 @@ if [ "$DEBUG_COUNT" -gt 0 ]; then
   
   Resume Debug Session — ${DEBUG_COUNT} active session(s)
   
-  /gsd:debug
+  {{cmdPrefix}}debug
   ---
   
   Exit
@@ -424,9 +424,9 @@ Display:
 Milestone may be complete, or planning structure needs attention.
 
 Options:
-- /gsd:complete-milestone — archive and prepare for next
-- /gsd:new-milestone — start new milestone  
-- /gsd:verify-work ${CURRENT_PHASE} — run user acceptance testing
+- {{cmdPrefix}}complete-milestone — archive and prepare for next
+- {{cmdPrefix}}new-milestone — start new milestone  
+- {{cmdPrefix}}verify-work ${CURRENT_PHASE} — run user acceptance testing
 ---
 ```
 
@@ -434,17 +434,17 @@ Options:
 
 This command routes to 11 different GSD commands based on project state:
 
-1. `/gsd:plan-phase --gaps` (UAT gaps exist)
-2. `/gsd:execute-phase` (unexecuted plans exist)
-3. `/gsd:complete-milestone` (milestone complete)
-4. `/gsd:discuss-phase` (next phase, no context)
-5. `/gsd:plan-phase` (has context or alternative)
-6. `/gsd:verify-work` (alternative for testing)
-7. `/gsd:list-phase-assumptions` (alternative for planning)
-8. `/gsd:check-todos` (pending todos)
-9. `/gsd:debug` (active debug sessions)
-10. `/gsd:new-milestone` (fallback between milestones)
-11. `/gsd:new-project` (no planning structure - from step "verify_structure")
+1. `{{cmdPrefix}}plan-phase --gaps` (UAT gaps exist)
+2. `{{cmdPrefix}}execute-phase` (unexecuted plans exist)
+3. `{{cmdPrefix}}complete-milestone` (milestone complete)
+4. `{{cmdPrefix}}discuss-phase` (next phase, no context)
+5. `{{cmdPrefix}}plan-phase` (has context or alternative)
+6. `{{cmdPrefix}}verify-work` (alternative for testing)
+7. `{{cmdPrefix}}list-phase-assumptions` (alternative for planning)
+8. `{{cmdPrefix}}check-todos` (pending todos)
+9. `{{cmdPrefix}}debug` (active debug sessions)
+10. `{{cmdPrefix}}new-milestone` (fallback between milestones)
+11. `{{cmdPrefix}}new-project` (no planning structure - from step "verify_structure")
 
 All routing decisions based on file counts and state checks.
 </step>
