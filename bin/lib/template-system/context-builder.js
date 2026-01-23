@@ -30,6 +30,7 @@ function buildContext(platform, options = {}) {
   // Build platform-specific paths
   const agentsPath = options.paths?.agents || getAgentsPath(platform, configPaths);
   const skillsPath = options.paths?.skills || getSkillsPath(platform, configPaths);
+  const gsdPath = options.paths?.gsd || getGsdPath(platform, configPaths);
   const workDir = options.workDir || process.cwd();
 
   // Platform flags (for conditional sections in templates)
@@ -51,6 +52,7 @@ function buildContext(platform, options = {}) {
     // Paths
     agentsPath,
     skillsPath,
+    gsdPath,
     workDir,
     
     // Capabilities
@@ -87,6 +89,19 @@ function getSkillsPath(platform, configPaths) {
     codex: path.join(configPaths.global, 'skills')
   };
   return skillsPaths[platform];
+}
+
+/**
+ * Get get-shit-done installation directory path for platform
+ * @private
+ */
+function getGsdPath(platform, configPaths) {
+  const gsdPaths = {
+    claude: path.join(configPaths.global, 'get-shit-done'),
+    copilot: path.join(configPaths.local, 'skills', 'get-shit-done'),
+    codex: path.join(configPaths.global, 'skills', 'get-shit-done')
+  };
+  return gsdPaths[platform];
 }
 
 /**

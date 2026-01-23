@@ -39,7 +39,7 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @{{gsdPath}}/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -337,7 +337,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md .planning/ROADMAP.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+    source {{gsdPath}}/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -515,7 +515,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+    source {{gsdPath}}/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
