@@ -4,9 +4,7 @@ description: Update GSD installation to latest version from repository
 skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
-tools:
-  - read
-  - bash
+tools: Read, Bash
 arguments: []
 ---
 
