@@ -9,24 +9,24 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 5.1 of 8.5 (Fix git identity preservation in agents) [INSERTED]
-Plan: 2 of 2 (Phase complete)
-Status: Phase 5.1 complete - All agents preserve user git identity
-Last activity: 2026-01-23 — Completed 5.1-02-PLAN.md (Update Agent Git Commits)
+Phase: 6 of 8.5 (Orchestration Validation)
+Plan: 1 of 3 (In progress)
+Status: Building orchestration validation infrastructure
+Last activity: 2026-01-23 — Completed 06-01-PLAN.md (Structured Returns + Parallel Spawning)
 
 **Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
 - Migrated 60+ files from legacy /gsd: to new /gsd- format
 - Eliminated experimental command-system (1,160 lines)
 - Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
 
-Progress: [█████░░░░░] ~59% (5.1/8.5 phases, 29 plans total)
+Progress: [██████░░░░] ~65% (6/8.5 phases, 30 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
-- Average duration: 5.5 min
-- Total execution time: 2.67 hours
+- Total plans completed: 30
+- Average duration: 5.4 min
+- Total execution time: 2.73 hours
 
 **By Phase:**
 
@@ -38,10 +38,11 @@ Progress: [█████░░░░░] ~59% (5.1/8.5 phases, 29 plans total)
 | 04-mid-complexity-commands | 5 | 21.2 min | 4.2 min |
 | 05-simple-command-migration | 9 | 51.3 min | 5.7 min |
 | 5.1-fix-git-identity | 2 | 6.4 min | 3.2 min |
+| 06-orchestration-validation | 1 | 3.5 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5.4 min (05-03), 4.7 min (05-04), 5.8 min (05-05), 2.4 min (5.1-01), 4.0 min (5.1-02)
-- Trend: Phase 5.1 complete - efficient infrastructure updates (avg 3.2 min)
+- Last 5 plans: 4.7 min (05-04), 5.8 min (05-05), 2.4 min (5.1-01), 4.0 min (5.1-02), 3.5 min (06-01)
+- Trend: Phase 6 started - validation infrastructure (3.5 min first plan)
 
 *Updated after each plan completion*
 
@@ -146,6 +147,11 @@ Recent decisions affecting current work:
 - **[MAINT-01]** Template system {{cmdPrefix}} variable for platform-specific rendering (/gsd- for Claude/Copilot, $gsd- for Codex)
 - **[MAINT-01]** Deprecation documentation strategy: maintain legacy references in migration docs (specs/skills/README.md)
 - **[MAINT-01]** Property names and debug namespaces exempt from migration (technical identifiers, not command formats)
+- **[06-01]** Regex-based markdown parsing for structured returns (lightweight, no dependencies vs. Marked.js)
+- **[06-01]** Timing threshold of 70% for parallel detection (< 70% = parallel, >= 70% = sequential)
+- **[06-01]** Independent validator modules (don't require agent-invoker.js wiring for standalone testing)
+- **[06-01]** 5 structured return patterns supported (RESEARCH/PLAN/EXECUTION COMPLETE, RESEARCH BLOCKED, CHECKPOINT REACHED)
+- **[06-01]** Separate test files per module (clear organization, independent test runs)
 
 ### Pending Todos
 
@@ -172,10 +178,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5.1 complete. All agents now preserve user git identity.
+None - Phase 6 in progress. Orchestration validation infrastructure established with 24 passing tests.
 
 ## Session Continuity
 
-Last session: 2026-01-23T18:02:52Z
-Stopped at: Closed all debug sessions (moved to resolved/)
+Last session: 2026-01-23T22:19:04Z
+Stopped at: Completed 06-01-PLAN.md (Structured Returns + Parallel Spawning)
 Resume file: None
