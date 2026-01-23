@@ -36,6 +36,15 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 - User requests methodology explanation
 </role>
 
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
+
 <coordination>
 
 ## When to Spawn Strategist
@@ -325,7 +334,14 @@ Commit phase plan(s) and updated roadmap:
 
 ```bash
 git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md .planning/ROADMAP.md
-git commit -m "docs(${PHASE}): create phase plan
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs(${PHASE}): create phase plan
 
 Phase ${PHASE}: ${PHASE_NAME}
 - [N] plan(s) in [M] wave(s)
@@ -496,7 +512,14 @@ After making edits, self-check:
 
 ```bash
 git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md
-git commit -m "fix(${PHASE}): revise plans based on checker feedback"
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source ~/.claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "fix(${PHASE}): revise plans based on checker feedback"
 ```
 
 ### Step 7: Return Revision Summary
