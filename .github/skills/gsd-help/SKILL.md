@@ -1,9 +1,14 @@
 ---
 name: gsd-help
 description: Show available GSD commands and usage guide
+skill_version: 1.9.1
+requires_version: 1.9.0+
+platforms: [claude, copilot, codex]
+tools: [read]
+arguments: []
 metadata:
   platform: copilot
-  generated: '2026-01-22'
+  generated: '2026-01-23'
   templateVersion: 1.0.0
   projectVersion: 1.9.0
   projectName: 'get-shit-done-multi'

@@ -97,6 +97,32 @@ const FIELD_RULES = {
     claude: true,
     copilot: true,
     codex: true
+  },
+  
+  // GSD skill metadata fields (added in Phase 5)
+  skill_version: {
+    claude: true,
+    copilot: true,
+    codex: true,
+    reason: 'Skill version tracking for GSD system'
+  },
+  requires_version: {
+    claude: true,
+    copilot: true,
+    codex: true,
+    reason: 'Minimum GSD version requirement'
+  },
+  platforms: {
+    claude: true,
+    copilot: true,
+    codex: true,
+    reason: 'Platform compatibility list for GSD skills'
+  },
+  arguments: {
+    claude: true,
+    copilot: true,
+    codex: true,
+    reason: 'Skill argument definitions'
   }
 };
 

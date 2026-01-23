@@ -8,7 +8,7 @@ tools: [agent, read, edit, execute, AskUserQuestion]
 arguments: [{name: domain, type: string, required: false, description: Project domain for research context}]
 metadata:
   platform: copilot
-  generated: '2026-01-22'
+  generated: '2026-01-23'
   templateVersion: 1.0.0
   projectVersion: 1.9.0
   projectName: 'get-shit-done-multi'

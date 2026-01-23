@@ -4,7 +4,7 @@ description: Verifies plans will achieve phase goal before execution. Goal-backw
 tools: [read, execute, search]
 metadata:
   platform: copilot
-  generated: '2026-01-22'
+  generated: '2026-01-23'
   templateVersion: 1.0.0
   projectVersion: 1.9.0
   projectName: 'get-shit-done-multi'

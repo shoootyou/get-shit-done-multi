@@ -103,6 +103,22 @@ const TOOL_COMPATIBILITY_MATRIX = {
     safe: false,
     warning: 'Write is Claude-specific. Use Edit for cross-platform compatibility.',
   },
+  'AskUserQuestion': {
+    claude: 'AskUserQuestion',
+    copilot: null,  // Not a real tool on Copilot - use conversational prompts
+    codex: null,    // Not a real tool on Codex
+    aliases: ['askuserquestion', 'AskUserQuestion'],
+    safe: false,
+    warning: 'AskUserQuestion is Claude-specific. Use conversational prompts for cross-platform compatibility.',
+  },
+  'TodoWrite': {
+    claude: 'TodoWrite',
+    copilot: 'edit',  // Maps to edit on Copilot (write to todo files)
+    codex: 'write',   // Maps to write on Codex
+    aliases: ['todowrite', 'TodoWrite'],
+    safe: false,
+    warning: 'TodoWrite is a GSD extension. Maps to edit/write on other platforms.',
+  },
 };
 
 /**
