@@ -22,12 +22,12 @@ This guide helps you diagnose and resolve common issues when using GSD (Get Shit
 
 ### Command not found
 
-**Symptom:** Running `/gsd:new-project` shows "command not found" or "skill not recognized"
+**Symptom:** Running `/gsd-new-project` shows "command not found" or "skill not recognized"
 
 **Diagnosis:**
 ```bash
 # Run verification to diagnose issue
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output will show what's missing:
 # ✗ Skills not found
@@ -48,7 +48,7 @@ npx get-shit-done-multi --claude
 # (Skills are cached by Claude Code runtime)
 
 # 4. Verify
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Copilot CLI:**
@@ -63,7 +63,7 @@ npx get-shit-done-multi --copilot
 gh copilot reload
 
 # 4. Verify
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Codex CLI:**
@@ -78,7 +78,7 @@ npx get-shit-done-multi --codex
 codex skills reload
 
 # 4. Verify
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Root Cause:**
@@ -87,7 +87,7 @@ codex skills reload
 - Incorrect installation path (global vs local)
 
 **Prevention:**
-- Always run `/gsd:verify-installation` after installation
+- Always run `/gsd-verify-installation` after installation
 - Restart CLI or reload skills after installation
 - Use consistent installation method (global vs local)
 
@@ -146,7 +146,7 @@ ls .codex/skills/get-shit-done/    # Local
 **Prevention:**
 - Decide on global vs local before installing
 - Document team's preferred installation method
-- Use `/gsd:verify-installation` to confirm correct path
+- Use `/gsd-verify-installation` to confirm correct path
 
 ## Permission Issues
 
@@ -327,7 +327,7 @@ cat .claude/get-shit-done/package.json 2>/dev/null
 **Prevention:**
 - Always restart Claude Code after skill installation
 - Monitor installation output for errors
-- Use `/gsd:verify-installation` to confirm
+- Use `/gsd-verify-installation` to confirm
 
 #### Path resolution errors on Windows
 
@@ -392,7 +392,7 @@ cat .claude/agents/gsd-executor.md
 
 1. **Verify native agent support:**
    ```bash
-   /gsd:verify-installation
+   /gsd-verify-installation
    # Should show: ✓ Native agent support available
    ```
 
@@ -415,7 +415,7 @@ cat .claude/agents/gsd-executor.md
 **Prevention:**
 - Keep Claude Code updated
 - Limit agent delegation depth
-- Use `/gsd:verify-installation` to check support
+- Use `/gsd-verify-installation` to check support
 
 ### Copilot CLI Issues
 
@@ -641,7 +641,7 @@ cat .codex/prompts/new-project.txt
 **Prevention:**
 - Let installer create directory automatically
 - Don't manually create `.codex/` structure
-- Run `/gsd:verify-installation` after setup
+- Run `/gsd-verify-installation` after setup
 
 #### OpenAI API configuration
 
@@ -700,7 +700,7 @@ codex auth status
 **Diagnosis:**
 ```bash
 # Check which CLI you're using
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Test agent directly (example for executor)
 # Via CLI command interface
@@ -882,7 +882,7 @@ cat .planning/STATE.md
 node -e "console.log(JSON.parse(require('fs').readFileSync('.planning/.session.json')))"
 
 # Run state validation
-/gsd:verify-installation
+/gsd-verify-installation
 # Look for state validation errors
 ```
 
@@ -900,7 +900,7 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('.planning/.session.j
 2. **Recreate STATE.md:**
    ```bash
    # If no backup, recreate from scratch
-   /gsd:new-project
+   /gsd-new-project
    # This initializes new .planning/ directory
    ```
 
@@ -961,7 +961,7 @@ cat .planning/.backup/migration.log 2>/dev/null
    ```bash
    # Last resort: backup .planning/ and recreate
    mv .planning .planning.old
-   /gsd:new-project
+   /gsd-new-project
    # Manually copy important data from .planning.old
    ```
 
@@ -984,7 +984,7 @@ cat .planning/.backup/migration.log 2>/dev/null
 export GSD_DEBUG=1
 
 # Run command with debug output
-/gsd:new-project
+/gsd-new-project
 
 # Debug logs written to:
 .planning/debug.log
@@ -994,7 +994,7 @@ export GSD_DEBUG=1
 
 ```bash
 # Run full diagnostic report
-/gsd:verify-installation > diagnostic-report.txt
+/gsd-verify-installation > diagnostic-report.txt
 
 # Include system information
 echo "--- System Info ---" >> diagnostic-report.txt
@@ -1026,7 +1026,7 @@ If issues persist after following this guide:
 
 1. **Run full verification:**
    ```bash
-   /gsd:verify-installation
+   /gsd-verify-installation
    ```
 
 2. **Review setup guides:**

@@ -73,7 +73,7 @@ your-project/
     skills/
       get-shit-done/
         agents/        # 11 specialized agents
-        commands/      # 15 /gsd:* commands
+        commands/      # 15 /gsd-* commands
         get-shit-done/ # Core workflow files
         lib-ghcc/      # Shared utilities
 ```
@@ -95,7 +95,7 @@ After installation, verify everything works:
 
 ```bash
 # Run verification command in Copilot CLI
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output:
 # ✅ Installation Verification Report
@@ -110,7 +110,7 @@ After installation, verify everything works:
 # 
 # Commands Available
 # ✓ 15 GSD commands registered
-#   /gsd:new-project, /gsd:plan-phase, /gsd:execute-plan, etc.
+#   /gsd-new-project, /gsd-plan-phase, /gsd-execute-plan, etc.
 # 
 # Agent Capabilities
 # ✓ All 11 agents available with full support
@@ -162,7 +162,7 @@ Let's start a new project using GSD:
 
 ```bash
 # Create a new project with GSD
-/gsd:new-project
+/gsd-new-project
 
 # Copilot CLI will prompt you for:
 # - Project name
@@ -183,22 +183,22 @@ Let's start a new project using GSD:
 
 ```bash
 # Create project roadmap
-/gsd:new-project
+/gsd-new-project
 
 # Plan a specific phase
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Execute a plan
-/gsd:execute-plan 01-01
+/gsd-execute-plan 01-01
 
 # Verify phase completion
-/gsd:verify-phase 1
+/gsd-verify-phase 1
 
 # Debug issues
-/gsd:debug
+/gsd-debug
 
 # Get help
-/gsd:help
+/gsd-help
 ```
 
 ## Key Differences for Copilot CLI
@@ -209,7 +209,7 @@ Copilot CLI provides **seamless GitHub workflow integration**:
 
 ```bash
 # GSD commands can interact with GitHub
-/gsd:new-project  # Can create GitHub repo, issues, projects
+/gsd-new-project  # Can create GitHub repo, issues, projects
 
 # State synchronization via GitHub
 # Team members see same .planning/ artifacts via git
@@ -249,14 +249,14 @@ Copilot CLI uses **.github/** directory structure exclusively:
 
 3. **Leverage GitHub Actions:**
    - Automate verification on PR
-   - Run `/gsd:verify-phase` in CI
+   - Run `/gsd-verify-phase` in CI
    - Enforce planning standards
 
 ### Common Gotchas
 
 **1. Skills not loading after git clone**
 - **Cause:** Copilot CLI hasn't refreshed skill list
-- **Fix:** Run `/gsd:verify-installation` to register skills
+- **Fix:** Run `/gsd-verify-installation` to register skills
 
 **2. GitHub authentication expired**
 - **Cause:** `gh` CLI token expired
@@ -274,11 +274,11 @@ Copilot CLI uses **.github/** directory structure exclusively:
 
 ### Command Not Found
 
-**Symptom:** Running `/gsd:new-project` shows "command not found"
+**Symptom:** Running `/gsd-new-project` shows "command not found"
 
 **Diagnosis:**
 ```bash
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Solutions:**
@@ -338,7 +338,7 @@ gh api rate_limit
 **Solutions:**
 1. **Wait for reset:** Rate limits reset hourly
 2. **Use authenticated requests:** `gh auth login` provides higher limits (5000/hour)
-3. **Optimize commands:** Use `/gsd:verify-installation` sparingly
+3. **Optimize commands:** Use `/gsd-verify-installation` sparingly
 
 ### Agent Timeout
 
@@ -383,8 +383,8 @@ npx get-shit-done-multi --claude
 cat .planning/STATE.md  # Shows same progress
 
 # Switch between CLIs anytime
-# In Copilot CLI: /gsd:plan-phase 1
-# In Claude Code: /gsd:execute-plan 01-01
+# In Copilot CLI: /gsd-plan-phase 1
+# In Claude Code: /gsd-execute-plan 01-01
 
 # Both see same .planning/ directory
 ```
@@ -403,10 +403,10 @@ git clone <repo-url>
 cd <project>
 
 # 2. Verify GSD installation
-/gsd:verify-installation
+/gsd-verify-installation
 
 # 3. Start contributing
-/gsd:verify-phase 1  # Check current phase status
+/gsd-verify-phase 1  # Check current phase status
 ```
 
 GSD is automatically available - no separate installation needed!
@@ -438,7 +438,7 @@ GSD is automatically available - no separate installation needed!
 
 If you encounter issues not covered here:
 
-1. **Run verification:** `/gsd:verify-installation`
+1. **Run verification:** `/gsd-verify-installation`
 2. **Check troubleshooting:** [Troubleshooting Guide](troubleshooting.md)
 3. **Review differences:** [Implementation Differences](implementation-differences.md)
 4. **Compare CLIs:** [CLI Comparison Matrix](cli-comparison.md)

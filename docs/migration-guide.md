@@ -28,15 +28,15 @@ This guide walks you through transitioning from using GSD (Get Shit Done) with a
 # Morning: Complex planning in Claude Code (best reasoning)
 cd my-project
 claude
-/gsd:new-project
+/gsd-new-project
 
 # Afternoon: Collaborative planning in Copilot CLI (GitHub integration)
 gh copilot
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Evening: Cost-conscious execution in Codex CLI (OpenAI pricing)
 codex
-/gsd:execute-plan 01-01
+/gsd-execute-plan 01-01
 
 # All three CLIs see same .planning/ state!
 ```
@@ -49,7 +49,7 @@ Before migrating, understand your current setup:
 
 ```bash
 # Run verification to see what's installed
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Example output:
 # ✅ Installation Verification Report
@@ -107,7 +107,7 @@ npx get-shit-done-multi --copilot
 # ✓ Installation complete!
 
 # Verify both CLIs see same state
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output:
 # CLI Detection
@@ -157,11 +157,11 @@ cat .planning/STATE.md  # Same progress
 
 # Now use Claude Code as primary
 claude
-/gsd:plan-phase 2
+/gsd-plan-phase 2
 
 # Copilot CLI still works as fallback
 gh copilot
-/gsd:verify-phase 1
+/gsd-verify-phase 1
 ```
 
 ## Migration Steps (Detailed)
@@ -235,7 +235,7 @@ npx get-shit-done-multi --all
 
 ```bash
 # Run verification
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output for successful multi-CLI setup:
 # ✅ Installation Verification Report
@@ -277,7 +277,7 @@ cat .planning/STATE.md
 
 # Test 2: Make a change in one CLI
 # In Claude Code:
-/gsd:new-project
+/gsd-new-project
 
 # Switch to Copilot CLI - verify change visible:
 gh copilot
@@ -286,7 +286,7 @@ cat .planning/PROJECT.md  # Shows project from Claude Code
 
 # Test 3: Execute command in different CLI
 # In Copilot CLI:
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Switch to Codex CLI - verify plan exists:
 codex
@@ -440,12 +440,12 @@ chown -R $USER:$USER .planning/
 
 ### Issue: Commands not available after installation
 
-**Symptom:** New CLI doesn't recognize `/gsd:*` commands
+**Symptom:** New CLI doesn't recognize `/gsd-*` commands
 
 **Diagnosis:**
 ```bash
 # Run verification
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Check specific CLI installation
 # Claude:
@@ -472,7 +472,7 @@ gh copilot reload
 codex skills reload
 
 # Verify again:
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 ### Issue: State corruption during migration
@@ -524,7 +524,7 @@ rm -rf .codex/skills/get-shit-done/
 rm -rf ~/.codex/skills/get-shit-done/
 
 # 3. Verify original CLI still works
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 ## Best Practices
@@ -588,7 +588,7 @@ npx get-shit-done-multi --all --upgrade
    ```yaml
    # .github/workflows/verify-gsd.yml
    - name: Verify GSD installation
-     run: /gsd:verify-installation
+     run: /gsd-verify-installation
    ```
 
 3. **Create onboarding guide:**
@@ -649,7 +649,7 @@ After successful migration:
 
 If you encounter issues during migration:
 
-1. **Run verification:** `/gsd:verify-installation`
+1. **Run verification:** `/gsd-verify-installation`
 2. **Check troubleshooting:** [troubleshooting.md](troubleshooting.md)
 3. **Restore backup:** From Step 1 backup
 4. **Review setup guides:** Ensure each CLI installed correctly

@@ -12,11 +12,11 @@ As of Phase 4 gap closure, the agent translation layer is **fully implemented**:
 - ✅ CLI-agnostic orchestration layer built
 - ✅ Real CLI command execution (adapters no longer use mocks)
 - ✅ Performance tracking with sub-millisecond precision
-- ✅ User-facing `/gsd:invoke-agent` command for agent invocation
+- ✅ User-facing `/gsd-invoke-agent` command for agent invocation
 
 **Next steps:** Phase 5 (Testing & Verification) will validate cross-CLI equivalence and integration.
 
-**Testing agent availability:** Run `/gsd:invoke-agent {agent-name} "{prompt}"` to test if an agent works on your installed CLI.
+**Testing agent availability:** Run `/gsd-invoke-agent {agent-name} "{prompt}"` to test if an agent works on your installed CLI.
 
 ---
 
@@ -118,19 +118,19 @@ Platform constraints that affect GSD workflow execution:
 
 ### Claude Code
 
-- ✓ **Slash Commands**: Full /gsd:* command support via native slash command system
+- ✓ **Slash Commands**: Full /gsd-* command support via native slash command system
 - ✓ **Custom Agents**: Native .agent.md format in .agent/ directories
 - ✓ **Parallel Agents**: No limitations on concurrent agent invocation
 
 ### GitHub Copilot CLI
 
-- ✗ **Slash Commands**: Use skills with $get-shit-done instead of /gsd:* commands
+- ✗ **Slash Commands**: Use skills with $get-shit-done instead of /gsd-* commands
 - ✓ **Custom Agents**: Custom agent definitions in .github/agents/
 - ✓ **Parallel Agents**: No limitations on concurrent agent invocation
 
 ### Codex CLI
 
-- ✗ **Slash Commands**: Use skills with $get-shit-done instead of /gsd:* commands
+- ✗ **Slash Commands**: Use skills with $get-shit-done instead of /gsd-* commands
 - ✓ **Custom Agents**: Skill-based approach in .codex/skills/
 - ✓ **Parallel Agents**: No limitations on concurrent agent invocation
 

@@ -18,7 +18,7 @@ Esta guía detalla todos los comandos disponibles en Get Shit Done, organizados 
 
 Estos son los comandos que usarás en el flujo típico de desarrollo:
 
-### `/gsd:new-project`
+### `/gsd-new-project`
 **Inicializa un nuevo proyecto**
 
 Comienza el flujo completo de inicialización:
@@ -33,7 +33,7 @@ Comienza el flujo completo de inicialización:
 
 ---
 
-### `/gsd:discuss-phase [N]`
+### `/gsd-discuss-phase [N]`
 **Captura decisiones de implementación**
 
 Analiza la fase y identifica áreas grises donde necesitas decidir cómo quieres que funcione. Para cada área, hace preguntas hasta que estés satisfecho.
@@ -44,7 +44,7 @@ Analiza la fase y identifica áreas grises donde necesitas decidir cómo quieres
 
 ---
 
-### `/gsd:plan-phase [N]`
+### `/gsd-plan-phase [N]`
 **Investiga y planifica una fase**
 
 El sistema:
@@ -58,7 +58,7 @@ El sistema:
 
 ---
 
-### `/gsd:execute-phase <N>`
+### `/gsd-execute-phase <N>`
 **Ejecuta todos los planes de una fase**
 
 Ejecuta los planes en oleadas:
@@ -73,7 +73,7 @@ Ejecuta los planes en oleadas:
 
 ---
 
-### `/gsd:verify-work [N]`
+### `/gsd-verify-work [N]`
 **Pruebas de aceptación de usuario**
 
 Extrae entregables testeables y te guía uno por uno. Si algo falla:
@@ -88,7 +88,7 @@ Extrae entregables testeables y te guía uno por uno. Si algo falla:
 
 ## Gestión de Fases
 
-### `/gsd:add-phase`
+### `/gsd-add-phase`
 **Agrega una fase al final del roadmap**
 
 Permite añadir una nueva fase después de las existentes.
@@ -97,7 +97,7 @@ Permite añadir una nueva fase después de las existentes.
 
 ---
 
-### `/gsd:insert-phase [N]`
+### `/gsd-insert-phase [N]`
 **Inserta una fase urgente**
 
 Inserta una fase entre las existentes y renumera automáticamente.
@@ -106,7 +106,7 @@ Inserta una fase entre las existentes y renumera automáticamente.
 
 ---
 
-### `/gsd:remove-phase [N]`
+### `/gsd-remove-phase [N]`
 **Elimina una fase futura**
 
 Remueve una fase que aún no se ha ejecutado y renumera.
@@ -115,7 +115,7 @@ Remueve una fase que aún no se ha ejecutado y renumera.
 
 ---
 
-### `/gsd:research-phase [N]`
+### `/gsd-research-phase [N]`
 **Investiga una fase sin planificar**
 
 Solo ejecuta la fase de investigación sin crear planes.
@@ -124,7 +124,7 @@ Solo ejecuta la fase de investigación sin crear planes.
 
 ---
 
-### `/gsd:list-phase-assumptions`
+### `/gsd-list-phase-assumptions`
 **Lista las suposiciones de todas las fases**
 
 Extrae y muestra las suposiciones clave de cada fase.
@@ -135,7 +135,7 @@ Extrae y muestra las suposiciones clave de cada fase.
 
 ## Gestión de Milestones
 
-### `/gsd:complete-milestone`
+### `/gsd-complete-milestone`
 **Completa el milestone actual**
 
 Archiva el milestone y crea un tag de release.
@@ -144,7 +144,7 @@ Archiva el milestone y crea un tag de release.
 
 ---
 
-### `/gsd:new-milestone [name]`
+### `/gsd-new-milestone [name]`
 **Inicia un nuevo milestone**
 
 Mismo flujo que new-project pero para codebase existente:
@@ -157,7 +157,7 @@ Mismo flujo que new-project pero para codebase existente:
 
 ---
 
-### `/gsd:archive-milestone`
+### `/gsd-archive-milestone`
 **Archiva un milestone manualmente**
 
 Mueve archivos de planificación a `.planning/archive/{milestone}/`.
@@ -166,7 +166,7 @@ Mueve archivos de planificación a `.planning/archive/{milestone}/`.
 
 ---
 
-### `/gsd:restore-milestone`
+### `/gsd-restore-milestone`
 **Restaura un milestone archivado**
 
 Trae de vuelta un milestone archivado al workspace activo.
@@ -175,7 +175,7 @@ Trae de vuelta un milestone archivado al workspace activo.
 
 ---
 
-### `/gsd:list-milestones`
+### `/gsd-list-milestones`
 **Lista todos los milestones**
 
 Muestra milestones activos y archivados con su estado.
@@ -184,7 +184,7 @@ Muestra milestones activos y archivados con su estado.
 
 ---
 
-### `/gsd:audit-milestone`
+### `/gsd-audit-milestone`
 **Audita la completitud del milestone**
 
 Verifica que todas las fases estén completas y los archivos existan.
@@ -193,7 +193,7 @@ Verifica que todas las fases estén completas y los archivos existan.
 
 ---
 
-### `/gsd:plan-milestone-gaps`
+### `/gsd-plan-milestone-gaps`
 **Identifica gaps en el milestone**
 
 Analiza el roadmap y sugiere fases faltantes o áreas no cubiertas.
@@ -204,7 +204,7 @@ Analiza el roadmap y sugiere fases faltantes o áreas no cubiertas.
 
 ## Navegación y Progreso
 
-### `/gsd:progress`
+### `/gsd-progress`
 **¿Dónde estoy? ¿Qué sigue?**
 
 Muestra estado actual del proyecto:
@@ -216,7 +216,7 @@ Muestra estado actual del proyecto:
 
 ---
 
-### `/gsd:help`
+### `/gsd-help`
 **Muestra todos los comandos**
 
 Lista completa de comandos con breves descripciones.
@@ -227,7 +227,7 @@ Lista completa de comandos con breves descripciones.
 
 ## Sesión de Trabajo
 
-### `/gsd:pause-work`
+### `/gsd-pause-work`
 **Pausa el trabajo actual**
 
 Crea un handoff document cuando necesitas detener el trabajo a mitad de fase.
@@ -238,7 +238,7 @@ Crea un handoff document cuando necesitas detener el trabajo a mitad de fase.
 
 ---
 
-### `/gsd:resume-work`
+### `/gsd-resume-work`
 **Reanuda desde la última sesión**
 
 Restaura el contexto de donde lo dejaste usando HANDOFF.md.
@@ -249,7 +249,7 @@ Restaura el contexto de donde lo dejaste usando HANDOFF.md.
 
 ## Utilidades
 
-### `/gsd:add-todo [desc]`
+### `/gsd-add-todo [desc]`
 **Captura una idea para después**
 
 Guarda una idea o tarea en `.planning/todos/`.
@@ -258,7 +258,7 @@ Guarda una idea o tarea en `.planning/todos/`.
 
 ---
 
-### `/gsd:check-todos`
+### `/gsd-check-todos`
 **Lista todos los TODOs pendientes**
 
 Muestra todas las ideas capturadas.
@@ -267,7 +267,7 @@ Muestra todas las ideas capturadas.
 
 ---
 
-### `/gsd:debug [desc]`
+### `/gsd-debug [desc]`
 **Debugging sistemático**
 
 Usa el método científico para debugging con estado persistente.
@@ -276,7 +276,7 @@ Usa el método científico para debugging con estado persistente.
 
 ---
 
-### `/gsd:map-codebase`
+### `/gsd-map-codebase`
 **Analiza codebase existente**
 
 Spawns parallel agents to analyze:
@@ -293,7 +293,7 @@ Spawns parallel agents to analyze:
 
 ## Sistema
 
-### `/gsd:verify-installation`
+### `/gsd-verify-installation`
 **Verifica que GSD esté instalado correctamente**
 
 Chequea que todos los archivos necesarios existan.
@@ -302,7 +302,7 @@ Chequea que todos los archivos necesarios existan.
 
 ---
 
-### `/gsd:whats-new`
+### `/gsd-whats-new`
 **Muestra las novedades**
 
 Compara tu versión instalada con la última disponible.
@@ -311,7 +311,7 @@ Compara tu versión instalada con la última disponible.
 
 ---
 
-### `/gsd:update`
+### `/gsd-update`
 **Actualiza GSD**
 
 Reinstala con la última versión.
@@ -320,7 +320,7 @@ Reinstala con la última versión.
 
 ---
 
-### `/gsd:invoke-agent`
+### `/gsd-invoke-agent`
 **Invoca un agente GSD manualmente**
 
 Para uso avanzado: invoca agentes específicos directamente.
@@ -332,14 +332,14 @@ Para uso avanzado: invoca agentes específicos directamente.
 ## Flujo Típico
 
 ```
-1. /gsd:new-project              # Inicializar
-2. /gsd:discuss-phase 1          # Tu visión
-3. /gsd:plan-phase 1             # Investigar + planificar
-4. /gsd:execute-phase 1          # Construir
-5. /gsd:verify-work 1            # Probar
+1. /gsd-new-project              # Inicializar
+2. /gsd-discuss-phase 1          # Tu visión
+3. /gsd-plan-phase 1             # Investigar + planificar
+4. /gsd-execute-phase 1          # Construir
+5. /gsd-verify-work 1            # Probar
 6. Repetir pasos 2-5 para cada fase
-7. /gsd:complete-milestone       # Archivar
-8. /gsd:new-milestone            # Siguiente versión
+7. /gsd-complete-milestone       # Archivar
+8. /gsd-new-milestone            # Siguiente versión
 ```
 
 ---
@@ -348,7 +348,7 @@ Para uso avanzado: invoca agentes específicos directamente.
 
 GSD funciona en **tres CLIs diferentes**:
 
-- **Claude Code** - `/gsd:*` comandos nativos
+- **Claude Code** - `/gsd-*` comandos nativos
 - **GitHub Copilot CLI** - Usa skills `$get-shit-done`
 - **Codex CLI** - Usa skills en `.codex/skills/`
 

@@ -55,7 +55,7 @@ your-project/
   .claude/
     get-shit-done/
       agents/          # 11 specialized agents
-      commands/        # 15 /gsd:* commands
+      commands/        # 15 /gsd-* commands
       get-shit-done/   # Core workflow files
       lib-ghcc/        # Shared utilities
 ```
@@ -89,7 +89,7 @@ After installation, verify everything works:
 
 ```bash
 # Run verification command in Claude Code
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output:
 # ✅ Installation Verification Report
@@ -104,7 +104,7 @@ After installation, verify everything works:
 # 
 # Commands Available
 # ✓ 15 GSD commands registered
-#   /gsd:new-project, /gsd:plan-phase, /gsd:execute-plan, etc.
+#   /gsd-new-project, /gsd-plan-phase, /gsd-execute-plan, etc.
 # 
 # Agent Capabilities
 # ✓ All 11 agents available with full support
@@ -141,7 +141,7 @@ ls -la .claude/get-shit-done/
 ```bash
 # Solution: Restart Claude Code CLI to refresh skills
 # Then try again
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 For more troubleshooting, see [Troubleshooting Guide](troubleshooting.md).
@@ -152,7 +152,7 @@ Let's start a new project using GSD:
 
 ```bash
 # Create a new project with GSD
-/gsd:new-project
+/gsd-new-project
 
 # Claude Code will prompt you for:
 # - Project name
@@ -173,22 +173,22 @@ Let's start a new project using GSD:
 
 ```bash
 # Create project roadmap
-/gsd:new-project
+/gsd-new-project
 
 # Plan a specific phase
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Execute a plan
-/gsd:execute-plan 01-01
+/gsd-execute-plan 01-01
 
 # Verify phase completion
-/gsd:verify-phase 1
+/gsd-verify-phase 1
 
 # Debug issues
-/gsd:debug
+/gsd-debug
 
 # Get help
-/gsd:help
+/gsd-help
 ```
 
 ## Key Differences for Claude Code
@@ -261,7 +261,7 @@ Claude Code uses OS-specific paths:
 
 **1. Skills not loading after installation**
 - **Cause:** Claude Code caches skill list
-- **Fix:** Restart Claude Code or run `/gsd:verify-installation`
+- **Fix:** Restart Claude Code or run `/gsd-verify-installation`
 
 **2. Permission errors on macOS**
 - **Cause:** macOS Gatekeeper or file permissions
@@ -279,11 +279,11 @@ Claude Code uses OS-specific paths:
 
 ### Command Not Found
 
-**Symptom:** Running `/gsd:new-project` shows "command not found"
+**Symptom:** Running `/gsd-new-project` shows "command not found"
 
 **Diagnosis:**
 ```bash
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Solutions:**
@@ -368,8 +368,8 @@ npx get-shit-done-multi --copilot
 cat .planning/STATE.md  # Shows same progress
 
 # Switch between CLIs anytime
-# In Claude Code: /gsd:plan-phase 1
-# In Copilot CLI: /gsd:execute-plan 01-01
+# In Claude Code: /gsd-plan-phase 1
+# In Copilot CLI: /gsd-execute-plan 01-01
 
 # Both see same .planning/ directory
 ```
@@ -380,7 +380,7 @@ See [Migration Guide](migration-guide.md) for details.
 
 If you encounter issues not covered here:
 
-1. **Run verification:** `/gsd:verify-installation`
+1. **Run verification:** `/gsd-verify-installation`
 2. **Check troubleshooting:** [Troubleshooting Guide](troubleshooting.md)
 3. **Review differences:** [Implementation Differences](implementation-differences.md)
 4. **Compare CLIs:** [CLI Comparison Matrix](cli-comparison.md)

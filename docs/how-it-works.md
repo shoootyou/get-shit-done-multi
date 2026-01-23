@@ -17,14 +17,14 @@ This guide walks through the complete GSD workflow from project initialization t
 
 ## Before You Start: Brownfield Projects
 
-> **Already have code?** Run `/gsd:map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd:new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
+> **Already have code?** Run `/gsd-map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd-new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
 
 ---
 
 ## Step 1: Initialize Project
 
 ```
-/gsd:new-project
+/gsd-new-project
 ```
 
 One command, one flow. The system:
@@ -47,7 +47,7 @@ You approve the roadmap. Now you're ready to build.
 ✓ Creating roadmap (8 phases)
 
 Your project is ready to build.
-Next: /gsd:discuss-phase 1
+Next: /gsd-discuss-phase 1
 ```
 
 ---
@@ -55,7 +55,7 @@ Next: /gsd:discuss-phase 1
 ## Step 2: Discuss Phase
 
 ```
-/gsd:discuss-phase 1
+/gsd-discuss-phase 1
 ```
 
 **This is where you shape the implementation.**
@@ -107,7 +107,7 @@ What happens after successful login?
 [Continues for each selected area...]
 
 ✓ Context captured in 01-CONTEXT.md
-Next: /gsd:plan-phase 1
+Next: /gsd-plan-phase 1
 ```
 
 ---
@@ -115,7 +115,7 @@ Next: /gsd:plan-phase 1
 ## Step 3: Plan Phase
 
 ```
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 ```
 
 The system:
@@ -167,7 +167,7 @@ Each plan is small enough to execute in a fresh context window. No degradation, 
 ## Step 4: Execute Phase
 
 ```
-/gsd:execute-phase 1
+/gsd-execute-phase 1
 ```
 
 The system:
@@ -208,7 +208,7 @@ pqr678m feat(01-02): implement session middleware
   - Sessions persist across page loads ✓
   - Password reset works ✓
 
-Phase 01 complete. Next: /gsd:verify-work 1
+Phase 01 complete. Next: /gsd-verify-work 1
 ```
 
 ---
@@ -216,7 +216,7 @@ Phase 01 complete. Next: /gsd:verify-work 1
 ## Step 5: Verify Work
 
 ```
-/gsd:verify-work 1
+/gsd-verify-work 1
 ```
 
 **This is where you confirm it actually works.**
@@ -230,7 +230,7 @@ The system:
 3. **Diagnoses failures automatically** — Spawns debug agents to find root causes
 4. **Creates verified fix plans** — Ready for immediate re-execution
 
-If everything passes, you move on. If something's broken, you don't manually debug — you just run `/gsd:execute-phase` again with the fix plans it created.
+If everything passes, you move on. If something's broken, you don't manually debug — you just run `/gsd-execute-phase` again with the fix plans it created.
 
 **Creates:** `{phase}-UAT.md`, fix plans if issues found
 
@@ -271,8 +271,8 @@ Results:
 
 Next steps:
 1. Review fix plans (01-FIX-01-PLAN.md, 01-FIX-02-PLAN.md)
-2. Run: /gsd:execute-phase 1 --fixes-only
-3. Re-run: /gsd:verify-work 1
+2. Run: /gsd-execute-phase 1 --fixes-only
+3. Re-run: /gsd-verify-work 1
 ```
 
 ---
@@ -282,10 +282,10 @@ Next steps:
 ### Loop Through Phases
 
 ```
-/gsd:discuss-phase 2
-/gsd:plan-phase 2
-/gsd:execute-phase 2
-/gsd:verify-work 2
+/gsd-discuss-phase 2
+/gsd-plan-phase 2
+/gsd-execute-phase 2
+/gsd-verify-work 2
 ...
 ```
 
@@ -304,7 +304,7 @@ Context stays fresh. Quality stays high.
 ### Complete Milestone
 
 ```
-/gsd:complete-milestone
+/gsd-complete-milestone
 ```
 
 When all phases are done, this command:
@@ -330,7 +330,7 @@ Stats:
 - 342 files modified
 - 89 commits created
 
-Next: /gsd:new-milestone
+Next: /gsd-new-milestone
 ```
 
 ---
@@ -338,7 +338,7 @@ Next: /gsd:new-milestone
 ### Start Next Milestone
 
 ```
-/gsd:new-milestone v2.0
+/gsd-new-milestone v2.0
 ```
 
 Same flow as `new-project` but for your existing codebase:
@@ -365,7 +365,7 @@ What do you want to build in this milestone?
 ✓ 6 phases planned
 ✓ Mapped to 18 requirements
 
-Next: /gsd:discuss-phase 1
+Next: /gsd-discuss-phase 1
 ```
 
 ---
@@ -375,7 +375,7 @@ Next: /gsd:discuss-phase 1
 ```
 ┌─────────────────────────────────────────────┐
 │ 1. INITIALIZE                               │
-│    /gsd:new-project                         │
+│    /gsd-new-project                         │
 │    → Questions, research, requirements      │
 │    → Roadmap with phases                    │
 └─────────────────────────────────────────────┘
@@ -383,29 +383,29 @@ Next: /gsd:discuss-phase 1
 ┌─────────────────────────────────────────────┐
 │ 2. FOR EACH PHASE                           │
 │                                             │
-│    /gsd:discuss-phase N                     │
+│    /gsd-discuss-phase N                     │
 │    → Capture your vision                    │
 │                                             │
-│    /gsd:plan-phase N                        │
+│    /gsd-plan-phase N                        │
 │    → Research + atomic plans                │
 │                                             │
-│    /gsd:execute-phase N                     │
+│    /gsd-execute-phase N                     │
 │    → Build in fresh context                 │
 │                                             │
-│    /gsd:verify-work N                       │
+│    /gsd-verify-work N                       │
 │    → Manual testing + auto-fix              │
 │                                             │
 └─────────────────────────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │ 3. COMPLETE MILESTONE                       │
-│    /gsd:complete-milestone                  │
+│    /gsd-complete-milestone                  │
 │    → Archive + tag release                  │
 └─────────────────────────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │ 4. NEXT VERSION                             │
-│    /gsd:new-milestone                       │
+│    /gsd-new-milestone                       │
 │    → Repeat cycle                           │
 └─────────────────────────────────────────────┘
 ```
@@ -434,22 +434,22 @@ Next: /gsd:discuss-phase 1
 
 ### Pause & Resume
 
-Use `/gsd:pause-work` when stopping:
+Use `/gsd-pause-work` when stopping:
 - Mid-phase execution
 - Before context switch
 - End of work session
 
-Resume with `/gsd:resume-work` to restore exactly where you left off.
+Resume with `/gsd-resume-work` to restore exactly where you left off.
 
 ### Capture TODOs
 
 When ideas pop up:
 ```
-/gsd:add-todo "Add dark mode support"
-/gsd:add-todo "Optimize database queries in user search"
+/gsd-add-todo "Add dark mode support"
+/gsd-add-todo "Optimize database queries in user search"
 ```
 
-Review later with `/gsd:check-todos` when planning new phases.
+Review later with `/gsd-check-todos` when planning new phases.
 
 ---
 

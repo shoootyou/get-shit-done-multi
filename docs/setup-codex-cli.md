@@ -71,7 +71,7 @@ your-project/
     skills/
       get-shit-done/
         agents/        # 11 specialized agents (skill-based)
-        commands/      # 15 /gsd:* commands
+        commands/      # 15 /gsd-* commands
         get-shit-done/ # Core workflow files
         lib-ghcc/      # Shared utilities
     prompts/           # Generated prompts for CLI processing
@@ -108,7 +108,7 @@ After installation, verify everything works:
 
 ```bash
 # Run verification command in Codex CLI
-/gsd:verify-installation
+/gsd-verify-installation
 
 # Expected output:
 # ✅ Installation Verification Report
@@ -123,7 +123,7 @@ After installation, verify everything works:
 # 
 # Commands Available
 # ✓ 15 GSD commands registered
-#   /gsd:new-project, /gsd:plan-phase, /gsd:execute-plan, etc.
+#   /gsd-new-project, /gsd-plan-phase, /gsd-execute-plan, etc.
 # 
 # Agent Capabilities
 # ✓ All 11 agents available (skill-based simulation)
@@ -177,7 +177,7 @@ Let's start a new project using GSD:
 
 ```bash
 # Create a new project with GSD
-/gsd:new-project
+/gsd-new-project
 
 # Codex CLI will prompt you for:
 # - Project name
@@ -198,22 +198,22 @@ Let's start a new project using GSD:
 
 ```bash
 # Create project roadmap
-/gsd:new-project
+/gsd-new-project
 
 # Plan a specific phase
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Execute a plan
-/gsd:execute-plan 01-01
+/gsd-execute-plan 01-01
 
 # Verify phase completion
-/gsd:verify-phase 1
+/gsd-verify-phase 1
 
 # Debug issues
-/gsd:debug
+/gsd-debug
 
 # Get help
-/gsd:help
+/gsd-help
 ```
 
 ## Key Differences for Codex CLI
@@ -300,11 +300,11 @@ Codex CLI uses `.codex/` directory structure:
 
 ### Command Not Found
 
-**Symptom:** Running `/gsd:new-project` shows "command not found"
+**Symptom:** Running `/gsd-new-project` shows "command not found"
 
 **Diagnosis:**
 ```bash
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 **Solutions:**
@@ -422,8 +422,8 @@ npx get-shit-done-multi --claude
 cat .planning/STATE.md  # Shows same progress
 
 # Switch between CLIs anytime
-# In Codex CLI: /gsd:plan-phase 1
-# In Claude Code: /gsd:execute-plan 01-01
+# In Codex CLI: /gsd-plan-phase 1
+# In Claude Code: /gsd-execute-plan 01-01
 
 # Both see same .planning/ directory
 ```
@@ -457,7 +457,7 @@ Monitor and control OpenAI costs:
 
 ```bash
 # Check token usage
-/gsd:verify-installation  # Shows token estimates
+/gsd-verify-installation  # Shows token estimates
 
 # View usage tracking
 cat .planning/metrics/usage-tracking.json
@@ -476,7 +476,7 @@ node lib-ghcc/state/usage-tracking.js export > usage.csv
 
 If you encounter issues not covered here:
 
-1. **Run verification:** `/gsd:verify-installation`
+1. **Run verification:** `/gsd-verify-installation`
 2. **Check troubleshooting:** [Troubleshooting Guide](troubleshooting.md)
 3. **Review differences:** [Implementation Differences](implementation-differences.md)
 4. **Compare CLIs:** [CLI Comparison Matrix](cli-comparison.md)

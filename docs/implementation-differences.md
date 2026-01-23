@@ -15,13 +15,13 @@ GSD provides a unified planning and execution workflow across all three CLI plat
 
 **What stays the same:**
 - `.planning/` directory structure and state management
-- Command syntax (`/gsd:*` commands)
+- Command syntax (`/gsd-*` commands)
 - Agent workflows and orchestration logic
 - Documentation and planning artifacts
 
 ## Command System Differences
 
-All three CLIs use the `/gsd:*` command syntax, but the underlying implementation varies:
+All three CLIs use the `/gsd-*` command syntax, but the underlying implementation varies:
 
 ### Claude Code
 - **Architecture:** Native skills system in `~/.claude/get-shit-done/`
@@ -30,7 +30,7 @@ All three CLIs use the `/gsd:*` command syntax, but the underlying implementatio
 - **Performance:** Fastest - native integration with Claude Code runtime
 - **Example:**
   ```bash
-  /gsd:new-project  # Processed directly by Claude Code
+  /gsd-new-project  # Processed directly by Claude Code
   ```
 
 ### Copilot CLI
@@ -40,7 +40,7 @@ All three CLIs use the `/gsd:*` command syntax, but the underlying implementatio
 - **Performance:** Fast - optimized for GitHub workflows
 - **Example:**
   ```bash
-  /gsd:new-project  # Routed through GitHub Copilot skill system
+  /gsd-new-project  # Routed through GitHub Copilot skill system
   ```
 
 ### Codex CLI
@@ -50,7 +50,7 @@ All three CLIs use the `/gsd:*` command syntax, but the underlying implementatio
 - **Performance:** Good - OpenAI backend with prompt-based execution
 - **Example:**
   ```bash
-  /gsd:new-project  # Processed via Codex prompt system
+  /gsd-new-project  # Processed via Codex prompt system
   ```
 
 **Key takeaway:** Same command syntax works everywhere, but the execution path differs.
@@ -158,13 +158,13 @@ DirectoryLock.withLock(stateDir, async () => {
 **Example workflow:**
 ```bash
 # Start in Claude Code
-/gsd:new-project
+/gsd-new-project
 
 # Switch to Copilot CLI
-/gsd:plan-phase 1
+/gsd-plan-phase 1
 
 # Switch to Codex CLI
-/gsd:execute-plan 01-01
+/gsd-execute-plan 01-01
 
 # State remains consistent across all CLIs
 cat .planning/STATE.md
@@ -214,7 +214,7 @@ See [CLI Comparison Matrix](cli-comparison.md) for detailed feature availability
 
 | Feature Category | Claude Code | Copilot CLI | Codex CLI |
 |-----------------|-------------|-------------|-----------|
-| Commands (/gsd:*) | ✓ All | ✓ All | ✓ All |
+| Commands (/gsd-*) | ✓ All | ✓ All | ✓ All |
 | Agents (11 total) | ✓ Native | ✓ Native | ✓ Simulated |
 | State Management | ✓ Full | ✓ Full | ✓ Full |
 | Concurrent Usage | ✓ Yes | ✓ Yes | ✓ Yes |
@@ -253,7 +253,7 @@ You can seamlessly switch between CLIs in the same project:
 # Start with Claude Code
 cd my-project
 npx get-shit-done-multi --claude
-/gsd:new-project
+/gsd-new-project
 
 # Add Copilot CLI
 npx get-shit-done-multi --copilot
@@ -264,7 +264,7 @@ npx get-shit-done-multi --codex
 # Still using same .planning/ directory
 
 # Verify all CLIs see same state
-/gsd:verify-installation
+/gsd-verify-installation
 ```
 
 See [Migration Guide](migration-guide.md) for step-by-step instructions.
@@ -305,6 +305,6 @@ See [Migration Guide](migration-guide.md) for step-by-step instructions.
 ## Questions?
 
 If you encounter issues not covered here:
-1. Run `/gsd:verify-installation` to diagnose
+1. Run `/gsd-verify-installation` to diagnose
 2. Check [troubleshooting guide](troubleshooting.md) for solutions
 3. Review CLI-specific setup guides for your platform

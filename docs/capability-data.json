@@ -151,20 +151,20 @@
       }
     },
     {
-      "feature": "/gsd:* slash commands",
+      "feature": "/gsd-* slash commands",
       "category": "commands",
-      "description": "Native slash command syntax (e.g., /gsd:new-project)",
+      "description": "Native slash command syntax (e.g., /gsd-new-project)",
       "claude": "full",
       "copilot": "unsupported",
       "codex": "unsupported",
       "notes": {
-        "claude": "Full /gsd:* command support via native slash command system",
-        "copilot": "Use skills with $get-shit-done instead of /gsd:* commands",
-        "codex": "Use skills with $get-shit-done instead of /gsd:* commands"
+        "claude": "Full /gsd-* command support via native slash command system",
+        "copilot": "Use skills with $get-shit-done instead of /gsd-* commands",
+        "codex": "Use skills with $get-shit-done instead of /gsd-* commands"
       }
     },
     {
-      "feature": "/gsd:add-phase",
+      "feature": "/gsd-add-phase",
       "category": "commands",
       "description": "Add phase to end of current milestone in roadmap",
       "claude": "full",
@@ -177,7 +177,7 @@
       }
     },
     {
-      "feature": "/gsd:add-todo",
+      "feature": "/gsd-add-todo",
       "category": "commands",
       "description": "Capture idea or task as todo from current conversation context",
       "claude": "full",
@@ -190,7 +190,7 @@
       }
     },
     {
-      "feature": "/gsd:audit-milestone",
+      "feature": "/gsd-audit-milestone",
       "category": "commands",
       "description": "Audit milestone completion against original intent before archiving",
       "claude": "full",
@@ -203,7 +203,7 @@
       }
     },
     {
-      "feature": "/gsd:check-todos",
+      "feature": "/gsd-check-todos",
       "category": "commands",
       "description": "List pending todos and select one to work on",
       "claude": "full",
@@ -216,7 +216,7 @@
       }
     },
     {
-      "feature": "/gsd:complete-milestone",
+      "feature": "/gsd-complete-milestone",
       "category": "commands",
       "description": "Archive completed milestone and prepare for next version",
       "claude": "full",
@@ -229,7 +229,7 @@
       }
     },
     {
-      "feature": "/gsd:debug",
+      "feature": "/gsd-debug",
       "category": "commands",
       "description": "Systematic debugging with persistent state across context resets",
       "claude": "full",
@@ -242,7 +242,7 @@
       }
     },
     {
-      "feature": "/gsd:discuss-phase",
+      "feature": "/gsd-discuss-phase",
       "category": "commands",
       "description": "Gather phase context through adaptive questioning before planning",
       "claude": "full",
@@ -255,7 +255,7 @@
       }
     },
     {
-      "feature": "/gsd:execute-phase",
+      "feature": "/gsd-execute-phase",
       "category": "commands",
       "description": "Execute all plans in a phase with wave-based parallelization",
       "claude": "full",
@@ -268,7 +268,7 @@
       }
     },
     {
-      "feature": "/gsd:help",
+      "feature": "/gsd-help",
       "category": "commands",
       "description": "Show available GSD commands and usage guide",
       "claude": "full",
@@ -281,7 +281,7 @@
       }
     },
     {
-      "feature": "/gsd:insert-phase",
+      "feature": "/gsd-insert-phase",
       "category": "commands",
       "description": "Insert urgent work as decimal phase (e.g., 72.1) between existing phases",
       "claude": "full",
@@ -294,7 +294,7 @@
       }
     },
     {
-      "feature": "/gsd:invoke-agent",
+      "feature": "/gsd-invoke-agent",
       "category": "commands",
       "description": "Invoke a GSD agent with a custom prompt across any CLI",
       "claude": "full",
@@ -307,7 +307,7 @@
       }
     },
     {
-      "feature": "/gsd:list-phase-assumptions",
+      "feature": "/gsd-list-phase-assumptions",
       "category": "commands",
       "description": "Surface Claude's assumptions about a phase approach before planning",
       "claude": "full",
@@ -320,7 +320,7 @@
       }
     },
     {
-      "feature": "/gsd:map-codebase",
+      "feature": "/gsd-map-codebase",
       "category": "commands",
       "description": "Analyze codebase with parallel mapper agents to produce .planning/codebase/ documents",
       "claude": "full",
@@ -333,7 +333,7 @@
       }
     },
     {
-      "feature": "/gsd:new-milestone",
+      "feature": "/gsd-new-milestone",
       "category": "commands",
       "description": "Start a new milestone cycle — update PROJECT.md and route to requirements",
       "claude": "full",
@@ -346,7 +346,7 @@
       }
     },
     {
-      "feature": "/gsd:new-project",
+      "feature": "/gsd-new-project",
       "category": "commands",
       "description": "Initialize a new project with deep context gathering and PROJECT.md",
       "claude": "full",
@@ -359,7 +359,7 @@
       }
     },
     {
-      "feature": "/gsd:pause-work",
+      "feature": "/gsd-pause-work",
       "category": "commands",
       "description": "Create context handoff when pausing work mid-phase",
       "claude": "full",
@@ -372,7 +372,7 @@
       }
     },
     {
-      "feature": "/gsd:plan-milestone-gaps",
+      "feature": "/gsd-plan-milestone-gaps",
       "category": "commands",
       "description": "Create phases to close all gaps identified by milestone audit",
       "claude": "full",
@@ -385,7 +385,7 @@
       }
     },
     {
-      "feature": "/gsd:plan-phase",
+      "feature": "/gsd-plan-phase",
       "category": "commands",
       "description": "Create detailed execution plan for a phase (PLAN.md) with verification loop",
       "claude": "full",
@@ -398,7 +398,7 @@
       }
     },
     {
-      "feature": "/gsd:progress",
+      "feature": "/gsd-progress",
       "category": "commands",
       "description": "Check project progress, show context, and route to next action (execute or plan)",
       "claude": "full",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "feature": "/gsd:remove-phase",
+      "feature": "/gsd-remove-phase",
       "category": "commands",
       "description": "Remove a future phase from roadmap and renumber subsequent phases",
       "claude": "full",
@@ -424,9 +424,9 @@
       }
     },
     {
-      "feature": "/gsd:research-phase",
+      "feature": "/gsd-research-phase",
       "category": "commands",
-      "description": "Research how to implement a phase (standalone - usually use /gsd:plan-phase instead)",
+      "description": "Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)",
       "claude": "full",
       "copilot": "full",
       "codex": "full",
@@ -437,7 +437,7 @@
       }
     },
     {
-      "feature": "/gsd:resume-work",
+      "feature": "/gsd-resume-work",
       "category": "commands",
       "description": "Resume work from previous session with full context restoration",
       "claude": "full",
@@ -450,7 +450,7 @@
       }
     },
     {
-      "feature": "/gsd:update",
+      "feature": "/gsd-update",
       "category": "commands",
       "description": "Update GSD to latest version with changelog display",
       "claude": "full",
@@ -463,7 +463,7 @@
       }
     },
     {
-      "feature": "/gsd:verify-installation",
+      "feature": "/gsd-verify-installation",
       "category": "commands",
       "description": "Run comprehensive installation verification",
       "claude": "full",
@@ -476,7 +476,7 @@
       }
     },
     {
-      "feature": "/gsd:verify-work",
+      "feature": "/gsd-verify-work",
       "category": "commands",
       "description": "Validate built features through conversational UAT",
       "claude": "full",
@@ -489,7 +489,7 @@
       }
     },
     {
-      "feature": "/gsd:whats-new",
+      "feature": "/gsd-whats-new",
       "category": "commands",
       "description": "See what's new in GSD since your installed version",
       "claude": "full",

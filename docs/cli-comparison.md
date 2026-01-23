@@ -29,7 +29,7 @@ The following custom agents are available in the GSD workflow:
 ### Claude Code
 
 - **slash_commands**: ✓ Supported
-  - Full /gsd:* command support via native slash command system
+  - Full /gsd-* command support via native slash command system
 - **custom_agents**: ✓ Supported
   - Native .agent.md format in .agent/ directories
 - **parallel_agents**: ✓ Supported
@@ -38,7 +38,7 @@ The following custom agents are available in the GSD workflow:
 ### Copilot CLI
 
 - **slash_commands**: ✗ Not Supported
-  - Use skills with $get-shit-done instead of /gsd:* commands
+  - Use skills with $get-shit-done instead of /gsd-* commands
 - **custom_agents**: ✓ Supported
   - Custom agent definitions in .github/agents/
 - **parallel_agents**: ✓ Supported
@@ -47,7 +47,7 @@ The following custom agents are available in the GSD workflow:
 ### Codex CLI
 
 - **slash_commands**: ✗ Not Supported
-  - Use skills with $get-shit-done instead of /gsd:* commands
+  - Use skills with $get-shit-done instead of /gsd-* commands
 - **custom_agents**: ✓ Supported
   - Skill-based approach in .codex/skills/
 - **parallel_agents**: ✓ Supported
