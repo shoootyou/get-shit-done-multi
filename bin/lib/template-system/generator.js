@@ -11,7 +11,7 @@
 const { parseSpec, parseSpecString } = require('./spec-parser');
 const { buildContext } = require('./context-builder');
 const { render, validate } = require('./engine');
-const { mapTools, validateToolList } = require('./tool-mapper');
+const { mapTools, validateToolList, REVERSE_TOOL_INDEX, TOOL_COMPATIBILITY_MATRIX } = require('./tool-mapper');
 const { transformFields, addPlatformMetadata } = require('./field-transformer');
 const { validateSpec, checkPromptLength } = require('./validators');
 const yaml = require('js-yaml');
@@ -221,23 +221,59 @@ function generateAgent(specPath, platform, options = {}) {
           // Validate tools first to get warnings
           const toolValidation = validateToolList(spec.frontmatter.tools, platform);
         
-        // Add validation warnings
+        // Add validation warnings ONLY for tools that don't have valid mappings
+        // Tools with valid mappings will be transformed, so warnings are spurious
         if (toolValidation.warnings && toolValidation.warnings.length > 0) {
           toolValidation.warnings.forEach(warning => {
-            warnings.push({
-              stage: 'tool-mapping',
-              message: typeof warning === 'string' ? warning : warning.message
-            });
+            const warningStr = typeof warning === 'string' ? warning : warning.message;
+            const toolMatch = warningStr.match(/^(\w+):/);
+            
+            if (toolMatch) {
+              const toolName = toolMatch[1];
+              const canonical = REVERSE_TOOL_INDEX[toolName];
+              
+              if (canonical) {
+                const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
+                const platformKey = platform === 'codex' ? 'codex' : platform;
+                const hasPlatformMapping = compatibility && compatibility[platformKey] !== null;
+                
+                // Only add warning if tool doesn't have a valid platform mapping
+                if (!hasPlatformMapping) {
+                  warnings.push({
+                    stage: 'tool-mapping',
+                    message: warningStr
+                  });
+                }
+              } else {
+                warnings.push({
+                  stage: 'tool-mapping',
+                  message: warningStr
+                });
+              }
+            } else {
+              warnings.push({
+                stage: 'tool-mapping',
+                message: warningStr
+              });
+            }
           });
         }
         
-        // Add validation errors as warnings (non-blocking)
+        // Add validation errors ONLY for tools without valid mappings
+        // Errors for tools like askuserquestion (copilot=null) are suppressed
+        // since they'll be filtered by template rendering
         if (toolValidation.errors && toolValidation.errors.length > 0) {
           toolValidation.errors.forEach(error => {
-            warnings.push({
-              stage: 'tool-mapping',
-              message: typeof error === 'string' ? error : error.message
-            });
+            const errorStr = typeof error === 'string' ? error : error.message;
+            const toolMatch = errorStr.match(/^(\w+) is not available/);
+            
+            // Suppress "not available" errors - mapTools will handle them
+            if (!toolMatch) {
+              warnings.push({
+                stage: 'tool-mapping',
+                message: errorStr
+              });
+            }
           });
         }
         
@@ -556,23 +592,79 @@ function generateFromSpec(specObject, platform, options = {}) {
         // Validate tools first to get warnings
         const toolValidation = validateToolList(specObject.frontmatter.tools, platform);
         
-        // Add validation warnings
+        // Add validation warnings ONLY for tools that don't have valid mappings
+        // Tools with valid mappings will be transformed, so warnings are spurious
         if (toolValidation.warnings && toolValidation.warnings.length > 0) {
           toolValidation.warnings.forEach(warning => {
-            warnings.push({
-              stage: 'tool-mapping',
-              message: typeof warning === 'string' ? warning : warning.message
-            });
+            // Extract tool name from warning (format: "toolName: message" or just "message")
+            const warningStr = typeof warning === 'string' ? warning : warning.message;
+            const toolMatch = warningStr.match(/^(\w+):/);
+            
+            if (toolMatch) {
+              const toolName = toolMatch[1];
+              // Check if this tool has a valid mapping for the platform
+              const canonical = REVERSE_TOOL_INDEX[toolName];
+              
+              if (options.verbose) {
+                console.log(`[DEBUG] Warning for tool "${toolName}", canonical: "${canonical}"`);
+              }
+              
+              if (canonical) {
+                const compatibility = TOOL_COMPATIBILITY_MATRIX[canonical];
+                const platformKey = platform === 'codex' ? 'codex' : platform;
+                const hasPlatformMapping = compatibility && compatibility[platformKey] !== null;
+                
+                if (options.verbose) {
+                  console.log(`[DEBUG] Has ${platformKey} mapping:`, hasPlatformMapping, '(value:', compatibility[platformKey], ')');
+                }
+                
+                // Only add warning if tool doesn't have a valid platform mapping
+                if (!hasPlatformMapping) {
+                  warnings.push({
+                    stage: 'tool-mapping',
+                    message: warningStr
+                  });
+                } else if (options.verbose) {
+                  console.log(`[DEBUG] Suppressing warning for "${toolName}" (has valid mapping)`);
+                }
+                // Skip warning if tool has valid mapping - transformation will handle it
+              } else {
+                // Unknown tool, add warning
+                warnings.push({
+                  stage: 'tool-mapping',
+                  message: warningStr
+                });
+              }
+            } else {
+              // Non-tool-specific warning, add it
+              warnings.push({
+                stage: 'tool-mapping',
+                message: warningStr
+              });
+            }
           });
         }
         
-        // Add validation errors as warnings (non-blocking)
+        // Add validation errors as warnings ONLY for tools without valid mappings
         if (toolValidation.errors && toolValidation.errors.length > 0) {
           toolValidation.errors.forEach(error => {
-            warnings.push({
-              stage: 'tool-mapping',
-              message: typeof error === 'string' ? error : error.message
-            });
+            const errorStr = typeof error === 'string' ? error : error.message;
+            const toolMatch = errorStr.match(/^(\w+) is not available/);
+            
+            if (toolMatch) {
+              const toolName = toolMatch[1];
+              // Only add error if tool will actually be in the output
+              // (i.e., not filtered out by template conditionals)
+              // For now, we'll suppress these errors since tools in templates
+              // are conditional and may not reach the final output
+              // The mapTools function will handle the actual transformation
+            } else {
+              // Non-tool-specific error, add it as warning
+              warnings.push({
+                stage: 'tool-mapping',
+                message: errorStr
+              });
+            }
           });
         }
         

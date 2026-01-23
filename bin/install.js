@@ -986,7 +986,7 @@ function installCopilot(projectDir = process.cwd()) {
   }
 
   console.log(`
-  ${green}Done!${reset} Start GitHub Copilot CLI in this repo and use ${cyan}gsd:help${reset} for guidance.
+  ${green}Done!${reset} Start GitHub Copilot CLI in this repo and use ${cyan}/gsd-help${reset} for guidance.
 `);
 }
 
