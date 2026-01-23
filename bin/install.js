@@ -1198,7 +1198,27 @@ function installCodex(isGlobal) {
       console.log(`  ${yellow}⚠${reset} Skills: ${skillGenResult.generated} generated, ${skillGenResult.failed} failed`);
       failures.push(`skills (${skillGenResult.failed} generation failures)`);
     } else if (skillGenResult.generated > 0) {
-      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated at ${cyan}${skillDestDir}${reset}`);
+      
+      // List each skill created (similar to Claude/Copilot installation)
+      try {
+        const skillDirs = fs.readdirSync(skillDestDir)
+          .filter(name => {
+            const fullPath = path.join(skillDestDir, name);
+            return name.startsWith('gsd-') && fs.statSync(fullPath).isDirectory();
+          });
+        
+        skillDirs.forEach(skillName => {
+          const skillPath = path.join(skillDestDir, skillName, 'SKILL.md');
+          if (fs.existsSync(skillPath)) {
+            const stats = fs.statSync(skillPath);
+            const sizeKB = (stats.size / 1024).toFixed(1);
+            console.log(`    ${green}✓${reset} ${skillName}/ (${sizeKB} KB)`);
+          }
+        });
+      } catch (err) {
+        // Silently skip listing if there's an error
+      }
     }
   }
 
