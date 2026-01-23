@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 7 of 9 (05-01 through 05-07 complete - Waves 1-3 finished)
-Status: Phase 5 Wave 3 complete, 14/21 commands migrated (67% of phase)
-Last activity: 2026-01-23 — Completed 05-06-PLAN.md (milestone lifecycle: complete, audit, plan-gaps, archive, restore)
+Plan: 8 of 9 (05-01 through 05-08 complete - Wave 4 finished)
+Status: Phase 5 Wave 4 complete, progress routing hub migrated
+Last activity: 2026-01-23 — Completed 05-08-PLAN.md (progress routing hub with 11 command routes)
 
-Progress: [█████░░░░░] ~60% (5/8.5 phases, 23 plans total)
+Progress: [█████░░░░░] ~61% (5/8.5 phases, 24 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 5.7 min
-- Total execution time: 2.22 hours
+- Total plans completed: 24
+- Average duration: 5.6 min
+- Total execution time: 2.32 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████░░░░░] ~60% (5/8.5 phases, 23 plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 5 | 38.8 min | 7.8 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
-| 05-simple-command-migration | 7 | 38.3 min | 5.5 min |
+| 05-simple-command-migration | 8 | 44.3 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4.7 min (05-04), 5.8 min (05-05), 7.0 min (05-06), 3.7 min (05-07), [pending]
-- Trend: Consistent ~5min per plan, Wave 3 batch work efficient
+- Last 5 plans: 5.8 min (05-05), 7.0 min (05-06), 3.7 min (05-07), 6.0 min (05-08), [pending]
+- Trend: Consistent ~5-6min per plan, Wave 4 routing hub on target
 
 *Updated after each plan completion*
 
@@ -124,6 +124,10 @@ Recent decisions affecting current work:
 - **[05-06]** Archive/restore cycle: milestones/ for active, history/ for long-term storage with recovery option
 - **[05-07]** Git-based update workflow (fetch, compare versions, pull) instead of npm-based
 - **[05-07]** Tools format must be simple string arrays for Claude compatibility (not object arrays with name field)
+- **[05-08]** Route by displaying command suggestions, not auto-executing (preserves user control, follows legacy pattern)
+- **[05-08]** Priority 1 is UAT gaps in progress routing (quality over velocity, prevents tech debt)
+- **[05-08]** Progress command includes 11 routes for comprehensive workflow coverage (all major GSD commands)
+- **[05-08]** File counting with graceful degradation (handles 0 files without errors, 2>/dev/null redirects)
 
 ### Pending Todos
 
@@ -131,10 +135,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5 Wave 3 complete (14/21 commands migrated, 67% complete). Wave 4 (progress routing) can now proceed.
+None - Phase 5 Wave 4 complete (progress routing hub migrated). Wave 5 (E2E verification) ready to proceed.
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:45:00Z
-Stopped at: Completed 05-06-PLAN.md (milestone lifecycle commands, Wave 3 complete)
+Last session: 2026-01-23T10:54:32Z
+Stopped at: Completed 05-08-PLAN.md (progress routing hub, Wave 4 complete)
 Resume file: None
