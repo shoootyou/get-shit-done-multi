@@ -39,3 +39,4 @@ test-output
 .codex/agents/gsd-*
 .codex/get-shit-done
 .codex/ISSUE_TEMPLATE/gsd-*
+.codex/skills/get-shit-done/agents/gsd-*
