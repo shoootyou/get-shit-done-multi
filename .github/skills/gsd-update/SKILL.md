@@ -1,7 +1,7 @@
 ---
 name: gsd-update
-description: Update GSD installation to latest version from repository
-skill_version: 1.9.1
+description: Update GSD installation to latest version from npm
+skill_version: 1.9.2
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
 tools: [read, execute]
@@ -15,80 +15,137 @@ metadata:
 ---
 
 <objective>
-Update GSD installation to latest version from repository, display changelog, 
-and verify installation.
+Check current GSD version, compare with latest available on npm, and update if needed.
 
 Purpose: Keep GSD up-to-date with latest features and bug fixes.
-Output: Updated installation, changelog displayed.
+Output: Version comparison, changelog, and updated installation.
 </objective>
 
+<execution_context>
+@/workspace/.github/copilot/skills/get-shit-done/VERSION
+@/workspace/.github/copilot/skills/get-shit-done/CHANGELOG.md
+</execution_context>
+
 <process>
-<step name="check_current_version">
-Determine current GSD version:
+
+<step name="detect_platform">
+Detect which platform is being used:
 
 ```bash
-# Check current version from package.json
-CURRENT_VERSION=$(jq -r '.version' package.json 2>/dev/null || echo "unknown")
-echo "Current GSD version: ${CURRENT_VERSION}"
-```
-</step>
-
-<step name="fetch_latest">
-Fetch latest version from repository:
-
-```bash
-# Ensure we're in GSD directory
-if [ ! -f "package.json" ] || ! grep -q '"name": "get-shit-done"' package.json; then
-  echo "Error: Not in GSD directory"
+# Detect platform based on installation directory
+if [ -d "${HOME}/.claude/skills" ] || [ -d "./.claude/skills" ]; then
+  PLATFORM="claude"
+  INSTALL_CMD="npx get-shit-done-multi@latest"
+  if [ -f "./.claude/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./.claude/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/.claude/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/.claude/skills/get-shit-done/VERSION"
+  fi
+elif [ -d "./.github/skills" ] || [ -d "${HOME}/.github/copilot/skills" ]; then
+  PLATFORM="copilot"
+  INSTALL_CMD="npx get-shit-done-multi@latest --copilot"
+  if [ -f "./.github/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./.github/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/.github/copilot/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/.github/copilot/skills/get-shit-done/VERSION"
+  fi
+elif [ -d "./.codex/skills" ] || [ -d "${HOME}/.codex/skills" ]; then
+  PLATFORM="codex"
+  INSTALL_CMD="npx get-shit-done-multi@latest --codex"
+  if [ -f "./.codex/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./.codex/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/.codex/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/.codex/skills/get-shit-done/VERSION"
+  fi
+else
+  echo "Error: GSD installation not found"
+  echo "Run installation first: npx get-shit-done-multi"
   exit 1
 fi
 
-# Fetch latest from origin
-git fetch origin main
-
-# Get latest version
-LATEST_VERSION=$(git show origin/main:package.json | jq -r '.version' 2>/dev/null || echo "unknown")
-echo "Latest GSD version: ${LATEST_VERSION}"
+echo "Platform detected: ${PLATFORM}"
 ```
 </step>
 
-<step name="check_if_update_needed">
-Compare versions:
+<step name="check_current_version">
+Read current installed version:
+
+```bash
+if [ -f "${VERSION_FILE}" ]; then
+  CURRENT_VERSION=$(cat "${VERSION_FILE}")
+  echo "Current version: ${CURRENT_VERSION}"
+else
+  echo "Warning: VERSION file not found at ${VERSION_FILE}"
+  CURRENT_VERSION="unknown"
+fi
+```
+</step>
+
+<step name="check_npm_versions">
+Check available versions on npm:
+
+```bash
+echo ""
+echo "Checking npm registry..."
+
+# Get latest version from npm
+LATEST_VERSION=$(npm view get-shit-done-multi version 2>/dev/null)
+
+if [ -z "${LATEST_VERSION}" ]; then
+  echo "Error: Could not fetch version info from npm"
+  echo "Check your internet connection"
+  exit 1
+fi
+
+echo "Latest version: ${LATEST_VERSION}"
+echo ""
+
+# Get recent versions (last 5)
+echo "Recent versions available:"
+npm view get-shit-done-multi versions --json 2>/dev/null | \
+  jq -r '.[-5:] | reverse | .[]' 2>/dev/null || \
+  echo "  (Could not fetch version list)"
+echo ""
+```
+</step>
+
+<step name="compare_versions">
+Compare current vs latest:
 
 ```bash
 if [ "${CURRENT_VERSION}" = "${LATEST_VERSION}" ]; then
-  echo "✓ Already up-to-date (${CURRENT_VERSION})"
+  echo "✓ You're running the latest version (${CURRENT_VERSION})"
   echo ""
-  echo "No update needed. You're running the latest version."
+  echo "No update needed."
   exit 0
 fi
 
-echo ""
-echo "Update available: ${CURRENT_VERSION} → ${LATEST_VERSION}"
+# Simple version comparison (works for semantic versions)
+if [ "${CURRENT_VERSION}" != "unknown" ]; then
+  echo "📦 Update available: ${CURRENT_VERSION} → ${LATEST_VERSION}"
+else
+  echo "📦 Latest version available: ${LATEST_VERSION}"
+fi
 echo ""
 ```
 </step>
 
 <step name="display_changelog">
-Display changelog between versions:
+Display recent changes:
 
 ```bash
-# Parse CHANGELOG.md for changes between versions
-echo "=== Changelog: ${CURRENT_VERSION} → ${LATEST_VERSION} ==="
+echo "=== Recent Changes ==="
 echo ""
 
-# Extract relevant changelog section
-# Look for version headers and extract content between current and latest
-if [ -f "CHANGELOG.md" ]; then
-  # Show changes from remote (latest)
-  git show origin/main:CHANGELOG.md | awk "
-    /^## \[${LATEST_VERSION}\]/,/^## \[${CURRENT_VERSION}\]/ {
-      if (/^## \[${CURRENT_VERSION}\]/) exit;
-      print
-    }
-  " | head -50
+# Try to read CHANGELOG.md from installed location
+CHANGELOG_FILE="${VERSION_FILE%/*}/CHANGELOG.md"
+
+if [ -f "${CHANGELOG_FILE}" ]; then
+  # Show latest version changes (top section)
+  awk '/^## \[/{p++} p==1' "${CHANGELOG_FILE}" | head -30
 else
-  echo "(CHANGELOG.md not found)"
+  echo "(CHANGELOG.md not available locally)"
+  echo "View at: https://github.com/shoootyou/get-shit-done-multi/blob/main/CHANGELOG.md"
 fi
 
 echo ""
@@ -96,161 +153,115 @@ echo ""
 </step>
 
 <step name="confirm_update">
-Ask for confirmation:
-
-If user confirms: proceed with update
-If user declines: exit without updating
+Ask for update confirmation:
 
 ```bash
-echo "Proceed with update? This will:"
-echo "  1. Stash any local changes"
-echo "  2. Pull latest code from origin/main"
-echo "  3. Run npm install"
-echo "  4. Verify installation"
+echo "Update command: ${INSTALL_CMD}"
 echo ""
-read -p "Continue? (y/n): " CONFIRM
+echo "This will:"
+echo "  1. Download latest version from npm"
+echo "  2. Regenerate platform-specific skills and agents"
+echo "  3. Update all GSD files in place"
+echo ""
+read -p "Proceed with update? (y/n): " CONFIRM
 
 if [ "${CONFIRM}" != "y" ] && [ "${CONFIRM}" != "Y" ]; then
   echo "Update cancelled"
+  echo ""
+  echo "To update later, run: ${INSTALL_CMD}"
   exit 0
 fi
 ```
 </step>
 
-<step name="stash_local_changes">
-Stash any local changes:
+<step name="run_update">
+Execute npm installation:
 
 ```bash
-# Check for uncommitted changes
-if ! git diff-index --quiet HEAD --; then
-  echo "Stashing local changes..."
-  git stash push -m "GSD update: stash before update to ${LATEST_VERSION}"
-  STASHED=true
-else
-  STASHED=false
-fi
-```
-</step>
+echo ""
+echo "Running update..."
+echo "Command: ${INSTALL_CMD}"
+echo ""
 
-<step name="pull_latest">
-Pull latest code:
+# Run the installation command
+eval "${INSTALL_CMD}"
 
-```bash
-echo "Pulling latest code..."
-git pull origin main
+UPDATE_EXIT_CODE=$?
 
-if [ $? -ne 0 ]; then
-  echo "Error: git pull failed"
-  if [ "${STASHED}" = "true" ]; then
-    echo "Your changes are stashed. Run 'git stash pop' to restore."
-  fi
-  exit 1
-fi
-```
-</step>
-
-<step name="install_dependencies">
-Install updated dependencies:
-
-```bash
-echo "Installing dependencies..."
-npm install
-
-if [ $? -ne 0 ]; then
-  echo "Error: npm install failed"
-  exit 1
-fi
-```
-</step>
-
-<step name="verify_installation">
-Verify updated installation:
-
-```bash
-echo "Verifying installation..."
-
-# Check version updated
-NEW_VERSION=$(jq -r '.version' package.json)
-
-if [ "${NEW_VERSION}" != "${LATEST_VERSION}" ]; then
-  echo "Warning: Version mismatch after update"
-  echo "  Expected: ${LATEST_VERSION}"
-  echo "  Got: ${NEW_VERSION}"
-fi
-
-# Run basic checks
-echo "Running verification checks..."
-
-# Check required files exist
-CHECKS_PASSED=true
-
-if [ ! -f "bin/install.js" ]; then
-  echo "✗ Missing bin/install.js"
-  CHECKS_PASSED=false
-else
-  echo "✓ bin/install.js exists"
-fi
-
-if [ ! -d "specs/skills" ]; then
-  echo "✗ Missing specs/skills directory"
-  CHECKS_PASSED=false
-else
-  SKILL_COUNT=$(ls -1 specs/skills | wc -l)
-  echo "✓ specs/skills exists (${SKILL_COUNT} skills)"
-fi
-
-if [ ! -d "specs/agents" ]; then
-  echo "✗ Missing specs/agents directory"
-  CHECKS_PASSED=false
-else
-  AGENT_COUNT=$(ls -1 specs/agents | wc -l)
-  echo "✓ specs/agents exists (${AGENT_COUNT} agents)"
-fi
-```
-</step>
-
-<step name="restore_stashed_changes">
-Offer to restore stashed changes:
-
-```bash
-if [ "${STASHED}" = "true" ]; then
+if [ ${UPDATE_EXIT_CODE} -ne 0 ]; then
   echo ""
-  echo "Local changes were stashed before update."
-  read -p "Restore stashed changes? (y/n): " RESTORE
+  echo "✗ Update failed with exit code ${UPDATE_EXIT_CODE}"
+  echo ""
+  echo "Try running manually: ${INSTALL_CMD}"
+  exit 1
+fi
+```
+</step>
+
+<step name="verify_update">
+Verify the update succeeded:
+
+```bash
+echo ""
+echo "Verifying update..."
+
+# Read new version
+if [ -f "${VERSION_FILE}" ]; then
+  NEW_VERSION=$(cat "${VERSION_FILE}")
   
-  if [ "${RESTORE}" = "y" ] || [ "${RESTORE}" = "Y" ]; then
-    git stash pop
-    echo "Changes restored. Review any merge conflicts."
+  if [ "${NEW_VERSION}" = "${LATEST_VERSION}" ]; then
+    echo "✓ Successfully updated to ${NEW_VERSION}"
   else
-    echo "Changes remain stashed. Run 'git stash pop' to restore later."
+    echo "⚠ Version mismatch:"
+    echo "  Expected: ${LATEST_VERSION}"
+    echo "  Installed: ${NEW_VERSION}"
   fi
+else
+  echo "⚠ Could not verify version (VERSION file not found)"
+  NEW_VERSION="${LATEST_VERSION}"
 fi
 ```
 </step>
 
 <step name="present_summary">
-Present update summary:
+Show update summary:
 
 ```
 ## GSD UPDATE COMPLETE
 
 **Previous version:** ${CURRENT_VERSION}
-**Current version:** ${NEW_VERSION}
+**New version:** ${NEW_VERSION}
 
-✓ Code updated
-✓ Dependencies installed
+✓ Downloaded from npm
+✓ Skills and agents regenerated
 ✓ Installation verified
 
 ### Next Steps
 
-1. Review changelog above for new features
-2. Test critical workflows (e.g., /gsd:progress)
-3. Report any issues on GitHub
+1. Test a command to ensure everything works:
+   /gsd-help
 
-**Note:** Skills and agents were not regenerated. Run installation 
-manually if needed:
-  - npm run install:local (for testing)
-  - Or wait for next GSD command run (auto-regenerates)
+2. Review changelog for new features and changes
+
+3. If using Claude Code, restart to reload commands
+
+### Resources
+
+- Changelog: ${CHANGELOG_FILE}
+- Issues: https://github.com/shoootyou/get-shit-done-multi/issues
+- Docs: https://github.com/shoootyou/get-shit-done-multi/blob/main/docs/
+
+---
+
+**Having issues?** Run /gsd-verify-installation for diagnostics.
 ```
 </step>
+
 </process>
+
+<anti_patterns>
+- Don't try to update via git (use npm package)
+- Don't modify VERSION file manually
+- Don't skip version check (always compare first)
+- Don't assume update succeeded without verification
+</anti_patterns>

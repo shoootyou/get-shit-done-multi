@@ -25,11 +25,11 @@ Purpose: Create historical record of shipped version, archive milestone artifact
 Look for .planning/v{version}-MILESTONE-AUDIT.md where version is provided as argument
 
 If missing:
-  Recommend: "/gsd:audit-milestone first - need E2E validation before completion"
+  Recommend: "/gsd-audit-milestone first - need E2E validation before completion"
   Exit (user must audit first)
 
 If exists with status: gaps_found:
-  Recommend: "/gsd:plan-milestone-gaps - address gaps before completion"
+  Recommend: "/gsd-plan-milestone-gaps - address gaps before completion"
   Exit (user must fix gaps first)
 
 If exists with status: passed:
@@ -131,7 +131,7 @@ Present completion summary:
 ### Next Steps
 
 1. Retrospective (what went well, what to improve)
-2. Start next milestone: /gsd:new-milestone
+2. Start next milestone: /gsd-new-milestone
 3. Or take a break - you earned it!
 ```
 </step>

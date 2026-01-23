@@ -110,9 +110,9 @@ Present gap closure plan:
 
 ### Next Steps
 
-1. Execute gap closure phases: /gsd:progress (will route to execution)
-2. After gaps fixed: /gsd:audit-milestone {version} (re-audit)
-3. If audit passes: /gsd:complete-milestone {version}
+1. Execute gap closure phases: /gsd-progress (will route to execution)
+2. After gaps fixed: /gsd-audit-milestone {version} (re-audit)
+3. If audit passes: /gsd-complete-milestone {version}
 
 **Estimated time:** {phase_count} × ~1 day = {total} days
 ```

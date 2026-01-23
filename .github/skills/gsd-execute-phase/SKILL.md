@@ -84,7 +84,7 @@ Phase: $ARGUMENTS
    - Route by status:
      - `passed` → continue to step 8
      - `human_needed` → present items, get approval or feedback
-     - `gaps_found` → present gaps, offer `/gsd:plan-phase {X} --gaps`
+     - `gaps_found` → present gaps, offer `/gsd-plan-phase {X} --gaps`
 
 8. **Update roadmap and state**
    - Update ROADMAP.md, STATE.md
@@ -136,15 +136,15 @@ Goal verified ✓
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-/gsd:discuss-phase {Z+1} — gather context and clarify approach
+/gsd-discuss-phase {Z+1} — gather context and clarify approach
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:plan-phase {Z+1} — skip discussion, plan directly
-- /gsd:verify-work {Z} — manual acceptance testing before continuing
+- /gsd-plan-phase {Z+1} — skip discussion, plan directly
+- /gsd-verify-work {Z} — manual acceptance testing before continuing
 
 ───────────────────────────────────────────────────────────────
 
@@ -167,15 +167,15 @@ All phase goals verified ✓
 
 **Audit milestone** — verify requirements, cross-phase integration, E2E flows
 
-/gsd:audit-milestone
+/gsd-audit-milestone
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /gsd:verify-work — manual acceptance testing
-- /gsd:complete-milestone — skip audit, archive directly
+- /gsd-verify-work — manual acceptance testing
+- /gsd-complete-milestone — skip audit, archive directly
 
 ───────────────────────────────────────────────────────────────
 
@@ -202,7 +202,7 @@ Report: .planning/phases/{phase_dir}/{phase}-VERIFICATION.md
 
 **Plan gap closure** — create additional plans to complete the phase
 
-/gsd:plan-phase {Z} --gaps
+/gsd-plan-phase {Z} --gaps
 
 <sub>/clear first → fresh context window</sub>
 
@@ -210,16 +210,16 @@ Report: .planning/phases/{phase_dir}/{phase}-VERIFICATION.md
 
 **Also available:**
 - cat .planning/phases/{phase_dir}/{phase}-VERIFICATION.md — see full report
-- /gsd:verify-work {Z} — manual testing before planning
+- /gsd-verify-work {Z} — manual testing before planning
 
 ───────────────────────────────────────────────────────────────
 
 ---
 
-After user runs /gsd:plan-phase {Z} --gaps:
+After user runs /gsd-plan-phase {Z} --gaps:
 1. Planner reads VERIFICATION.md gaps
 2. Creates plans 04, 05, etc. to close gaps
-3. User runs /gsd:execute-phase {Z} again
+3. User runs /gsd-execute-phase {Z} again
 4. Execute-phase runs incomplete plans (04, 05...)
 5. Verifier runs again → loop until passed
 </offer_next>

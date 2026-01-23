@@ -126,10 +126,10 @@ cat ".planning/v${version}-MILESTONE-AUDIT.md"
 Display status prominently
 
 If status: passed:
-  "✓ Milestone ready for completion: /gsd:complete-milestone {version}"
+  "✓ Milestone ready for completion: /gsd-complete-milestone {version}"
 
 If status: gaps_found:
   "⚠ Gaps found: {count} integration issues
-   Next: /gsd:plan-milestone-gaps {version} (creates fix phases)"
+   Next: /gsd-plan-milestone-gaps {version} (creates fix phases)"
 </step>
 </process>

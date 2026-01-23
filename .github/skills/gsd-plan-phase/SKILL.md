@@ -48,7 +48,7 @@ Normalize phase input in step 2 before any directory lookups.
 ls .planning/ 2>/dev/null
 ```
 
-**If not found:** Error - user should run `/gsd:new-project` first.
+**If not found:** Error - user should run `/gsd-new-project` first.
 
 ## 2. Parse and Normalize Arguments
 
@@ -263,7 +263,7 @@ Fill prompt and spawn:
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /gsd:execute-phase
+Output consumed by /gsd-execute-phase
 Plans must be executable prompts with:
 
 - Frontmatter (wave, depends_on, files_modified, autonomous)
@@ -446,7 +446,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 **Execute Phase {X}** — run all {N} plans
 
-/gsd:execute-phase {X}
+/gsd-execute-phase {X}
 
 <sub>/clear first → fresh context window</sub>
 
@@ -454,7 +454,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 **Also available:**
 - cat .planning/phases/{phase-dir}/*-PLAN.md — review plans
-- /gsd:plan-phase {X} --research — re-research first
+- /gsd-plan-phase {X} --research — re-research first
 
 ───────────────────────────────────────────────────────────────
 </offer_next>

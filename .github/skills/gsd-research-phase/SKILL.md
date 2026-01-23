@@ -15,7 +15,7 @@ metadata:
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
 
-**Note:** This is a standalone research command. For most workflows, use `/gsd:plan-phase` which integrates research automatically.
+**Note:** This is a standalone research command. For most workflows, use `/gsd-plan-phase` which integrates research automatically.
 
 **Use this command when:**
 - You want to research without planning yet
@@ -108,7 +108,7 @@ Mode: ecosystem
 </context>
 
 <downstream_consumer>
-Your RESEARCH.md will be loaded by `/gsd:plan-phase` which uses specific sections:
+Your RESEARCH.md will be loaded by `/gsd-plan-phase` which uses specific sections:
 - `## Standard Stack` → Plans use these libraries
 - `## Architecture Patterns` → Task structure follows these
 - `## Don't Hand-Roll` → Tasks NEVER build custom solutions for listed problems
