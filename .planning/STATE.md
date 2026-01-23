@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 1 of 4+ (05-01 complete - Wave 1 finished)
-Status: Phase 5 Wave 1 complete, Wave 2 ready (Batch 2: Status/utility commands)
-Last activity: 2026-01-23 — Completed 05-01-PLAN.md (reference commands batch)
+Plan: 2 of 4+ (05-01, 05-02 complete - Wave 1 finished)
+Status: Phase 5 Wave 1 complete, Batch 2 complete, Wave 2 ready
+Last activity: 2026-01-23 — Completed 05-02-PLAN.md (workflow delegation commands)
 
-Progress: [█████░░░░░] ~54% (5/8.5 phases, 19/? plans total)
+Progress: [█████░░░░░] ~56% (5/8.5 phases, 20/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 5.9 min
-- Total execution time: 1.9 hours
+- Total execution time: 1.95 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [█████░░░░░] ~54% (5/8.5 phases, 19/? plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
-| 05-simple-command-migration | 1 | 5.7 min | 5.7 min |
+| 05-simple-command-migration | 2 | 11.7 min | 5.9 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.6 min (04-02), 6.0 min (04-01), 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01)
+- Last 5 plans: 6.0 min (04-01), 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01), 6.0 min (05-02)
 - Trend: Consistent ~5-6min per plan (established patterns working efficiently)
 
 *Updated after each plan completion*
@@ -106,6 +106,9 @@ Recent decisions affecting current work:
 - **[05-01]** Reference-only commands ideal for Wave 1 (no dependencies, validate migration tooling)
 - **[05-01]** Tools must be simple arrays for Claude compatibility (not objects with name/required/reason)
 - **[05-01]** Metadata section removed from frontmatter (Claude platform doesn't support)
+- **[05-02]** Workflow @-references preserved to ~/.claude/get-shit-done/workflows/ (enables reuse across commands)
+- **[05-02]** Handoff file path: .planning/phases/XX-name/.continue-here.md (session continuity pattern)
+- **[05-02]** Workflow delegation pattern: Commands reference external .md files for detailed process logic
 
 ### Pending Todos
 
@@ -113,10 +116,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 4 complete, Phase 5 progressing well (4/21 commands migrated).
+None - Phase 5 progressing well (6/21 commands migrated, 29% complete).
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:24:54Z
-Stopped at: Completed 05-01-PLAN.md (reference commands batch, Wave 1 complete)
+Last session: 2026-01-23T10:26:10Z
+Stopped at: Completed 05-02-PLAN.md (workflow delegation commands, Batch 2 complete)
 Resume file: None
