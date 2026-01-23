@@ -20,7 +20,8 @@ const execFileAsync = promisify(execFile);
  * Get target installation directories for Codex CLI
  * 
  * Codex uses skills-based structure with unique characteristics:
- * - Skills in ~/.codex/skills/get-shit-done/ or .codex/skills/get-shit-done/
+ * - Skills in ~/.codex/skills/get-shit-done/ or .codex/skills/get-shit-done/ (SKILL.md, CHANGELOG, VERSION only)
+ * - GSD resources in ~/.codex/get-shit-done/ or .codex/get-shit-done/ (workflows, templates, references)
  * - Agents converted to skills in ~/.codex/skills/get-shit-done/agents/ or .codex/skills/get-shit-done/agents/
  * - Commands (prompts) ONLY for global: ~/.codex/prompts/gsd/ (null for local per research)
  * 
@@ -28,6 +29,8 @@ const execFileAsync = promisify(execFile);
  * @returns {Object} Target directories with skills, agents, commands paths
  * @returns {string} return.skills - Skills directory path
  * @returns {string} return.agents - Agents directory path (nested in skills)
+ * @returns {string} return.gsd - GSD resources directory (workflows, templates, references)
+ * @returns {string} return.gsdSkill - GSD skill directory (SKILL.md, CHANGELOG.md, VERSION only)
  * @returns {string|null} return.commands - Commands directory path (null for local installations)
  */
 function getTargetDirs(isGlobal) {
@@ -39,7 +42,8 @@ function getTargetDirs(isGlobal) {
   return {
     skills: path.join(basePath, 'skills'),
     agents: path.join(skillsPath, 'agents'), // Agents nested in skills for Codex
-    gsd: path.join(basePath, 'skills', 'get-shit-done'), // workflows, templates, references
+    gsd: path.join(basePath, 'get-shit-done'), // workflows, templates, references (separate from skills)
+    gsdSkill: skillsPath, // SKILL.md, CHANGELOG.md, VERSION only
     commands: null // Commands embedded in skills, invoked with $get-shit-done
   };
 }
@@ -125,9 +129,15 @@ function verify(dirs) {
   }
   
   // Check SKILL.md exists in skills/get-shit-done/
-  const skillFile = path.join(dirs.skills, 'get-shit-done', 'SKILL.md');
+  const skillFile = path.join(dirs.gsdSkill, 'SKILL.md');
   if (!fs.existsSync(skillFile)) {
     errors.push(`SKILL.md missing: ${skillFile}`);
+  }
+  
+  // Check workflows directory exists in .codex/get-shit-done (not in skills)
+  const workflowsDir = path.join(dirs.gsd, 'workflows');
+  if (!fs.existsSync(workflowsDir)) {
+    errors.push(`Workflows directory missing: ${workflowsDir}`);
   }
   
   // Check agents directory has subfolder structure

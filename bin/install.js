@@ -1065,7 +1065,7 @@ function installCodex(isGlobal) {
 
   const failures = [];
 
-  // Copy workflows, templates, and references to skills/get-shit-done/
+  // Copy workflows, templates, and references to .codex/get-shit-done/
   const gsdSrc = path.join(src, 'get-shit-done');
   const gsdDirs = ['workflows', 'templates', 'references'];
   
@@ -1085,9 +1085,12 @@ function installCodex(isGlobal) {
     failures.push('get-shit-done resources');
   }
 
+  // Create skills/get-shit-done directory for SKILL.md
+  fs.mkdirSync(dirs.gsdSkill, { recursive: true });
+
   // Generate SKILL.md from template for Codex (required for Codex skill recognition)
   const skillMdSrc = path.join(src, 'get-shit-done', 'SKILL.md');
-  const skillMdDest = path.join(dirs.gsd, 'SKILL.md');
+  const skillMdDest = path.join(dirs.gsdSkill, 'SKILL.md');
   if (fs.existsSync(skillMdSrc)) {
     const skillTemplate = fs.readFileSync(skillMdSrc, 'utf8');
     // Generate platform-specific version using template system
@@ -1103,7 +1106,7 @@ function installCodex(isGlobal) {
 
   // Copy CHANGELOG.md and VERSION
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(dirs.gsd, 'CHANGELOG.md');
+  const changelogDest = path.join(dirs.gsdSkill, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'skills/get-shit-done/CHANGELOG.md')) {
@@ -1113,7 +1116,7 @@ function installCodex(isGlobal) {
     }
   }
 
-  const versionDest = path.join(dirs.gsd, 'VERSION');
+  const versionDest = path.join(dirs.gsdSkill, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'skills/get-shit-done/VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
