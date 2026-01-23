@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 3 of 4+ (05-01, 05-02, 05-03 complete - Batches 1-3 finished)
-Status: Phase 5 Wave 2 in progress, 9/21 commands migrated
-Last activity: 2026-01-23 — Completed 05-03-PLAN.md (phase management commands)
+Plan: 5 of 4+ (05-01, 05-02, 05-03, 05-04, 05-07 complete - Wave 3 in progress)
+Status: Phase 5 progressing well, 10/21 commands migrated (48% of phase)
+Last activity: 2026-01-23 — Completed 05-07-PLAN.md (update command)
 
-Progress: [█████░░░░░] ~56% (5/8.5 phases, 21/? plans total)
+Progress: [█████░░░░░] ~57% (5/8.5 phases, 22/? plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
-- Average duration: 5.6 min
-- Total execution time: 1.97 hours
+- Total plans completed: 22
+- Average duration: 4.7 min
+- Total execution time: 1.72 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████░░░░░] ~56% (5/8.5 phases, 21/? plans total)
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
 | 03-high-complexity-orchestrators | 3 | 19.3 min | 6.4 min |
 | 04-mid-complexity-commands | 4 | 21.2 min | 5.3 min |
-| 05-simple-command-migration | 3 | 17.3 min | 5.8 min |
+| 05-simple-command-migration | 5 | 25.5 min | 5.1 min |
 
 **Recent Trend:**
-- Last 5 plans: 6.2 min (04-03), 5.4 min (04-04), 5.7 min (05-01), 6.0 min (05-02), 5.4 min (05-03)
-- Trend: Consistent ~5-6min per plan (established patterns working efficiently)
+- Last 5 plans: 5.4 min (05-02), 5.4 min (05-03), 4.7 min (05-04), 3.7 min (05-07), [pending]
+- Trend: Improving efficiency, under 5min average for recent Phase 5 plans
 
 *Updated after each plan completion*
 
@@ -114,6 +114,8 @@ Recent decisions affecting current work:
 - **[05-03]** Renumbering includes directories and files (18-dashboard → 17-dashboard, 18-01-PLAN.md → 17-01-PLAN.md)
 - **[05-03]** Git commit as historical record for removals (no STATE.md "Roadmap Evolution" notes)
 - **[05-03]** Validation prevents removing completed work (checks for SUMMARY.md files)
+- **[05-07]** Git-based update workflow (fetch, compare versions, pull) instead of npm-based
+- **[05-07]** Tools format must be simple string arrays for Claude compatibility (not object arrays with name field)
 
 ### Pending Todos
 
@@ -121,10 +123,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 5 progressing well (9/21 commands migrated, 43% complete).
+None - Phase 5 progressing well (10/21 commands migrated, 48% complete).
 
 ## Session Continuity
 
-Last session: 2026-01-23T10:33:18Z
-Stopped at: Completed 05-03-PLAN.md (phase management commands, Batch 3 complete)
+Last session: 2026-01-23T10:39:18Z
+Stopped at: Completed 05-07-PLAN.md (update command, Wave 3 batch)
 Resume file: None
