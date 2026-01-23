@@ -294,6 +294,206 @@ EOF
 )"
 ```
 
+## Phase 5.5: Git Identity Configuration
+
+**Goal:** Ensure git identity is configured before agents make commits.
+
+**Check if git is already configured:**
+
+```bash
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -n "$GIT_NAME" ] && [ -n "$GIT_EMAIL" ]; then
+    echo "Git identity already configured:"
+    echo "  Name: $GIT_NAME"
+    echo "  Email: $GIT_EMAIL"
+    
+    # Store source in config.json
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+    
+    # Continue to next phase
+fi
+```
+
+**If not configured**, use AskUserQuestion:
+
+```yaml
+header: "Git Identity Configuration"
+question: |
+  Git user information is needed for commit attribution. Automated agents 
+  (like gsd-executor) will commit using this identity.
+  
+  How would you like to proceed?
+options:
+  - id: configure-global
+    label: "Configure git globally (recommended)"
+    description: "I'll set it in git config for all repositories"
+  - id: project-only
+    label: "Store in this project only"
+    description: "Keep identity in .planning/config.json for this project"
+  - id: already-done
+    label: "I already configured it"
+    description: "Skip this step and verify configuration"
+```
+
+**If "configure-global" selected:**
+
+```bash
+echo "Please configure git globally by running:"
+echo ""
+echo "  git config --global user.name \"Your Name\""
+echo "  git config --global user.email \"you@example.com\""
+echo ""
+echo "After running these commands, type 'done' to continue."
+
+# Wait for user confirmation (via AskUserQuestion)
+# Then re-check git config and store source as "global"
+
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "ERROR: Git config not detected. Please try again."
+    # Loop back to question
+else
+    # Store in config.json
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+fi
+```
+
+**If "project-only" selected:**
+
+```yaml
+# Ask for name
+header: "Git Author Name"
+question: "Enter your full name for git commits:"
+input_type: freeform
+
+# Ask for email
+header: "Git Author Email"
+question: "Enter your email for git commits:"
+input_type: freeform
+
+# Validate and store
+```
+
+```bash
+# After receiving inputs (USER_NAME, USER_EMAIL)
+# Validate email contains @
+if [[ ! "$USER_EMAIL" =~ "@" ]]; then
+    echo "ERROR: Invalid email format (must contain @)"
+    # Loop back
+fi
+
+# Store in config.json
+python3 << PYTHON
+import json
+import os
+
+user_name = os.environ.get('USER_NAME', '')
+user_email = os.environ.get('USER_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': user_name,
+        'email': user_email
+    },
+    'source': 'config'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+
+echo "Git identity stored in .planning/config.json"
+```
+
+**If "already-done" selected:**
+
+```bash
+# Verify git config returns values
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "ERROR: Git identity not found. Please configure it first."
+    # Loop back to question
+else
+    echo "Git identity verified."
+    # Store source as "global"
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+fi
+```
+
+**Success criteria for Phase 5.5:**
+- [ ] Git identity exists in git config OR .planning/config.json
+- [ ] Identity includes valid name (non-empty) and email (contains @)
+- [ ] Source recorded in config.json ("global", "config", or "local")
+
 ## Phase 6: Research Decision
 
 Use AskUserQuestion:
