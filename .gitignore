@@ -22,13 +22,20 @@ CLAUDE.md
 # Tests folders
 test-output
 
-# Clean installation
+# Clean GSD Github installation
 .github/skills/gsd-*
 .github/agents/gsd-*
+.github/get-shit-done
 .github/ISSUE_TEMPLATE/gsd-*
+
+# Clean GSD Claude Installation
 .claude/skills/gsd-*
 .claude/agents/gsd-*
+.claude/get-shit-done
 .claude/ISSUE_TEMPLATE/gsd-*
+
+# Clean GSD Codex Installation
 .codex/skills/gsd-*
 .codex/agents/gsd-*
+.codex/get-shit-done
 .codex/ISSUE_TEMPLATE/gsd-*

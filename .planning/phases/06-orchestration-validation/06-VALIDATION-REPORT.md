@@ -1,6 +1,6 @@
 # Phase 6: Orchestration Validation Report
 
-**Generated:** 2026-01-23T22:30:59.797Z
+**Generated:** 2026-01-23T22:34:43.797Z
 **Total Tests:** 9
 **Passed:** 9 ✓
 **Failed:** 0 ✗
@@ -10,14 +10,14 @@
 
 ### Structured Returns (3/3 passed)
 
-- ✓ gsd-phase-researcher return format
+- ✓ gsd-phase-researcher return format (1ms)
 - ✓ gsd-planner return format
 - ✓ gsd-executor return format
 
 ### Parallel Spawning (2/2 passed)
 
 - ✓ gsd-new-project parallel spawning (101ms)
-- ✓ gsd-new-milestone parallel spawning (102ms)
+- ✓ gsd-new-milestone parallel spawning (105ms)
 
 ### Sequential Spawning (2/2 passed)
 
