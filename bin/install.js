@@ -1405,8 +1405,8 @@ function installAll() {
   const successCount = results.filter(r => r.success).length;
   console.log(`\n  ${green}✓${reset} Installed to ${successCount}/${results.length} CLI(s)\n`);
   console.log(`  Invoke commands with your CLI's syntax:`);
-  console.log(`    • Claude Code:       ${cyan}/gsd:help${reset}`);
-  console.log(`    • GitHub Copilot:    ${cyan}gsd:help${reset}`);
+  console.log(`    • Claude Code:       ${cyan}/gsd-help${reset}`);
+  console.log(`    • GitHub Copilot:    ${cyan}/gsd-help${reset}`);
   console.log(`    • Codex CLI:         ${cyan}$gsd-help${reset}\n`);
 }
 

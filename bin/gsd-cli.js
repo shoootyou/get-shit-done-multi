@@ -38,8 +38,8 @@ async function main() {
     if (positionals.length === 0) {
       console.error('❌ No command provided\n');
       console.error('Usage: gsd-cli <command> [args...]\n');
-      console.error('Example: gsd-cli gsd:help\n');
-      console.error('\nRun "gsd-cli gsd:help" to see all available commands.');
+      console.error('Example: gsd-cli gsd-help\n');
+      console.error('\nRun "gsd-cli gsd-help" to see all available commands.');
       process.exit(1);
     }
     

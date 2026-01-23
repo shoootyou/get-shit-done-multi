@@ -66,7 +66,7 @@ npx get-shit-done-multi --codex
 
 ```bash
 # In Claude Code
-/gsd:new-project
+/gsd-new-project
 
 # In Copilot/Codex (conversational)
 "Start a new GSD project"
@@ -81,10 +81,10 @@ System will:
 Then for each phase:
 
 ```bash
-/gsd:discuss-phase 1   # Shape implementation (optional)
-/gsd:plan-phase 1      # Research + create atomic plans
-/gsd:execute-phase 1   # Build with fresh context per plan
-/gsd:verify-work 1     # Test + auto-fix issues
+/gsd-discuss-phase 1   # Shape implementation (optional)
+/gsd-plan-phase 1      # Research + create atomic plans
+/gsd-execute-phase 1   # Build with fresh context per plan
+/gsd-verify-work 1     # Test + auto-fix issues
 ```
 
 **That's it.** Repeat for each phase, complete milestone, start next version.
@@ -131,7 +131,7 @@ This version extends the original brilliant work to support three AI platforms w
 
 ## Commands
 
-> **Note:** Syntax shown for Claude Code (`/gsd:*`). For Copilot/Codex, use conversational commands.
+> **Note:** Syntax shown for Claude Code (`/gsd-*`). For Copilot/Codex, use conversational commands.
 >
 > 📖 **Complete reference:** [docs/commands/README.md](docs/commands/README.md)
 
@@ -139,29 +139,29 @@ This version extends the original brilliant work to support three AI platforms w
 
 | Command | What It Does |
 |---------|--------------|
-| `/gsd:new-project` | Initialize: questions → research → requirements → roadmap |
-| `/gsd:discuss-phase [N]` | Capture your implementation vision (optional) |
-| `/gsd:plan-phase [N]` | Research domain + create atomic task plans |
-| `/gsd:execute-phase <N>` | Build in fresh context, atomic commits |
-| `/gsd:verify-work [N]` | Manual testing + automated fix generation |
-| `/gsd:complete-milestone` | Archive + tag release |
+| `/gsd-new-project` | Initialize: questions → research → requirements → roadmap |
+| `/gsd-discuss-phase [N]` | Capture your implementation vision (optional) |
+| `/gsd-plan-phase [N]` | Research domain + create atomic task plans |
+| `/gsd-execute-phase <N>` | Build in fresh context, atomic commits |
+| `/gsd-verify-work [N]` | Manual testing + automated fix generation |
+| `/gsd-complete-milestone` | Archive + tag release |
 
 ### Management
 
 | Command | What It Does |
 |---------|--------------|
-| `/gsd:progress` | Show current state + next steps |
-| `/gsd:add-phase` | Extend current milestone |
-| `/gsd:map-codebase` | Analyze existing code (brownfield projects) |
-| `/gsd:pause-work` / `/gsd:resume-work` | Session handoff |
+| `/gsd-progress` | Show current state + next steps |
+| `/gsd-add-phase` | Extend current milestone |
+| `/gsd-map-codebase` | Analyze existing code (brownfield projects) |
+| `/gsd-pause-work` / `/gsd-resume-work` | Session handoff |
 
 ### Utilities
 
 | Command | What It Does |
 |---------|--------------|
-| `/gsd:add-todo [desc]` | Capture ideas for later |
-| `/gsd:debug [desc]` | Systematic debugging |
-| `/gsd:help` | List all commands |
+| `/gsd-add-todo [desc]` | Capture ideas for later |
+| `/gsd-debug [desc]` | Systematic debugging |
+| `/gsd-help` | List all commands |
 
 **More commands:** Phase insertion, milestone management, todos, and more in [full reference](docs/commands/README.md).
 
@@ -211,7 +211,7 @@ npx get-shit-done-multi@latest [--copilot|--codex]
 
 - **Claude Code:** Restart to reload slash commands
 - **Copilot/Codex:** Try conversational: "Start a GSD project"
-- Run help command to verify: `/gsd:help` or `"Show GSD help"`
+- Run help command to verify: `/gsd-help` or `"Show GSD help"`
 
 **Docker/Podman containers:**
 
