@@ -11,7 +11,6 @@ This directory contains test suites, validation scripts, and utility tools for t
 - **test-cross-platform.js** - E2E orchestrator running all test stages (generation → installation → invocation)
 
 ### System Tests
-- **test-command-system.js** - Tests GSD command system functionality
 - **test-cross-cli-state.js** - Tests cross-CLI state management
 - **test-state-management.js** - Tests state persistence and consistency
 
@@ -63,7 +62,6 @@ scripts/
 ├── test-agent-installation.js     # Installation validation
 ├── test-agent-invocation.js       # CLI invocation smoke tests
 ├── test-cross-platform.js         # E2E test orchestrator
-├── test-command-system.js         # Command system tests
 ├── test-cross-cli-state.js        # State management tests
 ├── test-state-management.js       # State persistence tests
 ├── validate-docs.js               # Documentation validator
