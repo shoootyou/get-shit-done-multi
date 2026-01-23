@@ -47,7 +47,12 @@
     "github"
   ],
   "scripts": {
-    "test": "node scripts/test-cross-platform.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:specs": "jest __tests__/",
+    "test:orchestration": "node bin/lib/orchestration/orchestration-test-suite.js",
+    "test:cross-platform": "node scripts/test-cross-platform.js",
     "test:generation": "node scripts/test-agent-generation.js",
     "test:installation": "node scripts/test-agent-installation.js",
     "test:invocation": "node scripts/test-agent-invocation.js",
@@ -66,5 +71,14 @@
   },
   "engines": {
     "node": ">=16.7.0"
+  },
+  "devDependencies": {
+    "diff": "^5.2.2",
+    "execa": "^5.1.1",
+    "jest": "^29.7.0",
+    "p-map": "^4.0.0",
+    "strip-ansi": "^7.1.2",
+    "tmp-promise": "^3.0.3",
+    "which": "^3.0.1"
   }
 }
