@@ -155,10 +155,12 @@ URGENT: Multiple agents (gsd-debugger, gsd-executor, gsd-planner, etc.) are over
   3. Context passing via @-references verified across command boundaries
   4. Validation suite created comparing legacy vs new spec behavior
   5. Variable interpolation in @-references works correctly
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 06-01-PLAN.md — Structured Returns + Parallel Spawning (Wave 1)
+- [ ] 06-02-PLAN.md — Sequential Spawning + @-References (Wave 2)
+- [ ] 06-03-PLAN.md — Integration Suite + Report (Wave 3)
 
 ### Phase 7: Multi-Platform Testing
 **Goal**: Test installation and execution on all 3 platforms with comprehensive coverage
