@@ -13,13 +13,13 @@ description: Structured spec-driven workflow for planning and executing software
 ## How to run commands
 {{#isCopilot}}GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd:` or `gsd:` as command invocations.
 
-Commands are installed as individual skills in `{{gsdPath}}/../skills/`. Load the corresponding skill:
+Commands are installed as individual skills in `{{skillsPath}}/`. Load the corresponding skill:
 
-`{{gsdPath}}/../skills/gsd-<command>/SKILL.md`
+`{{skillsPath}}/gsd-<command>/SKILL.md`
 
 Example:
-- `gsd:new-project` -> `{{gsdPath}}/../skills/gsd-new-project/SKILL.md`
-- `gsd:help` -> `{{gsdPath}}/../skills/gsd-help/SKILL.md`
+- `gsd:new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
+- `gsd:help` -> `{{skillsPath}}/gsd-help/SKILL.md`
 {{/isCopilot}}{{#isCodex}}In Codex CLI, invoke this skill explicitly with:
 ```
 $get-shit-done help
@@ -41,16 +41,16 @@ The skill name is `get-shit-done` (NOT `gsd`). All commands are passed as argume
 - And 17 more commands (use `$get-shit-done help` for full list)
 
 ## Command definitions
-Each command loads its definition from individual skills in `{{gsdPath}}/../skills/gsd-<command>/`.
+Each command loads its definition from individual skills in `{{skillsPath}}/gsd-<command>/`.
 {{/isCodex}}{{#isClaude}}Commands are invoked with `/gsd:<command>` syntax.
 
-Commands are installed as individual skills in `{{gsdPath}}/../skills/`. Load the corresponding skill:
+Commands are installed as individual skills in `{{skillsPath}}/`. Load the corresponding skill:
 
-`{{gsdPath}}/../skills/gsd-<command>/SKILL.md`
+`{{skillsPath}}/gsd-<command>/SKILL.md`
 
 Example:
-- `/gsd:new-project` -> `{{gsdPath}}/../skills/gsd-new-project/SKILL.md`
-- `/gsd:help` -> `{{gsdPath}}/../skills/gsd-help/SKILL.md`
+- `/gsd:new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
+- `/gsd:help` -> `{{skillsPath}}/gsd-help/SKILL.md`
 {{/isClaude}}
 
 ## File references
@@ -80,7 +80,7 @@ When a command spawns a subagent, load the corresponding `SKILL.md` from the age
 Follow the XML or markdown formats defined in the command and template files exactly. These files are operational prompts, not documentation.
 
 ## Paths
-Resources are installed under `{{gsdPath}}`. Individual skills are under `{{gsdPath}}/../skills/gsd-*/`. {{#isClaude}}Use those paths when command content references files.{{/isClaude}}{{#isCopilot}}Use those paths when command content references `~/.claude`.{{/isCopilot}}{{#isCodex}}Use those paths when command content references other files.
+Resources are installed under `{{gsdPath}}`. Individual skills are under `{{skillsPath}}/gsd-*/`. {{#isClaude}}Use those paths when command content references files.{{/isClaude}}{{#isCopilot}}Use those paths when command content references Claude-style paths.{{/isCopilot}}{{#isCodex}}Use those paths when command content references other files.
 
 ## Installation modes
 - **Global**: Skills in global directory, invoke from any directory
