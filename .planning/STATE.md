@@ -10,23 +10,23 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 6 of 8.5 (Orchestration Validation)
-Plan: 1 of 3 (In progress)
+Plan: 2 of 3 (In progress)
 Status: Building orchestration validation infrastructure
-Last activity: 2026-01-23 — Completed 06-01-PLAN.md (Structured Returns + Parallel Spawning)
+Last activity: 2026-01-23 — Completed 06-02-PLAN.md (Sequential Spawning + @-References)
 
 **Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
 - Migrated 60+ files from legacy /gsd: to new /gsd- format
 - Eliminated experimental command-system (1,160 lines)
 - Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
 
-Progress: [██████░░░░] ~65% (6/8.5 phases, 30 plans total)
+Progress: [██████░░░░] ~66% (6/8.5 phases, 32 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
-- Average duration: 5.4 min
-- Total execution time: 2.73 hours
+- Total plans completed: 32
+- Average duration: 5.3 min
+- Total execution time: 2.83 hours
 
 **By Phase:**
 
@@ -38,11 +38,11 @@ Progress: [██████░░░░] ~65% (6/8.5 phases, 30 plans total)
 | 04-mid-complexity-commands | 5 | 21.2 min | 4.2 min |
 | 05-simple-command-migration | 9 | 51.3 min | 5.7 min |
 | 5.1-fix-git-identity | 2 | 6.4 min | 3.2 min |
-| 06-orchestration-validation | 1 | 3.5 min | 3.5 min |
+| 06-orchestration-validation | 2 | 6.9 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4.7 min (05-04), 5.8 min (05-05), 2.4 min (5.1-01), 4.0 min (5.1-02), 3.5 min (06-01)
-- Trend: Phase 6 started - validation infrastructure (3.5 min first plan)
+- Last 5 plans: 5.8 min (05-05), 2.4 min (5.1-01), 4.0 min (5.1-02), 3.5 min (06-01), 3.4 min (06-02)
+- Trend: Phase 6 validation infrastructure building efficiently (3.5 min avg)
 
 *Updated after each plan completion*
 
@@ -152,6 +152,10 @@ Recent decisions affecting current work:
 - **[06-01]** Independent validator modules (don't require agent-invoker.js wiring for standalone testing)
 - **[06-01]** 5 structured return patterns supported (RESEARCH/PLAN/EXECUTION COMPLETE, RESEARCH BLOCKED, CHECKPOINT REACHED)
 - **[06-01]** Separate test files per module (clear organization, independent test runs)
+- **[06-02]** Checkpoint continuation pattern: spawn → .continue-here.md → respawn with @-reference (validates gsd-research-phase, gsd-execute-phase)
+- **[06-02]** Variable interpolation order: {var} first, then @{var} (handles nested patterns correctly)
+- **[06-02]** Reference path resolution: absolute (/) workspace-relative, dot-relative (.) preserved, others relative to baseDir
+- **[06-02]** validateAndInterpolate combines interpolation and validation in one step (efficiency for agent invocation)
 
 ### Pending Todos
 
@@ -178,10 +182,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 6 in progress. Orchestration validation infrastructure established with 24 passing tests.
+None - Phase 6 in progress. Orchestration validation infrastructure established with 50 passing tests (24 structured returns, 10 sequential spawning, 16 reference resolution).
 
 ## Session Continuity
 
-Last session: 2026-01-23T22:19:04Z
-Stopped at: Completed 06-01-PLAN.md (Structured Returns + Parallel Spawning)
+Last session: 2026-01-23T22:25:09Z
+Stopped at: Completed 06-02-PLAN.md (Sequential Spawning + @-References)
 Resume file: None
