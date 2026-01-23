@@ -6,7 +6,7 @@ description: Structured spec-driven workflow for planning and executing software
 # Get Shit Done (GSD) Skill for Codex CLI
 
 ## When to use
-- Use this skill when the user asks for GSD or uses a `gsd:*` command.
+- Use this skill when the user asks for GSD or invokes `$get-shit-done`.
 - Use it for structured planning, phase execution, verification, or roadmap work.
 - Automatically loaded when user types `$get-shit-done`
 

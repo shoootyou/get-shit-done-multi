@@ -6,7 +6,7 @@ description: Structured spec-driven workflow for planning and executing software
 # Get Shit Done (GSD) Skill for Claude Code
 
 ## When to use
-- Use this skill when the user asks for GSD or uses a `gsd:*` command.
+- Use this skill when the user asks for GSD or uses a `/gsd-*` command.
 - Use it for structured planning, phase execution, verification, or roadmap work.
 
 
