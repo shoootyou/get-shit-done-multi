@@ -124,8 +124,8 @@ function verify(dirs) {
     errors.push(`Agents directory missing: ${dirs.agents}`);
   }
   
-  // Check SKILL.md exists
-  const skillFile = path.join(dirs.skills, 'SKILL.md');
+  // Check SKILL.md exists in skills/get-shit-done/
+  const skillFile = path.join(dirs.skills, 'get-shit-done', 'SKILL.md');
   if (!fs.existsSync(skillFile)) {
     errors.push(`SKILL.md missing: ${skillFile}`);
   }
@@ -140,17 +140,7 @@ function verify(dirs) {
     }
   }
   
-  // Check commands directory (only if global)
-  if (dirs.commands !== null) {
-    if (!fs.existsSync(dirs.commands)) {
-      errors.push(`Commands directory missing: ${dirs.commands}`);
-    } else {
-      const commandFiles = fs.readdirSync(dirs.commands);
-      if (commandFiles.length === 0) {
-        errors.push(`No command files found in: ${dirs.commands}`);
-      }
-    }
-  }
+  // Commands removed - embedded in skills
   
   return {
     success: errors.length === 0,

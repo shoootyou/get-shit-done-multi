@@ -731,9 +731,31 @@ function install(isGlobal) {
     }
   }
 
+  // Create skills/get-shit-done directory for SKILL.md (like Copilot)
+  const gsdSkillDir = path.join(dirs.skills, 'get-shit-done');
+  fs.mkdirSync(gsdSkillDir, { recursive: true });
+
+  // Generate SKILL.md from template for Claude
+  const skillTemplateSrc = path.join(src, 'get-shit-done', 'SKILL.md');
+  const skillTemplateDest = path.join(gsdSkillDir, 'SKILL.md');
+  if (fs.existsSync(skillTemplateSrc)) {
+    const skillTemplate = fs.readFileSync(skillTemplateSrc, 'utf8');
+    // Generate platform-specific version using template system
+    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const skillContent = generateFromTemplate(skillTemplate, 'claude');
+    fs.writeFileSync(skillTemplateDest, skillContent);
+    if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
+      console.log(`  ${green}✓${reset} Installed SKILL.md`);
+    } else {
+      failures.push('skills/get-shit-done/SKILL.md');
+    }
+  } else {
+    failures.push('get-shit-done/SKILL.md (source missing)');
+  }
+
   // Copy CHANGELOG.md
   const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(dirs.skills, 'CHANGELOG.md');
+  const changelogDest = path.join(gsdSkillDir, 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
     if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
@@ -744,7 +766,7 @@ function install(isGlobal) {
   }
 
   // Write VERSION file for whats-new command
-  const versionDest = path.join(dirs.skills, 'VERSION');
+  const versionDest = path.join(gsdSkillDir, 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
   if (verifyFileInstalled(versionDest, 'VERSION')) {
     console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
@@ -776,11 +798,14 @@ function install(isGlobal) {
   // Verify installation with detailed reporting
   const verifyResult = claudeAdapter.verify(dirs);
   if (verifyResult.success) {
-    const commandCount = fs.readdirSync(dirs.commands)
-      .filter(f => f.endsWith('.md')).length;
+    const skillCount = fs.readdirSync(dirs.skills)
+      .filter(name => {
+        const fullPath = path.join(dirs.skills, name);
+        return name.startsWith('gsd-') && fs.statSync(fullPath).isDirectory();
+      }).length;
     const agentCount = fs.readdirSync(dirs.agents)
       .filter(f => f.startsWith('gsd-') && f.endsWith('.md')).length;
-    console.log(`  ${dim}✓ Verified: ${commandCount} commands, ${agentCount} agents${reset}\n`);
+    console.log(`  ${dim}✓ Verified: ${skillCount} skill files, ${agentCount} agents${reset}\n`);
   } else {
     console.error(`  ${yellow}⚠ Installation verification warnings:${reset}`);
     verifyResult.errors.forEach(err => console.error(`    - ${err}`));
@@ -1219,7 +1244,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
   writeSettings(settingsPath, settings);
 
   console.log(`
-  ${green}Done!${reset} Launch Claude Code and run ${cyan}/gsd:help${reset}.
+  ${green}Done!${reset} Launch Claude Code and run ${cyan}/gsd-help${reset}.
 `);
 }
 
