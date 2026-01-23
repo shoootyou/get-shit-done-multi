@@ -18,18 +18,21 @@ const execFileAsync = promisify(execFile);
  * Get target installation directories for Copilot CLI
  * 
  * Copilot uses skills-based structure:
- * - Skills in ~/.copilot/skills/get-shit-done/ or .github/skills/get-shit-done/
+ * - Skills in ~/.copilot/skills/ (global) or .github/skills/ (local)
+ * - Individual skills: .github/skills/gsd-help/, .github/skills/gsd-execute-phase/, etc.
+ * - Legacy skill: .github/skills/get-shit-done/
  * - Agents in ~/.copilot/agents/ or .github/agents/
  * - Commands embedded in skills (no separate commands directory)
  * 
  * @param {boolean} isGlobal - If true, returns global installation paths, else local (.github/)
+ * @param {string} [projectDir] - Optional project directory override (defaults to process.cwd())
  * @returns {Object} Target directories with skills, agents, commands paths
  * @returns {string} return.skills - Skills directory path
  * @returns {string} return.agents - Agents directory path
  * @returns {string|null} return.commands - Commands directory path (null for Copilot)
  */
-function getTargetDirs(isGlobal) {
-  const { global, local } = getConfigPaths('copilot');
+function getTargetDirs(isGlobal, projectDir = null) {
+  const { global, local } = getConfigPaths('copilot', projectDir);
   const basePath = isGlobal ? global : local;
   
   return {
@@ -43,7 +46,7 @@ function getTargetDirs(isGlobal) {
  * Convert content for Copilot CLI format
  * 
  * Replaces Claude CLI paths with Copilot CLI paths:
- * - ~/.claude/get-shit-done/ → .github/skills/get-shit-done/ (local) or ~/.copilot/skills/get-shit-done/ (global)
+ * - ~/.claude/get-shit-done/ → .github/skills/ (local) or ~/.copilot/skills/ (global)
  * - ~/.claude/agents/ → .github/agents/ (local) or ~/.copilot/agents/ (global)
  * - Commands path embedded in skills
  * 

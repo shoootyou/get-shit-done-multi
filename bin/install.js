@@ -67,6 +67,27 @@ function parseConfigDirArg() {
   return null;
 }
 const explicitConfigDir = parseConfigDirArg();
+
+// Parse --project-dir argument
+function parseProjectDirArg() {
+  const projectDirIndex = args.findIndex(arg => arg === '--project-dir');
+  if (projectDirIndex !== -1) {
+    const nextArg = args[projectDirIndex + 1];
+    if (!nextArg || nextArg.startsWith('-')) {
+      console.error(`  ${yellow}--project-dir requires a path argument${reset}`);
+      process.exit(1);
+    }
+    return nextArg;
+  }
+  // Handle --project-dir=value format
+  const projectDirArg = args.find(arg => arg.startsWith('--project-dir='));
+  if (projectDirArg) {
+    return projectDirArg.split('=')[1];
+  }
+  return null;
+}
+const explicitProjectDir = parseProjectDirArg();
+
 const hasHelp = args.includes('--help') || args.includes('-h');
 const forceStatusline = args.includes('--force-statusline');
 
@@ -80,6 +101,7 @@ if (hasHelp) {
     ${cyan}-g, --global${reset}              Install Claude globally (to Claude config directory)
     ${cyan}-l, --local${reset}               Install Claude locally (to ./.claude in current directory)
     ${cyan}-c, --config-dir <path>${reset}   Specify custom Claude config directory
+    ${cyan}--project-dir <path>${reset}      Install to specific project directory (for Copilot/Codex)
     ${cyan}--all, -A${reset}                Install to all detected CLIs (Claude, Copilot, Codex)
     ${cyan}--copilot${reset}                 Install GitHub Copilot CLI assets locally (to ./.github)
     ${cyan}--codex${reset}                   Install Codex CLI assets locally (to ./.codex)
@@ -796,13 +818,12 @@ function install(isGlobal) {
 /**
  * Install to GitHub Copilot CLI local directories
  */
-function installCopilot() {
+function installCopilot(projectDir = process.cwd()) {
   const src = path.join(__dirname, '..');
   
   // Get target directories from adapter (always local for Copilot)
-  const dirs = copilotAdapter.getTargetDirs(false);
+  const dirs = copilotAdapter.getTargetDirs(false, projectDir);
   
-  const projectDir = process.cwd();
   const githubDir = path.join(projectDir, '.github');
 
   console.log(`  Installing GitHub Copilot CLI assets to ${cyan}./.github${reset}\n`);
@@ -880,7 +901,7 @@ function installCopilot() {
   // Generate skills from specs
   const skillSpecsDir = path.join(src, 'specs', 'skills');
   const dotGithubDir = path.join(projectDir, '.github');
-  const skillDestDir = path.join(dotGithubDir, 'copilot', 'skills');
+  const skillDestDir = path.join(dotGithubDir, 'skills');
   if (fs.existsSync(skillSpecsDir)) {
     fs.mkdirSync(skillDestDir, { recursive: true });
     
@@ -890,7 +911,29 @@ function installCopilot() {
       console.log(`  ${yellow}⚠${reset} Skills: ${skillGenResult.generated} generated, ${skillGenResult.failed} failed`);
       failures.push(`skills (${skillGenResult.failed} generation failures)`);
     } else if (skillGenResult.generated > 0) {
-      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated`);
+      console.log(`  ${green}✓${reset} Skills: ${skillGenResult.generated} generated at ${cyan}${skillDestDir}${reset}`);
+      
+      // List each skill created
+      try {
+        const skillDirs = fs.readdirSync(skillDestDir)
+          .filter(name => {
+            const fullPath = path.join(skillDestDir, name);
+            return name.startsWith('gsd-') && fs.statSync(fullPath).isDirectory();
+          });
+        
+        skillDirs.forEach(skillName => {
+          const skillPath = path.join(skillDestDir, skillName, 'SKILL.md');
+          if (fs.existsSync(skillPath)) {
+            const stats = fs.statSync(skillPath);
+            const sizeKB = (stats.size / 1024).toFixed(1);
+            console.log(`    ${green}✓${reset} ${skillName}/ (${sizeKB} KB)`);
+          }
+        });
+        
+        console.log(`  ${dim}Verify with: ls ${skillDestDir}${reset}`);
+      } catch (err) {
+        // Silent fail on listing - generation was successful
+      }
     }
   }
 
@@ -1203,10 +1246,11 @@ function installAll() {
   if (detected.copilot) {
     console.log(`  ${cyan}━━━ GitHub Copilot CLI ━━━${reset}\n`);
     try {
-      installCopilot();
+      const targetProjectDir = explicitProjectDir || process.cwd();
+      installCopilot(targetProjectDir);
       
       // Capture verification
-      const dirs = copilotAdapter.getTargetDirs(false);
+      const dirs = copilotAdapter.getTargetDirs(false, targetProjectDir);
       const verifyResult = copilotAdapter.verify(dirs);
       const skillFiles = verifyResult.success ?
         fs.readdirSync(dirs.skills).filter(f => f.endsWith('.md')).length : 0;
@@ -1393,7 +1437,7 @@ function promptLocation() {
     rl.close();
     const choice = answer.trim() || '1';
     if (choice === '3') {
-      installCopilot();
+      installCopilot(explicitProjectDir || process.cwd());
       return;
     }
     if (choice === '4') {
@@ -1438,7 +1482,7 @@ if (hasGlobal && hasLocal) {
   console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
   process.exit(1);
 } else if (hasCopilot) {
-  installCopilot();
+  installCopilot(explicitProjectDir || process.cwd());
 } else if (hasCodex) {
   installCodex(false);
 } else if (hasCodexGlobal) {

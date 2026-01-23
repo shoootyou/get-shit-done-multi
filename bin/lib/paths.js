@@ -10,11 +10,12 @@ const fs = require('fs');
 /**
  * Get configuration paths for a specific CLI
  * @param {string} cli - CLI name: 'claude', 'copilot', or 'codex'
+ * @param {string} [projectDir] - Optional project directory override (defaults to process.cwd())
  * @returns {{global: string, local: string}} Global and local config paths
  */
-function getConfigPaths(cli) {
+function getConfigPaths(cli, projectDir = null) {
   const home = os.homedir();
-  const cwd = process.cwd();
+  const cwd = projectDir || process.cwd();
   
   const paths = {
     claude: {
