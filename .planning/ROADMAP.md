@@ -175,10 +175,12 @@ Plans:
   6. Legacy fallback works when spec missing (no breaking changes)
   7. Jest test suite passes with tests for parsing, conditionals, frontmatter, metadata
   8. Regression tests verify all 29 commands behave identically to legacy versions
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 07-01-PLAN.md — Foundation + Jest Suite (Wave 1)
+- [ ] 07-02-PLAN.md — Platform Testing + Execution (Wave 2, checkpoint)
+- [ ] 07-03-PLAN.md — Analysis + Reporting (Wave 3)
 
 ### Phase 8: Documentation & Release
 **Goal**: Complete documentation, update changelog, and release v1.9.1
