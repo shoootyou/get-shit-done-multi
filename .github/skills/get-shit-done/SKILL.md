@@ -13,13 +13,13 @@ description: Structured spec-driven workflow for planning and executing software
 ## How to run commands
 GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd-` or `gsd-` as command invocations.
 
-Commands are installed as individual skills in `/workspace/.github/copilot/skills/`. Load the corresponding skill:
+Commands are installed as individual skills in `/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/skills/`. Load the corresponding skill:
 
-`/workspace/.github/copilot/skills/gsd-<command>/SKILL.md`
+`/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/skills/gsd-<command>/SKILL.md`
 
 Example:
-- `gsd-new-project` -> `/workspace/.github/copilot/skills/gsd-new-project/SKILL.md`
-- `gsd-help` -> `/workspace/.github/copilot/skills/gsd-help/SKILL.md`
+- `gsd-new-project` -> `/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/skills/gsd-new-project/SKILL.md`
+- `gsd-help` -> `/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/skills/gsd-help/SKILL.md`
 
 
 ## File references
@@ -29,11 +29,11 @@ Command files and workflows include `@path` references. These are mandatory cont
 - "Bash tool" → use the execute tool
 - "Read/Write" → use read/edit tools
 - "AskUserQuestion" → ask directly in chat and provide explicit numbered options
-- "Task/subagent" → prefer a matching custom agent from `/workspace/.github/copilot/agents` when available; otherwise adopt that role in-place
+- "Task/subagent" → prefer a matching custom agent from `/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/agents` when available; otherwise adopt that role in-place
 
 
 ## Output expectations
 Follow the XML or markdown formats defined in the command and template files exactly. These files are operational prompts, not documentation.
 
 ## Paths
-Resources are installed under `/workspace/.github/get-shit-done`. Individual skills are under `/workspace/.github/copilot/skills/gsd-*/`. Use those paths when command content references Claude-style paths.
+Resources are installed under `/Users/rodolfo/croonix-github/get-shit-done/.github/get-shit-done`. Individual skills are under `/Users/rodolfo/croonix-github/get-shit-done/.github/copilot/skills/gsd-*/`. Use those paths when command content references Claude-style paths.
