@@ -91,26 +91,37 @@ Plans:
 **Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Migrate research-phase (checkpoint continuation pattern)
-- [ ] 04-02-PLAN.md — Migrate map-codebase (prose → explicit parallel spawns)
+- [ ] 04-01-PLAN.md — Migrate research-phase (checkpoint continuation, Wave 1)
+- [ ] 04-02-PLAN.md — Migrate map-codebase (prose → explicit spawns, Wave 1)
+- [ ] 04-03-PLAN.md — Migrate debug (session persistence, Wave 2)
+- [ ] 04-04-PLAN.md — Migrate plan-phase (verification loop, 13 deps, Wave 3)
+- [ ] 04-05-PLAN.md — E2E verification checkpoint (Wave 4)
 - [ ] 04-03-PLAN.md — Migrate debug (session persistence)
 - [ ] 04-04-PLAN.md — Migrate plan-phase (verification loop, 4 flags, most complex)
 - [ ] 04-05-PLAN.md — E2E verification checkpoint (test all 4 commands)
 
 ### Phase 5: Simple Command Migration
-**Goal**: Bulk migrate remaining 19 single-stage commands with no orchestration
+**Goal**: Bulk migrate remaining 21 single-stage commands with minimal orchestration
 **Depends on**: Phase 4
 **Requirements**: MIGR-03, MIGR-06, MIGR-07, MIGR-08, MIGR-09
 **Success Criteria** (what must be TRUE):
-  1. All 19 remaining commands migrated: progress, add-todo, check-todos, help, verify-installation, etc.
-  2. Batch migration tool created for simple command conversion
-  3. All basic frontmatter and tool declarations working
-  4. No orchestration or complex argument handling required
+  1. All 21 remaining commands migrated: progress, verify-work, milestone lifecycle, todos, phase management, reference commands
+  2. All basic frontmatter and tool declarations working
+  3. Spawning commands preserve subagent invocation patterns (verify-work, audit-milestone, plan-milestone-gaps)
+  4. Progress routing hub works correctly (routes to 11 commands based on state)
   5. All commands install and are discoverable on at least one platform
-**Plans**: TBD
+**Plans**: 9 plans in 5 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 05-01-PLAN.md — Batch 1: Reference commands (help, verify-installation, list-milestones) - Wave 1
+- [ ] 05-02-PLAN.md — Batch 2: Status/utility commands (whats-new, list-phase-assumptions, resume-work) - Wave 1
+- [ ] 05-03-PLAN.md — Batch 3: Phase management (add-phase, insert-phase, remove-phase) - Wave 2
+- [ ] 05-04-PLAN.md — Batch 4: Todo management (add-todo, check-todos) - Wave 2
+- [ ] 05-05-PLAN.md — Batch 5: Verification suite (verify-work, discuss-phase) - Wave 3
+- [ ] 05-06-PLAN.md — Batch 6: Milestone lifecycle (complete, audit, plan-gaps, archive, restore) - Wave 3
+- [ ] 05-07-PLAN.md — Batch 7: Update command - Wave 3
+- [ ] 05-08-PLAN.md — Batch 8: Progress routing hub (MUST GO LAST) - Wave 4
+- [ ] 05-09-PLAN.md — E2E verification checkpoint - Wave 5
 
 ### Phase 6: Orchestration Validation
 **Goal**: Verify subagent spawning, structured returns, and cross-command invocation work end-to-end
