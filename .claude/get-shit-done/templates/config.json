@@ -22,5 +22,12 @@
   "safety": {
     "always_confirm_destructive": true,
     "always_confirm_external_services": true
+  },
+  "git": {
+    "author": {
+      "name": "User Name",
+      "email": "user@example.com"
+    },
+    "source": "global"
   }
 }
