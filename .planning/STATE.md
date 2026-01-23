@@ -14,6 +14,11 @@ Plan: 2 of 2 (Phase complete)
 Status: Phase 5.1 complete - All agents preserve user git identity
 Last activity: 2026-01-23 — Completed 5.1-02-PLAN.md (Update Agent Git Commits)
 
+**Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
+- Migrated 60+ files from legacy /gsd: to new /gsd- format
+- Eliminated experimental command-system (1,160 lines)
+- Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
+
 Progress: [█████░░░░░] ~59% (5.1/8.5 phases, 29 plans total)
 
 ## Performance Metrics
@@ -136,6 +141,11 @@ Recent decisions affecting current work:
 - **[5.1-02]** Helper sourcing with type check pattern (prevents redundant sourcing: if ! type func; then source)
 - **[5.1-02]** commit_as_user() replaces all bare git commit commands in agents (7 total across 5 agents)
 - **[5.1-02]** Git Identity Preservation section added to all committing agents (after role, documents helper usage)
+- **[MAINT-01]** Command prefix migration gsd: → gsd- for platform consistency (completed 2026-01-23 ad-hoc)
+- **[MAINT-01]** Elimination of experimental command-system/ (1,160 lines removed, non-functional prototype)
+- **[MAINT-01]** Template system {{cmdPrefix}} variable for platform-specific rendering (/gsd- for Claude/Copilot, $gsd- for Codex)
+- **[MAINT-01]** Deprecation documentation strategy: maintain legacy references in migration docs (specs/skills/README.md)
+- **[MAINT-01]** Property names and debug namespaces exempt from migration (technical identifiers, not command formats)
 
 ### Pending Todos
 
@@ -145,6 +155,20 @@ None yet.
 
 - Phase 5.1 inserted after Phase 5: Fix git identity preservation in agents (URGENT)
   Reason: Agents are overriding user git identity when committing. Must fix specs, revert incorrect generated agent changes, add git config to project setup workflow, and update all affected agents.
+
+### Ad-Hoc Maintenance Work
+
+**Command Prefix Migration (2026-01-23)**
+- **Branch:** fix/optimize_agents
+- **Commits:** 961174d (remove command-system), 48e671c (update docs)
+- **Scope:** Migrated legacy /gsd: format to new /gsd- format across codebase
+- **Impact:**
+  - Updated 60+ files (specs, docs, source code, templates)
+  - Removed experimental command-system/ directory (1,160 lines, non-functional)
+  - Template system enhanced with {{cmdPrefix}} variable
+  - Platform-specific rendering: /gsd- (Claude/Copilot), $gsd- (Codex)
+- **Status:** Complete - all necessary references updated, legacy references preserved in migration documentation
+- **Reason:** Platform consistency and removal of abandoned experimental code
 
 ### Blockers/Concerns
 
