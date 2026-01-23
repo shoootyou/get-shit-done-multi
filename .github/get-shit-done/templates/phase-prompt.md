@@ -37,10 +37,10 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
+@.github/skills/get-shit-done/workflows/execute-plan.md
+@.github/skills/get-shit-done/templates/summary.md
 [If plan contains checkpoint tasks (type="checkpoint:*"), add:]
-@~/.claude/get-shit-done/references/checkpoints.md
+@.github/skills/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -278,7 +278,7 @@ TDD features get dedicated plans with `type: tdd`.
 → Yes: Create a TDD plan
 → No: Standard task in standard plan
 
-See `~/.claude/get-shit-done/references/tdd.md` for TDD plan structure.
+See `.github/skills/get-shit-done/references/tdd.md` for TDD plan structure.
 
 ---
 
@@ -382,9 +382,9 @@ Output: Working dashboard component.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
-@~/.claude/get-shit-done/references/checkpoints.md
+@.github/skills/get-shit-done/workflows/execute-plan.md
+@.github/skills/get-shit-done/templates/summary.md
+@.github/skills/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -506,7 +506,7 @@ user_setup:
 
 **Result:** Execute-plan generates `{phase}-USER-SETUP.md` with checklist for the user.
 
-See `~/.claude/get-shit-done/templates/user-setup.md` for full schema and examples
+See `.github/skills/get-shit-done/templates/user-setup.md` for full schema and examples
 
 ---
 
@@ -573,4 +573,4 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 5. Gaps found → fix plans created → execute → re-verify
 6. All must_haves pass → phase complete
 
-See `~/.claude/get-shit-done/workflows/verify-phase.md` for verification logic.
+See `.github/skills/get-shit-done/workflows/verify-phase.md` for verification logic.

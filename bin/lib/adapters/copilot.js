@@ -38,6 +38,7 @@ function getTargetDirs(isGlobal, projectDir = null) {
   return {
     skills: path.join(basePath, 'skills', 'get-shit-done'),
     agents: path.join(basePath, 'agents'),
+    gsd: path.join(basePath, 'get-shit-done'), // workflows, templates, references
     commands: null // Copilot embeds commands in skills
   };
 }

@@ -949,7 +949,7 @@ After TDD plan completion, ensure:
 - Standard plans: Multiple tasks, 1 commit per task, 2-4 commits total
 - TDD plans: Single feature, 2-3 commits for RED/GREEN/REFACTOR cycle
 
-See `~/.claude/get-shit-done/references/tdd.md` for TDD plan structure.
+See `.github/skills/get-shit-done/references/tdd.md` for TDD plan structure.
 </tdd_plan_execution>
 
 <task_commit>
@@ -1124,7 +1124,7 @@ I'll verify after: [verification]
 - If verification passes or N/A: continue to next task
 - If verification fails: inform user, wait for resolution
 
-See ~/.claude/get-shit-done/references/checkpoints.md for complete checkpoint guidance.
+See .github/skills/get-shit-done/references/checkpoints.md for complete checkpoint guidance.
 </step>
 
 <step name="checkpoint_return_for_orchestrator">
@@ -1258,7 +1258,7 @@ grep -A 50 "^user_setup:" .planning/phases/XX-name/{phase}-{plan}-PLAN.md | head
 
 **If user_setup exists and is not empty:**
 
-Create `.planning/phases/XX-name/{phase}-USER-SETUP.md` using template from `~/.claude/get-shit-done/templates/user-setup.md`.
+Create `.planning/phases/XX-name/{phase}-USER-SETUP.md` using template from `.github/skills/get-shit-done/templates/user-setup.md`.
 
 **Content generation:**
 
@@ -1319,7 +1319,7 @@ Set `USER_SETUP_CREATED=true` if file was generated, for use in completion messa
 
 <step name="create_summary">
 Create `{phase}-{plan}-SUMMARY.md` as specified in the prompt's `<output>` section.
-Use ~/.claude/get-shit-done/templates/summary.md for structure.
+Use .github/skills/get-shit-done/templates/summary.md for structure.
 
 **File location:** `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
@@ -1574,7 +1574,7 @@ lmn012o feat(08-02): create user registration endpoint
 
 Each task has its own commit, followed by one metadata commit documenting plan completion.
 
-For commit message conventions, see ~/.claude/get-shit-done/references/git-integration.md
+For commit message conventions, see .github/skills/get-shit-done/references/git-integration.md
 </step>
 
 <step name="update_codebase_map">

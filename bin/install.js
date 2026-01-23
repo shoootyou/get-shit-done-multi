@@ -853,14 +853,28 @@ function installCopilot(projectDir = process.cwd()) {
 
   const failures = [];
 
-  // Copy core GSD resources into the skill directory
-  const skillSrc = path.join(src, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, dirs.skills, copilotAdapter, 'skill');
-  if (verifyInstalled(dirs.skills, 'skills/get-shit-done')) {
-    console.log(`  ${green}✓${reset} Installed skill resources`);
-  } else {
-    failures.push('skills/get-shit-done');
+  // Copy workflows, templates, and references to .github/get-shit-done/
+  const gsdSrc = path.join(src, 'get-shit-done');
+  const gsdDirs = ['workflows', 'templates', 'references'];
+  
+  fs.mkdirSync(dirs.gsd, { recursive: true });
+  
+  for (const dir of gsdDirs) {
+    const srcPath = path.join(gsdSrc, dir);
+    const destPath = path.join(dirs.gsd, dir);
+    if (fs.existsSync(srcPath)) {
+      copyWithPathReplacement(srcPath, destPath, copilotAdapter, 'skill');
+    }
   }
+  
+  if (fs.existsSync(dirs.gsd) && fs.readdirSync(dirs.gsd).length > 0) {
+    console.log(`  ${green}✓${reset} Installed get-shit-done resources (workflows, templates, references)`);
+  } else {
+    failures.push('get-shit-done resources');
+  }
+
+  // Ensure skills directory exists for SKILL.md and commands
+  fs.mkdirSync(dirs.skills, { recursive: true });
 
   // Copy commands into the skill directory
   const commandsSrc = path.join(src, 'commands', 'gsd');

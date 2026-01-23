@@ -98,7 +98,7 @@ function getSkillsPath(platform, configPaths) {
 function getGsdPath(platform, configPaths) {
   const gsdPaths = {
     claude: path.join(configPaths.global, 'get-shit-done'),
-    copilot: path.join(configPaths.local, 'skills', 'get-shit-done'),
+    copilot: path.join(configPaths.local, 'get-shit-done'),
     codex: path.join(configPaths.global, 'skills', 'get-shit-done')
   };
   return gsdPaths[platform];

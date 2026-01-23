@@ -19,8 +19,8 @@ Then verify each level against the actual codebase.
 
 <required_reading>
 **Load these references:**
-- ~/.claude/get-shit-done/references/verification-patterns.md (detection patterns)
-- ~/.claude/get-shit-done/templates/verification-report.md (output format)
+- .github/skills/get-shit-done/references/verification-patterns.md (detection patterns)
+- .github/skills/get-shit-done/templates/verification-report.md (output format)
 </required_reading>
 
 <process>
@@ -565,7 +565,7 @@ Fill template sections:
 9. **Recommended Fix Plans:** If gaps_found
 10. **Verification Metadata:** Approach, timing, counts
 
-See ~/.claude/get-shit-done/templates/verification-report.md for complete template.
+See .github/skills/get-shit-done/templates/verification-report.md for complete template.
 </step>
 
 <step name="return_to_orchestrator">
