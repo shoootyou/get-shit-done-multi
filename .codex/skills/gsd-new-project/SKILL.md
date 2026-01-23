@@ -22,16 +22,16 @@ This is the most leveraged moment in any project. Deep questioning here means be
 - `.planning/ROADMAP.md` — phase structure
 - `.planning/STATE.md` — project memory
 
-**After this command:** Run `/gsd:plan-phase 1` to start execution.
+**After this command:** Run `$gsd-plan-phase 1` to start execution.
 
 </objective>
 
 <execution_context>
 
-@~/.claude/get-shit-done/references/questioning.md
-@~/.claude/get-shit-done/references/ui-brand.md
-@~/.claude/get-shit-done/templates/project.md
-@~/.claude/get-shit-done/templates/requirements.md
+@~/.codex/skills/get-shit-done/references/questioning.md
+@~/.codex/skills/get-shit-done/references/ui-brand.md
+@~/.codex/skills/get-shit-done/templates/project.md
+@~/.codex/skills/get-shit-done/templates/requirements.md
 
 </execution_context>
 
@@ -43,7 +43,7 @@ This is the most leveraged moment in any project. Deep questioning here means be
 
 1. **Abort if project exists:**
    ```bash
-   [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use /gsd:progress" && exit 1
+   [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use $gsd-progress" && exit 1
    ```
 
 2. **Initialize git repo in THIS directory** (required even if inside a parent repo):
@@ -77,12 +77,12 @@ Use AskUserQuestion:
 - header: "Existing Code"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
-  - "Map codebase first" — Run /gsd:map-codebase to understand existing architecture (Recommended)
+  - "Map codebase first" — Run $gsd-map-codebase to understand existing architecture (Recommended)
   - "Skip mapping" — Proceed with project initialization
 
 **If "Map codebase first":**
 ```
-Run `/gsd:map-codebase` first, then return to `/gsd:new-project`
+Run `$gsd-map-codebase` first, then return to `$gsd-new-project`
 ```
 Exit command.
 
@@ -282,6 +282,206 @@ EOF
 )"
 ```
 
+## Phase 5.5: Git Identity Configuration
+
+**Goal:** Ensure git identity is configured before agents make commits.
+
+**Check if git is already configured:**
+
+```bash
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -n "$GIT_NAME" ] && [ -n "$GIT_EMAIL" ]; then
+    echo "Git identity already configured:"
+    echo "  Name: $GIT_NAME"
+    echo "  Email: $GIT_EMAIL"
+    
+    # Store source in config.json
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+    
+    # Continue to next phase
+fi
+```
+
+**If not configured**, use AskUserQuestion:
+
+```yaml
+header: "Git Identity Configuration"
+question: |
+  Git user information is needed for commit attribution. Automated agents 
+  (like gsd-executor) will commit using this identity.
+  
+  How would you like to proceed?
+options:
+  - id: configure-global
+    label: "Configure git globally (recommended)"
+    description: "I'll set it in git config for all repositories"
+  - id: project-only
+    label: "Store in this project only"
+    description: "Keep identity in .planning/config.json for this project"
+  - id: already-done
+    label: "I already configured it"
+    description: "Skip this step and verify configuration"
+```
+
+**If "configure-global" selected:**
+
+```bash
+echo "Please configure git globally by running:"
+echo ""
+echo "  git config --global user.name \"Your Name\""
+echo "  git config --global user.email \"you@example.com\""
+echo ""
+echo "After running these commands, type 'done' to continue."
+
+# Wait for user confirmation (via AskUserQuestion)
+# Then re-check git config and store source as "global"
+
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "ERROR: Git config not detected. Please try again."
+    # Loop back to question
+else
+    # Store in config.json
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+fi
+```
+
+**If "project-only" selected:**
+
+```yaml
+# Ask for name
+header: "Git Author Name"
+question: "Enter your full name for git commits:"
+input_type: freeform
+
+# Ask for email
+header: "Git Author Email"
+question: "Enter your email for git commits:"
+input_type: freeform
+
+# Validate and store
+```
+
+```bash
+# After receiving inputs (USER_NAME, USER_EMAIL)
+# Validate email contains @
+if [[ ! "$USER_EMAIL" =~ "@" ]]; then
+    echo "ERROR: Invalid email format (must contain @)"
+    # Loop back
+fi
+
+# Store in config.json
+python3 << PYTHON
+import json
+import os
+
+user_name = os.environ.get('USER_NAME', '')
+user_email = os.environ.get('USER_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': user_name,
+        'email': user_email
+    },
+    'source': 'config'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+
+echo "Git identity stored in .planning/config.json"
+```
+
+**If "already-done" selected:**
+
+```bash
+# Verify git config returns values
+GIT_NAME=$(git config user.name 2>/dev/null)
+GIT_EMAIL=$(git config user.email 2>/dev/null)
+
+if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "ERROR: Git identity not found. Please configure it first."
+    # Loop back to question
+else
+    echo "Git identity verified."
+    # Store source as "global"
+    python3 << PYTHON
+import json
+import os
+
+git_name = os.environ.get('GIT_NAME', '')
+git_email = os.environ.get('GIT_EMAIL', '')
+
+with open('.planning/config.json', 'r') as f:
+    config = json.load(f)
+
+config['git'] = {
+    'author': {
+        'name': git_name,
+        'email': git_email
+    },
+    'source': 'global'
+}
+
+with open('.planning/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+PYTHON
+fi
+```
+
+**Success criteria for Phase 5.5:**
+- [ ] Git identity exists in git config OR .planning/config.json
+- [ ] Identity includes valid name (non-empty) and email (contains @)
+- [ ] Source recorded in config.json ("global", "config", or "local")
+
 ## Phase 6: Research Decision
 
 Use AskUserQuestion:
@@ -360,7 +560,7 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 
 <output>
 Write to: .planning/research/STACK.md
-Use template: ~/.claude/get-shit-done/templates/research-project/STACK.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/STACK.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Stack research")
 
@@ -399,7 +599,7 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 
 <output>
 Write to: .planning/research/FEATURES.md
-Use template: ~/.claude/get-shit-done/templates/research-project/FEATURES.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/FEATURES.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Features research")
 
@@ -438,7 +638,7 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 
 <output>
 Write to: .planning/research/ARCHITECTURE.md
-Use template: ~/.claude/get-shit-done/templates/research-project/ARCHITECTURE.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Architecture research")
 
@@ -477,7 +677,7 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 
 <output>
 Write to: .planning/research/PITFALLS.md
-Use template: ~/.claude/get-shit-done/templates/research-project/PITFALLS.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/PITFALLS.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Pitfalls research")
 ```
@@ -500,7 +700,7 @@ Read these files:
 
 <output>
 Write to: .planning/research/SUMMARY.md
-Use template: ~/.claude/get-shit-done/templates/research-project/SUMMARY.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
 ", subagent_type="gsd-research-synthesizer", description="Synthesize research")
@@ -835,14 +1035,14 @@ Present completion with next steps:
 
 **Phase 1: [Phase Name]** — [Goal from ROADMAP.md]
 
-`/gsd:discuss-phase 1` — gather context and clarify approach
+`$gsd-discuss-phase 1` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase 1` — skip discussion, plan directly
+- `$gsd-plan-phase 1` — skip discussion, plan directly
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -883,7 +1083,7 @@ Present completion with next steps:
 - [ ] ROADMAP.md created with phases, requirement mappings, success criteria
 - [ ] STATE.md initialized
 - [ ] REQUIREMENTS.md traceability updated
-- [ ] User knows next step is `/gsd:discuss-phase 1`
+- [ ] User knows next step is `$gsd-discuss-phase 1`
 
 **Atomic commits:** Each phase commits its artifacts immediately. If context is lost, artifacts persist.
 

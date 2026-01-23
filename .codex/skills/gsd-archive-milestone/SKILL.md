@@ -26,7 +26,7 @@ milestone_dir=".planning/milestones/v${version}"
 
 If not found:
   Error: "Milestone v{version} not found in milestones/"
-  Hint: "Did you mean to complete it first? /gsd:complete-milestone {version}"
+  Hint: "Did you mean to complete it first? $gsd-complete-milestone {version}"
 </step>
 
 <step name="create_history_directory">
@@ -89,7 +89,7 @@ Files preserved:
 
 ### Recovery
 
-To restore: /gsd:restore-milestone {version}
+To restore: $gsd-restore-milestone {version}
 ```
 </step>
 </process>

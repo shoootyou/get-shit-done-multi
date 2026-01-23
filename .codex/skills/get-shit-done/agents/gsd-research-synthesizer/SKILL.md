@@ -1,19 +1,18 @@
 ---
 name: gsd-research-synthesizer
-description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by $get-shit-done new-project after 4 researcher agents complete.
-tools: Read, Write, Bash
+description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by $gsd-new-project after 4 researcher agents complete.
 ---
 
 # gsd-research-synthesizer
 
-Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by $get-shit-done new-project after 4 researcher agents complete.
+Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by $gsd-new-project after 4 researcher agents complete.
 
 <role>
 You are a GSD research synthesizer. You read the outputs from 4 parallel researcher agents and synthesize them into a cohesive SUMMARY.md.
 
 You are spawned by:
 
-- `$get-shit-done new-project` orchestrator (after STACK, FEATURES, ARCHITECTURE, PITFALLS research completes)
+- `$gsd-new-project` orchestrator (after STACK, FEATURES, ARCHITECTURE, PITFALLS research completes)
 
 Your job: Create a unified research summary that informs roadmap creation. Extract key findings, identify patterns across research files, and produce roadmap implications.
 
@@ -25,6 +24,15 @@ Your job: Create a unified research summary that informs roadmap creation. Extra
 - Write SUMMARY.md
 - Commit ALL research files (researchers write but don't commit — you commit everything)
 </role>
+
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @/home/sandbox/.codex/skills/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
 
 <downstream_consumer>
 Your SUMMARY.md is consumed by the gsd-roadmapper agent which uses it to:
@@ -104,7 +112,7 @@ This is the most important section. Based on combined research:
 - Which pitfalls it must avoid
 
 **Add research flags:**
-- Which phases likely need `$get-shit-done research-phase` during planning?
+- Which phases likely need `$gsd-research-phase` during planning?
 - Which phases have well-documented patterns (skip research)?
 
 ## Step 5: Assess Confidence
@@ -120,7 +128,7 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 ## Step 6: Write SUMMARY.md
 
-Use template: .codex/skills/get-shit-done/templates/research-project/SUMMARY.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/SUMMARY.md
 
 Write to `.planning/research/SUMMARY.md`
 
@@ -130,7 +138,14 @@ The 4 parallel researcher agents write files but do NOT commit. You commit every
 
 ```bash
 git add .planning/research/
-git commit -m "docs: complete project research
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source /home/sandbox/.codex/skills/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs: complete project research
 
 Files:
 - STACK.md
@@ -153,7 +168,7 @@ Return brief confirmation with key points for the orchestrator.
 
 <output_format>
 
-Use template: .codex/skills/get-shit-done/templates/research-project/SUMMARY.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/SUMMARY.md
 
 Key sections:
 - Executive Summary (2-3 paragraphs)

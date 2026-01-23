@@ -21,16 +21,16 @@ This is the brownfield equivalent of new-project. The project exists, PROJECT.md
 - `.planning/ROADMAP.md` — phase structure
 - `.planning/STATE.md` — updated project memory
 
-**After this command:** Run `/gsd:plan-phase [N]` to start execution.
+**After this command:** Run `$gsd-plan-phase [N]` to start execution.
 
 </objective>
 
 <execution_context>
 
-@~/.claude/get-shit-done/references/questioning.md
-@~/.claude/get-shit-done/references/ui-brand.md
-@~/.claude/get-shit-done/templates/project.md
-@~/.claude/get-shit-done/templates/requirements.md
+@~/.codex/skills/get-shit-done/references/questioning.md
+@~/.codex/skills/get-shit-done/references/ui-brand.md
+@~/.codex/skills/get-shit-done/templates/project.md
+@~/.codex/skills/get-shit-done/templates/requirements.md
 
 </execution_context>
 
@@ -54,7 +54,7 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 
 1. **Verify project exists:**
    ```bash
-   [ -f .planning/PROJECT.md ] || { echo "ERROR: No PROJECT.md. Run /gsd:new-project first."; exit 1; }
+   [ -f .planning/PROJECT.md ] || { echo "ERROR: No PROJECT.md. Run $gsd-new-project first."; exit 1; }
    ```
 
 2. **Check for active milestone (ROADMAP.md exists):**
@@ -67,10 +67,10 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided)
    - header: "Active Milestone"
    - question: "A milestone is in progress. What would you like to do?"
    - options:
-     - "Complete current first" — Run /gsd:complete-milestone
+     - "Complete current first" — Run $gsd-complete-milestone
      - "Continue anyway" — Start new milestone (will archive current)
 
-   If "Complete current first": Exit with routing to `/gsd:complete-milestone`
+   If "Complete current first": Exit with routing to `$gsd-complete-milestone`
    If "Continue anyway": Continue to Phase 2
 
 3. **Load previous milestone context:**
@@ -266,7 +266,7 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 
 <output>
 Write to: .planning/research/STACK.md
-Use template: ~/.claude/get-shit-done/templates/research-project/STACK.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/STACK.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Stack research")
 
@@ -298,7 +298,7 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 
 <output>
 Write to: .planning/research/FEATURES.md
-Use template: ~/.claude/get-shit-done/templates/research-project/FEATURES.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/FEATURES.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Features research")
 
@@ -330,7 +330,7 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 
 <output>
 Write to: .planning/research/ARCHITECTURE.md
-Use template: ~/.claude/get-shit-done/templates/research-project/ARCHITECTURE.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Architecture research")
 
@@ -362,7 +362,7 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 
 <output>
 Write to: .planning/research/PITFALLS.md
-Use template: ~/.claude/get-shit-done/templates/research-project/PITFALLS.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/PITFALLS.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Pitfalls research")
 ```
@@ -385,7 +385,7 @@ Read these files:
 
 <output>
 Write to: .planning/research/SUMMARY.md
-Use template: ~/.claude/get-shit-done/templates/research-project/SUMMARY.md
+Use template: /home/sandbox/.codex/skills/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
 ", subagent_type="gsd-research-synthesizer", description="Synthesize research")
@@ -666,14 +666,14 @@ Present completion with next steps:
 
 **Phase [N]: [Phase Name]** — [Goal from ROADMAP.md]
 
-`/gsd:discuss-phase [N]` — gather context and clarify approach
+`$gsd-discuss-phase [N]` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase [N]` — skip discussion, plan directly
+- `$gsd-plan-phase [N]` — skip discussion, plan directly
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -709,6 +709,6 @@ Present completion with next steps:
 - [ ] Roadmap files written immediately
 - [ ] User feedback incorporated (if any)
 - [ ] ROADMAP.md, STATE.md → **committed**
-- [ ] User knows next step is `/gsd:plan-phase [N]`
+- [ ] User knows next step is `$gsd-plan-phase [N]`
 
 </success_criteria>

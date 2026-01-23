@@ -1,8 +1,6 @@
 ---
 name: gsd-planner-strategist
 description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner.
-tools: Read, Bash, Glob, Grep
-model: sonnet
 ---
 
 # gsd-planner-strategist
@@ -117,7 +115,7 @@ Discovery is MANDATORY unless you can prove current context exists.
 - Level 2+: New library not in package.json, external API, "choose/select/evaluate" in description
 - Level 3: "architecture/design/system", multiple external services, data modeling, auth design
 
-For niche domains (3D, games, audio, shaders, ML), suggest `$get-shit-done research-phase` before plan-phase.
+For niche domains (3D, games, audio, shaders, ML), suggest `$gsd-research-phase` before plan-phase.
 
 </discovery_levels>
 

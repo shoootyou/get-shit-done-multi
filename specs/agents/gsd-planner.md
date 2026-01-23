@@ -15,9 +15,9 @@ You are a GSD planner. You orchestrate phase planning and spawn specialists when
 
 You are spawned by:
 
-- `/gsd:plan-phase` orchestrator (standard phase planning)
-- `/gsd:plan-phase --gaps` orchestrator (gap closure planning from verification failures)
-- `/gsd:plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
+- `{{cmdPrefix}}plan-phase` orchestrator (standard phase planning)
+- `{{cmdPrefix}}plan-phase --gaps` orchestrator (gap closure planning from verification failures)
+- `{{cmdPrefix}}plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
 
 Your job: Produce PLAN.md files that Claude executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
@@ -150,7 +150,7 @@ Apply discovery level protocol. Spawn strategist if uncertainty about discovery 
 - High-risk, hard to change later
 - Action: Full research with DISCOVERY.md
 
-For niche domains (3D, games, audio, shaders, ML), suggest `/gsd:research-phase` before plan-phase.
+For niche domains (3D, games, audio, shaders, ML), suggest `{{cmdPrefix}}research-phase` before plan-phase.
 </step>
 
 <step name="read_project_history">
@@ -195,10 +195,10 @@ Understand:
 PADDED_PHASE=$(printf "%02d" ${PHASE} 2>/dev/null || echo "${PHASE}")
 PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-* 2>/dev/null | head -1)
 
-# Read CONTEXT.md if exists (from /gsd:discuss-phase)
+# Read CONTEXT.md if exists (from {{cmdPrefix}}discuss-phase)
 cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
 
-# Read RESEARCH.md if exists (from /gsd:research-phase)
+# Read RESEARCH.md if exists (from {{cmdPrefix}}research-phase)
 cat "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 
 # Read DISCOVERY.md if exists (from mandatory discovery)
@@ -316,7 +316,7 @@ Update ROADMAP.md to finalize phase placeholders created by add-phase or insert-
 
 **Plans** (always update):
 - `**Plans:** 0 plans` → `**Plans:** {N} plans`
-- `**Plans:** (created by /gsd:plan-phase)` → `**Plans:** {N} plans`
+- `**Plans:** (created by {{cmdPrefix}}plan-phase)` → `**Plans:** {N} plans`
 
 **Plan list** (always update):
 - Replace `Plans:\n- [ ] TBD ...` with actual plan checkboxes:
@@ -701,7 +701,7 @@ Why bad: Verification fatigue. Combine into one checkpoint at end.
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase}`
+Execute: `{{cmdPrefix}}execute-phase {phase}`
 
 <sub>`/clear` first - fresh context window</sub>
 ```
@@ -745,7 +745,7 @@ Execute: `/gsd:execute-phase {phase}`
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase} --gaps-only`
+Execute: `{{cmdPrefix}}execute-phase {phase} --gaps-only`
 ```
 
 ## Revision Complete
@@ -811,6 +811,6 @@ Planning complete when:
 - [ ] PLAN file(s) exist with gap_closure: true
 - [ ] Each plan: tasks derived from gap.missing items
 - [ ] PLAN file(s) committed to git
-- [ ] User knows to run `/gsd:execute-phase {X}` next
+- [ ] User knows to run `{{cmdPrefix}}execute-phase {X}` next
 
 </success_criteria>

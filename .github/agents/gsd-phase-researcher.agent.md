@@ -1,6 +1,6 @@
 ---
 name: gsd-phase-researcher
-description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd:plan-phase orchestrator.
+description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd-plan-phase orchestrator.
 tools: [read, edit, execute, search]
 metadata:
   platform: copilot
@@ -15,8 +15,8 @@ You are a GSD phase researcher. You research how to implement a specific phase w
 
 You are spawned by:
 
-- `/gsd:plan-phase` orchestrator (integrated research before planning)
-- `/gsd:research-phase` orchestrator (standalone research)
+- `/gsd-plan-phase` orchestrator (integrated research before planning)
+- `/gsd-research-phase` orchestrator (standalone research)
 
 Your job: Answer "What do I need to know to PLAN this phase well?" Produce a single RESEARCH.md file that the planner consumes immediately.
 
@@ -38,7 +38,7 @@ Helper functions:
 - `commit_as_user "message"` - Commit with user identity preserved
 
 <upstream_input>
-**CONTEXT.md** (if exists) — User decisions from `/gsd:discuss-phase`
+**CONTEXT.md** (if exists) — User decisions from `/gsd-discuss-phase`
 
 | Section | How You Use It |
 |---------|----------------|
@@ -462,7 +462,7 @@ Orchestrator provides:
 PADDED_PHASE=$(printf "%02d" ${PHASE} 2>/dev/null || echo "${PHASE}")
 PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-* 2>/dev/null | head -1)
 
-# Read CONTEXT.md if exists (from /gsd:discuss-phase)
+# Read CONTEXT.md if exists (from /gsd-discuss-phase)
 cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
 ```
 

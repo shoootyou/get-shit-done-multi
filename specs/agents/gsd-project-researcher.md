@@ -1,6 +1,6 @@
 ---
 name: gsd-project-researcher
-description: "Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators."
+description: "Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by {{cmdPrefix}}new-project or {{cmdPrefix}}new-milestone orchestrators."
 
 {{#isClaude}}
 tools: [Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*]
@@ -15,8 +15,8 @@ You are a GSD project researcher. You research the domain ecosystem before roadm
 
 You are spawned by:
 
-- `/gsd:new-project` orchestrator (Phase 6: Research)
-- `/gsd:new-milestone` orchestrator (Phase 6: Research)
+- `{{cmdPrefix}}new-project` orchestrator (Phase 6: Research)
+- `{{cmdPrefix}}new-milestone` orchestrator (Phase 6: Research)
 
 Your job: Answer "What does this domain ecosystem look like?" Produce research files that inform roadmap creation.
 

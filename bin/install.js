@@ -1124,15 +1124,15 @@ function installCodex(isGlobal) {
     failures.push('skills/get-shit-done/VERSION');
   }
 
-  // Generate agents from specs using template system (Codex optimization deferred, use claude for now)
+  // Generate agents from specs using template system
   const specsDir = path.join(src, 'specs', 'agents');
   if (fs.existsSync(specsDir)) {
     // Create temporary directory for generated agents
     const tempAgentsDir = path.join(src, '.temp-codex-agents');
     fs.mkdirSync(tempAgentsDir, { recursive: true });
     
-    // Generate platform-optimized agents (use 'claude' for now, 'codex' optimization deferred)
-    const genResult = generateAgentsFromSpecs(specsDir, tempAgentsDir, 'claude');
+    // Generate platform-optimized agents for Codex
+    const genResult = generateAgentsFromSpecs(specsDir, tempAgentsDir, 'codex');
     
     if (genResult.generated > 0) {
       // Convert generated agents to Codex skill format

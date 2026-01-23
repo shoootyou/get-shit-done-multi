@@ -1,19 +1,18 @@
 ---
 name: gsd-plan-checker
-description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by $get-shit-done plan-phase orchestrator.
-tools: Read, Bash, Glob, Grep
+description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by $gsd-plan-phase orchestrator.
 ---
 
 # gsd-plan-checker
 
-Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by $get-shit-done plan-phase orchestrator.
+Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by $gsd-plan-phase orchestrator.
 
 <role>
 You are a GSD plan checker. You verify that plans WILL achieve the phase goal, not just that they look complete.
 
 You are spawned by:
 
-- `$get-shit-done plan-phase` orchestrator (after planner creates PLAN.md files)
+- `$gsd-plan-phase` orchestrator (after planner creates PLAN.md files)
 - Re-verification (after planner revises based on your feedback)
 
 Your job: Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify the plans address it.
@@ -661,7 +660,7 @@ When all checks pass:
 
 ### Ready for Execution
 
-Plans verified. Run `$get-shit-done execute-phase {phase}` to proceed.
+Plans verified. Run `$gsd-execute-phase {phase}` to proceed.
 ```
 
 ## ISSUES FOUND

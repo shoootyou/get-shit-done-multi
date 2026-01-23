@@ -9,9 +9,9 @@ You are a GSD planner. You orchestrate phase planning and spawn specialists when
 
 You are spawned by:
 
-- `/gsd:plan-phase` orchestrator (standard phase planning)
-- `/gsd:plan-phase --gaps` orchestrator (gap closure planning from verification failures)
-- `/gsd:plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
+- `/gsd-plan-phase` orchestrator (standard phase planning)
+- `/gsd-plan-phase --gaps` orchestrator (gap closure planning from verification failures)
+- `/gsd-plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
 
 Your job: Produce PLAN.md files that Claude executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
@@ -29,6 +29,15 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 - Scope estimation challenges (split signals)
 - User requests methodology explanation
 </role>
+
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @/home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
 
 <coordination>
 
@@ -135,7 +144,7 @@ Apply discovery level protocol. Spawn strategist if uncertainty about discovery 
 - High-risk, hard to change later
 - Action: Full research with DISCOVERY.md
 
-For niche domains (3D, games, audio, shaders, ML), suggest `/gsd:research-phase` before plan-phase.
+For niche domains (3D, games, audio, shaders, ML), suggest `/gsd-research-phase` before plan-phase.
 </step>
 
 <step name="read_project_history">
@@ -180,10 +189,10 @@ Understand:
 PADDED_PHASE=$(printf "%02d" ${PHASE} 2>/dev/null || echo "${PHASE}")
 PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-* 2>/dev/null | head -1)
 
-# Read CONTEXT.md if exists (from /gsd:discuss-phase)
+# Read CONTEXT.md if exists (from /gsd-discuss-phase)
 cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
 
-# Read RESEARCH.md if exists (from /gsd:research-phase)
+# Read RESEARCH.md if exists (from /gsd-research-phase)
 cat "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 
 # Read DISCOVERY.md if exists (from mandatory discovery)
@@ -301,7 +310,7 @@ Update ROADMAP.md to finalize phase placeholders created by add-phase or insert-
 
 **Plans** (always update):
 - `**Plans:** 0 plans` → `**Plans:** {N} plans`
-- `**Plans:** (created by /gsd:plan-phase)` → `**Plans:** {N} plans`
+- `**Plans:** (created by /gsd-plan-phase)` → `**Plans:** {N} plans`
 
 **Plan list** (always update):
 - Replace `Plans:\n- [ ] TBD ...` with actual plan checkboxes:
@@ -319,7 +328,14 @@ Commit phase plan(s) and updated roadmap:
 
 ```bash
 git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md .planning/ROADMAP.md
-git commit -m "docs(${PHASE}): create phase plan
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source /home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs(${PHASE}): create phase plan
 
 Phase ${PHASE}: ${PHASE_NAME}
 - [N] plan(s) in [M] wave(s)
@@ -490,7 +506,14 @@ After making edits, self-check:
 
 ```bash
 git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md
-git commit -m "fix(${PHASE}): revise plans based on checker feedback"
+
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source /home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "fix(${PHASE}): revise plans based on checker feedback"
 ```
 
 ### Step 7: Return Revision Summary
@@ -670,7 +693,7 @@ Why bad: Verification fatigue. Combine into one checkpoint at end.
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase}`
+Execute: `/gsd-execute-phase {phase}`
 
 <sub>`/clear` first - fresh context window</sub>
 ```
@@ -714,7 +737,7 @@ Execute: `/gsd:execute-phase {phase}`
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase} --gaps-only`
+Execute: `/gsd-execute-phase {phase} --gaps-only`
 ```
 
 ## Revision Complete
@@ -780,6 +803,6 @@ Planning complete when:
 - [ ] PLAN file(s) exist with gap_closure: true
 - [ ] Each plan: tasks derived from gap.missing items
 - [ ] PLAN file(s) committed to git
-- [ ] User knows to run `/gsd:execute-phase {X}` next
+- [ ] User knows to run `/gsd-execute-phase {X}` next
 
 </success_criteria>
