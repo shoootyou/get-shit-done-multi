@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 5 of 8.5 (Simple Command Migration)
-Plan: 9 of 9 (ALL COMPLETE - Phase 5 verified)
-Status: Phase 5 complete, 21 commands migrated, ready for Phase 6
-Last activity: 2026-01-23 — Completed Phase 5: Simple Command Migration
+Phase: 5.1 of 8.5 (Fix git identity preservation in agents) [INSERTED]
+Plan: 0 of TBD (Planning needed)
+Status: Phase 5 complete, Phase 5.1 inserted for urgent git identity fix
+Last activity: 2026-01-23 — Inserted Phase 5.1: Fix git identity preservation in agents
 
 Progress: [█████░░░░░] ~59% (5/8.5 phases, 27 plans total)
 
@@ -132,6 +132,11 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Roadmap Evolution
+
+- Phase 5.1 inserted after Phase 5: Fix git identity preservation in agents (URGENT)
+  Reason: Agents are overriding user git identity when committing. Must fix specs, revert incorrect generated agent changes, add git config to project setup workflow, and update all affected agents.
 
 ### Blockers/Concerns
 

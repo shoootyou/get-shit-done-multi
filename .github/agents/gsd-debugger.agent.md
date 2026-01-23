@@ -313,13 +313,32 @@ mkdir -p .planning/debug/resolved
 mv .planning/debug/{slug}.md .planning/debug/resolved/
 ```
 
-Commit:
-```bash
+**Return commit instructions to user** (DO NOT commit automatically):
+
+```markdown
+## DEBUG COMPLETE
+
+**Root Cause:** {root_cause}
+**Fix Applied:** {what was changed}
+**Verification:** {how verified}
+
+**Files Changed:**
+- {file1}: {change}
+- {file2}: {change}
+
+### Commit Instructions
+
+Please commit these changes with your git identity:
+
+\`\`\`bash
 git add -A
 git commit -m "fix: {brief description}
 
 Root cause: {root_cause}
 Debug session: .planning/debug/resolved/{slug}.md"
+\`\`\`
+
+**Why manual commit?** To preserve your git identity. The debug agent should never override your author information.
 ```
 
 Report completion and offer next steps.
@@ -444,7 +463,19 @@ Orchestrator presents checkpoint to user, gets response, spawns fresh continuati
 - {file1}: {change}
 - {file2}: {change}
 
-**Commit:** {hash}
+### Commit Instructions
+
+Please commit these changes with your git identity:
+
+\`\`\`bash
+git add -A
+git commit -m "fix: {brief description}
+
+Root cause: {root_cause}
+Debug session: .planning/debug/resolved/{slug}.md"
+\`\`\`
+
+**Why manual commit?** To preserve your git identity. The debug agent should never override your author information.
 ```
 
 ## INVESTIGATION INCONCLUSIVE
