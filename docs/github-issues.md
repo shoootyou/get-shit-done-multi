@@ -1,7 +1,7 @@
 # GitHub Issue Templates
 
 ## Purpose
-GSD installs a GitHub issue template that captures the minimum context required to run `gsd:new-project` effectively. The template is designed so a new issue can serve as the project intake document.
+GSD installs a GitHub issue template that captures the minimum context required to run `/gsd-new-project` effectively. The template is designed so a new issue can serve as the project intake document.
 
 ## Installed files
 - `.github/ISSUE_TEMPLATE/gsd-new-project.yml`

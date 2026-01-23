@@ -1,5 +1,5 @@
 name: "GSD New Project"
-description: "Provide full context so gsd:new-project can start without extra back-and-forth."
+description: "Provide full context so /gsd-new-project can start without extra back-and-forth."
 title: "[GSD] "
 labels:
   - gsd
@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This template collects the minimum context needed to run gsd:new-project effectively.
+        This template collects the minimum context needed to run /gsd-new-project effectively.
         Fill the fields below. Then start GSD and reference this issue as the single source of truth.
   - type: textarea
     id: summary

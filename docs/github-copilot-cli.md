@@ -41,13 +41,13 @@ It does not modify global Copilot settings.
 3. Invoke a GSD command by typing it directly:
 
    ```
-   gsd:new-project
+   /gsd-new-project
    ```
 
 4. Use `/agent` to switch to a specific GSD agent when needed.
 
 ## Behavior differences from Claude Code
-- Copilot CLI does not support custom slash commands, so you must type `gsd:*` directly.
+- Copilot CLI does not support custom slash commands, so you must type `/gsd-*` or `gsd-*` directly.
 - `AskUserQuestion` is replaced with plain chat questions and numbered options.
 - Claude-specific hooks (statusline, update checks) are not installed.
 - All GSD paths point to `.github/skills/get-shit-done`.

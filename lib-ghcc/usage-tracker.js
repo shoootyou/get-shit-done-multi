@@ -22,7 +22,7 @@ import { existsSync } from 'fs';
  * const tracker = new UsageTracker('.planning');
  * await tracker.trackUsage({
  *   cli: 'claude-code',
- *   command: 'gsd:execute-phase',
+ *   command: 'gsd-execute-phase',
  *   duration: 5000,
  *   tokens: { input: 1000, output: 500 },
  *   cost: 0.02
