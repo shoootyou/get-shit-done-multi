@@ -1,0 +1,9 @@
+# Test environment directories (never commit)
+copilot-test/
+claude-test/
+codex-test/
+
+# Test results
+test-results.json
+test-results.yml
+*.test-output.txt
