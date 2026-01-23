@@ -16,7 +16,7 @@
  * 
  * Level 'full' indicates infrastructure complete and CLI execution implemented.
  * Actual availability depends on CLI installation (claude-code, gh, codex).
- * Use /gsd:invoke-agent to test agent availability on your system.
+ * Use /gsd-invoke-agent to test agent availability on your system.
  */
 
 /**
@@ -89,7 +89,7 @@ const CLI_LIMITATIONS = {
   claude: {
     slash_commands: { 
       supported: true, 
-      notes: 'Full /gsd:* command support via native slash command system' 
+      notes: 'Full /gsd-* command support via native slash command system' 
     },
     custom_agents: { 
       supported: true, 
@@ -103,7 +103,7 @@ const CLI_LIMITATIONS = {
   copilot: {
     slash_commands: { 
       supported: false, 
-      notes: 'Use skills with $get-shit-done instead of /gsd:* commands' 
+      notes: 'Use skills with $get-shit-done instead of /gsd-* commands' 
     },
     custom_agents: { 
       supported: true, 
@@ -117,7 +117,7 @@ const CLI_LIMITATIONS = {
   codex: {
     slash_commands: { 
       supported: false, 
-      notes: 'Use skills with $get-shit-done instead of /gsd:* commands' 
+      notes: 'Use skills with $get-shit-done instead of /gsd-* commands' 
     },
     custom_agents: { 
       supported: true, 

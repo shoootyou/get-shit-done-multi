@@ -1,7 +1,7 @@
 /**
  * Diagnostic Test Framework - Base class and runner
  * Modular diagnostic tests following "doctor" pattern
- * Used by /gsd:verify-installation command
+ * Used by /gsd-verify-installation command
  * 
  * @module verification/diagnostic-test
  */

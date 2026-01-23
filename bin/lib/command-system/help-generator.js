@@ -29,7 +29,7 @@ function formatCommandHelp(name) {
   const command = registry.get(name);
   
   if (!command) {
-    return `❌ Command not found: ${name}\n\nRun /gsd:help to see all available commands.`;
+    return `❌ Command not found: ${name}\n\nRun /gsd-help to see all available commands.`;
   }
   
   const { metadata } = command;
@@ -117,9 +117,9 @@ function formatAllCommandsHelp() {
   }
   
   help += `\nFor detailed help on a specific command:\n`;
-  help += `  /gsd:help [command]\n`;
+  help += `  /gsd-help [command]\n`;
   help += `\nExample:\n`;
-  help += `  /gsd:help gsd:execute-phase\n`;
+  help += `  /gsd-help gsd:execute-phase\n`;
   
   return help.trimEnd();
 }

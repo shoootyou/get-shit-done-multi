@@ -6,20 +6,20 @@ description: Structured spec-driven workflow for planning and executing software
 # Get Shit Done (GSD) Skill{{#isCopilot}} for GitHub Copilot CLI{{/isCopilot}}{{#isCodex}} for Codex CLI{{/isCodex}}{{#isClaude}} for Claude Code{{/isClaude}}
 
 ## When to use
-- Use this skill when the user asks for GSD or uses a `gsd:*` command.
+- Use this skill when the user asks for GSD{{#isClaude}} or uses a `{{cmdPrefix}}*` command{{/isClaude}}{{#isCopilot}} or uses a `/gsd-*` or `gsd-*` command{{/isCopilot}}{{#isCodex}} or invokes `$get-shit-done`{{/isCodex}}.
 - Use it for structured planning, phase execution, verification, or roadmap work.
 {{#isCodex}}- Automatically loaded when user types `$get-shit-done`{{/isCodex}}
 
 ## How to run commands
-{{#isCopilot}}GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `{{cmdPrefix}}` or `gsd:` as command invocations.
+{{#isCopilot}}GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `{{cmdPrefix}}` or `gsd-` as command invocations.
 
 Commands are installed as individual skills in `{{skillsPath}}/`. Load the corresponding skill:
 
 `{{skillsPath}}/gsd-<command>/SKILL.md`
 
 Example:
-- `gsd:new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
-- `gsd:help` -> `{{skillsPath}}/gsd-help/SKILL.md`
+- `gsd-new-project` -> `{{skillsPath}}/gsd-new-project/SKILL.md`
+- `gsd-help` -> `{{skillsPath}}/gsd-help/SKILL.md`
 {{/isCopilot}}{{#isCodex}}In Codex CLI, invoke this skill explicitly with:
 ```
 $get-shit-done help

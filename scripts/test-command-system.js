@@ -185,7 +185,7 @@ This is the command prompt content.`;
     const error = new CommandError(
       'Command not found',
       'COMMAND_NOT_FOUND',
-      ['Check spelling', 'Run /gsd:help']
+      ['Check spelling', 'Run /gsd-help']
     );
     
     assert(error.message === 'Command not found', 'Should have message');

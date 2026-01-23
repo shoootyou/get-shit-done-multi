@@ -48,8 +48,8 @@ export function formatError(error, commandName) {
   let formatted = `❌ Error executing command '${commandName}'\n`;
   formatted += `\nMessage: ${error.message}\n`;
   formatted += '\nSuggestions:\n';
-  formatted += '  • Run /gsd:help for available commands\n';
-  formatted += `  • Run /gsd:help ${commandName} for command-specific help\n`;
+  formatted += '  • Run /gsd-help for available commands\n';
+  formatted += `  • Run /gsd-help ${commandName} for command-specific help\n`;
   formatted += '  • Check the command syntax and arguments\n';
   
   return formatted.trimEnd();

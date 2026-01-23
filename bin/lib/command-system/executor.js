@@ -43,7 +43,7 @@ export async function executeCommand(commandName, args = []) {
       // Command not found - suggest similar commands
       const availableCommands = registry.list();
       const suggestions = [
-        'Run /gsd:help to see all available commands',
+        'Run /gsd-help to see all available commands',
         `Available commands: ${availableCommands.slice(0, 5).join(', ')}${availableCommands.length > 5 ? '...' : ''}`
       ];
       

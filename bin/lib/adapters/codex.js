@@ -72,10 +72,10 @@ function convertContent(content, type) {
   let converted = replaceClaudePaths(content, '.codex/skills/get-shit-done/', { isLocal: true });
   
   // Step 2: Replace command syntax for Codex
-  // Claude: /gsd:command or /gsd:command arg
+  // Claude/Copilot: /gsd-command or /gsd-command arg
   // Codex: $get-shit-done command arg
-  converted = converted.replace(/\/gsd:(\S+)/g, '$get-shit-done $1');
-  converted = converted.replace(/`\/gsd:(\S+)`/g, '`$get-shit-done $1`');
+  converted = converted.replace(/\/gsd-(\S+)/g, '$get-shit-done $1');
+  converted = converted.replace(/`\/gsd-(\S+)`/g, '`$get-shit-done $1`');
   
   // Step 3: Replace CLI-specific references
   converted = converted.replace(/\bClaude Code\b/g, 'Codex CLI');

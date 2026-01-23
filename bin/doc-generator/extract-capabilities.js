@@ -79,9 +79,9 @@ function extractCommandCapabilities() {
   
   // Slash commands support
   capabilities.push({
-    feature: '/gsd:* slash commands',
+    feature: '/gsd-* slash commands',
     category: 'commands',
-    description: 'Native slash command syntax (e.g., /gsd:new-project)',
+    description: 'Native slash command syntax (e.g., /gsd-new-project)',
     claude: CLI_LIMITATIONS.claude.slash_commands.supported ? 'full' : 'unsupported',
     copilot: CLI_LIMITATIONS.copilot.slash_commands.supported ? 'full' : 'unsupported',
     codex: CLI_LIMITATIONS.codex.slash_commands.supported ? 'full' : 'unsupported',
@@ -117,7 +117,7 @@ function extractCommandCapabilities() {
       }
       
       capabilities.push({
-        feature: `/gsd:${commandName}`,
+        feature: `/gsd-${commandName}`,
         category: 'commands',
         description: description,
         claude: 'full',

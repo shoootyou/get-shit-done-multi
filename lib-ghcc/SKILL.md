@@ -6,18 +6,18 @@ description: Structured spec-driven workflow for planning and executing software
 # Get Shit Done (GSD) Skill for GitHub Copilot CLI
 
 ## When to use
-- Use this skill when the user asks for GSD or uses a `gsd:*` command.
+- Use this skill when the user asks for GSD or uses a `gsd-*` command.
 - Use it for structured planning, phase execution, verification, or roadmap work.
 
 ## How to run commands
-GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd:` or `gsd:` as command invocations.
+GitHub Copilot CLI does not support custom slash commands. Treat inputs that start with `/gsd-` or `gsd-` as command invocations.
 
 Load the corresponding command definition from:
 
 `.github/skills/get-shit-done/commands/gsd/<command>.md`
 
 Example:
-- `gsd:new-project` -> `.github/skills/get-shit-done/commands/gsd/new-project.md`
+- `gsd-new-project` -> `.github/skills/get-shit-done/commands/gsd/new-project.md`
 
 If the user asks for help, load:
 `.github/skills/get-shit-done/commands/gsd/help.md`
