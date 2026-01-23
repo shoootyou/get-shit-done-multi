@@ -4,7 +4,7 @@ description: Orchestrate project initialization with parallel research and roadm
 skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, AskUserQuestion]
+tools: [agent, read, edit, execute]
 arguments: [{name: domain, type: string, required: false, description: Project domain for research context}]
 metadata:
   platform: copilot

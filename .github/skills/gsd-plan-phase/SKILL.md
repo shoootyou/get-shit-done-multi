@@ -4,7 +4,7 @@ description: Orchestrate phase planning with research, planning, and verificatio
 skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, askuserquestion]
+tools: [agent, read, edit, execute]
 arguments: [{name: phase, type: string, required: true, description: Phase number or name to plan}, {name: '--research', type: flag, required: false, description: Force re-research (ignore existing RESEARCH.md)}, {name: '--skip-research', type: flag, required: false, description: Skip research entirely (go straight to planning)}, {name: '--gaps', type: flag, required: false, description: Gap closure mode (plan from VERIFICATION.md/UAT.md failures)}, {name: '--skip-verify', type: flag, required: false, description: Skip verification loop (trust planner output)}]
 metadata:
   platform: copilot

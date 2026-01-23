@@ -4,7 +4,7 @@ description: Orchestrate milestone planning with parallel research for subsequen
 skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, search, AskUserQuestion]
+tools: [agent, read, edit, execute, search]
 arguments: [{name: milestone, type: string, required: false, description: Milestone number or description}]
 metadata:
   platform: copilot

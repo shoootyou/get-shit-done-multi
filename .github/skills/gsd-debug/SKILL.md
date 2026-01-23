@@ -4,7 +4,7 @@ description: Structured debugging workflow with session persistence and investig
 skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, askuserquestion]
+tools: [agent, read, edit, execute]
 arguments: [{name: issue, type: string, required: false, description: 'Issue description (if omitted, shows active sessions for resume)'}]
 metadata:
   platform: copilot
