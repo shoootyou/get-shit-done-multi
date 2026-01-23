@@ -16,14 +16,14 @@ arguments:
 ---
 
 <objective>
-Mark milestone {{version}} complete, archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
+Mark milestone complete (version provided as argument), archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
 
 Purpose: Create historical record of shipped version, archive milestone artifacts, and prepare for next milestone.
 </objective>
 
 <process>
 <step name="check_audit">
-Look for .planning/v{{version}}-MILESTONE-AUDIT.md
+Look for .planning/v{version}-MILESTONE-AUDIT.md where version is provided as argument
 
 If missing:
   Recommend: "/gsd:audit-milestone first - need E2E validation before completion"
@@ -41,15 +41,18 @@ If exists with status: passed:
 Archive current milestone artifacts:
 
 ```bash
+# version argument provided by user
+version="$1"
+
 # Create milestone directory
-mkdir -p .planning/milestones/v{{version}}
+mkdir -p ".planning/milestones/v${version}"
 
 # Archive key files
-cp .planning/ROADMAP.md .planning/milestones/v{{version}}/
-cp .planning/REQUIREMENTS.md .planning/milestones/v{{version}}/
+cp .planning/ROADMAP.md ".planning/milestones/v${version}/"
+cp .planning/REQUIREMENTS.md ".planning/milestones/v${version}/"
 
 # Archive audit report
-cp .planning/v{{version}}-MILESTONE-AUDIT.md .planning/milestones/v{{version}}/
+cp ".planning/v${version}-MILESTONE-AUDIT.md" ".planning/milestones/v${version}/"
 
 # Count phases completed
 PHASE_COUNT=$(ls -d .planning/phases/* | wc -l)
@@ -68,16 +71,16 @@ Update "Current focus" to "Between milestones" or next milestone if known.
 Update MILESTONES.md registry:
 
 ```bash
-cat >> .planning/MILESTONES.md << EOF
+cat >> .planning/MILESTONES.md << ENDMARKER
 
-## v{{version}}
+## v${version}
 - **Completed:** $(date +%Y-%m-%d)
 - **Phases:** ${PHASE_COUNT} phases completed
 - **Requirements:** $(grep -c "^###" .planning/REQUIREMENTS.md) requirements met
 - **Status:** Completed
-- **Location:** .planning/milestones/v{{version}}/
+- **Location:** .planning/milestones/v${version}/
 - **Audit:** Passed E2E integration checks
-EOF
+ENDMARKER
 ```
 </step>
 
@@ -85,16 +88,16 @@ EOF
 Create git tag for milestone:
 
 ```bash
-git add .planning/milestones/v{{version}}/
+git add ".planning/milestones/v${version}/"
 git add .planning/MILESTONES.md
 git add .planning/PROJECT.md
-git commit -m "milestone: complete v{{version}}
+git commit -m "milestone: complete v${version}
 
 - ${PHASE_COUNT} phases completed
 - All requirements met
 - E2E audit passed"
 
-git tag -a "v{{version}}" -m "Release v{{version}}
+git tag -a "v${version}" -m "Release v${version}
 
 $(cat .planning/ROADMAP.md | head -20)
 "
@@ -109,22 +112,22 @@ git rm .planning/ROADMAP.md .planning/REQUIREMENTS.md
 git commit -m "milestone: clear roadmap for next cycle"
 ```
 
-Note: Files are preserved in .planning/milestones/v{{version}}/
+Note: Files are preserved in .planning/milestones/v${version}/
 </step>
 
 <step name="present_summary">
 Present completion summary:
 
 ```
-## MILESTONE COMPLETE: v{{version}}
+## MILESTONE COMPLETE: v{version}
 
 **Completed:** {date}
 **Phases:** {count} phases
 **Requirements:** {count} requirements met
 **Audit:** Passed
 
-**Archived to:** .planning/milestones/v{{version}}/
-**Git tag:** v{{version}}
+**Archived to:** .planning/milestones/v{version}/
+**Git tag:** v{version}
 
 ### Next Steps
 
