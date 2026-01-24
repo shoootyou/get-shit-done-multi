@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Schema** - Establish spec structure and prove architecture
 - [x] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
 - [x] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
-- [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
+- [x] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
 - [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
 - [x] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
 - [x] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
