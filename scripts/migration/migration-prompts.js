@@ -2,20 +2,20 @@ const prompts = require('prompts');
 const { cyan, green, yellow, dim, reset } = require('../shared/colors');
 
 async function confirmMigration(detectedStructures) {
-  console.log(`\n  ${yellow}⚠${reset}  Old GSD structure detected:\n`);
+  console.log(`  ${cyan}Old GSD detected:${reset}`);
   
   detectedStructures.forEach(structure => {
-    console.log(`  ${cyan}${structure.platform}:${reset} ${structure.path}`);
-    console.log(`  ${dim}Files: ${structure.fileCount}${reset}`);
+    const fileLabel = structure.fileCount === 1 ? 'file' : 'files';
+    console.log(`  ${structure.platform}: ${structure.path} ${dim}(${structure.fileCount} ${fileLabel})${reset}`);
   });
   
   const today = new Date().toISOString().split('T')[0];
-  console.log(`\n  Backup will be created at: ${dim}.old-gsd-system/${today}/${reset}`);
+  console.log(`\n  ${dim}Creating backup at: .old-gsd-system/${today}/${reset}`);
   
   const response = await prompts({
     type: 'confirm',
     name: 'proceed',
-    message: 'Backup old structure and migrate to new skill-based system?',
+    message: 'Backup old structure and migrate?',
     initial: true
   });
   

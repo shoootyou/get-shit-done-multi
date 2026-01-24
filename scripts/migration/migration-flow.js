@@ -6,7 +6,7 @@ const { cyan, green, yellow, dim, reset } = require('../shared/colors');
 const fs = require('fs-extra');
 
 async function runMigration() {
-  console.log('\n🔍 Checking for old GSD structure...\n');
+  console.log('\n  🔍 Checking for old GSD structure...\n');
   
   // 1. Detection
   const detected = await detectAllPlatforms();
@@ -30,7 +30,9 @@ async function runMigration() {
   for (const structure of detected) {
     const result = await createBackup(structure.path);
     backupResults.push({ platform: structure.platform, ...result });
-    console.log(`  ${green}✓${reset} Backed up ${structure.platform}: ${dim}${result.backupPath}${reset}`);
+    // Show relative path from backupBase
+    const relativePath = result.backupPath.replace(process.cwd() + '/', '');
+    console.log(`  ${green}✓${reset} Backed up ${structure.platform}: ${dim}${relativePath}${reset}`);
   }
   
   // 4. Add to .gitignore
@@ -51,9 +53,8 @@ async function runMigration() {
   progressBar.stop();
   
   // 6. Success message
-  console.log(`\n  ${green}✅ Migration complete!${reset}`);
-  console.log(`  ${dim}Old files backed up to: .old-gsd-system/${backupResults[0].date}/${reset}`);
-  console.log(`  ${dim}Run installation again to set up new structure${reset}\n`);
+  console.log(`\n  ${green}✓${reset} Migration complete`);
+  console.log(`  ${dim}Backup location: .old-gsd-system/${backupResults[0].date}/${reset}\n`);
   
   return {
     migrated: true,

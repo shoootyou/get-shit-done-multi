@@ -158,9 +158,7 @@ if (hasHelp) {
   // Check for old structure and migrate if needed
   try {
     const migrationResult = await runMigration();
-    if (migrationResult.migrated) {
-      console.log('Migration completed. Proceeding with fresh installation...\n');
-    }
+    // No message needed - migration output is self-contained
   } catch (err) {
     console.error(`  ${yellow}Migration failed:${reset} ${err.message}`);
     console.error(`  ${dim}Please backup manually and try again.${reset}`);
