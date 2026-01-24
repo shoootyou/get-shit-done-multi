@@ -1,33 +1,20 @@
-# GSD Skills Standardization (v1.9.1)
+# GSD Skills Standardization
 
 ## What This Is
 
-Migración de la estructura de comandos GSD del formato legacy (`./commands/gsd/*.md`) al nuevo formato de SKILLS estandarizado según especificación de Claude, creando specs reutilizables en `/specs/skills/` que funcionan para las 3 plataformas: GitHub Copilot CLI, Claude Code, y Codex CLI. Los 29 comandos existentes se transforman a estructura de carpetas con frontmatter, metadata, y nuevo prefijo "gsd-".
+GSD (Get Shit Done) is a multi-platform AI assistant framework providing 28 specialized commands for project management, planning, execution, and debugging. Completed v1.9.1 milestone successfully migrated all commands from legacy format to unified spec-based architecture.
+
+**v1.9.1 Achievement:** Transformed 29 legacy commands into spec-driven skills in `/specs/skills/` that generate platform-specific outputs for GitHub Copilot CLI, Claude Code, and Codex CLI. Single source of truth with frontmatter-based metadata, conditional rendering, and folder-per-skill structure.
 
 ## Core Value
 
-Los specs en `/specs/skills/` deben ser la fuente única de verdad para comandos GSD, permitiendo instalación consistente en las 3 plataformas sin duplicación de lógica.
+Specs in `/specs/skills/` serve as the single source of truth for GSD commands, enabling consistent installation across 3 platforms without code duplication. Template-based generation ensures maintainability and multi-platform compatibility.
 
-## Requirements
+## Current Focus
 
-### Validated
+Between milestones. v1.9.1 shipped successfully with 11 phases completed, all requirements met, and E2E integration validated.
 
-(None yet — ship to validate)
-
-### Active
-
-- [ ] Crear estructura `/specs/skills/` siguiendo formato de carpetas de Claude
-- [ ] Migrar 29 comandos de `./commands/gsd/*.md` a specs con nuevo formato
-- [ ] Cambiar prefijo de comandos de "gsd:" a "gsd-" en specs nuevos
-- [ ] Agregar frontmatter según especificación de Claude a cada skill spec
-- [ ] Agregar metadata block (platform, generated, versions) a cada spec
-- [ ] Migrar skill principal (SKILL.md) a nuevo formato de carpeta
-- [ ] Adaptar install.js para procesar `/specs/skills/` en las 3 plataformas
-- [ ] Mantener compatibilidad con sistema existente en `./commands/gsd/` (no modificar)
-- [ ] Actualizar lógica de instalación para Copilot, Claude, y Codex usando mismo spec
-- [ ] Crear documentación de la nueva estructura en `/specs/skills/README.md`
-- [ ] Actualizar CHANGELOG.md con cambios de v1.9.1
-- [ ] Verificar que specs generados funcionan en las 3 plataformas
+**Next milestone:** To be planned. Consider improvements based on v1.9.1 retrospective.
 
 ### Out of Scope
 

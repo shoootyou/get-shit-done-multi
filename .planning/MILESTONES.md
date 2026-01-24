@@ -20,3 +20,12 @@ None - ready for next milestone
 ---
 
 *Updated by /gsd:archive-milestone*
+
+## v1.9.1
+- **Completed:** 2026-01-24
+- **Phases:** 11 phases completed
+- **Requirements:** 58 requirements tracked
+- **Status:** Completed
+- **Location:** .planning/milestones/v1.9.1/
+- **Audit:** Passed E2E integration checks
+- **Achievement:** Migrated 28 GSD commands to unified spec-based architecture
