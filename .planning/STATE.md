@@ -9,24 +9,24 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 7 of 8.5 (Multi-Platform Testing)
-Plan: 3 of 3 - **Phase 7 Complete**
-Status: Phase complete - npm installation testing validated (100% success)
-Last activity: 2026-01-24 — Completed 07-03-PLAN.md (Installation Analysis + Reporting)
+Phase: 8 of 8.5 (Documentation and Release)
+Plan: 1 of 3 - **In progress**
+Status: In progress - core documentation complete
+Last activity: 2026-01-24 — Completed 08-01-PLAN.md (Core Documentation)
 
 **Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
 - Migrated 60+ files from legacy /gsd: to new /gsd- format
 - Eliminated experimental command-system (1,160 lines)
 - Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
 
-Progress: [████████░░] ~91% (7/8.5 phases, 32/34 plans complete)
+Progress: [████████░░] ~94% (8/8.5 phases, 33/34 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 36
-- Average duration: 5.0 min
-- Total execution time: 3.04 hours
+- Total plans completed: 37
+- Average duration: 4.8 min
+- Total execution time: 3.09 hours
 
 **By Phase:**
 
@@ -40,10 +40,11 @@ Progress: [████████░░] ~91% (7/8.5 phases, 32/34 plans compl
 | 5.1-fix-git-identity | 2 | 6.4 min | 3.2 min |
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
+| 08-documentation-and-release | 1 | 3.3 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.7 min (06-03), 9.0 min (07-01), 0.4 min (07-02), 3.8 min (07-03), 4.2 min avg
-- Trend: Phase 7 complete with consistent fast execution times
+- Last 5 plans: 9.0 min (07-01), 0.4 min (07-02), 3.8 min (07-03), 3.3 min (08-01), 4.1 min avg
+- Trend: Maintaining fast execution times through Phase 8
 
 *Updated after each plan completion*
 
@@ -175,6 +176,9 @@ Recent decisions affecting current work:
 - **[07-03]** Phase 7.1 triggered only on P0 failures (critical gaps only, not minor polish)
 - **[07-03]** Overall grade formula: 40% install + 30% generation + 30% execution (weighted metrics for balanced assessment)
 - **[07-03]** 96.6% command generation rate acceptable (84/87 commands, consistent 28/29 per platform indicates intentional design)
+- **[08-01]** WHY section before technical details (users need context before schemas)
+- **[08-01]** Separate comparison doc vs inline (different audiences: upgrading vs new users)
+- **[08-01]** Comprehensive tool reference with equivalents (multi-platform mapping is critical for spec authors)
 
 ### Pending Todos
 
@@ -201,17 +205,15 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 7 complete:
-- 100% npm installation success rate (3/3 platforms)
-- 96.6% command generation rate (84/87 commands)
-- 28/29 commands per platform (consistent pattern indicates intentional design)
-- 0 P0 failures, Phase 7.1 gap closure not needed
-- Validation report confirms multi-platform testing objectives met
+None - Phase 8 in progress:
+- Plan 08-01 complete: Core documentation (WHY section, tool reference, comparison table)
+- Plan 08-02 pending: User guides (migration + troubleshooting)
+- Plan 08-03 pending: Release artifacts (cleanup script + CHANGELOG + README)
 
-**Ready for Phase 8** - proceed to next phase.
+**Ready for Plan 08-02** - migration and troubleshooting guides.
 
 ## Session Continuity
 
-Last session: 2026-01-24T00:57:32Z
-Stopped at: Completed 07-03-PLAN.md (Installation Analysis + Reporting) - Phase 7 complete
+Last session: 2026-01-24T01:46:29Z
+Stopped at: Completed 08-01-PLAN.md (Core Documentation) - Phase 8 plan 1/3 complete
 Resume file: None
