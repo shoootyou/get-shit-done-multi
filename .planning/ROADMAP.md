@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
 - [x] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
 - [x] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
+- [ ] **Phase 8.1: Documentation Cleanup & Fixes (INSERTED)** - URGENT: Pre-release documentation refinements and cleanup
 
 ## Phase Details
 
@@ -203,6 +204,17 @@ Plans:
 - [ ] 08-01-PLAN.md — Core documentation (README expansion + comparison table) - Wave 1
 - [ ] 08-02-PLAN.md — User guides (migration + troubleshooting) - Wave 2
 - [ ] 08-03-PLAN.md — Release artifacts (cleanup script + CHANGELOG + README) - Wave 3
+
+### Phase 8.1: Documentation Cleanup & Fixes (INSERTED)
+
+**Goal:** Refine documentation structure, fix inconsistencies, and implement proper migration mechanism
+**Depends on:** Phase 8
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 8.1-01-PLAN.md — Migration mechanism & file organization (Wave 1)
+- [ ] 8.1-02-PLAN.md — Documentation content updates (Wave 1, parallel)
+- [ ] 8.1-03-PLAN.md — Link validation & script audit (Wave 2)
 
 ## Progress
 
