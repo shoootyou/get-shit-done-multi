@@ -52,5 +52,23 @@
     "cli": "claude",
     "duration": 53.83420799999999,
     "timestamp": "2026-01-22T10:29:57.827Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 31.056917,
+    "timestamp": "2026-01-23T23:44:56.536Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.378625000000056,
+    "timestamp": "2026-01-23T23:44:56.577Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 51.11479100000008,
+    "timestamp": "2026-01-23T23:44:56.628Z"
   }
 ]
