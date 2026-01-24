@@ -8,21 +8,15 @@ const { detectInstalledCLIs, getDetectedCLIsMessage } = require('./lib/detect');
 const { getConfigPaths } = require('./lib/paths');
 const { preserveUserData, restoreUserData } = require('./lib/upgrade');
 const { replaceClaudePaths } = require('./lib/adapters/shared/path-rewriter');
-const { getRecommendations } = require('../lib-ghcc/cli-recommender');
+const { getRecommendations } = require('./lib/cli-detection/recommender');
+const { cyan, green, yellow, dim, reset } = require('./lib/colors');
 const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
 const { generateAgent } = require('./lib/template-system/generator');
 const { buildContext } = require('./lib/template-system/context-builder');
 const { render } = require('./lib/template-system/engine');
-const { runMigration } = require('../scripts/migration/migration-flow');
-
-// Colors
-const cyan = '\x1b[36m';
-const green = '\x1b[32m';
-const yellow = '\x1b[33m';
-const dim = '\x1b[2m';
-const reset = '\x1b[0m';
+const { runMigration } = require('./lib/migration/migration-flow');
 
 // Get version from package.json
 const pkg = require('../package.json');
