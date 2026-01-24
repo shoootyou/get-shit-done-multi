@@ -12,9 +12,10 @@ Specs in `/specs/skills/` serve as the single source of truth for GSD commands, 
 
 ## Current Focus
 
-Between milestones. v1.9.1 shipped successfully with 11 phases completed, all requirements met, and E2E integration validated.
+Planning milestone v1.10.0: Installation CLI Optimization. Roadmap complete with 7 phases, 24 P0 requirements mapped, awaiting user approval to begin phase planning.
 
-**Next milestone:** To be planned. Consider improvements based on v1.9.1 retrospective.
+**Active milestone:** v1.10.0 - Installation CLI Optimization (3-4 week timeline)  
+**Status:** Roadmap created, ready for phase 1 planning
 
 ### Out of Scope
 
