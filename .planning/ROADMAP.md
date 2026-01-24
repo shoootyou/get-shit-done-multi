@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
 - [x] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
 - [x] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
-- [ ] **Phase 8.1: Documentation Cleanup & Fixes (INSERTED)** - URGENT: Pre-release documentation refinements and cleanup
+- [x] **Phase 8.1: Documentation Cleanup & Fixes (INSERTED)** - URGENT: Pre-release documentation refinements and cleanup
 
 ## Phase Details
 
@@ -216,7 +216,7 @@ Plans:
 - [x] 8.1-02-PLAN.md — Documentation content updates (Wave 1, parallel)
 - [x] 8.1-03-PLAN.md — Link validation (Wave 2)
 - [x] 8.1-04-PLAN.md — Script audit & asset updates (Wave 2)
-- [ ] 8.1-05-PLAN.md — Close verification gaps (Wave 3, gap closure)
+- [x] 8.1-05-PLAN.md — Close verification gaps (Wave 3, gap closure)
 
 ## Progress
 
