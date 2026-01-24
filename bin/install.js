@@ -15,6 +15,7 @@ const codexAdapter = require('./lib/adapters/codex');
 const { generateAgent } = require('./lib/template-system/generator');
 const { buildContext } = require('./lib/template-system/context-builder');
 const { render } = require('./lib/template-system/engine');
+const { runMigration } = require('../scripts/migration/migration-flow');
 
 // Colors
 const cyan = '\x1b[36m';
@@ -152,44 +153,58 @@ if (hasHelp) {
   process.exit(0);
 }
 
-// Handle --all flag first
-if (hasAll) {
-  console.log(banner);
-  installAll();
-  process.exit(0);
-}
+// Run async initialization (migration check)
+(async function() {
+  // Check for old structure and migrate if needed
+  try {
+    const migrationResult = await runMigration();
+    if (migrationResult.migrated) {
+      console.log('Migration completed. Proceeding with fresh installation...\n');
+    }
+  } catch (err) {
+    console.error(`  ${yellow}Migration failed:${reset} ${err.message}`);
+    console.error(`  ${dim}Please backup manually and try again.${reset}`);
+    process.exit(1);
+  }
 
-// Display detected CLIs and recommendations
-const detected = detectInstalledCLIs();
-const currentCLIs = Object.entries(detected)
-  .filter(([_, isInstalled]) => isInstalled)
-  .map(([cli, _]) => cli);
+  // Handle --all flag first
+  if (hasAll) {
+    console.log(banner);
+    installAll();
+    process.exit(0);
+  }
 
-// Get intelligent recommendations
-const recommendations = getRecommendations({
-  currentCLIs,
-  platform: os.platform()
-});
+  // Display detected CLIs and recommendations
+  const detected = detectInstalledCLIs();
+  const currentCLIs = Object.entries(detected)
+    .filter(([_, isInstalled]) => isInstalled)
+    .map(([cli, _]) => cli);
 
-// Display CLI status
-console.log(`  ${cyan}CLI Status:${reset}`);
-for (const cli of recommendations.installed) {
-  console.log(`  ${green}✓${reset} ${cli.message}`);
-}
-for (const cli of recommendations.available) {
-  console.log(`  ${dim}○${reset} ${cli.message}`);
-}
+  // Get intelligent recommendations
+  const recommendations = getRecommendations({
+    currentCLIs,
+    platform: os.platform()
+  });
 
-// Display recommendation
-console.log(`\n  ${cyan}Recommendation:${reset}`);
-console.log(`  ${recommendations.recommendation}`);
+  // Display CLI status
+  console.log(`  ${cyan}CLI Status:${reset}`);
+  for (const cli of recommendations.installed) {
+    console.log(`  ${green}✓${reset} ${cli.message}`);
+  }
+  for (const cli of recommendations.available) {
+    console.log(`  ${dim}○${reset} ${cli.message}`);
+  }
 
-// Display platform notes if any
-if (recommendations.platformNotes.length > 0) {
-  console.log(`\n  ${dim}Note: ${recommendations.platformNotes.join(', ')}${reset}`);
-}
+  // Display recommendation
+  console.log(`\n  ${cyan}Recommendation:${reset}`);
+  console.log(`  ${recommendations.recommendation}`);
 
-console.log(); // Empty line for spacing
+  // Display platform notes if any
+  if (recommendations.platformNotes.length > 0) {
+    console.log(`\n  ${dim}Note: ${recommendations.platformNotes.join(', ')}${reset}`);
+  }
+
+  console.log(); // Empty line for spacing
 
 /**
  * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
@@ -1547,49 +1562,54 @@ function promptLocation() {
   });
 }
 
-// Main
-if (hasGlobal && hasLocal) {
-  console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
+  // Main
+  if (hasGlobal && hasLocal) {
+    console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
+    process.exit(1);
+  } else if (hasCodex && hasCodexGlobal) {
+    console.error(`  ${yellow}Cannot specify both --codex and --codex-global${reset}`);
+    process.exit(1);
+  } else if (hasCopilot && (hasGlobal || hasLocal)) {
+    console.error(`  ${yellow}Cannot combine --copilot with --global or --local${reset}`);
+    process.exit(1);
+  } else if ((hasCodex || hasCodexGlobal) && (hasGlobal || hasLocal)) {
+    console.error(`  ${yellow}Cannot combine --codex flags with --global or --local${reset}`);
+    process.exit(1);
+  } else if ((hasCodex || hasCodexGlobal) && hasCopilot) {
+    console.error(`  ${yellow}Cannot combine --codex with --copilot${reset}`);
+    process.exit(1);
+  } else if (hasCopilot && explicitConfigDir) {
+    console.error(`  ${yellow}Cannot use --config-dir with --copilot${reset}`);
+    process.exit(1);
+  } else if ((hasCodex || hasCodexGlobal) && explicitConfigDir) {
+    console.error(`  ${yellow}Cannot use --config-dir with --codex flags${reset}`);
+    process.exit(1);
+  } else if (explicitConfigDir && hasLocal) {
+    console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
+    process.exit(1);
+  } else if (hasCopilot) {
+    installCopilot(explicitProjectDir || process.cwd());
+  } else if (hasCodex) {
+    installCodex(false);
+  } else if (hasCodexGlobal) {
+    installCodex(true);
+  } else if (hasGlobal) {
+    const { settingsPath, settings, statuslineCommand } = install(true);
+    // Non-interactive - respect flags
+    handleStatusline(settings, false, (shouldInstallStatusline) => {
+      finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
+    });
+  } else if (hasLocal) {
+    const { settingsPath, settings, statuslineCommand } = install(false);
+    // Non-interactive - respect flags
+    handleStatusline(settings, false, (shouldInstallStatusline) => {
+      finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
+    });
+  } else {
+    promptLocation();
+  }
+
+})().catch(err => {
+  console.error(`  ${yellow}Fatal error:${reset} ${err.message}`);
   process.exit(1);
-} else if (hasCodex && hasCodexGlobal) {
-  console.error(`  ${yellow}Cannot specify both --codex and --codex-global${reset}`);
-  process.exit(1);
-} else if (hasCopilot && (hasGlobal || hasLocal)) {
-  console.error(`  ${yellow}Cannot combine --copilot with --global or --local${reset}`);
-  process.exit(1);
-} else if ((hasCodex || hasCodexGlobal) && (hasGlobal || hasLocal)) {
-  console.error(`  ${yellow}Cannot combine --codex flags with --global or --local${reset}`);
-  process.exit(1);
-} else if ((hasCodex || hasCodexGlobal) && hasCopilot) {
-  console.error(`  ${yellow}Cannot combine --codex with --copilot${reset}`);
-  process.exit(1);
-} else if (hasCopilot && explicitConfigDir) {
-  console.error(`  ${yellow}Cannot use --config-dir with --copilot${reset}`);
-  process.exit(1);
-} else if ((hasCodex || hasCodexGlobal) && explicitConfigDir) {
-  console.error(`  ${yellow}Cannot use --config-dir with --codex flags${reset}`);
-  process.exit(1);
-} else if (explicitConfigDir && hasLocal) {
-  console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
-  process.exit(1);
-} else if (hasCopilot) {
-  installCopilot(explicitProjectDir || process.cwd());
-} else if (hasCodex) {
-  installCodex(false);
-} else if (hasCodexGlobal) {
-  installCodex(true);
-} else if (hasGlobal) {
-  const { settingsPath, settings, statuslineCommand } = install(true);
-  // Non-interactive - respect flags
-  handleStatusline(settings, false, (shouldInstallStatusline) => {
-    finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
-  });
-} else if (hasLocal) {
-  const { settingsPath, settings, statuslineCommand } = install(false);
-  // Non-interactive - respect flags
-  handleStatusline(settings, false, (shouldInstallStatusline) => {
-    finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
-  });
-} else {
-  promptLocation();
-}
+});
