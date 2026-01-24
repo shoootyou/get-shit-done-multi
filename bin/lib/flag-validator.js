@@ -1,10 +1,14 @@
 /**
- * Flag Validator - Post-parse validation for flag combinations
+ * Flag Validator - Post-parse validation
  * 
- * Validates parsed flag configuration for conflicts and invalid combinations.
- * Primarily checks for conflicting scope flags (--local and --global together).
+ * Validates parsed flag combinations and exits on errors.
  * 
- * Part of v1.10.0 flag system redesign - Phase 2, Task 3
+ * Edge cases handled:
+ * - Conflicting scopes (--local --global): ERROR, exit 2
+ * - Duplicate platforms: Handled by parser (warn + dedupe)
+ * - --all with specific platforms: Handled by parser (info + ignore specific)
+ * - --all --global: ALLOWED - Claude/Copilot global, Codex local (see codex-warning.js)
+ * - Scope without platform: ALLOWED - triggers menu (needsMenu: true)
  */
 
 const { red, reset } = require('./colors');
