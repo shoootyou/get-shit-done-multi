@@ -20,6 +20,7 @@ const { runMigration } = require('./lib/migration/migration-flow');
 const detectAndFilterOldFlags = require('./lib/old-flag-detector');
 const parseFlags = require('./lib/flag-parser');
 const validateFlags = require('./lib/flag-validator');
+const warnAndConfirmCodexLocal = require('./lib/codex-warning');
 
 // Get version from package.json
 const pkg = require('../package.json');
@@ -154,40 +155,57 @@ if (hasHelp) {
 // THREE-STAGE FLAG PARSING (v1.10.0)
 // ============================================================================
 
-// Stage 1: Pre-parse old flag detection
-const cleanedArgv = detectAndFilterOldFlags(process.argv);
+// Wrap in async function for Stage 4 (Codex warning with async prompt)
+(async function main() {
+  // Stage 1: Pre-parse old flag detection
+  const cleanedArgv = detectAndFilterOldFlags(process.argv);
 
-// Stage 2: Parse flags with Commander.js
-let flagConfig;
-try {
-  flagConfig = parseFlags(cleanedArgv);
-} catch (err) {
-  console.error(`  ${yellow}${err.message}${reset}`);
-  process.exit(2);
-}
+  // Stage 2: Parse flags with Commander.js
+  let flagConfig;
+  try {
+    flagConfig = parseFlags(cleanedArgv);
+  } catch (err) {
+    console.error(`  ${yellow}${err.message}${reset}`);
+    process.exit(2);
+  }
 
-// Stage 3: Validate flag combinations
-validateFlags(process.argv, flagConfig);
+  // Stage 3: Validate flag combinations
+  validateFlags(process.argv, flagConfig);
 
-// Extract parsed configuration
-let { platforms, scope, needsMenu } = flagConfig;
+  // Extract parsed configuration
+  let { platforms, scope, needsMenu } = flagConfig;
 
-// Handle interactive menu mode (Phase 3 integration point)
-if (needsMenu) {
-  console.log(`  ${cyan}ℹ️  Interactive menu will be implemented in Phase 3${reset}`);
-  console.log(`  ${dim}For now, defaulting to: install all platforms locally${reset}\n`);
-  platforms = ['claude', 'copilot', 'codex'];
-  scope = 'local';
-}
+  // Handle interactive menu mode (Phase 3 integration point)
+  if (needsMenu) {
+    console.log(`  ${cyan}ℹ️  Interactive menu will be implemented in Phase 3${reset}`);
+    console.log(`  ${dim}For now, defaulting to: install all platforms locally${reset}\n`);
+    platforms = ['claude', 'copilot', 'codex'];
+    scope = 'local';
+  }
 
-// Display parsed configuration (temporary - will be replaced in Phase 4)
-console.log(`  ${cyan}Flag parsing complete:${reset}`);
-console.log(`    Platforms: ${platforms.join(', ')}`);
-console.log(`    Scope: ${scope}`);
-console.log('');
-console.log(`  ${dim}Installation logic will be updated in Phase 4${reset}`);
-console.log(`  ${dim}For now, exiting after successful flag parsing${reset}`);
-process.exit(0);
+  // Stage 4: Codex global warning (if applicable)
+  const shouldProceed = await warnAndConfirmCodexLocal(platforms, scope);
+  if (!shouldProceed) {
+    console.log('Installation cancelled by user');
+    process.exit(0);
+  }
+
+  // Effective scope helper (Codex always local)
+  const effectiveScope = (platform) => {
+    return platform === 'codex' ? 'local' : scope;
+  };
+
+  // Display parsed configuration (temporary - will be replaced in Phase 4)
+  console.log(`  ${cyan}Flag parsing complete:${reset}`);
+  platforms.forEach(platform => {
+    const finalScope = effectiveScope(platform);
+    console.log(`    ${platform} → ${finalScope}`);
+  });
+  console.log('');
+  console.log(`  ${dim}Installation logic will be updated in Phase 4${reset}`);
+  console.log(`  ${dim}For now, exiting after successful flag parsing${reset}`);
+  process.exit(0);
+})();
 
 // ============================================================================
 // OLD INSTALLATION LOGIC (will be updated in Phase 4)
