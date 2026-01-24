@@ -9,23 +9,24 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 8 of 8.5 (Documentation and Release)
-Plan: 3 of 3 - **Complete ✅**
-Status: Phase 8 complete - All milestone phases complete
-Last activity: 2026-01-24 — Completed Phase 8 (Documentation & Release)
+Phase: 8.1 of 8.5 (Documentation Cleanup & Fixes)
+Plan: 2 of 3 - **In Progress**
+Status: Phase 8.1 in progress - Documentation content updates complete
+Last activity: 2026-01-24 — Completed 8.1-02-PLAN.md (Documentation Content Updates)
 
-**Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
-- Migrated 60+ files from legacy /gsd: to new /gsd- format
-- Eliminated experimental command-system (1,160 lines)
-- Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
+**Phase 8.1 Context:** Ad-hoc maintenance phase for pre-release documentation refinements
+- Remove migration references from user docs
+- Fix file naming conventions
+- Restructure CHANGELOG for user vs contributor audiences
+- Audit and cleanup non-essential scripts
 
-Progress: [██████████] 100% (8/8.5 phases, 37/37 plans complete)
+Progress: [██████████] 98% (8/8.5 phases, 39/40 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 39
-- Average duration: 4.5 min
+- Total plans completed: 40
+- Average duration: 4.4 min
 - Total execution time: 3.0 hours
 
 **By Phase:**
@@ -41,10 +42,11 @@ Progress: [██████████] 100% (8/8.5 phases, 37/37 plans compl
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
 | 08-documentation-and-release | 3 | 10.3 min | 3.4 min |
+| 8.1-documentation-cleanup-and-fixes | 2 | 9.1 min | 4.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.8 min (07-03), 3.3 min (08-01), 6.0 min (08-02), 1.0 min (08-03), 3.6 min avg
-- Trend: Fast execution maintained through Phase 8 completion
+- Last 5 plans: 6.0 min (08-02), 1.0 min (08-03), 6.1 min (8.1-01), 3.2 min (8.1-02), 4.1 min avg
+- Trend: Fast execution maintained through Phase 8.1
 
 *Updated after each plan completion*
 
@@ -188,6 +190,11 @@ Recent decisions affecting current work:
 - **[08-03]** Idempotent cleanup script (safe to run multiple times)
 - **[08-03]** Keep a Changelog format for v1.9.1 entry (standard format with BREAKING markers)
 - **[08-03]** What's New in v1.9.1 replaces v1.9 section in README (users care about latest changes)
+- **[8.1-02]** README DOCUMENTATION section is index-style (links to detailed docs, comprehensive content in docs/)
+- **[8.1-02]** CHANGELOG two-section format per version (User Changes + GSD Internal Logic for user/contributor audiences)
+- **[8.1-02]** BREAKING changes appear only in User Changes section (no duplication across sections)
+- **[8.1-02]** Setup docs show directory tree structure with file count expectations (visual verification)
+- **[8.1-02]** Troubleshooting.md uses static /gsd- format (no template syntax, it's user-facing not generated)
 
 ### Pending Todos
 
@@ -197,6 +204,8 @@ None yet.
 
 - Phase 5.1 inserted after Phase 5: Fix git identity preservation in agents (URGENT)
   Reason: Agents are overriding user git identity when committing. Must fix specs, revert incorrect generated agent changes, add git config to project setup workflow, and update all affected agents.
+- Phase 8.1 inserted after Phase 8: Documentation Cleanup & Fixes (URGENT)
+  Reason: Pre-release documentation refinements - remove migration references from user docs, fix file naming conventions, implement proper migration mechanism in install.js, restructure CHANGELOG for user vs contributor audiences, and audit/cleanup non-essential scripts.
 
 ### Ad-Hoc Maintenance Work
 
@@ -214,15 +223,15 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 8 complete:
-- Plan 08-01 complete: Core documentation (WHY section, tool reference, comparison table)
-- Plan 08-02 complete: User guides (8-step migration tutorial, platform-specific troubleshooting)
-- Plan 08-03 complete: Release artifacts (cleanup script, CHANGELOG v1.9.1, README updates)
+None - Phase 8.1 in progress (2/3 plans complete):
+- Plan 8.1-01 complete: Migration mechanism and file naming conventions
+- Plan 8.1-02 complete: Documentation content updates (README simplification, CHANGELOG restructure, setup guides)
+- Plan 8.1-03 next: Link validation and script audit
 
-**v1.9.1 is ready for release** - all documentation and release artifacts complete.
+**Phase 8.1 focus:** Pre-release documentation polish and cleanup for v1.9.1.
 
 ## Session Continuity
 
-Last session: 2026-01-24T02:00:59Z
-Stopped at: Completed 08-03-PLAN.md (Release Artifacts) - Phase 8 complete (3/3 plans)
+Last session: 2026-01-24T11:29:12Z
+Stopped at: Completed 8.1-02-PLAN.md (Documentation Content Updates) - Phase 8.1 (2/3 plans)
 Resume file: None
