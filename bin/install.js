@@ -211,8 +211,13 @@ if (hasHelp) {
 // OLD INSTALLATION LOGIC (will be updated in Phase 4)
 // ============================================================================
 
+// Note: Function definition kept but not invoked to prevent race condition
+// The new three-stage system (above) handles everything and exits
+// This old code will be refactored in Phase 4
+
 // Run async initialization (migration check)
-(async function() {
+// DISABLED: (async function() {
+async function oldInstallationLogic() {
   // Check for old structure and migrate if needed
   try {
     const migrationResult = await runMigration();
@@ -1670,7 +1675,8 @@ function promptLocation() {
     promptLocation();
   }
 
-})().catch(err => {
-  console.error(`  ${yellow}Fatal error:${reset} ${err.message}`);
-  process.exit(1);
-});
+}
+// DISABLED: })().catch(err => {
+//   console.error(`  ${yellow}Fatal error:${reset} ${err.message}`);
+//   process.exit(1);
+// });
