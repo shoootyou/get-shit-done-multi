@@ -10,6 +10,32 @@ This directory contains skill specifications for the GSD (Get Shit Done) command
 
 **Relationship to legacy:** Legacy commands live in `/commands/gsd/*.md` with `gsd:` prefix. New specs use `gsd-` prefix and live in `/specs/skills/{skill-name}/SKILL.md`. During transition, both systems coexist. The spec system will eventually replace legacy commands.
 
+## Why Spec-Based Skills?
+
+**Problem solved:**
+
+Before v1.9.1, GSD maintained 29 command files per platform manually:
+- `commands/gsd/*.md` for legacy format
+- `.claude/commands/*.md` for Claude Code
+- `.github/copilot/commands/*.md` for GitHub Copilot CLI
+- `.codex/skills/*.md` for Codex CLI
+
+**Changes = 4× work:** Any update required editing 4 files manually.
+
+**Platform drift:** Subtle differences crept in between platforms over time.
+
+**Benefits of spec system:**
+
+1. **Single source of truth** - One spec generates all platforms
+2. **Zero drift** - Generated files guaranteed identical behavior
+3. **Automatic adaptation** - Tools map to platform capabilities
+4. **Proven foundation** - Reuses template system from agents (208 passing tests)
+5. **Easy maintenance** - Update spec once, regenerate all platforms
+
+**Migration impact:**
+
+v1.9.1 removes legacy system completely. Use spec-based skills exclusively.
+
 ## Directory Structure
 
 Skills follow a **folder-per-skill** structure that matches the Claude standard:
@@ -234,6 +260,46 @@ tools:
   {{/isClaude}}
 ```
 
+### Syntax Examples
+
+**Simple conditional:**
+```yaml
+tools:
+  {{#isClaude}}
+  - Read
+  - Bash
+  {{/isClaude}}
+  {{#isCopilot}}
+  - file_read
+  - shell_execute
+  {{/isCopilot}}
+  {{#isCodex}}
+  - fs_read
+  - terminal_run
+  {{/isCodex}}
+```
+
+**Conditional with shared content:**
+```yaml
+description: "Create execution plan for phase"
+{{#isClaude}}
+argument-hint: "<phase-number>"
+{{/isClaude}}
+{{#isCopilot}}
+argument-hint: "[phase number]"
+{{/isCopilot}}
+{{#isCodex}}
+argument-hint: "<phase-number>"
+{{/isCodex}}
+```
+
+### Rules
+
+1. **Conditionals ONLY in frontmatter**, NEVER in body
+2. **Body must be platform-agnostic** markdown
+3. **Always provide all 3 platforms** (Claude, Copilot, Codex)
+4. **Conditionals cannot be nested**
+
 ## Tool Declarations
 
 Tool names vary by platform. Use conditionals to map correctly.
@@ -288,6 +354,50 @@ Quick reference for cross-platform tool declarations:
 # User interaction
 {{#isClaude}}AskUserQuestion{{/isClaude}}{{#isCopilot}}prompt_user{{/isCopilot}}{{#isCodex}}user_prompt{{/isCodex}}
 ```
+
+## Tool Reference by Platform
+
+Skills declare required tools in frontmatter. Tools differ by platform.
+
+### Claude Code Tools
+
+| Tool | Purpose | Common Use |
+|------|---------|------------|
+| `Read` | View files and directories | Reading context files, checking structure |
+| `Bash` | Execute shell commands | Running tests, git operations, file operations |
+| `Write` | Create/edit files | Creating plans, updating state, writing code |
+| `Task` | Spawn subagents | Orchestrators spawning specialized agents |
+| `Edit` | Batch file edits | Multiple changes to same file |
+
+### GitHub Copilot CLI Tools
+
+| Tool | Purpose | Equivalent |
+|------|---------|------------|
+| `file_read` | Read file contents | Claude: Read |
+| `file_write` | Create/modify files | Claude: Write |
+| `shell_execute` | Run shell commands | Claude: Bash |
+| `directory_list` | List directory contents | Claude: Read |
+| `search_code` | Search codebase | Claude: grep via Bash |
+
+### Codex CLI Tools
+
+| Tool | Purpose | Equivalent |
+|------|---------|------------|
+| `fs_read` | Read file contents | Claude: Read |
+| `fs_write` | Write file contents | Claude: Write |
+| `terminal_run` | Execute commands | Claude: Bash |
+| `fs_list` | List directories | Claude: Read |
+| `search_grep` | Search files | Claude: grep via Bash |
+
+### Tool Mapping
+
+Template system automatically maps tools during generation:
+- `Read` → `file_read` (Copilot) → `fs_read` (Codex)
+- `Bash` → `shell_execute` (Copilot) → `terminal_run` (Codex)
+- `Write` → `file_write` (Copilot) → `fs_write` (Codex)
+- `Task` → `spawn_agent` (Copilot) → `agent_spawn` (Codex)
+
+**Do NOT manually map tools in specs.** Use conditionals to declare platform-native names.
 
 ## Metadata Template
 
