@@ -4,6 +4,71 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.9.1] - 2026-01-24
+
+### User Changes
+
+**BREAKING:**
+- Old command structure replaced with skill-based structure
+  - Was: `~/.claude/commands/gsd/`, `.github/copilot/commands/`, `.codex/commands/gsd/`
+  - Now: `.claude/skills/gsd-*/`, `.github/skills/gsd-*/`, `.codex/skills/gsd-*/`
+- Command prefix changed: `/gsd:command` → `/gsd-command` (hyphen instead of colon)
+- Run `npx get-shit-done-multi` (or `--copilot`, `--codex`) to upgrade with automatic migration
+
+**New Skills:**
+
+Each command now has dedicated skill folder:
+- `gsd-new-project` - Initialize new project with roadmap
+- `gsd-execute-phase` - Execute phase plans with wave-based parallelization
+- `gsd-plan-phase` - Create executable phase plans
+- `gsd-verify-work` - Verify phase completion with UAT
+- `gsd-help` - Command help and reference
+- ...and 24 more skills (29 total)
+
+**Documentation:**
+- Added [Migration Guide](docs/migration-guide.md) - Create new skill specs
+- Added [Troubleshooting Guide](docs/troubleshooting.md) - Platform-specific issues
+- Added [Command Comparison](docs/command-comparison.md) - Legacy vs new format
+- Updated setup guides with directory structure examples
+
+**Installation:**
+- Progress bar shows installation status
+- Cross-platform support (macOS, Windows, Linux)
+- Idempotent - safe to re-run
+
+### GSD Internal Logic
+
+**Template System:**
+- Skill generation reuses proven agent template system (208 passing tests)
+- Frontmatter inheritance via `_shared.yml` eliminates duplication
+- Platform conditionals: `{{#isClaude}}`, `{{#isCopilot}}`, `{{#isCodex}}`
+- Metadata auto-generation (timestamps, versions)
+- Tool declaration mapping (Read → file_read → fs.read automatically)
+
+**Orchestration:**
+- Structured return parsing (RESEARCH COMPLETE, EXECUTION COMPLETE formats)
+- Parallel subagent spawning preserved through spec → generated output
+- @-reference resolution with variable interpolation
+- Checkpoint continuation pattern validated
+
+**Documentation:**
+- Files in `docs/` use lowercase naming for consistency
+- Scripts organized into functional subfolders (migration/, documentation/, audit/, validation/, shared/)
+- Comprehensive tool reference with platform equivalents
+- WHY section before technical details in skill spec docs
+
+**Dependencies:**
+- Added: fs-extra@11.3.3, prompts@2.4.2, cli-progress@3.12.0, chalk@5.6.2
+
+**Testing:**
+- Phase 6: Orchestration validation (structured returns, parallel spawning)
+- Phase 7: Multi-platform testing (Claude, Copilot, Codex)
+- 96.6% command generation rate (84/87 commands across 3 platforms)
+- 100% npm installation success
+- 0 P0 failures, production-ready
+
+---
+
 ## [1.9.0] - 2026-01-22
 
 ### For Users
