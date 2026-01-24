@@ -165,7 +165,7 @@ This version extends the original brilliant work to support three AI platforms w
 ## Documentation
 
 **Getting Started:**
-- [Setup Guide](docs/setup-claude-cli.md) — Install for Claude Code, Copilot CLI, or Codex CLI
+- [Setup Guide](docs/setup-claude-code.md) — Install for Claude Code, Copilot CLI, or Codex CLI
 - [Troubleshooting](docs/troubleshooting.md) — Common issues and solutions
 
 **User Guides:**

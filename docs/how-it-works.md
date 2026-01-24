@@ -455,7 +455,6 @@ Review later with `/gsd-check-todos` when planning new phases.
 
 ## Next Steps
 
-- **See it in action:** [Workflow Examples](workflow-examples.md)
 - **Understand why it works:** [Architecture](architecture.md)
 - **Troubleshoot issues:** [Troubleshooting](troubleshooting.md)
 - **All commands:** [Command Reference](commands/README.md)

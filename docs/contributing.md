@@ -677,9 +677,8 @@ Before requesting review:
 ### Documentation Resources
 
 - [architecture.md](architecture.md) - Technical design and implementation
-- [testing-cross-platform.md](docs/testing-cross-platform.md) - Test suite details
-- [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) - Size optimization pattern
-- [README.md](README.md) - Project overview and quick start
+- [testing-cross-platform.md](testing-cross-platform.md) - Test suite details
+- [README.md](../README.md) - Project overview and quick start
 
 ### Debug Mode
 
@@ -705,7 +704,7 @@ tools: [execute, read]
 
 **Q: Agent exceeds 30K limit for Copilot?**
 
-A: See [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) for coordinator/specialist splitting pattern.
+A: Consider coordinator/specialist splitting pattern (see architecture documentation for details).
 
 **Q: Generation tests fail with YAML syntax error?**
 

@@ -358,7 +358,7 @@ Ver [docs/cli-comparison.md](../cli-comparison.md) para detalles de compatibilid
 
 ## Próximos Pasos
 
-- Lee la [Guía de Instalación](../setup-guide.md) para configuración específica de tu CLI
+- Lee la Guía de Instalación para tu CLI: [Claude Code](../setup-claude-code.md), [Copilot](../setup-copilot-cli.md), [Codex](../setup-codex-cli.md)
 - Revisa [Comparación de CLIs](../cli-comparison.md) para entender las diferencias
 - Consulta [Troubleshooting](../troubleshooting.md) si tienes problemas
 

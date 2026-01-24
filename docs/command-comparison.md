@@ -184,7 +184,7 @@ Benefits:
 
 **From legacy to new:**
 
-1. **Uninstall legacy** - Run cleanup script or manual removal (see [cleanup guide](./LEGACY-CLEANUP.md))
+1. **Uninstall legacy** - Run cleanup script or manual removal (legacy files will be backed up automatically during upgrade)
 2. **Reinstall v1.9.1+** - Run `npx get-shit-done-multi` with appropriate flags
 3. **Update invocations** - Replace `/gsd:` with `/gsd-` in all usage
 4. **Verify installation** - Run `/gsd-verify-installation`
@@ -202,5 +202,4 @@ Benefits:
 
 **See also:**
 - [Migration Guide](./migration-guide.md) - How to create new skills
-- [Legacy Cleanup](./LEGACY-CLEANUP.md) - How to remove old system
 - [Skills README](../specs/skills/README.md) - Spec schema documentation

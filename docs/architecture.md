@@ -525,7 +525,6 @@ project-root/
 ├── scripts/
 │   └── test-cross-platform.js      # E2E test orchestrator
 └── docs/
-    ├── AGENT-SPLIT-PATTERN.md      # Size optimization pattern
     └── testing-cross-platform.md   # Test suite documentation
 ```
 
@@ -591,7 +590,7 @@ Some agents exceed Copilot's 30,000 character limit:
 
 **Agent Splitting Pattern:**
 
-See [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) for details on coordinator/specialist decomposition.
+For details on coordinator/specialist decomposition, see the architecture documentation.
 
 **Key Points:**
 - Coordinator uses original name (backward compatible)
@@ -706,7 +705,7 @@ const sizeResult = validateForPlatform(largeSpec, 'copilot');
 
 ## Testing Architecture
 
-Comprehensive test suite validates the complete pipeline. See [testing-cross-platform.md](docs/testing-cross-platform.md) for details.
+Comprehensive test suite validates the complete pipeline. See [testing-cross-platform.md](testing-cross-platform.md) for details.
 
 **Test Stages:**
 
@@ -740,10 +739,9 @@ npm run test:invocation     # Invocation only (requires CLIs)
 
 ## Related Documentation
 
-- [testing-cross-platform.md](docs/testing-cross-platform.md) - Test suite guide
-- [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) - Size optimization pattern
+- [testing-cross-platform.md](testing-cross-platform.md) - Test suite guide
 - [contributing.md](contributing.md) - How to add agents and run tests
-- [README.md](README.md) - Project overview and quick start
+- [README.md](../README.md) - Project overview and quick start
 
 ---
 
