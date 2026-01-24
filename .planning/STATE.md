@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 1 of 8 (Dependency Setup)
-Plan: 01-01 of 01 in Phase 1
-Status: Phase 1 complete - dependencies installed and verified
-Last activity: 2026-01-24 — Completed 01-01-PLAN.md (Install and Verify CLI Libraries)
+Phase: 2 of 8 (Flag System Redesign)
+Plan: 01 of 02 in Phase 2
+Status: In progress - core flag parsing complete
+Last activity: 2026-01-24 — Completed 02-01-PLAN.md (Core Flag Parsing Infrastructure)
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
@@ -25,7 +25,7 @@ Last activity: 2026-01-24 — Completed 01-01-PLAN.md (Install and Verify CLI Li
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [█░░░░░░░░░] 12.5% (1/8 phases complete)
+Progress: [█░░░░░░░░░] 12.5% (1.5/8 phases - Phase 2 in progress)
 
 ## Performance Metrics
 
@@ -74,10 +74,15 @@ Recent decisions for v1.10.0:
 - **[01-01]** Use exact version 14.0.2 for Commander.js (not caret range) for strictest version control
 - **[01-01]** Commander.js promoted from transitive to direct dependency for stability
 - **[01-01]** Functional verification (instantiation + basic operations) for dependency validation
+- **[02-01]** Context-aware old flag detection (--local/--global checked based on platform flag presence)
+- **[02-01]** Same flag names for old and new system with different semantics based on context
+- **[02-01]** Lenient deduplication (warn) vs strict conflicts (error) for better UX
+- **[02-01]** needsMenu flag pattern for loose coupling between parser and menu system
 
 ### Pending Todos
 
-None - Phase 1 complete, ready for Phase 2 planning and execution.
+- Plan 02-02: Codex warnings and edge case handling
+- Phase 2 completion: Flag system redesign
 
 ### Roadmap Evolution
 
@@ -101,17 +106,17 @@ None - Phase 1 complete, ready for Phase 2 planning and execution.
 
 ### Blockers/Concerns
 
-None currently. Phase 1 complete. Ready for Phase 2 (Flag System Redesign).
+None currently. Phase 2 in progress. Ready for Plan 02-02 (Codex warnings and edge cases).
 
 ## Session Continuity
 
-Last session: 2026-01-24 21:01:27Z
-Stopped at: Completed Phase 1 (Dependency Setup) - 01-01-PLAN.md executed successfully
+Last session: 2026-01-24 21:58:50Z
+Stopped at: Completed Phase 2, Plan 1 - 02-01-PLAN.md (Core Flag Parsing Infrastructure)
 Resume file: None
 
 **Next steps:**
-1. Phase 2 planning: Create detailed plan for Flag System Redesign
-2. Execute Phase 2 plans (FLAG-01 through FLAG-06)
+1. Plan 02-02: Codex warnings and edge case handling
+2. Complete Phase 2 (Flag System Redesign)
 3. Continue through remaining phases
 
 ---
