@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1769297152640" clover="3.2.0">
+  <project timestamp="1769297152640" name="All files">
+    <metrics statements="14" coveredstatements="13" conditionals="13" coveredconditionals="11" methods="4" coveredmethods="3" elements="31" coveredelements="27" complexity="0" loc="14" ncloc="14" packages="1" files="1" classes="1"/>
+    <file name="interactive-menu.js" path="/workspace/bin/lib/menu/interactive-menu.js">
+      <metrics statements="14" coveredstatements="13" conditionals="13" coveredconditionals="11" methods="4" coveredmethods="3"/>
+      <line num="8" count="1" type="stmt"/>
+      <line num="19" count="24" type="cond" truecount="2" falsecount="0"/>
+      <line num="20" count="4" type="stmt"/>
+      <line num="23" count="20" type="stmt"/>
+      <line num="35" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="40" count="19" type="cond" truecount="2" falsecount="0"/>
+      <line num="51" count="20" type="stmt"/>
+      <line num="53" count="1" type="stmt"/>
+      <line num="54" count="1" type="stmt"/>
+      <line num="59" count="20" type="stmt"/>
+      <line num="60" count="20" type="cond" truecount="4" falsecount="0"/>
+      <line num="61" count="2" type="stmt"/>
+      <line num="65" count="20" type="stmt"/>
+      <line num="72" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>

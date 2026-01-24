@@ -20,24 +20,33 @@ async function showInteractiveMenu(scopeFromFlags = null) {
     throw new Error('Interactive menu requires TTY. Use explicit flags for non-interactive environments.');
   }
 
-  const questions = [
-    {
-      type: 'multiselect',
-      name: 'platforms',
-      message: 'Select platforms to install (Space to toggle, Enter to confirm):',
-      choices: [
-        { title: 'Claude', value: 'claude' },
-        { title: 'Copilot', value: 'copilot' },
-        { title: 'Codex', value: 'codex' },
-        { title: 'All', value: 'all' }
-      ],
-      instructions: false,
-      validate: value => value.length === 0 
-        ? 'At least one platform must be selected' 
-        : true
-    },
-    {
-      type: () => scopeFromFlags ? null : 'select',  // Skip if scope preset from flags
+  const questions = [];
+  
+  // Platform selection (always shown when menu is needed)
+  questions.push({
+    type: 'multiselect',
+    name: 'platforms',
+    message: 'Select platforms to install (Space to toggle, Enter to confirm):',
+    choices: [
+      { title: 'Claude', value: 'claude' },
+      { title: 'Copilot', value: 'copilot' },
+      { title: 'Codex', value: 'codex' },
+      { title: 'All', value: 'all' }
+    ],
+    instructions: false,
+    min: 1,  // Require at least one selection
+    validate: value => {
+      if (!value || value.length === 0) {
+        return 'At least one platform must be selected';
+      }
+      return true;
+    }
+  });
+  
+  // Scope selection (only if not provided via flags)
+  if (!scopeFromFlags) {
+    questions.push({
+      type: 'select',
       name: 'scope',
       message: 'Select installation scope:',
       choices: [
@@ -45,8 +54,8 @@ async function showInteractiveMenu(scopeFromFlags = null) {
         { title: 'Global', value: 'global' }
       ],
       initial: 0  // Default to Local
-    }
-  ];
+    });
+  }
 
   const response = await prompts(questions, {
     onCancel: () => {
