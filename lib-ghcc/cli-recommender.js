@@ -83,12 +83,13 @@ function getRecommendations(options = {}) {
     recommendation += '. Consider adding Claude Code for fast personal development';
   }
   
-  // Platform-specific notes
+  // Platform-specific notes (only show if relevant to installed CLIs)
   const platformNotes = [];
   
   if (platform === 'win32') {
     platformNotes.push('Windows: Paths differ on Windows - installer handles this automatically');
-  } else if (platform === 'darwin') {
+  } else if (platform === 'darwin' && currentCLIs.includes('claude')) {
+    // Only show Claude path note if Claude is actually installed
     platformNotes.push('macOS: Using ~/Library/Application Support/Claude for Claude Code');
   } else if (platform === 'linux') {
     platformNotes.push('Linux: XDG Base Directory support for config paths');
