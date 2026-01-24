@@ -3,13 +3,16 @@ const path = require('path');
 
 /**
  * Detect old GSD structure across all supported CLIs
- * Old: .github/skills/get-shit-done/commands (nested structure)
- * New: .github/skills/gsd-* (multiple skill folders in skills/)
+ * Old structures:
+ *   - Copilot: .github/skills/get-shit-done/commands (nested)
+ *   - Claude: .claude/commands (old format before skills/)
+ *   - Codex: .codex/skills/get-shit-done/commands (nested)
+ * New: .github/skills/gsd-*, .claude/get-shit-done/gsd-*, .codex/skills/gsd-*
  */
 async function detectOldStructure(platform) {
   const patterns = {
     copilot: '.github/skills/get-shit-done/commands',
-    claude: '.claude/get-shit-done/commands',
+    claude: '.claude/commands', // Old Claude format (no get-shit-done parent)
     codex: '.codex/skills/get-shit-done/commands'
   };
   

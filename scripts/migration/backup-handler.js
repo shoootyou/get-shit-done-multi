@@ -3,24 +3,27 @@ const path = require('path');
 
 /**
  * Create backup in .old-gsd-system/YYYY-MM-DD/ structure
+ * Preserves CLI directory structure: .old-gsd-system/YYYY-MM-DD/.claude (or .github, .codex)
  * Per RESEARCH.md decision: Use folder per date to preserve history
  */
 async function createBackup(sourcePath, options = {}) {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const backupBase = path.join(process.cwd(), '.old-gsd-system');
-  const backupPath = path.join(backupBase, today);
+  const backupBase = path.join(process.cwd(), '.old-gsd-system', today);
   
-  // Check if today's backup already exists
+  // Extract CLI root directory (.claude, .github, .codex) from sourcePath
+  const cliRoot = sourcePath.split(path.sep)[0]; // e.g., ".claude" from ".claude/commands"
+  const backupPath = path.join(backupBase, cliRoot);
+  
+  // If backup exists, remove it (automatic overwrite for same-day re-runs)
   const exists = await fs.pathExists(backupPath);
-  if (exists && !options.overwrite) {
-    throw new Error(`Backup already exists for ${today}. Use --overwrite to replace.`);
+  if (exists) {
+    await fs.remove(backupPath);
   }
   
-  // Create backup with atomic copy
+  // Create backup with atomic copy (preserves full structure)
   await fs.copy(sourcePath, backupPath, {
     preserveTimestamps: true,
-    errorOnExist: !options.overwrite,
-    overwrite: options.overwrite
+    overwrite: true
   });
   
   // Verify backup
