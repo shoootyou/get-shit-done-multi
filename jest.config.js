@@ -2,15 +2,15 @@ module.exports = {
   // Test environment
   testEnvironment: 'node',
   
-  // Test match patterns (only __tests__ directory, not bin/lib/*.test.js)
+  // Test match patterns (include __tests__ and bin/lib unit tests)
   testMatch: [
-    '**/__tests__/**/*.test.js'
+    '**/__tests__/**/*.test.js',
+    '**/bin/lib/**/*.test.js'
   ],
   
-  // Ignore native assert tests in bin/lib/
+  // Ignore node_modules only
   testPathIgnorePatterns: [
-    '/node_modules/',
-    '/bin/lib/.*\\.test\\.js$'
+    '/node_modules/'
   ],
   
   // Coverage configuration
