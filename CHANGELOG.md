@@ -4,6 +4,137 @@ All notable changes to GSD will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.9.1] - 2026-01-24
+
+### For Users
+
+- **Spec-based skill system** - All 28 GSD commands now generated from unified specs in `/specs/skills/`
+- **⚠️ BREAKING: Command prefix change** - Use `/gsd-` instead of `/gsd:` (e.g., `/gsd-help` not `/gsd:help`)
+- **⚠️ BREAKING: Legacy system removed** - Pre-v1.9.1 command directories must be cleaned up ([cleanup guide](docs/COMMAND-COMPARISON.md#migration-path))
+- **Manual migration required** - Run `bash scripts/cleanup-legacy-commands.sh` to remove old command files
+- **New documentation** - Comprehensive migration guide, troubleshooting, and comparison table
+
+### Added
+
+- Spec-based skill system with template generation (28 skills from `/specs/skills/`)
+- Folder-per-skill structure (`gsd-help/SKILL.md`) enabling future expansion
+- Platform conditionals in specs (`{{#isClaude}}`, `{{#isCopilot}}`, `{{#isCodex}}`)
+- Frontmatter schema with validation (name, description, tools, metadata fields)
+- Automatic metadata generation (platform, timestamp, version tracking)
+- Tool declaration mapping (Read → file_read → fs.read automatically)
+- Documentation: [Migration Guide](docs/MIGRATION-GUIDE.md) with step-by-step tutorial
+- Documentation: [Command Comparison](docs/COMMAND-COMPARISON.md) showing old vs new format
+- Documentation: [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for installation issues
+- Documentation: Expanded [Skills README](specs/skills/README.md) with conditional syntax examples
+- Cleanup script: `scripts/cleanup-legacy-commands.sh` for safe legacy removal
+- Shared frontmatter inheritance via `_shared.yml` (eliminates duplication)
+
+### Changed
+
+- Command invocation: `/gsd:command` → `/gsd-command` (hyphen replaces colon)
+- File structure: Single files → Folder-per-skill with `SKILL.md`
+- Frontmatter: Optional → Required YAML with schema validation
+- Tool declarations: Implicit → Explicit platform-specific arrays
+- Generation: Hand-written → Template-based from specs
+- Installation directories:
+  - Claude Code: `~/.claude/get-shit-done/.github/skills/` (was `~/.claude/commands/gsd/`)
+  - Copilot CLI: `.github/skills/get-shit-done/` (was `.github/copilot/commands/`)
+  - Codex CLI: `.codex/skills/get-shit-done/` (was `.codex/commands/gsd/`)
+
+### Removed
+
+- **BREAKING:** Legacy `/gsd:` command prefix — use `/gsd-` instead ([migration guide](docs/MIGRATION-GUIDE.md))
+- **BREAKING:** Legacy command directories — use spec-based skills ([comparison table](docs/COMMAND-COMPARISON.md))
+  - Removed: `commands/gsd/*.md` (source files)
+  - Removed: `~/.claude/commands/gsd/` (installed files)
+  - Removed: `.github/copilot/commands/` (installed files)
+  - Removed: `.codex/commands/gsd/` (installed files)
+- **BREAKING:** Unstructured frontmatter — use [canonical schema](specs/skills/README.md#canonical-frontmatter-schema)
+
+### Migration Path
+
+**From pre-v1.9.1 to v1.9.1:**
+
+1. **Backup your work** (if mid-project):
+   ```bash
+   cp -r .planning .planning-backup
+   ```
+
+2. **Uninstall legacy version:**
+   ```bash
+   npm uninstall -g get-shit-done-multi
+   ```
+
+3. **Install v1.9.1:**
+   ```bash
+   npm install -g get-shit-done-multi@1.9.1
+   ```
+
+4. **Clean up legacy files:**
+   ```bash
+   # Preview what will be deleted (safe)
+   bash scripts/cleanup-legacy-commands.sh --dry-run
+   
+   # Perform cleanup (requires confirmation)
+   bash scripts/cleanup-legacy-commands.sh
+   ```
+
+5. **Update command invocations:**
+   - Replace `/gsd:` with `/gsd-` in all usage
+   - Example: `/gsd:new-project` → `/gsd-new-project`
+
+6. **Verify installation:**
+   ```bash
+   /gsd-verify-installation
+   ```
+
+**Creating new skills:**
+
+Follow the [Migration Guide](docs/MIGRATION-GUIDE.md) to create custom skills from scratch.
+
+### Technical
+
+**Architecture:**
+- Reuses proven template system from agent specs (208 passing tests)
+- Mustache conditionals for platform adaptation
+- Gray-matter frontmatter parsing
+- Automatic tool mapping during generation
+- Schema validation at build time
+
+**Testing:**
+- Multi-platform testing completed (Phase 7)
+- 28/29 commands generated successfully (96.6% rate)
+- 100% npm installation success across 3 platforms
+- 0 P0 failures, ready for production release
+
+**Documentation:**
+- 4 new documentation files (1,500+ lines total)
+- Platform-specific troubleshooting coverage
+- Working examples for all 3 CLIs
+- Comprehensive schema reference
+
+**Files changed:**
+- 28 skill specs created in `/specs/skills/`
+- 1 cleanup script (`scripts/cleanup-legacy-commands.sh`)
+- 4 documentation files (migration guide, troubleshooting, comparison, README expansion)
+- CHANGELOG.md (this file)
+- README.md (brief mention + links)
+
+**Compatibility:**
+- Node.js 16+ required (no change)
+- Claude Code, GitHub Copilot CLI, Codex CLI supported (no change)
+- Zero npm dependencies maintained (no change)
+
+### See Also
+
+- [Migration Guide](docs/MIGRATION-GUIDE.md) - Creating new skill specs
+- [Command Comparison](docs/COMMAND-COMPARISON.md) - Old vs new format side-by-side
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Installation issues
+- [Skills README](specs/skills/README.md) - Spec schema documentation
+- [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) - Changelog format standard
+
+---
+
 ## [1.9.0] - 2026-01-22
 
 ### For Users
