@@ -209,12 +209,13 @@ Plans:
 
 **Goal:** Refine documentation structure, fix inconsistencies, and implement proper migration mechanism
 **Depends on:** Phase 8
-**Plans:** 3 plans in 2 waves
+**Plans:** 4 plans in 2 waves
 
 Plans:
 - [ ] 8.1-01-PLAN.md — Migration mechanism & file organization (Wave 1)
 - [ ] 8.1-02-PLAN.md — Documentation content updates (Wave 1, parallel)
-- [ ] 8.1-03-PLAN.md — Link validation & script audit (Wave 2)
+- [ ] 8.1-03-PLAN.md — Link validation (Wave 2)
+- [ ] 8.1-04-PLAN.md — Script audit & asset updates (Wave 2, has checkpoint)
 
 ## Progress
 
