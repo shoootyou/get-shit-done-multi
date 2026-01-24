@@ -109,8 +109,8 @@ The requirements are technically sound, but PATH-01 represents a **BREAKING CHAN
   - ✅ Local path is CORRECT: `.claude/`
   - ❌ Global path is WRONG: Uses macOS-specific `~/Library/Application Support/Claude` instead of `~/.claude/`
 - **Gap Analysis:** Must change global path to `~/.claude/` — this is a **BREAKING CHANGE** for existing macOS users
-- **Risk Level:** HIGH  
-- **Notes:** This change will break existing global Claude installations on macOS. Users will need to migrate or reinstall. Should be clearly documented in CHANGELOG and MIGRATION.md. Consider data migration helper.
+- **Risk Level:** HIGH → ACCEPTED (User Decision: 2026-01-24)
+- **Notes:** **DECISION: Clean break strategy.** Replace with `~/.claude/` and act like old path never existed. No migration documentation, no migration helpers. Update all docs to show only new paths. Document in CHANGELOG as breaking change.
 
 **PATH-02**: Copilot platform paths  
 - **Requirement:** Local: `[repo-root]/.github/`, Global: `~/.copilot/`  
