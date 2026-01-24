@@ -10,25 +10,26 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8.1 of 8.5 (Documentation Cleanup & Fixes)
-Plan: 1 of 4 - **Complete ✅**
-Status: Phase 8.1 in progress - Migration mechanism and file organization complete
-Last activity: 2026-01-24 — Completed 8.1-01-PLAN.md (Migration Mechanism & File Organization)
+Plan: 3 of 4 - **Complete ✅**
+Status: Phase 8.1 in progress - Link validation and broken links fixed
+Last activity: 2026-01-24 — Completed 8.1-03-PLAN.md (Link Validation)
 
 **Phase 8.1 Context:** Ad-hoc maintenance phase for pre-release documentation refinements
-- Remove migration references from user docs
-- Fix file naming conventions
-- Implement proper migration mechanism in install.js
-- Restructure CHANGELOG for user vs contributor audiences
-- Audit and cleanup non-essential scripts
+- Remove migration references from user docs ✅
+- Fix file naming conventions ✅
+- Implement proper migration mechanism in install.js ✅
+- Restructure CHANGELOG for user vs contributor audiences ✅
+- Validate and fix all documentation links ✅
+- Audit and cleanup non-essential scripts (next)
 
-Progress: [██████████] 98% (8/8.5 phases, 38/41 plans complete)
+Progress: [██████████] 99% (8/8.5 phases, 40/41 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
-- Average duration: 4.5 min
-- Total execution time: 2.9 hours
+- Total plans completed: 40
+- Average duration: 4.6 min
+- Total execution time: 3.1 hours
 
 **By Phase:**
 
@@ -43,11 +44,11 @@ Progress: [██████████] 98% (8/8.5 phases, 38/41 plans comple
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
 | 08-documentation-and-release | 3 | 10.3 min | 3.4 min |
-| 8.1-documentation-cleanup-and-fixes | 1 | 7.6 min | 7.6 min |
+| 8.1-documentation-cleanup-and-fixes | 3 | 19.7 min | 6.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 1.0 min (08-03), 7.6 min (8.1-01), 5.5 min avg
-- Trend: Stable execution through Phase 8.1 start
+- Last 5 plans: 1.0 min (08-03), 7.6 min (8.1-01), 4.1 min (8.1-02), 6.0 min (8.1-03), 4.7 min avg
+- Trend: Consistent Phase 8.1 execution
 
 *Updated after each plan completion*
 
@@ -203,6 +204,9 @@ Recent decisions affecting current work:
 - **[8.1-01]** Scripts organized by function: migration/, documentation/, audit/, validation/, shared/ (maintainability)
 - **[8.1-01]** All docs/ markdown files lowercase except root (README.md, CHANGELOG.md, LICENSE stay uppercase)
 - **[8.1-01]** References updated before file renaming (prevents broken links during migration)
+- **[8.1-03]** Link checker ignores anchor links (markdown-link-check doesn't handle {#anchor} syntax, custom validation needed)
+- **[8.1-03]** External URLs known to block scrapers added to ignore patterns (npm, claude.ai, openai.com, etc.)
+- **[8.1-03]** Non-existent documentation files removed from references (AGENT-SPLIT-PATTERN.md, LEGACY-CLEANUP.md, workflow-examples.md)
 
 ### Pending Todos
 
@@ -231,16 +235,16 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 8.1 in progress (1/4 plans complete):
-- Plan 8.1-01 complete: Migration mechanism, file organization, lowercase docs
-- Plan 8.1-02 next: Documentation content updates
-- Plan 8.1-03 next: Link validation and script audit
-- Plan 8.1-04 next: Final cleanup and release prep
+None - Phase 8.1 in progress (3/4 plans complete):
+- Plan 8.1-01 complete: Migration mechanism, file organization, lowercase docs ✅
+- Plan 8.1-02 complete: Documentation content updates ✅
+- Plan 8.1-03 complete: Link validation and broken link fixes ✅
+- Plan 8.1-04 next: Script audit and asset updates
 
-**Ready for 8.1-02** - Migration infrastructure and file naming established.
+**Ready for 8.1-04** - All documentation links validated and fixed. 54 markdown files checked, 0 broken links.
 
 ## Session Continuity
 
-Last session: 2026-01-24T11:33:37Z
-Stopped at: Completed 8.1-01-PLAN.md (Migration Mechanism & File Organization) - Phase 8.1 (1/4 plans)
+Last session: 2026-01-24T11:42:21Z
+Stopped at: Completed 8.1-03-PLAN.md (Link Validation) - Phase 8.1 (3/4 plans)
 Resume file: None
