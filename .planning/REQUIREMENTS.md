@@ -20,11 +20,11 @@ Requirements for v1.9.1 release. Each maps to roadmap phases.
 
 ### Command Migration
 
-- [ ] **MIGR-01**: Audit all 29 commands for dependencies and @-references
+- [x] **MIGR-01**: Audit all 29 commands for dependencies and @-references
 - [ ] **MIGR-02**: Create command name mapping table (gsd: → gsd-)
 - [ ] **MIGR-03**: Migrate 3 LOW complexity commands (help, progress, add-todo)
 - [ ] **MIGR-04**: Migrate 4 MEDIUM complexity commands (plan-phase, research-phase, debug, map-codebase)
-- [ ] **MIGR-05**: Migrate 3 HIGH complexity commands (new-project, execute-phase, new-milestone)
+- [x] **MIGR-05**: Migrate 3 HIGH complexity commands (new-project, execute-phase, new-milestone)
 - [ ] **MIGR-06**: Migrate remaining 19 commands in batch
 - [ ] **MIGR-07**: Preserve @-references functionality across all commands
 - [ ] **MIGR-08**: Maintain multi-section XML structure in all specs
@@ -48,11 +48,11 @@ Requirements for v1.9.1 release. Each maps to roadmap phases.
 
 ### Orchestration & Subagents
 
-- [ ] **ORCH-01**: Verify Task tool spawning works in new format
-- [ ] **ORCH-02**: Test subagent spawning with gsd-project-researcher
-- [ ] **ORCH-03**: Test subagent spawning with gsd-roadmapper
-- [ ] **ORCH-04**: Test subagent spawning with gsd-executor
-- [ ] **ORCH-05**: Test subagent spawning with gsd-planner
+- [x] **ORCH-01**: Verify Task tool spawning works in new format
+- [x] **ORCH-02**: Test subagent spawning with gsd-project-researcher
+- [x] **ORCH-03**: Test subagent spawning with gsd-roadmapper
+- [x] **ORCH-04**: Test subagent spawning with gsd-executor
+- [x] **ORCH-05**: Test subagent spawning with gsd-planner
 - [ ] **ORCH-06**: Validate structured return parsing in orchestrators
 - [ ] **ORCH-07**: Support agent context passing via @-references
 - [ ] **ORCH-08**: Test parallel subagent spawning (new-project scenario)
@@ -127,11 +127,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-06 | Phase 7 | Pending |
 | FOUN-07 | Phase 2 | Complete|
 | FOUN-08 | Phase 2 | Complete|
-| MIGR-01 | Phase 3 | Pending |
+| MIGR-01 | Phase 3 | Complete |
 | MIGR-02 | Phase 1 | Complete|
 | MIGR-03 | Phase 5 | Complete |
 | MIGR-04 | Phase 4 | Pending |
-| MIGR-05 | Phase 3 | Pending |
+| MIGR-05 | Phase 3 | Complete |
 | MIGR-06 | Phase 5 | Complete |
 | MIGR-07 | Phase 3, 4, 5 | Complete |
 | MIGR-08 | Phase 3, 4, 5 | Complete |
@@ -149,11 +149,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-09 | Phase 7 | Pending |
 | PLAT-10 | Phase 7 | Pending |
 | PLAT-11 | Phase 7 | Pending |
-| ORCH-01 | Phase 3 | Pending |
-| ORCH-02 | Phase 3 | Pending |
-| ORCH-03 | Phase 3 | Pending |
-| ORCH-04 | Phase 3 | Pending |
-| ORCH-05 | Phase 3 | Pending |
+| ORCH-01 | Phase 3 | Complete |
+| ORCH-02 | Phase 3 | Complete |
+| ORCH-03 | Phase 3 | Complete |
+| ORCH-04 | Phase 3 | Complete |
+| ORCH-05 | Phase 3 | Complete |
 | ORCH-06 | Phase 4, 6 | Complete |
 | ORCH-07 | Phase 4 | Pending |
 | ORCH-08 | Phase 6 | Complete |

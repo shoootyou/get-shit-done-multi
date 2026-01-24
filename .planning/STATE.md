@@ -9,21 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 8.1 of 8.5 (Documentation Cleanup & Fixes)
-Plan: 5 of 5 - **Complete ✅**
-Status: Phase 8.1 complete - All verification gaps closed
-Last activity: 2026-01-24 — Completed retrospective documentation for 03-04-PLAN.md (E2E Orchestration Verification)
+Phase: 3 of 8.1 (High-Complexity Orchestrators) - **Complete ✅**
+Plan: 6 of 6 - **Complete ✅**
+Status: Phase 3 complete - All orchestrators migrated and verified
+Last activity: 2026-01-24 — Completed Phase 3 (High-Complexity Orchestrators)
 
-**Phase 8.1 Context:** Ad-hoc maintenance phase for pre-release documentation refinements
-- Remove migration references from user docs ✅
-- Fix file naming conventions ✅
-- Implement proper migration mechanism in install.js ✅
-- Restructure CHANGELOG for user vs contributor audiences ✅
-- Validate and fix all documentation links ✅
-- Audit and cleanup non-essential scripts ✅
-- Close verification gaps ✅
+**Phase 3 Context:** Migrate critical orchestration commands
+- gsd-execute-phase migrated with wave-based parallelization ✅
+- gsd-new-project migrated with 7 parallel subagent spawns ✅
+- gsd-new-milestone migrated with orchestration logic intact ✅
+- @-reference resolution verified (34 references) ✅
+- Gap closures: --project-dir flag, skills directory path ✅
 
-Progress: [██████████] 100% (8.1/8.5 phases, 41/41 plans complete)
+Progress: [█████████░] 91% (46/51 plans complete)
 
 ## Performance Metrics
 

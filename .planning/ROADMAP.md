@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Schema** - Establish spec structure and prove architecture
 - [x] **Phase 2: Template Engine Integration** - Extend install.js with spec generation pipeline
-- [ ] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
+- [x] **Phase 3: High-Complexity Orchestrators** - Migrate critical multi-agent commands
 - [ ] **Phase 4: Mid-Complexity Commands** - Migrate planning and verification commands
 - [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
 - [x] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
@@ -72,13 +72,16 @@ Plans:
   4. All @-references preserved and working in migrated commands
   5. Multi-section XML structure maintained (<objective>, <process>, etc.)
   6. Dependency audit complete documenting all cross-command references
-**Plans**: 4 plans in 3 waves
+**Plans**: 6 plans in 3 waves
+**Status**: ✅ Complete (2026-01-24)
 
 Plans:
-- [ ] 03-01-PLAN.md — Dependency audit and @-reference validation (Wave 1)
-- [ ] 03-02-PLAN.md — Migrate execute-phase orchestrator (Wave 1)
-- [ ] 03-03-PLAN.md — Migrate new-project & new-milestone orchestrators (Wave 2)
-- [ ] 03-04-PLAN.md — E2E orchestration verification (Wave 3 - checkpoint)
+- [x] 03-01-PLAN.md — Dependency audit and @-reference validation (Wave 1)
+- [x] 03-02-PLAN.md — Migrate execute-phase orchestrator (Wave 1)
+- [x] 03-03-PLAN.md — Migrate new-project & new-milestone orchestrators (Wave 2)
+- [x] 03-04-PLAN.md — E2E orchestration verification (Wave 3 - checkpoint)
+- [x] 03-05-PLAN.md — Fix --project-dir flag (Wave 3 - gap closure)
+- [x] 03-06-PLAN.md — Fix skills directory path (Wave 3 - gap closure)
 
 ### Phase 4: Mid-Complexity Commands
 **Goal**: Migrate planning, verification, and research commands with 1-2 subagent spawns
