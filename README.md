@@ -29,17 +29,24 @@ GSD transforms vibecoding chaos into reliable, reproducible development:
 
 ---
 
-## What's New in v1.9 ✨
+## What's New in v1.9.1 ✨
 
-**Internal Optimization:** Template-based agent generation for better platform support
+**Spec-based skill system:** GSD commands are now generated from unified specs in `/specs/skills/`. This enables:
+- Single source of truth across all 3 platforms
+- Zero platform drift (generated files guaranteed identical)
+- Easier maintenance and future expansion
 
-- **Platform Optimization** — Each CLI gets agents optimized for its spec (Claude: string tools, Copilot: array tools + PRIMARY aliases)
-- **Single Source of Truth** — Agents generated from specs/agents/ templates (no drift between platforms)
-- **Zero Warnings** — Installation workflow validates against official platform specs
-- **Complete Testing** — 208 tests validate generation, installation, and invocation
-- **Better Maintainability** — Edit one spec, generate optimized agents for all platforms
+**⚠️ Breaking changes:**
+- Command prefix: Use `/gsd-` instead of `/gsd:` (e.g., `/gsd-help`)
+- Legacy system removed: Run cleanup script after upgrading
 
-**Note:** Agents are now generated during installation. Re-run install to regenerate agents. Agent behavior is identical - this is an internal optimization only.
+**Documentation:**
+- **[Migration Guide](docs/MIGRATION-GUIDE.md)** — Create custom skills from scratch
+- **[Command Comparison](docs/COMMAND-COMPARISON.md)** — See what changed
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** — Fix installation issues
+- **[Skills README](specs/skills/README.md)** — Spec schema reference
+
+See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
 
 ---
 
@@ -131,7 +138,9 @@ This version extends the original brilliant work to support three AI platforms w
 
 ## Commands
 
-> **Note:** Syntax shown for Claude Code (`/gsd-*`). For Copilot/Codex, use conversational commands.
+> **Note:** Commands use `/gsd-` prefix (hyphen) as of v1.9.1. Legacy `/gsd:` (colon) format removed.
+> 
+> **Syntax:** Claude Code uses `/gsd-*` commands. Copilot/Codex use conversational commands.
 >
 > 📖 **Complete reference:** [docs/commands/README.md](docs/commands/README.md)
 
@@ -169,6 +178,10 @@ This version extends the original brilliant work to support three AI platforms w
 
 ## Documentation
 
+- [docs/MIGRATION-GUIDE.md](docs/MIGRATION-GUIDE.md) — **NEW:** Create custom skills from scratch (v1.9.1)
+- [docs/COMMAND-COMPARISON.md](docs/COMMAND-COMPARISON.md) — **NEW:** Old vs new format side-by-side (v1.9.1)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — **NEW:** Platform-specific installation issues (v1.9.1)
+- [specs/skills/README.md](specs/skills/README.md) — **NEW:** Skill spec schema reference (v1.9.1)
 - [docs/architecture.md](docs/architecture.md) — Technical design and platform abstraction
 - [docs/contributing.md](docs/contributing.md) — How to add agents and contribute
 - [docs/troubleshooting.md](docs/troubleshooting.md) — Common errors and solutions
