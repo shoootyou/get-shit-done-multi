@@ -96,14 +96,11 @@ Plans:
 **Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Migrate research-phase (checkpoint continuation, Wave 1)
-- [ ] 04-02-PLAN.md — Migrate map-codebase (prose → explicit spawns, Wave 1)
-- [ ] 04-03-PLAN.md — Migrate debug (session persistence, Wave 2)
-- [ ] 04-04-PLAN.md — Migrate plan-phase (verification loop, 13 deps, Wave 3)
-- [ ] 04-05-PLAN.md — E2E verification checkpoint (Wave 4)
-- [ ] 04-03-PLAN.md — Migrate debug (session persistence)
-- [ ] 04-04-PLAN.md — Migrate plan-phase (verification loop, 4 flags, most complex)
-- [ ] 04-05-PLAN.md — E2E verification checkpoint (test all 4 commands)
+- [x] 04-01-PLAN.md — Migrate research-phase (checkpoint continuation, Wave 1)
+- [x] 04-02-PLAN.md — Migrate map-codebase (prose → explicit spawns, Wave 1)
+- [x] 04-03-PLAN.md — Migrate debug (session persistence, Wave 2)
+- [x] 04-04-PLAN.md — Migrate plan-phase (verification loop, 4 flags, most complex, Wave 3)
+- [x] 04-05-PLAN.md — E2E verification checkpoint (test all 4 commands, Wave 4)
 
 ### Phase 5: Simple Command Migration
 **Goal**: Bulk migrate remaining 21 single-stage commands with minimal orchestration

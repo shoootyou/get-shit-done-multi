@@ -23,7 +23,7 @@ Requirements for v1.9.1 release. Each maps to roadmap phases.
 - [x] **MIGR-01**: Audit all 29 commands for dependencies and @-references
 - [ ] **MIGR-02**: Create command name mapping table (gsd: → gsd-)
 - [ ] **MIGR-03**: Migrate 3 LOW complexity commands (help, progress, add-todo)
-- [ ] **MIGR-04**: Migrate 4 MEDIUM complexity commands (plan-phase, research-phase, debug, map-codebase)
+- [x] **MIGR-04**: Migrate 4 MEDIUM complexity commands (plan-phase, research-phase, debug, map-codebase)
 - [x] **MIGR-05**: Migrate 3 HIGH complexity commands (new-project, execute-phase, new-milestone)
 - [ ] **MIGR-06**: Migrate remaining 19 commands in batch
 - [ ] **MIGR-07**: Preserve @-references functionality across all commands
@@ -53,9 +53,9 @@ Requirements for v1.9.1 release. Each maps to roadmap phases.
 - [x] **ORCH-03**: Test subagent spawning with gsd-roadmapper
 - [x] **ORCH-04**: Test subagent spawning with gsd-executor
 - [x] **ORCH-05**: Test subagent spawning with gsd-planner
-- [ ] **ORCH-06**: Validate structured return parsing in orchestrators
-- [ ] **ORCH-07**: Support agent context passing via @-references
-- [ ] **ORCH-08**: Test parallel subagent spawning (new-project scenario)
+- [x] **ORCH-06**: Validate structured return parsing in orchestrators
+- [x] **ORCH-07**: Support agent context passing via @-references
+- [x] **ORCH-08**: Test parallel subagent spawning (new-project scenario)
 
 ### Testing & Validation
 

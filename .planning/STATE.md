@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 3 of 8.1 (High-Complexity Orchestrators) - **Complete ✅**
-Plan: 6 of 6 - **Complete ✅**
-Status: Phase 3 complete - All orchestrators migrated and verified
-Last activity: 2026-01-24 — Completed Phase 3 (High-Complexity Orchestrators)
+Phase: 4 of 8.1 (Mid-Complexity Commands) - **Complete ✅**
+Plan: 5 of 5 - **Complete ✅**
+Status: Phase 4 complete - All mid-complexity commands verified E2E
+Last activity: 2026-01-24 — Completed Phase 4 (Mid-Complexity Commands)
 
-**Phase 3 Context:** Migrate critical orchestration commands
-- gsd-execute-phase migrated with wave-based parallelization ✅
-- gsd-new-project migrated with 7 parallel subagent spawns ✅
-- gsd-new-milestone migrated with orchestration logic intact ✅
-- @-reference resolution verified (34 references) ✅
-- Gap closures: --project-dir flag, skills directory path ✅
+**Phase 4 Context:** Migrate planning, verification, and research commands
+- gsd-research-phase migrated with checkpoint continuation ✅
+- gsd-map-codebase migrated with parallel spawning (4 agents) ✅
+- gsd-debug migrated with session persistence ✅
+- gsd-plan-phase migrated with verification loop (4 flags) ✅
+- E2E verification: 27/28 checks passed (96.4%) ✅
 
-Progress: [█████████░] 91% (46/51 plans complete)
+Progress: [█████████▓] 93% (51/55 plans complete)
 
 ## Performance Metrics
 
@@ -36,8 +36,8 @@ Progress: [█████████░] 91% (46/51 plans complete)
 |-------|-------|-------|----------|
 | 01-foundation-schema | 2 | 24.3 min | 12.1 min |
 | 02-template-engine-integration | 5 | 13.1 min | 2.6 min |
-| 03-high-complexity-orchestrators | 5 | 38.8 min | 7.8 min |
-| 04-mid-complexity-commands | 5 | 21.2 min | 4.2 min |
+| 03-high-complexity-orchestrators | 6 | 42.2 min | 7.0 min |
+| 04-mid-complexity-commands | 5 | 36.4 min | 7.3 min |
 | 05-simple-command-migration | 9 | 51.3 min | 5.7 min |
 | 5.1-fix-git-identity | 2 | 6.4 min | 3.2 min |
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
@@ -46,8 +46,8 @@ Progress: [█████████░] 91% (46/51 plans complete)
 | 8.1-documentation-cleanup-and-fixes | 5 | 22.0 min | 4.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 4.1 min (8.1-02), 6.0 min (8.1-03), 1.0 min (8.1-04), 2.3 min (8.1-05), 3.4 min avg
-- Trend: Phase 8.1 complete with consistent execution
+- Last 5 plans: 3.4 min (03-04), 4.0 min (04-01), 5.0 min (04-02), 6.2 min (04-03), 7.1 min (04-04), 15.1 min (04-05)
+- Trend: E2E verification plans take longer (checkpoint + testing)
 
 *Updated after each plan completion*
 
