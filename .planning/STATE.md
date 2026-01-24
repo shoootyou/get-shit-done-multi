@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8.1 of 8.5 (Documentation Cleanup & Fixes)
-Plan: 3 of 4 - **Complete ✅**
-Status: Phase 8.1 in progress - Link validation and broken links fixed
-Last activity: 2026-01-24 — Completed 8.1-03-PLAN.md (Link Validation)
+Plan: 5 of 5 - **Complete ✅**
+Status: Phase 8.1 complete - All verification gaps closed
+Last activity: 2026-01-24 — Completed 8.1-05-PLAN.md (Close Verification Gaps)
 
 **Phase 8.1 Context:** Ad-hoc maintenance phase for pre-release documentation refinements
 - Remove migration references from user docs ✅
@@ -20,14 +20,15 @@ Last activity: 2026-01-24 — Completed 8.1-03-PLAN.md (Link Validation)
 - Implement proper migration mechanism in install.js ✅
 - Restructure CHANGELOG for user vs contributor audiences ✅
 - Validate and fix all documentation links ✅
-- Audit and cleanup non-essential scripts (next)
+- Audit and cleanup non-essential scripts ✅
+- Close verification gaps ✅
 
-Progress: [██████████] 99% (8/8.5 phases, 40/41 plans complete)
+Progress: [██████████] 100% (8.1/8.5 phases, 41/41 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 4.6 min
 - Total execution time: 3.1 hours
 
@@ -44,11 +45,11 @@ Progress: [██████████] 99% (8/8.5 phases, 40/41 plans comple
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
 | 08-documentation-and-release | 3 | 10.3 min | 3.4 min |
-| 8.1-documentation-cleanup-and-fixes | 3 | 19.7 min | 6.6 min |
+| 8.1-documentation-cleanup-and-fixes | 5 | 22.0 min | 4.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 1.0 min (08-03), 7.6 min (8.1-01), 4.1 min (8.1-02), 6.0 min (8.1-03), 4.7 min avg
-- Trend: Consistent Phase 8.1 execution
+- Last 5 plans: 4.1 min (8.1-02), 6.0 min (8.1-03), 1.0 min (8.1-04), 2.3 min (8.1-05), 3.4 min avg
+- Trend: Phase 8.1 complete with consistent execution
 
 *Updated after each plan completion*
 
@@ -207,6 +208,10 @@ Recent decisions affecting current work:
 - **[8.1-03]** Link checker ignores anchor links (markdown-link-check doesn't handle {#anchor} syntax, custom validation needed)
 - **[8.1-03]** External URLs known to block scrapers added to ignore patterns (npm, claude.ai, openai.com, etc.)
 - **[8.1-03]** Non-existent documentation files removed from references (AGENT-SPLIT-PATTERN.md, LEGACY-CLEANUP.md, workflow-examples.md)
+- **[8.1-05]** SVG assets updated to reflect current multi-platform installation command (get-shit-done-multi --copilot)
+- **[8.1-05]** .gitignore pre-populated with .old-gsd-system/ before migration runs (improves UX, no surprise git changes)
+- **[8.1-05]** Migration modules in bin/lib/ not scripts/ (architectural decision for self-contained bin/ with zero dependencies)
+- **[8.1-05]** Gap closure documents architectural improvements vs reverting them (verification explains design decisions)
 
 ### Pending Todos
 
@@ -235,16 +240,20 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 8.1 in progress (3/4 plans complete):
+None - Phase 8.1 complete (5/5 plans):
 - Plan 8.1-01 complete: Migration mechanism, file organization, lowercase docs ✅
 - Plan 8.1-02 complete: Documentation content updates ✅
 - Plan 8.1-03 complete: Link validation and broken link fixes ✅
-- Plan 8.1-04 next: Script audit and asset updates
+- Plan 8.1-04 complete: Script audit and asset updates ✅
+- Plan 8.1-05 complete: Close verification gaps ✅
 
-**Ready for 8.1-04** - All documentation links validated and fixed. 54 markdown files checked, 0 broken links.
+**Phase 8.1 Status:** FULLY ACHIEVED
+- Verification score: 25/25 must-haves verified (was 21/25)
+- All gaps closed or documented as intentional design improvements
+- Ready for Phase 8.5 (Final Testing & Release)
 
 ## Session Continuity
 
-Last session: 2026-01-24T11:42:21Z
-Stopped at: Completed 8.1-03-PLAN.md (Link Validation) - Phase 8.1 (3/4 plans)
+Last session: 2026-01-24T16:27:14Z
+Stopped at: Completed 8.1-05-PLAN.md (Close Verification Gaps) - Phase 8.1 complete (5/5 plans)
 Resume file: None
