@@ -177,10 +177,15 @@ if (hasHelp) {
 
   // Handle interactive menu mode (Phase 3 integration point)
   if (needsMenu) {
-    console.log(`  ${cyan}ℹ️  Interactive menu will be implemented in Phase 3${reset}`);
-    console.log(`  ${dim}For now, defaulting to: install all platforms locally${reset}\n`);
-    platforms = ['claude', 'copilot', 'codex'];
-    scope = 'local';
+    const { showInteractiveMenu } = require('./lib/menu/interactive-menu');
+    try {
+      const menuConfig = await showInteractiveMenu(scope);
+      platforms = menuConfig.platforms;
+      scope = menuConfig.scope;
+    } catch (err) {
+      console.error(`  ${yellow}${err.message}${reset}`);
+      process.exit(1);
+    }
   }
 
   // Stage 4: Codex global warning (if applicable)
