@@ -10,24 +10,25 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8.1 of 8.5 (Documentation Cleanup & Fixes)
-Plan: 2 of 3 - **In Progress**
-Status: Phase 8.1 in progress - Documentation content updates complete
-Last activity: 2026-01-24 — Completed 8.1-02-PLAN.md (Documentation Content Updates)
+Plan: 1 of 4 - **Complete ✅**
+Status: Phase 8.1 in progress - Migration mechanism and file organization complete
+Last activity: 2026-01-24 — Completed 8.1-01-PLAN.md (Migration Mechanism & File Organization)
 
 **Phase 8.1 Context:** Ad-hoc maintenance phase for pre-release documentation refinements
 - Remove migration references from user docs
 - Fix file naming conventions
+- Implement proper migration mechanism in install.js
 - Restructure CHANGELOG for user vs contributor audiences
 - Audit and cleanup non-essential scripts
 
-Progress: [██████████] 98% (8/8.5 phases, 39/40 plans complete)
+Progress: [██████████] 98% (8/8.5 phases, 38/41 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
-- Average duration: 4.4 min
-- Total execution time: 3.0 hours
+- Total plans completed: 38
+- Average duration: 4.5 min
+- Total execution time: 2.9 hours
 
 **By Phase:**
 
@@ -42,11 +43,11 @@ Progress: [██████████] 98% (8/8.5 phases, 39/40 plans comple
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
 | 08-documentation-and-release | 3 | 10.3 min | 3.4 min |
-| 8.1-documentation-cleanup-and-fixes | 2 | 9.1 min | 4.6 min |
+| 8.1-documentation-cleanup-and-fixes | 1 | 7.6 min | 7.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 6.0 min (08-02), 1.0 min (08-03), 6.1 min (8.1-01), 3.2 min (8.1-02), 4.1 min avg
-- Trend: Fast execution maintained through Phase 8.1
+- Last 5 plans: 1.0 min (08-03), 7.6 min (8.1-01), 5.5 min avg
+- Trend: Stable execution through Phase 8.1 start
 
 *Updated after each plan completion*
 
@@ -195,6 +196,13 @@ Recent decisions affecting current work:
 - **[8.1-02]** BREAKING changes appear only in User Changes section (no duplication across sections)
 - **[8.1-02]** Setup docs show directory tree structure with file count expectations (visual verification)
 - **[8.1-02]** Troubleshooting.md uses static /gsd- format (no template syntax, it's user-facing not generated)
+- **[8.1-01]** Migration runs automatically during npm install (no user flag needed for upgrade path)
+- **[8.1-01]** Backup folders use date format .old-gsd-system/YYYY-MM-DD/ (preserves multiple migration attempts)
+- **[8.1-01]** Progress bars detect CI environment and fall back to text (cross-platform compatibility)
+- **[8.1-01]** Git mv with two-step rename for case-insensitive filesystems (macOS, Windows support)
+- **[8.1-01]** Scripts organized by function: migration/, documentation/, audit/, validation/, shared/ (maintainability)
+- **[8.1-01]** All docs/ markdown files lowercase except root (README.md, CHANGELOG.md, LICENSE stay uppercase)
+- **[8.1-01]** References updated before file renaming (prevents broken links during migration)
 
 ### Pending Todos
 
@@ -223,15 +231,16 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 8.1 in progress (2/3 plans complete):
-- Plan 8.1-01 complete: Migration mechanism and file naming conventions
-- Plan 8.1-02 complete: Documentation content updates (README simplification, CHANGELOG restructure, setup guides)
+None - Phase 8.1 in progress (1/4 plans complete):
+- Plan 8.1-01 complete: Migration mechanism, file organization, lowercase docs
+- Plan 8.1-02 next: Documentation content updates
 - Plan 8.1-03 next: Link validation and script audit
+- Plan 8.1-04 next: Final cleanup and release prep
 
-**Phase 8.1 focus:** Pre-release documentation polish and cleanup for v1.9.1.
+**Ready for 8.1-02** - Migration infrastructure and file naming established.
 
 ## Session Continuity
 
-Last session: 2026-01-24T11:29:12Z
-Stopped at: Completed 8.1-02-PLAN.md (Documentation Content Updates) - Phase 8.1 (2/3 plans)
+Last session: 2026-01-24T11:33:37Z
+Stopped at: Completed 8.1-01-PLAN.md (Migration Mechanism & File Organization) - Phase 8.1 (1/4 plans)
 Resume file: None
