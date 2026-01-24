@@ -66,8 +66,8 @@ async function testPlatformInstall(platform) {
 
 function verifyInstallation(platform, testDir) {
   const platformPaths = {
-    copilot: '.github/copilot/skills',
-    claude: '.claude/get-shit-done',
+    copilot: '.github/skills',
+    claude: '.claude/skills',
     codex: '.codex/skills'
   };
   
@@ -81,8 +81,11 @@ function verifyInstallation(platform, testDir) {
     };
   }
   
-  const skills = fs.readdirSync(skillsDir).filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
-  const expectedCount = 29; // Total GSD commands
+  const skills = fs.readdirSync(skillsDir).filter(f => {
+    const fullPath = path.join(skillsDir, f);
+    return fs.statSync(fullPath).isDirectory() && f.startsWith('gsd-');
+  });
+  const expectedCount = 28; // Total GSD commands
   
   const success = skills.length === expectedCount;
   const errors = [];
@@ -123,7 +126,7 @@ async function main() {
   for (const result of results) {
     const status = result.success ? '✅' : '❌';
     const skills = result.skillsGenerated || 0;
-    console.log(`${status} ${result.platform}: ${skills}/29 commands`);
+    console.log(`${status} ${result.platform}: ${skills}/28 commands`);
     
     if (!result.success && result.error) {
       console.log(`   Error: ${result.error}`);
