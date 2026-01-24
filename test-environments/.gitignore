@@ -3,7 +3,14 @@ copilot-test/
 claude-test/
 codex-test/
 
+# Test project directories (never commit)
+copilot-test-project/
+claude-test-project/
+codex-test-project/
+
 # Test results
+install-results.json
 test-results.json
 test-results.yml
+regression-results.json
 *.test-output.txt
