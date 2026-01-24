@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 2 of 8 (Flag System Redesign) — COMPLETE ✓
-Progress: [███░░░░░░░] 25% (2/8 phases complete)
-Last activity: 2026-01-24 — Phase 2 verified and complete
+Phase: 3 of 8 (Interactive Menu) — COMPLETE ✓
+Progress: [█████░░░░░] 37.5% (3/8 phases complete)
+Last activity: 2026-01-24 — Phase 3 verified and complete
 
-**Phase 2 Summary:**
-- 3 plans executed (02-01, 02-02, 02-03)
-- 13 tasks completed with 100% test coverage
-- Three-stage flag parsing architecture implemented
-- All FLAG-01 through FLAG-06 requirements satisfied
-- Ready for Phase 3: Interactive Menu Implementation
+**Phase 3 Summary:**
+- 1 plan executed (03-01)
+- 4 tasks completed with 92.85% test coverage
+- Prompts-based interactive menu implemented
+- All MENU-01 through MENU-04 requirements satisfied
+- 87 unit tests passing, 8 manual tests approved
+- Ready for Phase 4: Platform Paths
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
 **Key Changes:**
 - Platform flags: `--claude`, `--copilot`, `--codex`, `--all`
 - Scope modifiers: `--global`, `--local` (combine with platform flags)
-- Interactive menu with checkbox multi-select
+- Interactive menu with checkbox multi-select ✅ COMPLETE
 - Uninstall.js implementation (P0, not deferred)
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [███░░░░░░░] 25% (2/8 phases - Phase 2 complete)
+Progress: [█████░░░░░] 37.5% (3/8 phases - Phase 3 complete)
 
 ## Performance Metrics
 
@@ -46,7 +47,7 @@ Progress: [███░░░░░░░] 25% (2/8 phases - Phase 2 complete)
 |-------|------|----------|--------|
 | 1 | Dependency Setup | 1 day | **Complete** ✓ (2 min) |
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
-| 3 | Interactive Menu | 2-3 days | Pending |
+| 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
 | 4 | Platform Paths | 2-3 days | Pending |
 | 5 | Message Optimization | 2 days | Pending |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
@@ -87,11 +88,15 @@ Recent decisions for v1.10.0:
 - **[02-03]** Commander.js boolean flags are idempotent - duplicate flags handled gracefully without custom logic
 - **[02-03]** Jest configuration supports both unit tests (bin/lib/*.test.js) and integration tests (__tests__/*.test.js)
 - **[02-03]** 100% test coverage target for flag system modules (exceeds >80% requirement)
+- **[03-01]** Array-building approach for conditional prompts questions (cleaner than type function)
+- **[03-01]** Dual validation (`min: 1` + `validate` function) for better UX on empty selection
+- **[03-01]** Scope null handling: flag parser returns null when no scope flag, menu knows to ask
+- **[03-01]** --local/--global alone are NEW flags (scope presets), only --codex-global is truly old
 
 ### Pending Todos
 
-- Phase 3: Interactive menu implementation
-- Phase 2 complete: Ready for Phase 3
+- Phase 4: Platform paths implementation
+- Phase 3 complete: Ready for Phase 4
 
 ### Roadmap Evolution
 
@@ -115,16 +120,16 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 2 complete. Ready for Phase 3 (Interactive Menu).
+None currently. Phase 3 complete. Ready for Phase 4 (Platform Paths).
 
 ## Session Continuity
 
-Last session: 2026-01-24 22:04:32Z
-Stopped at: Completed Phase 2, Plan 3 - 02-03-PLAN.md (Flag System Test Suite)
+Last session: 2026-01-24 23:46:00Z
+Stopped at: Completed Phase 3, Plan 1 - 03-01-PLAN.md (Interactive Menu Implementation)
 Resume file: None
 
 **Next steps:**
-1. Phase 3: Interactive menu implementation
+1. Phase 4: Platform paths implementation
 2. Continue through remaining phases
 3. Integration testing in Phase 7
 
