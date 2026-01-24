@@ -6,13 +6,13 @@ const fs = require('fs-extra');
 const chalk = require('chalk');
 
 async function runMigration() {
-  console.log(chalk.cyan('\n🔍 Checking for old GSD structure...\n'));
+  console.log('\n🔍 Checking for old GSD structure...\n');
   
   // 1. Detection
   const detected = await detectAllPlatforms();
   
   if (detected.length === 0) {
-    console.log(chalk.green('✓ No migration needed - already on new structure'));
+    console.log('  ' + chalk.green('✓ No migration needed - already on new structure\n'));
     return { migrated: false, reason: 'no-old-structure' };
   }
   

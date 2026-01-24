@@ -183,7 +183,12 @@ if (hasHelp) {
   // Get intelligent recommendations
   const recommendations = getRecommendations({
     currentCLIs,
-    platform: os.platform()
+    platform: os.platform(),
+    installingCLIs: [
+      ...(hasLocal || hasGlobal ? ['claude'] : []),
+      ...(hasCopilot ? ['copilot'] : []),
+      ...(hasCodex || hasCodexGlobal ? ['codex'] : [])
+    ]
   });
 
   // Display CLI status

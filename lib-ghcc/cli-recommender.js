@@ -10,12 +10,14 @@ const os = require('os');
  * Get intelligent CLI recommendations based on system state
  * @param {Object} options - Configuration options
  * @param {Array<string>} options.currentCLIs - Array of installed CLI names from detectInstalledCLIs()
+ * @param {Array<string>} [options.installingCLIs] - Array of CLIs being installed this run
  * @param {string} options.platform - os.platform() result (darwin, win32, linux)
  * @param {string} [options.useCase='general'] - Use case: 'general' | 'team' | 'personal'
  * @returns {Object} Recommendation object with installed, available, recommendation, and platformNotes
  */
 function getRecommendations(options = {}) {
   const currentCLIs = options.currentCLIs || [];
+  const installingCLIs = options.installingCLIs || [];
   const platform = options.platform || os.platform();
   const useCase = options.useCase || 'general';
   
@@ -83,13 +85,13 @@ function getRecommendations(options = {}) {
     recommendation += '. Consider adding Claude Code for fast personal development';
   }
   
-  // Platform-specific notes (only show if relevant to installed CLIs)
+  // Platform-specific notes (only show if relevant to CLIs being installed)
   const platformNotes = [];
   
   if (platform === 'win32') {
     platformNotes.push('Windows: Paths differ on Windows - installer handles this automatically');
-  } else if (platform === 'darwin' && currentCLIs.includes('claude')) {
-    // Only show Claude path note if Claude is actually installed
+  } else if (platform === 'darwin' && installingCLIs.includes('claude')) {
+    // Only show Claude path note if Claude is BEING INSTALLED (not just detected)
     platformNotes.push('macOS: Using ~/Library/Application Support/Claude for Claude Code');
   } else if (platform === 'linux') {
     platformNotes.push('Linux: XDG Base Directory support for config paths');
