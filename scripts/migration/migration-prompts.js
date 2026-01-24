@@ -1,16 +1,16 @@
 const prompts = require('prompts');
-const chalk = require('chalk');
+const { cyan, green, yellow, dim, reset } = require('../shared/colors');
 
 async function confirmMigration(detectedStructures) {
-  console.log(chalk.yellow('\n⚠  Old GSD structure detected:\n'));
+  console.log(`\n  ${yellow}⚠${reset}  Old GSD structure detected:\n`);
   
   detectedStructures.forEach(structure => {
-    console.log(`  ${chalk.cyan(structure.platform)}: ${structure.path}`);
-    console.log(`    Files: ${structure.fileCount}`);
+    console.log(`  ${cyan}${structure.platform}:${reset} ${structure.path}`);
+    console.log(`  ${dim}Files: ${structure.fileCount}${reset}`);
   });
   
   const today = new Date().toISOString().split('T')[0];
-  console.log(`\n  Backup will be created at: ${chalk.green(`.old-gsd-system/${today}/`)}`);
+  console.log(`\n  Backup will be created at: ${dim}.old-gsd-system/${today}/${reset}`);
   
   const response = await prompts({
     type: 'confirm',

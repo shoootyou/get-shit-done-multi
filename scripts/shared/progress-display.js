@@ -1,10 +1,11 @@
 const cliProgress = require('cli-progress');
 const chalk = require('chalk');
+const { green, reset } = require('./colors');
 
 function createProgressBar(label, total) {
   // Detect CI/non-TTY environment (per RESEARCH.md Pitfall 1)
   if (!process.stdout.isTTY || process.env.CI) {
-    // Mock progress bar for CI
+    // Mock progress bar for CI (uses ANSI colors from shared/colors.js)
     let current = 0;
     return {
       start: () => console.log(`⏳ ${label} (0/${total})`),
@@ -18,13 +19,14 @@ function createProgressBar(label, total) {
       increment: () => {
         current++;
         if (current === total) {
-          console.log(`✓ ${label} complete (${total}/${total})`);
+          console.log(`${green}✓${reset} ${label} complete (${total}/${total})`);
         }
       },
-      stop: () => console.log(`✓ ${label} complete`)
+      stop: () => console.log(`${green}✓${reset} ${label} complete`)
     };
   }
   
+  // For TTY, use cli-progress with chalk (cli-progress requires chalk)
   const bar = new cliProgress.SingleBar({
     format: `${label} |${chalk.cyan('{bar}')}| {percentage}% | {value}/{total} files`,
     barCompleteChar: '\u2588',
