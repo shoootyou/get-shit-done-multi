@@ -5,7 +5,65 @@ const fs = require('fs-extra');
 const chalk = require('chalk');
 const path = require('path');
 
+// Test mode flag - uses /tmp copy if --test-mode
+const TEST_MODE = process.argv.includes('--test-mode');
+const WORKSPACE_ROOT = TEST_MODE ? '/tmp/gsd-audit-test' : process.cwd();
+
+async function setupTestEnvironment() {
+  const testDir = '/tmp/gsd-audit-test';
+  
+  console.log(chalk.cyan(`\n📦 Setting up test environment in ${testDir}...\n`));
+  
+  // Clean and create test directory
+  await fs.remove(testDir);
+  await fs.ensureDir(testDir);
+  
+  // Copy workspace to test directory
+  const sourceDir = '/workspace';
+  await fs.copy(sourceDir, testDir, {
+    filter: (src) => {
+      // Skip node_modules, .git, and other large/system directories
+      const name = path.basename(src);
+      const skipDirs = [
+        'node_modules', 
+        '.git', 
+        'test-environments',
+        '.sandbox-cache',
+        '__pycache__',
+        '.pytest_cache',
+        'coverage'
+      ];
+      
+      // Skip if directory name matches
+      if (skipDirs.includes(name)) return false;
+      
+      // Skip hidden files/dirs in root (except .planning, .github)
+      if (name.startsWith('.') && src === path.join(sourceDir, name)) {
+        return ['.planning', '.github'].includes(name);
+      }
+      
+      return true;
+    }
+  });
+  
+  console.log(chalk.green(`✓ Test environment created at ${testDir}`));
+  console.log(chalk.dim(`  Use --test-mode to run against this copy\n`));
+  
+  return testDir;
+}
+
 async function confirmRemovals() {
+  // Setup test environment if requested
+  if (TEST_MODE) {
+    if (!await fs.pathExists(WORKSPACE_ROOT)) {
+      console.log(chalk.yellow('⚠  Test environment not found. Creating...'));
+      await setupTestEnvironment();
+    }
+    
+    console.log(chalk.cyan(`\n🧪 RUNNING IN TEST MODE - working in ${WORKSPACE_ROOT}\n`));
+    process.chdir(WORKSPACE_ROOT);
+  }
+  
   console.log(chalk.cyan('\n🔍 Analyzing project scripts...\n'));
   
   const scripts = await analyzeAllScripts();
@@ -36,11 +94,32 @@ async function confirmRemovals() {
   console.log(chalk.yellow('Auditing non-essential scripts:\n'));
   
   for (const script of nonEssential) {
-    console.log(chalk.cyan(`\n${script.relativePath}`));
-    console.log(`  Purpose: ${chalk.dim(script.purpose)}`);
-    console.log(`  Last modified: ${chalk.dim(script.lastModified)}`);
-    console.log(`  Size: ${chalk.dim(script.size)}`);
-    console.log(`  Usage: ${chalk.dim(script.usage.join(', '))}`);
+    console.log(chalk.cyan(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`));
+    console.log(chalk.cyan.bold(`📄 ${script.relativePath}`));
+    console.log(chalk.cyan(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`));
+    
+    console.log(chalk.white.bold('📝 Purpose:'));
+    console.log(`   ${chalk.dim(script.purpose)}\n`);
+    
+    console.log(chalk.white.bold('📊 Metadata:'));
+    console.log(`   Last modified: ${chalk.dim(script.lastModified)}`);
+    console.log(`   Size: ${chalk.dim(script.size)}\n`);
+    
+    console.log(chalk.white.bold('🔗 Consumed by (who uses this):'));
+    if (script.usage[0] === 'Not detected') {
+      console.log(chalk.red(`   ⚠  No consumers detected`));
+    } else {
+      script.usage.forEach(u => console.log(`   ${chalk.green('✓')} ${u}`));
+    }
+    console.log();
+    
+    console.log(chalk.white.bold('⚙️  Invokes (what this uses):'));
+    if (script.invocations[0] === 'None detected') {
+      console.log(chalk.dim(`   No dependencies`));
+    } else {
+      script.invocations.forEach(inv => console.log(`   ${chalk.blue('→')} ${inv}`));
+    }
+    console.log();
     
     const response = await prompts({
       type: 'select',
@@ -145,12 +224,56 @@ git checkout <commit-hash> -- path/to/file
 
 // Run if called directly
 if (require.main === module) {
+  // Show help if requested
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log(`
+${chalk.cyan.bold('GSD Script Audit Tool')}
+
+${chalk.white('Usage:')}
+  node scripts/audit/removal-confirmer.js [options]
+
+${chalk.white('Options:')}
+  --test-mode    Run in test mode (uses /tmp/gsd-audit-test copy)
+  --setup-test   Create test environment in /tmp
+  -h, --help     Show this help
+
+${chalk.white('Description:')}
+  Interactive script audit tool that analyzes all scripts in the project
+  and helps identify non-essential files safe for removal.
+
+${chalk.white('Essential criteria (kept if ANY true):')}
+  • Used in package.json scripts
+  • Called by install.js or core libs
+  • Referenced in user documentation
+  • Part of CI/CD workflow
+
+${chalk.white('Test mode:')}
+  1. Run: node scripts/audit/removal-confirmer.js --setup-test
+  2. Then: node scripts/audit/removal-confirmer.js --test-mode
+  3. Test environment created in /tmp/gsd-audit-test (safe to modify)
+`);
+    process.exit(0);
+  }
+  
+  // Setup test environment only
+  if (process.argv.includes('--setup-test')) {
+    setupTestEnvironment().then(() => {
+      console.log(chalk.green('\n✅ Test environment ready!'));
+      console.log(chalk.dim('   Run with --test-mode to use it\n'));
+    }).catch(err => {
+      console.error(chalk.red(`Error: ${err.message}`));
+      process.exit(1);
+    });
+    return;
+  }
+  
+  // Run audit
   confirmRemovals().then(result => {
-    console.log(`Final: ${result.kept} kept, ${result.removed} removed`);
+    console.log(chalk.green(`\n✅ Final: ${result.kept} kept, ${result.removed} removed\n`));
   }).catch(err => {
-    console.error(chalk.red(`Error: ${err.message}`));
+    console.error(chalk.red(`\n❌ Error: ${err.message}\n`));
     process.exit(1);
   });
 }
 
-module.exports = { confirmRemovals };
+module.exports = { confirmRemovals, setupTestEnvironment };

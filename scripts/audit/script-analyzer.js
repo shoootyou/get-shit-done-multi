@@ -4,6 +4,45 @@ const path = require('path');
 const fg = require('fast-glob');
 
 /**
+ * Find what a script INVOKES (its dependencies)
+ */
+function findInvocations(content, filename) {
+  const invocations = [];
+  
+  // require() calls in JS
+  const requires = content.matchAll(/require\(['"](\.\.?\/[^'"]+)['"]\)/g);
+  for (const match of requires) {
+    invocations.push(match[1]);
+  }
+  
+  // import statements in JS
+  const imports = content.matchAll(/import .+ from ['"](\.\.?\/[^'"]+)['"]/g);
+  for (const match of imports) {
+    invocations.push(match[1]);
+  }
+  
+  // Shell script sourcing
+  if (filename.endsWith('.sh')) {
+    const sources = content.matchAll(/(?:source|\.)\s+([^\s;]+)/g);
+    for (const match of sources) {
+      if (!match[1].startsWith('$')) { // Skip variables
+        invocations.push(match[1]);
+      }
+    }
+  }
+  
+  // Executable calls (node, bash, python, etc.)
+  const execs = content.matchAll(/(?:node|bash|sh|python3?)\s+([^\s;'"]+)/g);
+  for (const match of execs) {
+    if (match[1].includes('/') || match[1].includes('.')) {
+      invocations.push(match[1]);
+    }
+  }
+  
+  return [...new Set(invocations)]; // dedupe
+}
+
+/**
  * Analyze script usage across codebase
  * Per CONTEXT.md essential criteria:
  * - Used in package.json scripts, OR
@@ -22,7 +61,7 @@ async function analyzeScript(filePath) {
   // 1. In package.json scripts?
   const pkgJson = await fs.readJson('package.json').catch(() => ({}));
   const inPackageScripts = Object.entries(pkgJson.scripts || {})
-    .filter(([name, script]) => script.includes(filename))
+    .filter(([name, script]) => script.includes(filename) || script.includes(relativePath))
     .map(([name]) => name);
   
   if (inPackageScripts.length) {
@@ -81,6 +120,9 @@ async function analyzeScript(filePath) {
     usage.push(`CI: ${inWorkflows.join(', ')}`);
   }
   
+  // NEW: Find what this script invokes
+  const invocations = findInvocations(content, filename);
+  
   return {
     path: filePath,
     relativePath,
@@ -89,12 +131,13 @@ async function analyzeScript(filePath) {
     lastModified: stat.mtime.toISOString().split('T')[0],
     size: formatBytes(stat.size),
     usage: usage.length ? usage : ['Not detected'],
+    invocations: invocations.length ? invocations : ['None detected'],
     essential: usage.length > 0 // Used = essential
   };
 }
 
 function inferPurpose(content, filename) {
-  // Extract first comment or docstring
+  // 1. Extract first comment block (most descriptive)
   const commentMatch = 
     content.match(/^\/\/\s*(.+)$/m) ||          // JS single-line
     content.match(/^#\s*(.+)$/m) ||              // Shell/Python comment
@@ -104,14 +147,22 @@ function inferPurpose(content, filename) {
     return commentMatch[1].trim();
   }
   
-  // Infer from filename
+  // 2. Look for descriptive function names or exported functionality
+  const functionMatch = content.match(/(?:function|const|async function)\s+(\w+)/);
+  if (functionMatch) {
+    return `Exports: ${functionMatch[1]}()`;
+  }
+  
+  // 3. Infer from filename patterns
   if (filename.includes('test')) return 'Testing/validation';
   if (filename.includes('doc')) return 'Documentation generation';
   if (filename.includes('migration')) return 'Migration/upgrade utility';
   if (filename.includes('cleanup')) return 'Cleanup/maintenance';
   if (filename.includes('install')) return 'Installation';
+  if (filename.includes('analyzer')) return 'Analysis tool';
+  if (filename.includes('checker')) return 'Validation/checking';
   
-  return 'Unknown';
+  return 'Unknown (no header comment found)';
 }
 
 function formatBytes(bytes) {
