@@ -197,10 +197,12 @@ Plans:
   8. CHANGELOG.md updated with v1.9.1 release notes
   9. Transition strategy documented (legacy → new spec coexistence)
   10. Command reference comparison table created (old vs new format)
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] TBD during planning
+- [ ] 08-01-PLAN.md — Core documentation (README expansion + comparison table) - Wave 1
+- [ ] 08-02-PLAN.md — User guides (migration + troubleshooting) - Wave 2
+- [ ] 08-03-PLAN.md — Release artifacts (cleanup script + CHANGELOG + README) - Wave 3
 
 ## Progress
 
