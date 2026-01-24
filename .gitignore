@@ -43,3 +43,6 @@ test-output
 .codex/ISSUE_TEMPLATE/gsd-*
 .codex/skills/get-shit-done/agents/gsd-*
 .codex/skills/get-shit-done/SKILL.md
+
+# GSD migration backup (created during upgrade from old structure)
+.old-gsd-system/
