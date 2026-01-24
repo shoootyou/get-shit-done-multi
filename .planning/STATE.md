@@ -10,23 +10,23 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8 of 8.5 (Documentation and Release)
-Plan: 1 of 3 - **In progress**
-Status: In progress - core documentation complete
-Last activity: 2026-01-24 — Completed 08-01-PLAN.md (Core Documentation)
+Plan: 2 of 3 - **In progress**
+Status: In progress - user guides complete
+Last activity: 2026-01-24 — Completed 08-02-PLAN.md (User Guides)
 
 **Ad-hoc maintenance:** Command prefix migration (gsd: → gsd-) completed 2026-01-23
 - Migrated 60+ files from legacy /gsd: to new /gsd- format
 - Eliminated experimental command-system (1,160 lines)
 - Branch: fix/optimize_agents (2 commits: 961174d, 48e671c)
 
-Progress: [████████░░] ~94% (8/8.5 phases, 33/34 plans complete)
+Progress: [████████░░] ~97% (8/8.5 phases, 34/35 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
-- Average duration: 4.8 min
-- Total execution time: 3.09 hours
+- Total plans completed: 38
+- Average duration: 4.7 min
+- Total execution time: 3.0 hours
 
 **By Phase:**
 
@@ -40,10 +40,10 @@ Progress: [████████░░] ~94% (8/8.5 phases, 33/34 plans compl
 | 5.1-fix-git-identity | 2 | 6.4 min | 3.2 min |
 | 06-orchestration-validation | 3 | 10.6 min | 3.5 min |
 | 07-multi-platform-testing | 3 | 13.2 min | 4.4 min |
-| 08-documentation-and-release | 1 | 3.3 min | 3.3 min |
+| 08-documentation-and-release | 2 | 9.3 min | 4.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 9.0 min (07-01), 0.4 min (07-02), 3.8 min (07-03), 3.3 min (08-01), 4.1 min avg
+- Last 5 plans: 0.4 min (07-02), 3.8 min (07-03), 3.3 min (08-01), 6.0 min (08-02), 3.4 min avg
 - Trend: Maintaining fast execution times through Phase 8
 
 *Updated after each plan completion*
@@ -179,6 +179,11 @@ Recent decisions affecting current work:
 - **[08-01]** WHY section before technical details (users need context before schemas)
 - **[08-01]** Separate comparison doc vs inline (different audiences: upgrading vs new users)
 - **[08-01]** Comprehensive tool reference with equivalents (multi-platform mapping is critical for spec authors)
+- **[08-02]** Migration guide teaches creating NEW specs, not converting legacy (v1.9.1 removed legacy system)
+- **[08-02]** Tutorial uses gsd-whoami as working example (real-world useful, tests conditional syntax)
+- **[08-02]** Troubleshooting lists tool requirements FIRST (most common root cause of installation failures)
+- **[08-02]** Platform-specific sections for all three CLIs (each has unique configuration and cache management)
+- **[08-02]** Symptom → Diagnosis → Solutions by CLI → Root Cause → Prevention pattern (guides problem-solving)
 
 ### Pending Todos
 
@@ -207,13 +212,13 @@ None yet.
 
 None - Phase 8 in progress:
 - Plan 08-01 complete: Core documentation (WHY section, tool reference, comparison table)
-- Plan 08-02 pending: User guides (migration + troubleshooting)
+- Plan 08-02 complete: User guides (8-step migration tutorial, platform-specific troubleshooting)
 - Plan 08-03 pending: Release artifacts (cleanup script + CHANGELOG + README)
 
-**Ready for Plan 08-02** - migration and troubleshooting guides.
+**Ready for Plan 08-03** - final release artifacts.
 
 ## Session Continuity
 
-Last session: 2026-01-24T01:46:29Z
-Stopped at: Completed 08-01-PLAN.md (Core Documentation) - Phase 8 plan 1/3 complete
+Last session: 2026-01-24T01:55:21Z
+Stopped at: Completed 08-02-PLAN.md (User Guides) - Phase 8 plan 2/3 complete
 Resume file: None
