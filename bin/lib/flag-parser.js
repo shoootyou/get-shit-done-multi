@@ -64,11 +64,18 @@ function parseFlags(argv) {
   // Note: Commander.js boolean flags are idempotent - duplicate flags
   // (e.g., --claude --claude) are handled gracefully as a single flag
   
-  // Determine scope (default: local)
-  const scope = parsedOptions.global ? 'global' : 'local';
+  // Determine scope
+  // Only set scope if explicitly provided via flag
+  // If needsMenu, scope will be null (menu will ask)
+  // If not needsMenu, scope defaults to 'local' unless --global provided
+  const scopeFlag = parsedOptions.global ? 'global' : (parsedOptions.local ? 'local' : null);
   
   // Check if interactive menu is needed (no platforms selected)
   const needsMenu = platforms.length === 0;
+  
+  // Set scope: if needsMenu and no scope flag, leave null for menu to ask
+  // Otherwise, use flag or default to 'local'
+  const scope = needsMenu && scopeFlag === null ? null : (scopeFlag || 'local');
   
   return {
     platforms,

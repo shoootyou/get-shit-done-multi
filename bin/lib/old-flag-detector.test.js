@@ -20,24 +20,20 @@ describe('Old Flag Detector', () => {
     consoleWarnSpy.mockRestore();
   });
   
-  describe('Single old flag detection (no platform flags)', () => {
-    test('detects and removes --local', () => {
+  describe('Scope flags without platform flags (NEW v1.10.0 behavior)', () => {
+    test('--local alone is KEPT (scope preset for menu)', () => {
       const cleaned = detectAndFilterOldFlags(['node', 'install.js', '--local']);
-      expect(cleaned).toEqual(['node', 'install.js']);
-      expect(consoleWarnSpy).toHaveBeenCalled();
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('removed in v1.10.0');
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('--local');
+      expect(cleaned).toEqual(['node', 'install.js', '--local']);
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
     
-    test('detects and removes --global', () => {
+    test('--global alone is KEPT (scope preset for menu)', () => {
       const cleaned = detectAndFilterOldFlags(['node', 'install.js', '--global']);
-      expect(cleaned).toEqual(['node', 'install.js']);
-      expect(consoleWarnSpy).toHaveBeenCalled();
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('removed in v1.10.0');
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('--global');
+      expect(cleaned).toEqual(['node', 'install.js', '--global']);
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
     
-    test('detects and removes --codex-global', () => {
+    test('--codex-global is ALWAYS removed (truly old flag)', () => {
       const cleaned = detectAndFilterOldFlags(['node', 'install.js', '--codex-global']);
       expect(cleaned).toEqual(['node', 'install.js']);
       expect(consoleWarnSpy).toHaveBeenCalled();
@@ -45,43 +41,41 @@ describe('Old Flag Detector', () => {
       expect(consoleWarnSpy.mock.calls[0][0]).toContain('--codex-global');
     });
     
-    test('shows migration example in warning', () => {
-      detectAndFilterOldFlags(['node', 'install.js', '--local']);
-      expect(consoleWarnSpy.mock.calls[1][0]).toContain('--claude --local');
+    test('--codex-global shows migration example', () => {
+      detectAndFilterOldFlags(['node', 'install.js', '--codex-global']);
+      expect(consoleWarnSpy.mock.calls[1][0]).toContain('--codex --local');
       expect(consoleWarnSpy.mock.calls[1][0]).toContain('instead of');
     });
     
-    test('references MIGRATION.md', () => {
-      detectAndFilterOldFlags(['node', 'install.js', '--local']);
+    test('--codex-global warning references MIGRATION.md', () => {
+      detectAndFilterOldFlags(['node', 'install.js', '--codex-global']);
       expect(consoleWarnSpy.mock.calls[2][0]).toContain('MIGRATION.md');
     });
   });
   
-  describe('Multiple old flags (no platform flags)', () => {
-    test('detects both --local and --global', () => {
+  describe('Multiple flags (no platform)', () => {
+    test('--local and --global both kept (will conflict in validator)', () => {
       const cleaned = detectAndFilterOldFlags(['node', 'install.js', '--local', '--global']);
-      expect(cleaned).toEqual(['node', 'install.js']);
-      expect(consoleWarnSpy).toHaveBeenCalled();
-      // Both flags mentioned in warning
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('--local');
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain('--global');
+      expect(cleaned).toEqual(['node', 'install.js', '--local', '--global']);
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
     
-    test('removes all old flags from argv', () => {
+    test('--codex-global with --local: only codex-global removed', () => {
       const cleaned = detectAndFilterOldFlags([
-        'node', 'install.js', '--local', '--codex-global', '--global'
+        'node', 'install.js', '--local', '--codex-global'
       ]);
-      expect(cleaned).toEqual(['node', 'install.js']);
+      expect(cleaned).toEqual(['node', 'install.js', '--local']);
+      expect(consoleWarnSpy).toHaveBeenCalled();
     });
     
-    test('shows single warning for multiple flags', () => {
-      detectAndFilterOldFlags(['node', 'install.js', '--local', '--global']);
+    test('single warning for old flags only', () => {
+      detectAndFilterOldFlags(['node', 'install.js', '--codex-global']);
       // Should have exactly 3 warnings: main warning, example, reference
       expect(consoleWarnSpy).toHaveBeenCalledTimes(4); // 3 warnings + 1 blank line
     });
   });
   
-  describe('Mixed old/new flags (with platform flags)', () => {
+  describe('Mixed scope flags with platform flags (NEW usage)', () => {
     test('keeps --local when used with --claude (new usage)', () => {
       const cleaned = detectAndFilterOldFlags(['node', 'install.js', '--claude', '--local']);
       expect(cleaned).toEqual(['node', 'install.js', '--claude', '--local']);
@@ -153,23 +147,23 @@ describe('Old Flag Detector', () => {
       expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
     
-    test('handles flags at different positions', () => {
+    test('handles flags at different positions (NEW: kept)', () => {
       const cleaned = detectAndFilterOldFlags(['node', '--local', 'install.js']);
-      expect(cleaned).toEqual(['node', 'install.js']);
-      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(cleaned).toEqual(['node', '--local', 'install.js']);
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
     
-    test('preserves other arguments', () => {
+    test('preserves other arguments (NEW: --local kept)', () => {
       const cleaned = detectAndFilterOldFlags([
         'node', 'install.js', '--local', 'some-arg', '--other-flag'
       ]);
-      expect(cleaned).toEqual(['node', 'install.js', 'some-arg', '--other-flag']);
+      expect(cleaned).toEqual(['node', 'install.js', '--local', 'some-arg', '--other-flag']);
     });
     
-    test('handles argv with only old flags', () => {
+    test('handles argv with only scope flags (NEW: kept)', () => {
       const cleaned = detectAndFilterOldFlags(['--local', '--global']);
-      expect(cleaned).toEqual([]);
-      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(cleaned).toEqual(['--local', '--global']);
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
   });
 });

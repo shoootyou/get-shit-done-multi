@@ -192,25 +192,25 @@ describe('Flag Parser', () => {
   });
   
   describe('No platforms (menu mode)', () => {
-    test('no flags triggers menu', () => {
+    test('no flags triggers menu with null scope (menu will ask)', () => {
       const result = parseFlags(['node', 'install.js']);
       expect(result.platforms).toEqual([]);
       expect(result.needsMenu).toBe(true);
-      expect(result.scope).toBe('local');
+      expect(result.scope).toBe(null);  // Scope will be asked in menu
     });
     
-    test('--global only triggers menu with global scope', () => {
+    test('--global only triggers menu with global scope preset', () => {
       const result = parseFlags(['node', 'install.js', '--global']);
       expect(result.platforms).toEqual([]);
       expect(result.needsMenu).toBe(true);
-      expect(result.scope).toBe('global');
+      expect(result.scope).toBe('global');  // Scope preset, menu asks for platform
     });
     
-    test('--local only triggers menu with local scope', () => {
+    test('--local only triggers menu with local scope preset', () => {
       const result = parseFlags(['node', 'install.js', '--local']);
       expect(result.platforms).toEqual([]);
       expect(result.needsMenu).toBe(true);
-      expect(result.scope).toBe('local');
+      expect(result.scope).toBe('local');  // Scope preset, menu asks for platform
     });
     
     test('-g only triggers menu', () => {

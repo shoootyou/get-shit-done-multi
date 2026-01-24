@@ -22,22 +22,30 @@ const OLD_FLAGS = {
  * Old flags are the standalone --local/--global that meant "Claude local/global".
  * NEW flags are the same names but used as scope modifiers WITH platform flags.
  * 
- * Detection strategy: Check if --local/--global is used WITHOUT platform flags.
+ * Detection strategy: --local/--global are only OLD if they're the ONLY flags.
+ * If used alone (no platform), they trigger the NEW interactive menu with scope preset.
  * If used with platform flags (--claude --global), it's the NEW usage.
  * 
  * @param {string[]} argv - Raw process.argv array
  * @returns {string[]} - Cleaned argv with old flags removed
  */
 function detectAndFilterOldFlags(argv) {
-  // Check if platform flags are present (new usage)
+  // Check if platform flags are present (new usage with explicit platform)
   const hasPlatformFlags = argv.some(arg => 
     ['--claude', '--copilot', '--codex', '--all'].includes(arg)
   );
   
-  // Only treat --local/--global as OLD flags if no platform flags present
-  const oldFlagsToCheck = hasPlatformFlags 
-    ? ['--codex-global']  // Only codex-global is always old
-    : Object.keys(OLD_FLAGS);  // All old flags if no platform
+  // Check if scope flags are present
+  const hasScopeFlags = argv.some(arg => 
+    ['--local', '-l', '--global', '-g'].includes(arg)
+  );
+  
+  // OLD usage: --codex-global is ALWAYS old (removed completely)
+  // NEW usage: --local/--global with platform flags = scope modifier
+  // NEW usage: --local/--global without platform = scope preset for menu
+  
+  // Only --codex-global is truly "old" and should be removed
+  const oldFlagsToCheck = ['--codex-global'];
   
   // Find all old flags present in argv
   const found = oldFlagsToCheck.filter(flag => argv.includes(flag));
