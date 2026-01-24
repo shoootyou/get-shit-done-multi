@@ -41,7 +41,7 @@ Before v1.9.1, creating a new GSD command required:
 
 ## What Changed in v1.9.1 {#what-changed}
 
-See [Command Comparison](./COMMAND-COMPARISON.md) for detailed side-by-side comparison.
+See [Command Comparison](./command-comparison.md) for detailed side-by-side comparison.
 
 **Key changes:**
 - Invocation: `/gsd:` → `/gsd-`
@@ -544,6 +544,6 @@ grep "^name:" specs/skills/gsd-yourskill/SKILL.md
 - **Customize existing skills:** Fork GSD, modify specs in `specs/skills/`
 - **Share your skills:** Submit PRs to GSD repository
 - **Advanced patterns:** Study orchestrator skills (gsd-new-project, gsd-execute-phase)
-- **Troubleshooting:** See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for installation issues
+- **Troubleshooting:** See [troubleshooting.md](./troubleshooting.md) for installation issues
 
 **Need help?** File an issue at https://github.com/shoootyou/get-shit-done-multi/issues

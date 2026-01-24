@@ -677,7 +677,7 @@ Before requesting review:
 ### Documentation Resources
 
 - [architecture.md](architecture.md) - Technical design and implementation
-- [TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) - Test suite details
+- [testing-cross-platform.md](docs/testing-cross-platform.md) - Test suite details
 - [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) - Size optimization pattern
 - [README.md](README.md) - Project overview and quick start
 

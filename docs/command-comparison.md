@@ -189,7 +189,7 @@ Benefits:
 3. **Update invocations** - Replace `/gsd:` with `/gsd-` in all usage
 4. **Verify installation** - Run `/gsd-verify-installation`
 
-**No automatic conversion:** Legacy command files cannot be automatically converted to specs. Creating new specs requires following [migration guide](./MIGRATION-GUIDE.md).
+**No automatic conversion:** Legacy command files cannot be automatically converted to specs. Creating new specs requires following [migration guide](./migration-guide.md).
 
 ## Breaking Changes
 
@@ -201,6 +201,6 @@ Benefits:
 - Manual migration required (cleanup script provided)
 
 **See also:**
-- [Migration Guide](./MIGRATION-GUIDE.md) - How to create new skills
+- [Migration Guide](./migration-guide.md) - How to create new skills
 - [Legacy Cleanup](./LEGACY-CLEANUP.md) - How to remove old system
 - [Skills README](../specs/skills/README.md) - Spec schema documentation

@@ -526,7 +526,7 @@ project-root/
 │   └── test-cross-platform.js      # E2E test orchestrator
 └── docs/
     ├── AGENT-SPLIT-PATTERN.md      # Size optimization pattern
-    └── TESTING-CROSS-PLATFORM.md   # Test suite documentation
+    └── testing-cross-platform.md   # Test suite documentation
 ```
 
 ## Generated Output
@@ -706,7 +706,7 @@ const sizeResult = validateForPlatform(largeSpec, 'copilot');
 
 ## Testing Architecture
 
-Comprehensive test suite validates the complete pipeline. See [TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) for details.
+Comprehensive test suite validates the complete pipeline. See [testing-cross-platform.md](docs/testing-cross-platform.md) for details.
 
 **Test Stages:**
 
@@ -740,7 +740,7 @@ npm run test:invocation     # Invocation only (requires CLIs)
 
 ## Related Documentation
 
-- [TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) - Test suite guide
+- [testing-cross-platform.md](docs/testing-cross-platform.md) - Test suite guide
 - [AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) - Size optimization pattern
 - [contributing.md](contributing.md) - How to add agents and run tests
 - [README.md](README.md) - Project overview and quick start
