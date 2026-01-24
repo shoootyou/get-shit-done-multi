@@ -57,7 +57,7 @@ async function showInteractiveMenu(scopeFromFlags = null) {
 
   // Handle "All" platform override (not additive)
   let platforms = response.platforms;
-  if (platforms.includes('all')) {
+  if (platforms && platforms.includes('all')) {
     platforms = ['claude', 'copilot', 'codex'];
   }
 
