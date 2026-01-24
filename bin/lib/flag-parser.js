@@ -61,24 +61,8 @@ function parseFlags(argv) {
     if (parsedOptions.codex) platforms.push('codex');
   }
   
-  // Deduplicate platforms (handle --claude --claude)
-  const originalLength = platforms.length;
-  platforms = [...new Set(platforms)];
-  
-  if (platforms.length < originalLength) {
-    const duplicates = [];
-    const seen = new Set();
-    
-    // Find which platforms were duplicated
-    for (const platform of ['claude', 'copilot', 'codex']) {
-      if (parsedOptions[platform] && seen.has(platform)) {
-        duplicates.push(`--${platform}`);
-      }
-      if (parsedOptions[platform]) seen.add(platform);
-    }
-    
-    console.warn(`${yellow}⚠️  Duplicate flags detected: ${duplicates.join(', ')} (will install once)${reset}`);
-  }
+  // Note: Commander.js boolean flags are idempotent - duplicate flags
+  // (e.g., --claude --claude) are handled gracefully as a single flag
   
   // Determine scope (default: local)
   const scope = parsedOptions.global ? 'global' : 'local';
