@@ -4,7 +4,7 @@
  */
 
 const fs = require('fs');
-const { getConfigPaths } = require('./paths');
+const { getConfigPaths } = require('../paths');
 
 /**
  * Detect which CLIs are currently installed on the system
@@ -76,39 +76,7 @@ function detectCLI() {
   return 'claude-code';
 }
 
-/**
- * Generate a human-readable message about detected CLIs
- * @param {{claude: boolean, copilot: boolean, codex: boolean}} detected - Detection results from detectInstalledCLIs()
- * @returns {string} Formatted message with checkmarks for installed CLIs
- */
-function getDetectedCLIsMessage(detected) {
-  const cliNames = {
-    claude: 'Claude Code',
-    copilot: 'GitHub Copilot CLI',
-    codex: 'Codex CLI'
-  };
-  
-  const installedCLIs = Object.entries(detected)
-    .filter(([_, isInstalled]) => isInstalled)
-    .map(([cli, _]) => cliNames[cli]);
-  
-  if (installedCLIs.length === 0) {
-    return 'No CLIs detected';
-  }
-  
-  // Format with checkmarks
-  const formatted = Object.entries(detected)
-    .map(([cli, isInstalled]) => {
-      const mark = isInstalled ? '✓' : '✗';
-      return `${mark} ${cliNames[cli]}`;
-    })
-    .join(', ');
-  
-  return `Detected: ${formatted}`;
-}
-
 module.exports = {
   detectInstalledCLIs,
-  getDetectedCLIsMessage,
   detectCLI
 };
