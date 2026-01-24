@@ -19,8 +19,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Simple Command Migration** - Bulk migrate remaining single-stage commands
 - [x] **Phase 5.1: Fix git identity preservation in agents (INSERTED)** - URGENT: Fix agents to preserve user git identity
 - [x] **Phase 6: Orchestration Validation** - Verify subagent spawning and structured returns
-- [ ] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
-- [ ] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
+- [x] **Phase 7: Multi-Platform Testing** - Test installation and execution on all 3 platforms
+- [x] **Phase 8: Documentation & Release** - Complete docs and ship v1.9.1
 
 ## Phase Details
 
