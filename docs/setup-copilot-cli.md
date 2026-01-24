@@ -65,18 +65,30 @@ npx get-shit-done-multi --copilot
 # ✓ Installation complete!
 ```
 
-**What gets installed:**
+## What Gets Installed
+
+Local project structure:
 ```
-your-project/
-  .github/
-    agents/            # Custom agents (if supported)
-    skills/
-      get-shit-done/
-        agents/        # 11 specialized agents
-        commands/      # 15 /gsd-* commands
-        get-shit-done/ # Core workflow files
-        lib-ghcc/      # Shared utilities
+.github/
+├── skills/          # 29 individual skill folders
+│   ├── gsd-new-project/
+│   ├── gsd-execute-phase/
+│   ├── gsd-plan-phase/
+│   └── ... (26 more)
+└── agents/          # 11 specialized agents
+    ├── gsd-executor/
+    ├── gsd-planner/
+    └── ... (9 more)
+
+get-shit-done/       # System content
+├── workflows/       # Workflow patterns
+├── templates/       # Document templates
+└── references/      # Reference docs
 ```
+
+**Expected file counts:**
+- Skills: 29 folders (one per command)
+- Agents: 11 folders (specialized agents)
 
 **Important:** The `.github/` directory should be committed to your repository for team collaboration.
 

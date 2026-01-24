@@ -64,18 +64,27 @@ npx get-shit-done-multi --codex
 # ✓ Installation complete!
 ```
 
-**What gets installed:**
+## What Gets Installed
+
 ```
-your-project/
-  .codex/
-    skills/
-      get-shit-done/
-        agents/        # 11 specialized agents (skill-based)
-        commands/      # 15 /gsd-* commands
-        get-shit-done/ # Core workflow files
-        lib-ghcc/      # Shared utilities
-    prompts/           # Generated prompts for CLI processing
+.codex/
+├── skills/          # 29 individual skill folders
+│   ├── gsd-new-project/
+│   ├── gsd-execute-phase/
+│   └── ... (27 more)
+└── agents/          # 11 specialized agents
+    ├── gsd-executor/
+    └── ... (10 more)
+
+get-shit-done/       # System content
+├── workflows/
+├── templates/
+└── references/
 ```
+
+**Expected file counts:**
+- Skills: 29 folders in `.codex/skills/`
+- Agents: 11 folders in `.codex/agents/`
 
 ### Global Installation
 

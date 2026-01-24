@@ -31,22 +31,13 @@ GSD transforms vibecoding chaos into reliable, reproducible development:
 
 ## What's New in v1.9.1 ✨
 
-**Spec-based skill system:** GSD commands are now generated from unified specs in `/specs/skills/`. This enables:
-- Single source of truth across all 3 platforms
-- Zero platform drift (generated files guaranteed identical)
-- Easier maintenance and future expansion
+**Spec-based skill system:** GSD commands are now generated from unified specs in `/specs/skills/` - single source of truth across all 3 platforms with zero drift.
 
 **⚠️ Breaking changes:**
 - Command prefix: Use `/gsd-` instead of `/gsd:` (e.g., `/gsd-help`)
 - Legacy system removed: Run cleanup script after upgrading
 
-**Documentation:**
-- **[Migration Guide](docs/MIGRATION-GUIDE.md)** — Create custom skills from scratch
-- **[Command Comparison](docs/COMMAND-COMPARISON.md)** — See what changed
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** — Fix installation issues
-- **[Skills README](specs/skills/README.md)** — Spec schema reference
-
-See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
+See [CHANGELOG.md](CHANGELOG.md) for complete release notes and [documentation](#documentation) for guides.
 
 ---
 
@@ -60,7 +51,7 @@ GSD generates agents optimized for each platform during installation:
 # Claude Code (uppercase tools, string format)
 npx get-shit-done-multi
 
-# GitHub Copilot CLI (PRIMARY aliases: execute, edit, search, agent)
+# GitHub Copilot CLI
 npx get-shit-done-multi --copilot
 
 # Codex CLI (optimized for OpenAI)
@@ -102,14 +93,9 @@ Then for each phase:
 
 ## Architecture
 
-GSD uses template-based generation to optimize agents for each platform:
+GSD uses template-based generation to optimize agents for each platform. Single source specs with install-time generation ensure zero drift across Claude Code, Copilot CLI, and Codex CLI.
 
-- **Spec-as-Template** — Single source in `specs/agents/` with Mustache conditionals
-- **Platform Abstraction** — Tool mapping, field transformation, validation
-- **Install-Time Generation** — No runtime overhead, each CLI gets optimal format
-
-**Technical Details:** See [docs/architecture.md](docs/architecture.md)  
-**Contributing:** See [docs/contributing.md](docs/contributing.md)
+📖 **Details:** [Architecture](docs/architecture.md) · [Contributing](docs/contributing.md)
 
 ---
 
@@ -178,31 +164,19 @@ This version extends the original brilliant work to support three AI platforms w
 
 ## Documentation
 
-- [docs/MIGRATION-GUIDE.md](docs/MIGRATION-GUIDE.md) — **NEW:** Create custom skills from scratch (v1.9.1)
-- [docs/COMMAND-COMPARISON.md](docs/COMMAND-COMPARISON.md) — **NEW:** Old vs new format side-by-side (v1.9.1)
-- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — **NEW:** Platform-specific installation issues (v1.9.1)
-- [specs/skills/README.md](specs/skills/README.md) — **NEW:** Skill spec schema reference (v1.9.1)
-- [docs/architecture.md](docs/architecture.md) — Technical design and platform abstraction
-- [docs/contributing.md](docs/contributing.md) — How to add agents and contribute
-- [docs/troubleshooting.md](docs/troubleshooting.md) — Common errors and solutions
-- [CHANGELOG.md](CHANGELOG.md) — Version history and release notes
-- [docs/TESTING-CROSS-PLATFORM.md](docs/TESTING-CROSS-PLATFORM.md) — Testing workflow
-- [docs/AGENT-SPLIT-PATTERN.md](docs/AGENT-SPLIT-PATTERN.md) — Size optimization pattern
+**Getting Started:**
+- [Setup Guide](docs/setup-claude-cli.md) — Install for Claude Code, Copilot CLI, or Codex CLI
+- [Troubleshooting](docs/troubleshooting.md) — Common issues and solutions
 
-### Getting Started
-- **[How It Works](docs/how-it-works.md)** — Complete workflow walkthrough
-- **[Architecture](docs/architecture.md)** — Why it works (context engineering, agents, XML)
-- **[Setup: Claude Code](docs/setup-claude-code.md)** · **[Copilot CLI](docs/setup-copilot-cli.md)** · **[Codex CLI](docs/setup-codex-cli.md)**
+**User Guides:**
+- [Migration Guide](docs/migration-guide.md) — Create new skill specs
+- [Command Comparison](docs/command-comparison.md) — Legacy vs new spec format
 
-### Reference
-- **[All Commands](docs/commands/README.md)** — Every command with examples
-- **[CLI Comparison](docs/cli-comparison.md)** — Platform differences
-- **[Agent Capabilities](docs/agent-capabilities.md)** — What each agent does
-- **[Container Environment](docs/containers-readme.md)** — Docker/Podman setup for isolated development
+**Reference:**
+- [Skill Specs](specs/skills/README.md) — Skill specification documentation
+- [CHANGELOG](CHANGELOG.md) — Version history and breaking changes
 
-### Help
-- **[Troubleshooting](docs/troubleshooting.md)** — Common issues
-- **[Migration Guide](docs/migration-guide.md)** — Moving from original GSD
+For contributors, see [GSD-STYLE.md](GSD-STYLE.md).
 
 ---
 

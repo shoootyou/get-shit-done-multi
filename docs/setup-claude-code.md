@@ -49,16 +49,33 @@ npx get-shit-done-multi --claude
 # ✓ Installation complete!
 ```
 
-**What gets installed:**
+## What Gets Installed
+
+Local project structure:
 ```
-your-project/
-  .claude/
-    get-shit-done/
-      agents/          # 11 specialized agents
-      commands/        # 15 /gsd-* commands
-      get-shit-done/   # Core workflow files
-      lib-ghcc/        # Shared utilities
+.claude/
+├── skills/          # 29 individual skill folders
+│   ├── gsd-new-project/
+│   ├── gsd-execute-phase/
+│   ├── gsd-plan-phase/
+│   ├── gsd-verify-work/
+│   └── ... (25 more)
+└── agents/          # 11 specialized agents
+    ├── gsd-executor/
+    ├── gsd-planner/
+    ├── gsd-verifier/
+    └── ... (8 more)
+
+get-shit-done/       # System content
+├── workflows/       # 15 workflow patterns
+├── templates/       # 18 document templates
+└── references/      # Reference docs
 ```
+
+**Expected file counts:**
+- Skills: 29 folders in `.claude/skills/`
+- Agents: 11 folders in `.claude/agents/`
+- Workflows: 15 files in `get-shit-done/workflows/`
 
 ### Global Installation
 
