@@ -5,7 +5,8 @@ module.exports = {
   // Test match patterns (include __tests__ and bin/lib unit tests)
   testMatch: [
     '**/__tests__/**/*.test.js',
-    '**/bin/lib/**/*.test.js'
+    '**/bin/lib/**/*.test.js',
+    '**/bin/*.test.js'  // Integration tests in bin root
   ],
   
   // Ignore node_modules only
