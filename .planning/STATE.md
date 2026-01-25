@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5.2 of 11 (Codex Global Support & Path Unification) — READY
-Progress: [█████░░░░░░] 50% (6/11 phases complete)
-Last activity: 2026-01-25 — Completed Phase 5.1 (Codebase Architecture Optimization)
-Next: Phase 5.2 (Codex Global Support & Path Unification)
+Phase: 5.2 of 15 (Function-level Inventory of `bin/**` - Stage 1) — READY
+Progress: [████░░░░░░░░░░░] 40% (6/15 phases complete)
+Last activity: 2026-01-25 — Inserted 4 urgent phases for function-level audit and consolidation
+Next: Phase 5.2 (Function-level Inventory - Stage 1) — Mandatory cleanup + function-by-function analysis
 
 **Phase 5.1 Complete:** ✅ 2026-01-25
 - 5 plans executed (01-01, 02-01, 02-02, 02-03, 03-01)
@@ -62,7 +62,7 @@ Next: Phase 5.2 (Codex Global Support & Path Unification)
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
-**NEW: Architecture Optimization Added** - 3 phases inserted before Uninstall to restructure codebase, implement Codex global, and prepare for future AI tool integrations (GPT-4All, Mistral, Gemini).
+**NEW: Architecture Optimization Complete + Function-level Audit Added** - Phase 5.1 complete (2026-01-25). 4 urgent phases inserted (5.2-5.5) for comprehensive function-by-function audit and consolidation of `bin/**` and `lib-ghcc/`, preparing for modern, maintainable structure and future AI tool integrations.
 
 **Key Changes:**
 - Platform flags: `--claude`, `--copilot`, `--codex`, `--all`
@@ -75,13 +75,13 @@ Next: Phase 5.2 (Codex Global Support & Path Unification)
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [█████░░░░░░] 45% (5/11 phases complete)
+Progress: [████░░░░░░░░░░░] 40% (6/15 phases complete)
 
 ## Performance Metrics
 
 **Milestone Timeline:**
 - Start date: 2026-01-24 (Phase 1 execution started)
-- Estimated duration: 3-4 weeks (17-23 days)
+- Estimated duration: 5-7 weeks (35-50 days with function-level audit)
 - Target completion: TBD
 
 **Phase Breakdown:**
@@ -91,18 +91,23 @@ Progress: [█████░░░░░░] 45% (5/11 phases complete)
 | 1 | Dependency Setup | 1 day | **Complete** ✓ (2 min) |
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
 | 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
-| 4 | Platform Paths | 2-3 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: TBD) |
-| 5 | Message Optimization | 2 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: 5 min) |
-| 5.1 | Architecture Optimization | 4-5 days | **Next** 🔄 ⚠️ CRITICAL |
-| 5.2 | Codex Global & Path Unification | 1-2 days | Pending |
-| 5.3 | Future Integration Prep | 2-3 days | Pending |
+| 4 | Platform Paths | 2-3 days | **Complete** ✓ (8 min) |
+| 5 | Message Optimization | 2 days | **Complete** ✓ (9 min) |
+| 5.1 | Architecture Optimization | 4-5 days | **Complete** ✓ (5 days) |
+| 5.2 | Function-level Inventory | 3-4 days | **Next** 🔄 Stage 1 |
+| 5.3 | Function-level Consolidation | 3-4 days | Pending (Stage 2) |
+| 5.4 | Function-level Index Review | 2-3 days | Pending (Stage 3) |
+| 5.5 | Execute Unification | 3-5 days | Pending (Implementation) |
+| 5.6 | Codex Global & Path Unification | 1-2 days | Pending |
+| 5.7 | Future Integration Prep | 2-3 days | Pending |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
 | 7 | Testing & QA | 3-4 days | Pending |
 | 8 | Documentation & Migration | 2-3 days | Pending |
 
 **Coverage:**
-- Total requirements: 44 (29 original + 15 new architecture)
-- Requirements mapped: 44/44 (100%)
+- Total requirements: 61 (29 original + 15 architecture + 17 function-level audit)
+- Requirements mapped: 61/61 (100%)
+- Requirements complete: 26/61 (43%)
 - Orphaned requirements: 0
 
 *Metrics will be updated after each phase completion*
@@ -153,9 +158,10 @@ Recent decisions for v1.10.0:
 - **[05-02]** Error collection pattern: results array with { platform, success, details/error }
 - **[05-02]** POSIX exit codes: 0 for all success, 1 for any failure
 - **[ROADMAP-EVOLUTION]** Phase 5.1 inserted: Architecture optimization (restructure bin/ and lib-ghcc/, SOLID principles, prepare for GPT-4All/Mistral/Gemini)
-- **[ROADMAP-EVOLUTION]** Phase 5.2 inserted: Codex global support (implement `--codex --global` to `~/.codex/` on clean architecture)
-- **[ROADMAP-EVOLUTION]** Phase 5.3 inserted: Future integration preparation and comprehensive validation
-- **[ROADMAP-EVOLUTION]** Phase order corrected: Architecture optimization MUST happen before Codex global to avoid refactoring new code
+- **[ROADMAP-EVOLUTION]** Phases 5.2-5.5 inserted (2026-01-25): Function-level audit and consolidation (URGENT) - comprehensive bin/** analysis with mandatory user interaction
+- **[ROADMAP-EVOLUTION]** Old Phase 5.2 → Phase 5.6: Codex global support (implement `--codex --global` to `~/.codex/` on consolidated architecture)
+- **[ROADMAP-EVOLUTION]** Old Phase 5.3 → Phase 5.7: Future integration preparation and comprehensive validation
+- **[ROADMAP-EVOLUTION]** Phase order: Architecture optimization → Function-level audit → Codex global to build on clean, consolidated foundation
 - **[05.1-01]** Analysis-driven cleanup: Use mature npm tools (depcheck, madge, unimported) for data-driven restructuring decisions
 - **[05.1-01]** Manual dependency tree analysis when unimported needs entry point configuration (madge + comm utility)
 - **[05.1-01]** Git checkpoint pattern: Commit before major changes for rollback safety
@@ -182,36 +188,77 @@ Recent decisions for v1.10.0:
 
 ### Pending Todos
 
-**Phase 5.2 - Codex Global Support:**
+**Pending Todos
+
+**Phase 5.2 - Function-level Inventory (Stage 1):**
+- Clean up all `.txt` artifacts from Phase 5.1 tests (with user confirmation)
+- Create `/eval/stage_1/` directory structure
+- Analyze every function in `bin/**` individually
+- Document: purpose, inputs/outputs, side effects, dependencies
+- Get user confirmation via `ask_user` for each function analysis
+- Create Stage 1 analysis documents with mandatory YAML headers
+
+**Phase 5.3 - Function-level Consolidation (Stage 2):**
+- Evaluate repeated/overlapping logic across all functions
+- Identify duplication and unification opportunities
+- Present consolidation options to user via `ask_user`
+- Create Stage 2 documents with merge/keep/rename/move decisions
+
+**Phase 5.4 - Function-level Index Review (Stage 3):**
+- Analyze `index.js` function-by-function
+- Identify clarity, duplication, and optimization opportunities
+- Review all proposals with user via `ask_user`
+- Document Stage 3 findings and improvement proposals
+
+**Phase 5.5 - Execute Unification:**
+- Implement approved consolidation plans
+- Execute merge/rename/move operations
+- Optimize `index.js` and `bin/**` structure
+- Minimize/remove `lib-ghcc/` dependencies (with user approval)
+- Verify no breaking changes
+
+**Phase 5.6 - Codex Global Support:**
 - Implement `--codex --global` support
 - Add codex global path to paths.js
 - Create codex global installation logic
 - Test codex global installation flow
 
-**Phase 5.3 - Future Integration Preparation:**
+**Phase 5.7 - Future Integration Preparation:**
 - Document extension points for future platforms
 - Validate architecture extensibility
 - Create platform adapter template
 
 ### Roadmap Evolution
 
-**Current roadmap:** v1.10.0 with 11 phases (8 original + 3 inserted)
+**Current roadmap:** v1.10.0 with 15 phases (8 original + 7 inserted)
 - Phase 1: Dependency Setup (DEPS-01, DEPS-02) ✅
 - Phase 2: Flag System Redesign (FLAG-01 to FLAG-06) ✅
 - Phase 3: Interactive Menu (MENU-01 to MENU-04) ✅
 - Phase 4: Platform Paths (PATH-01 to PATH-03) ✅
 - Phase 5: Message Optimization (MSG-01 to MSG-03) ✅
 - **Phase 5.1: Codebase Architecture Optimization (ARCH-OPT-01 to ARCH-OPT-08) ✅ COMPLETE**
-- **Phase 5.2: Codex Global & Path Unification (CODEX-GLOBAL-01, CODEX-GLOBAL-02, PATH-UNIF-01) 🔄 NEXT**
-- **Phase 5.3: Future Integration Preparation (FUTURE-PREP-01 to FUTURE-PREP-04)**
+- **Phase 5.2: Function-level Inventory - Stage 1 (FN-AUDIT-01 to FN-AUDIT-05) 🔄 NEXT (URGENT)**
+- **Phase 5.3: Function-level Consolidation - Stage 2 (FN-CONSOL-01 to FN-CONSOL-04) (URGENT)**
+- **Phase 5.4: Function-level Index Review - Stage 3 (FN-INDEX-01 to FN-INDEX-03) (URGENT)**
+- **Phase 5.5: Execute Unification (FN-EXEC-01 to FN-EXEC-04) (URGENT)**
+- **Phase 5.6: Codex Global & Path Unification (CODEX-GLOBAL-01, CODEX-GLOBAL-02, PATH-UNIF-01)**
+- **Phase 5.7: Future Integration Preparation (FUTURE-PREP-01 to FUTURE-PREP-04)**
 - Phase 6: Uninstall Implementation (UNINST-01 to UNINST-03)
 - Phase 7: Testing & QA (TEST-01 to TEST-04)
 - Phase 8: Documentation & Migration (DOCS-01 to DOCS-04)
 
+**Urgent insertions (2026-01-25):**
+- Phases 5.2-5.5 added for comprehensive function-level audit and consolidation
+- Function-first approach (not file-first) with mandatory user interaction
+- Clean up Phase 5.1 test artifacts before starting
+- Old phases 5.2-5.3 renumbered to 5.6-5.7
+- Critical path now 11-16 days longer (function-level work)
+
 **Scope changes from original research:**
-- Codex global: ~~NOT implemented (show warning only)~~ → ✅ NOW IMPLEMENTING (Phase 5.2, after architecture cleanup)
+- Codex global: ~~NOT implemented (show warning only)~~ → ✅ NOW IMPLEMENTING (Phase 5.6, after function audit)
 - Architecture optimization: ✅ COMPLETE (Phase 5.1) - restructure FIRST, then add features
-- Future AI tools prep: ✅ READY (Phase 5.3) - GPT-4All, Mistral, Gemini
+- **Function-level audit: ✅ NOW ADDED (Phases 5.2-5.5) - comprehensive bin/** consolidation with user decisions**
+- Future AI tools prep: ✅ READY (Phase 5.7) - GPT-4All, Mistral, Gemini
 - Backward compatibility: NONE (hard removal, not soft deprecation)
 - Migration guide: Simplified (basic flag transition only)
 - Uninstall: NOW P0 (was considered for deferral)
@@ -244,10 +291,14 @@ Stopped at: Completed Phase 5.1 (Codebase Architecture Optimization)
 Resume file: None
 
 **Next steps:**
-1. Phase 5.2: Codex Global Support (implement `--codex --global` to `~/.codex/`)
-2. Phase 5.3: Future Integration Preparation (document extension points)
-3. Phase 6: Uninstall Implementation
-4. Phase 7: Testing & QA
+1. Phase 5.2: Function-level Inventory (Stage 1) - Mandatory cleanup + function-by-function analysis with user confirmations
+2. Phase 5.3: Function-level Consolidation (Stage 2) - Evaluate duplication and propose merge/keep/rename/move with user decisions
+3. Phase 5.4: Function-level Index Review (Stage 3) - Analyze index.js for clarity and optimization
+4. Phase 5.5: Execute Unification - Implement approved consolidation plans
+5. Phase 5.6: Codex Global Support (implement `--codex --global` to `~/.codex/`)
+6. Phase 5.7: Future Integration Preparation (document extension points)
+7. Phase 6: Uninstall Implementation
+8. Phase 7: Testing & QA
 
 ---
 
