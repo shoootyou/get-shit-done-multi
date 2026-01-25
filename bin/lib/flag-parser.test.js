@@ -281,7 +281,7 @@ describe('Flag Parser', () => {
     
     test('has no unexpected properties', () => {
       const result = parseFlags(['node', 'install.js', '--claude']);
-      expect(Object.keys(result)).toEqual(['platforms', 'scope', 'needsMenu']);
+      expect(Object.keys(result)).toEqual(['platforms', 'scope', 'needsMenu', 'configDir']);
     });
   });
 });
