@@ -87,8 +87,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Plans:**
 - [ ] 01-01-PLAN.md — Foundation & Core Modules (Wave 1)
-- [ ] 01-02-PLAN.md — Templates, CLI & Installation Orchestrator (Wave 2)
-- [ ] 01-03-PLAN.md — Integration Testing & Verification (Wave 3)
+- [ ] 01-02-PLAN.md — Template System & CLI Output (Wave 2)
+- [ ] 01-03-PLAN.md — Integration & Verification (Wave 3)
 
 **Notes:**
 - Keep it simple: no adapter abstraction yet (validate mechanics first)
