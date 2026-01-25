@@ -1,0 +1,17 @@
+Unused dependencies
+* debug
+* ignore
+* ms
+* simple-git
+Unused devDependencies
+* depcheck
+* dependency-cruiser
+* diff
+* execa
+* madge
+* npm-check-updates
+* p-map
+* strip-ansi
+* tmp-promise
+* unimported
+* which
