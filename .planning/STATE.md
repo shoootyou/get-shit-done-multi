@@ -12,10 +12,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Milestone: v1.10.0 - Installation CLI Optimization
 Phase: 5.2 of 15 (Function-level Inventory of `bin/**` - Stage 1) — IN PROGRESS
 Progress: [████░░░░░░░░░░░] 40% (6/15 phases complete)
-Last activity: 2026-01-25 — Completed Plan 05.2-01b (Advanced Analysis Utilities)
+Last activity: 2026-01-25 — Completed Plan 05.2-01a (Cleanup & Foundation Setup)
 Next: Phase 5.2 Plan 02 — Analyze all functions in bin/** and generate documentation
 
-**Phase 5.2 Plan 01b Complete:** ✅ 2026-01-25
+**Phase 5.2 Plan 01a Complete:** ✅ 2026-01-25
+- Plan 01a: Cleanup & Foundation Setup (3.4 min)
+- AST parser with dual-parser fallback (@babel/parser + acorn)
+- Complexity calculator with McCabe's algorithm (Simple < 5, Moderate 5-9, Complex >= 10)
+- Parsers installed: @babel/parser ^7.28.6, acorn ^8.15.0
+- Directory structure created: eval/stage_1/, bin/lib/analysis/
+- Tested: 82 functions extracted from install.js
+- Resolved Questions 1 and 5 from research phase
+- Ready for advanced analysis utilities (plan 01b)
+
+**Phase 5.2 Plan 01b Complete:** ✅ 2026-01-25 (executed before 01a)
 - Plan 01b: Advanced Analysis Utilities (3.5 min)
 - 4 utilities created: side-effects, classifier, relationships, confidence
 - I/O side effects detector (file system, console, network)
@@ -194,6 +204,9 @@ Recent decisions for v1.10.0:
 - **[05.1-03]** ESM-only packages (chalk 5.x, execa 9.x, boxen 8.x) work in CommonJS project
 - **[05.1-03]** No reverts needed despite ESM-only marketing (packages provide compatibility)
 - **[05.1-03]** Comprehensive Phase 5.1 report provides audit trail and future integration guidance
+- **[05.2-01a]** Dual-parser fallback strategy: @babel/parser primary, acorn fallback for edge cases
+- **[05.2-01a]** Hardcoded complexity thresholds: Simple < 5, Moderate 5-9, Complex >= 10 (configurable later)
+- **[05.2-01a]** Three sourceType strategies for @babel/parser: module, script, unambiguous (automatic detection)
 - **[05.2-01b]** I/O side effects only (file system, console, network) - NOT state mutations
 - **[05.2-01b]** 3-heuristic helper detection: scope + naming + usage, 2+ matches = helper
 - **[05.2-01b]** Confidence deductions: dynamic requires -20%, unclear naming -10%, no JSDoc -5%, complex without docs -15%, unclear deps -10%
@@ -284,7 +297,15 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 5.1 complete with excellent results.
+None currently. Phase 5.2 Plan 01a complete with foundation utilities ready.
+
+**Key achievements from Phase 5.2 Plan 01a:**
+- Dual-parser AST extraction strategy operational (@babel/parser + acorn)
+- McCabe complexity calculator with hardcoded thresholds (Simple/Moderate/Complex)
+- Successfully tested: 82 functions extracted from install.js
+- Analysis utilities: 6 modules ready (ast-parser, complexity, side-effects, classifier, relationships, confidence)
+- Directory structure in place: eval/stage_1/ for analysis documents
+- Resolved research questions 1 and 5
 
 **Key achievements from Phase 5.1 (all 4 plans):**
 - Zero circular dependencies maintained - clean architecture
@@ -299,16 +320,16 @@ None currently. Phase 5.1 complete with excellent results.
 - 7 dependencies updated to latest stable versions
 - Comprehensive documentation (PHASE-5.1-REPORT.md, 381 lines)
 
-**Phase 5.1 complete** - Ready for Phase 5.2 (Codex Global Support).
+**Phase 5.2 foundation complete** - Ready for Phase 5.2 Plan 02 (bin/** comprehensive analysis).
 
 ## Session Continuity
 
-Last session: 2026-01-25 16:33:10Z
-Stopped at: Completed Plan 05.2-01b (Advanced Analysis Utilities)
+Last session: 2026-01-25T16:33:00Z
+Stopped at: Completed Plan 05.2-01a (Cleanup & Foundation Setup)
 Resume file: None
 
 **Next steps:**
-1. Phase 5.2 Plan 02: Analyze all functions in bin/** and generate documentation
+1. Phase 5.2 Plan 02: Analyze all functions in bin/** and generate documentation with user confirmations
 2. Phase 5.2 Plan 03: Smart batching and user interaction for function analysis
 3. Phase 5.3: Function-level Consolidation (Stage 2) - Evaluate duplication and propose merge/keep/rename/move with user decisions
 4. Phase 5.4: Function-level Index Review (Stage 3) - Analyze index.js for clarity and optimization
