@@ -10,10 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5.2 of 15 (Function-level Inventory of `bin/**` - Stage 1) — READY
+Phase: 5.2 of 15 (Function-level Inventory of `bin/**` - Stage 1) — IN PROGRESS
 Progress: [████░░░░░░░░░░░] 40% (6/15 phases complete)
-Last activity: 2026-01-25 — Inserted 4 urgent phases for function-level audit and consolidation
-Next: Phase 5.2 (Function-level Inventory - Stage 1) — Mandatory cleanup + function-by-function analysis
+Last activity: 2026-01-25 — Completed Plan 05.2-01b (Advanced Analysis Utilities)
+Next: Phase 5.2 Plan 02 — Analyze all functions in bin/** and generate documentation
+
+**Phase 5.2 Plan 01b Complete:** ✅ 2026-01-25
+- Plan 01b: Advanced Analysis Utilities (3.5 min)
+- 4 utilities created: side-effects, classifier, relationships, confidence
+- I/O side effects detector (file system, console, network)
+- 3-heuristic helper detection (scope + naming + usage, 2+ = helper)
+- Deduction-based confidence scoring (start 100%, min 30%)
+- Direct call relationships tracker with reverse dependency mapping
+- All 6 analysis utilities now operational and tested
+- Ready for function-level inventory of bin/**
 
 **Phase 5.1 Complete:** ✅ 2026-01-25
 - 5 plans executed (01-01, 02-01, 02-02, 02-03, 03-01)
@@ -184,6 +194,13 @@ Recent decisions for v1.10.0:
 - **[05.1-03]** ESM-only packages (chalk 5.x, execa 9.x, boxen 8.x) work in CommonJS project
 - **[05.1-03]** No reverts needed despite ESM-only marketing (packages provide compatibility)
 - **[05.1-03]** Comprehensive Phase 5.1 report provides audit trail and future integration guidance
+- **[05.2-01b]** I/O side effects only (file system, console, network) - NOT state mutations
+- **[05.2-01b]** 3-heuristic helper detection: scope + naming + usage, 2+ matches = helper
+- **[05.2-01b]** Confidence deductions: dynamic requires -20%, unclear naming -10%, no JSDoc -5%, complex without docs -15%, unclear deps -10%
+- **[05.2-01b]** Direct call relationships only in Stage 1 (one level deep), transitive deferred to Stage 2
+- **[05.2-01b]** Minimum confidence score: 30% (never go below this floor)
+- **[05.2-01b]** Helper naming patterns: starts with _, internal, private, anonymous, arrow_; ends with helper, util
+- **[05.2-01b]** Reverse dependency mapping via buildCalledByMap for helper detection
 
 
 ### Pending Todos
@@ -286,19 +303,19 @@ None currently. Phase 5.1 complete with excellent results.
 
 ## Session Continuity
 
-Last session: 2026-01-25 09:42:00Z
-Stopped at: Completed Phase 5.1 (Codebase Architecture Optimization)
+Last session: 2026-01-25 16:33:10Z
+Stopped at: Completed Plan 05.2-01b (Advanced Analysis Utilities)
 Resume file: None
 
 **Next steps:**
-1. Phase 5.2: Function-level Inventory (Stage 1) - Mandatory cleanup + function-by-function analysis with user confirmations
-2. Phase 5.3: Function-level Consolidation (Stage 2) - Evaluate duplication and propose merge/keep/rename/move with user decisions
-3. Phase 5.4: Function-level Index Review (Stage 3) - Analyze index.js for clarity and optimization
-4. Phase 5.5: Execute Unification - Implement approved consolidation plans
-5. Phase 5.6: Codex Global Support (implement `--codex --global` to `~/.codex/`)
-6. Phase 5.7: Future Integration Preparation (document extension points)
-7. Phase 6: Uninstall Implementation
-8. Phase 7: Testing & QA
+1. Phase 5.2 Plan 02: Analyze all functions in bin/** and generate documentation
+2. Phase 5.2 Plan 03: Smart batching and user interaction for function analysis
+3. Phase 5.3: Function-level Consolidation (Stage 2) - Evaluate duplication and propose merge/keep/rename/move with user decisions
+4. Phase 5.4: Function-level Index Review (Stage 3) - Analyze index.js for clarity and optimization
+5. Phase 5.5: Execute Unification - Implement approved consolidation plans
+6. Phase 5.6: Codex Global Support (implement `--codex --global` to `~/.codex/`)
+7. Phase 5.7: Future Integration Preparation (document extension points)
+8. Phase 6: Uninstall Implementation
 
 ---
 
