@@ -109,9 +109,9 @@ Continue? [y/N]: _
 
 **Exit codes:**
 - Exit 0: All platforms installed successfully
-- Exit 1: All platforms failed
-- Exit 2: Partial success (some succeeded, some failed)
-- Enables automation scripts to distinguish states
+- Exit 1: Any failure (all failed OR partial success)
+- Follows POSIX standard (exit code 2 reserved for shell command misuse)
+- Summary message provides success/failure details for multi-platform installs
 
 ## Technical Boundaries
 
