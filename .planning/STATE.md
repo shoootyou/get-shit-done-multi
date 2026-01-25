@@ -10,17 +10,16 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 3 of 8 (Interactive Menu) — COMPLETE ✓
-Progress: [█████░░░░░] 37.5% (3/8 phases complete)
-Last activity: 2026-01-24 — Phase 3 verified and complete
+Phase: 4 of 8 (Platform Paths) — IN PROGRESS
+Progress: [██████░░░░] 43.75% (3.5/8 phases complete - Plan 04-01 complete)
+Last activity: 2026-01-25 — Completed 04-01-PLAN.md (Path Resolution & Validation)
 
-**Phase 3 Summary:**
-- 1 plan executed (03-01)
-- 4 tasks completed with 92.85% test coverage
-- Prompts-based interactive menu implemented
-- All MENU-01 through MENU-04 requirements satisfied
-- 87 unit tests passing, 8 manual tests approved
-- Ready for Phase 4: Platform Paths
+**Phase 4 Progress:**
+- Plan 04-01 complete: Path resolution with breaking change to ~/.claude/
+- 3 tasks completed, 4 files modified (1 modified, 3 created)
+- 98.8% test coverage (53 tests passing)
+- Cross-platform validation (Windows/macOS/Linux/WSL)
+- Ready for Plan 04-02: Conflict resolution
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
@@ -28,11 +27,12 @@ Last activity: 2026-01-24 — Phase 3 verified and complete
 - Platform flags: `--claude`, `--copilot`, `--codex`, `--all`
 - Scope modifiers: `--global`, `--local` (combine with platform flags)
 - Interactive menu with checkbox multi-select ✅ COMPLETE
+- **Path resolution updated:** Claude global now `~/.claude/` (breaking change) ✅ COMPLETE
 - Uninstall.js implementation (P0, not deferred)
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [█████░░░░░] 37.5% (3/8 phases - Phase 3 complete)
+Progress: [██████░░░░] 43.75% (3 complete, 1 in progress - Phase 4 Plan 1 complete)
 
 ## Performance Metrics
 
@@ -48,7 +48,7 @@ Progress: [█████░░░░░] 37.5% (3/8 phases - Phase 3 complete)
 | 1 | Dependency Setup | 1 day | **Complete** ✓ (2 min) |
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
 | 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
-| 4 | Platform Paths | 2-3 days | Pending |
+| 4 | Platform Paths | 2-3 days | **In Progress** (Plan 1: 4 min) |
 | 5 | Message Optimization | 2 days | Pending |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
 | 7 | Testing & QA | 3-4 days | Pending |
@@ -92,11 +92,16 @@ Recent decisions for v1.10.0:
 - **[03-01]** Dual validation (`min: 1` + `validate` function) for better UX on empty selection
 - **[03-01]** Scope null handling: flag parser returns null when no scope flag, menu knows to ask
 - **[03-01]** --local/--global alone are NEW flags (scope presets), only --codex-global is truly old
+- **[04-01]** Breaking change: Claude global path from ~/Library/Application Support/Claude to ~/.claude/
+- **[04-01]** Codex global installation not supported (throws clear error)
+- **[04-01]** configDir parameter uses absolute path resolution with platform subdirectories
+- **[04-01]** Permission errors provide actionable suggestions (--local for global, --config-dir for local)
+- **[04-01]** Windows validation allows : only after drive letter (C:)
 
 ### Pending Todos
 
-- Phase 4: Platform paths implementation
-- Phase 3 complete: Ready for Phase 4
+- Phase 4 Plan 2: Conflict resolution and old path migration warning
+- Phase 4 Plan 3: Install.js integration
 
 ### Roadmap Evolution
 
@@ -120,18 +125,18 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 3 complete. Ready for Phase 4 (Platform Paths).
+None currently. Phase 4 Plan 1 complete. Ready for Plan 2 (conflict resolution).
 
 ## Session Continuity
 
-Last session: 2026-01-24 23:46:00Z
-Stopped at: Completed Phase 3, Plan 1 - 03-01-PLAN.md (Interactive Menu Implementation)
+Last session: 2026-01-25 00:47:43Z
+Stopped at: Completed Phase 4, Plan 1 - 04-01-PLAN.md (Path Resolution & Validation)
 Resume file: None
 
 **Next steps:**
-1. Phase 4: Platform paths implementation
-2. Continue through remaining phases
-3. Integration testing in Phase 7
+1. Phase 4 Plan 2: Conflict resolution and old path migration warning
+2. Phase 4 Plan 3: Install.js integration
+3. Continue through remaining phases
 
 ---
 
