@@ -38,6 +38,14 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 - **Path validation** (prevent traversal attacks)
 - **Rollback on failure** (transaction pattern)
 - **Pre-install checks** (disk space, permissions, conflicts)
+- **Testing isolation** (ALL tests run in `/tmp`, never in source directory)
+
+### Testing Constraints (CRITICAL)
+- **Test directory:** ALL tests MUST execute under `/tmp` directory
+- **Isolation:** Each test MUST have its own folder under `/tmp`
+- **Source protection:** CANNOT execute installation in current source directory
+- **No source modification:** CANNOT modify source files (.github/, .claude/, .codex/, get-shit-done/)
+- **Applies to:** ALL phases, ALL testing activities throughout the project
 
 ### Extensibility
 - **Adapter pattern** for platform differences

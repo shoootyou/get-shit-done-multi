@@ -596,26 +596,80 @@ export function isPathSafe(basePath, targetPath) {
 - Commander for CLI parsing (has maintained dominance)
 - Chalk for colors (respects standards, auto-detection)
 
-## Open Questions
+## Decisions (Accepted Recommendations)
 
-Things that couldn't be fully resolved:
+**These recommendations from research have been ACCEPTED and should be implemented:**
 
-1. **--help-full implementation approach**
-   - What we know: Commander supports help customization via configureHelp()
-   - What's unclear: Best pattern for two-tier help (brief default, detailed --help-full)
-   - Recommendation: Phase 1 use Commander's default help, add custom --help-full command in early tasks. Commander supports custom commands for this.
+1. **--help-full implementation approach** ✅ ACCEPTED
+   - Implementation: Use Commander's default help for `--help`, add custom `--help-full` command
+   - Rationale: Commander supports custom commands, clean separation of concerns
+   - Action: Phase 1 tasks should implement both help levels
 
-2. **Flag suggestion algorithm**
-   - What we know: User wants "suggest closest match" for typos
-   - What's unclear: Should Phase 1 use simple prefix matching or full Levenshtein?
-   - Recommendation: Start with simple prefix matching (3-character prefix match). Commander has some built-in suggestion. Add Levenshtein library (fastest-levenshtein) in Phase 3+ if suggestions are insufficient.
+2. **Flag suggestion algorithm** ✅ ACCEPTED
+   - Implementation: Start with simple prefix matching (3-character prefix match)
+   - Rationale: Simple, fast, covers most typos. Commander has some built-in suggestion
+   - Future: Add Levenshtein library (fastest-levenshtein) in Phase 3+ if insufficient
+   - Action: Phase 1 implements prefix matching
 
-3. **Template validation timing**
-   - What we know: User wants pre-validation before file writes
-   - What's unclear: Should validation read all templates at start, or validate per-file during copy?
-   - Recommendation: Read and validate all templates at installation start (fail fast). Store validation results. This prevents partial installs with bad templates.
+3. **Template validation timing** ✅ ACCEPTED
+   - Implementation: Read and validate all templates at installation start (fail fast)
+   - Rationale: Prevents partial installs with bad templates, better error messages
+   - Action: Phase 1 validation module scans all templates before any file writes
 
-4. **Windows path handling depth**
+4. **Windows path handling depth** ✅ ACCEPTED
+   - Implementation: Use cross-platform APIs from start (os.homedir(), path.join())
+   - Rationale: Defer Windows-specific testing to Phase 7, but write portable code now
+   - Action: All path operations use Node.js path module, never string concatenation
+
+## Testing Constraints (CRITICAL)
+
+**ALL testing activities MUST follow these rules:**
+
+### Test Execution Location
+- **Required:** ALL tests execute under `/tmp` directory
+- **Folder structure:** Each test gets unique folder `/tmp/gsd-test-{timestamp}/`
+- **Never test in:** Source directory, current working directory, or any subdirectory of repo
+- **Applies to:** Manual testing, automated testing, verification, all phases
+
+### Source Protection
+- **CANNOT execute installation in:** Current source directory
+- **CANNOT modify:** Source files in `.github/`, `.claude/`, `.codex/`, `get-shit-done/`
+- **Rationale:** Prevent accidental corruption of source during development/testing
+- **Enforcement:** Test setup MUST create isolated temp directory first
+
+### Test Cleanup
+- **Should cleanup:** Test folders after successful test completion
+- **May leave:** Failed test folders for debugging inspection
+- **Utility needed:** Command to clean all `/tmp/gsd-test-*` folders
+- **Implementation:** Each test creates unique timestamped folder, tracks for cleanup
+
+### Example Test Pattern
+```bash
+# Correct: Create isolated test environment
+TEST_DIR="/tmp/gsd-test-$(date +%s)"
+mkdir -p "$TEST_DIR"
+cd "$TEST_DIR"
+npx /path/to/source/package --claude
+
+# Incorrect: Testing in source directory
+cd /path/to/source
+npx . --claude  # ❌ NEVER DO THIS
+```
+
+## Open Questions (Remaining)
+
+**None remaining** - all research questions have been resolved or decisions made.
+
+Previous questions resolved:
+1. ✅ --help-full implementation → Use custom command
+2. ✅ Flag suggestion algorithm → Prefix matching (3-char)
+3. ✅ Template validation timing → Pre-validate all at start
+4. ✅ Windows path handling → Use cross-platform APIs, defer testing to Phase 7
+
+---
+
+**Research complete:** 2025-01-26  
+**Ready for:** Planning phase (`/gsd-plan-phase 1`)
    - What we know: Phase 7 includes Windows testing, Phase 1 targets macOS/Linux
    - What's unclear: Should Phase 1 include any Windows-specific handling?
    - Recommendation: Use os.homedir() and path.join() (cross-platform), but don't test Windows paths until Phase 7. Document Windows deferral in README.

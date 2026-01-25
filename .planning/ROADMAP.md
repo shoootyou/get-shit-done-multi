@@ -413,7 +413,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 
 | Phase | Requirements Covered | Count |
 |-------|---------------------|-------|
-| 1 - Core Installer | INSTALL-01, INSTALL-02, INSTALL-03, CLI-02, CLI-05, SAFETY-02, TEMPLATE-01, TEMPLATE-03 | 8 |
+| 1 - Core Installer | INSTALL-01, INSTALL-02, INSTALL-03, CLI-02, CLI-05, SAFETY-02, TEMPLATE-01, TEMPLATE-03, TEST-01, TEST-02 | 10 |
 | 2 - Multi-Platform | PLATFORM-01, PLATFORM-01B, PLATFORM-02, PLATFORM-03, PLATFORM-04, PLATFORM-04B, PLATFORM-05, CLI-03, TEMPLATE-02 | 9 |
 | 3 - Interactive UX | CLI-01, CLI-04, UX-01, UX-02, UX-03 | 5 |
 | 4 - Transactions | INSTALL-04, INSTALL-05, VERSION-01 | 3 |
@@ -421,7 +421,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 | 6 - Security | SAFETY-01 | 1 |
 | 7 - Documentation | DOCS-01, DOCS-02, DOCS-03 | 3 |
 
-**Total Mapped:** 31/31 requirements ✓
+**Total Mapped:** 33/33 requirements ✓
 
 ### Orphaned Requirements
 

@@ -235,6 +235,21 @@
   - `{{COMMAND_PREFIX}}` → `/gsd-` or `$gsd-`
 - **Rationale:** Same template, different output per platform
 
+### Category: Testing (TEST)
+
+**TEST-01: Testing Isolation**
+- ALL tests MUST execute under `/tmp` directory
+- Each test MUST have its own unique folder (e.g., `/tmp/gsd-test-{timestamp}`)
+- Never execute installation in source directory
+- Never modify source files (.github/, .claude/, .codex/, get-shit-done/)
+- **Rationale:** Prevent accidental source file corruption during development/testing
+
+**TEST-02: Test Cleanup**
+- Test folders should be cleaned up after test completion
+- Failed tests may leave folders for debugging
+- Provide utility to clean all `/tmp/gsd-test-*` folders
+- **Rationale:** Prevent /tmp pollution from repeated testing
+
 ### Category: Documentation (DOCS)
 
 **DOCS-01: Installation Instructions**
@@ -312,11 +327,13 @@
 | TEMPLATE-01 | Phase 1 | Pending |
 | TEMPLATE-02 | Phase 2 | Pending |
 | TEMPLATE-03 | Phase 1 | Pending |
-| DOCS-01 | Phase 8 | Pending |
-| DOCS-02 | Phase 8 | Pending |
-| DOCS-03 | Phase 8 | Pending |
+| DOCS-01 | Phase 7 | Pending |
+| DOCS-02 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Pending |
+| TEST-01 | All Phases | Pending |
+| TEST-02 | All Phases | Pending |
 
-**Total v1 Requirements:** 31 (was 29, added PLATFORM-01B, PLATFORM-04B)
+**Total v2.0 Requirements:** 33 (was 31, added TEST-01, TEST-02)
 **Total v2.x Requirements:** 4 (deferred enhancements)
 
 ---
