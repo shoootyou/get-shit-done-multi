@@ -49,7 +49,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** None (foundation)
 
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 **Requirements Mapped:**
 - INSTALL-01: NPX entry point (version 2.0.0)
@@ -88,7 +88,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 **Plans:**
 - [ ] 01-01-PLAN.md — Foundation & Core Modules (Wave 1)
 - [ ] 01-02-PLAN.md — Template System & CLI Output (Wave 2)
-- [ ] 01-03-PLAN.md — Integration & Verification (Wave 3)
+- [ ] 01-03-PLAN.md — Test Infrastructure (Wave 3)
+- [ ] 01-04-PLAN.md — Integration Test Suites & Verification (Wave 4)
 
 **Notes:**
 - Keep it simple: no adapter abstraction yet (validate mechanics first)
