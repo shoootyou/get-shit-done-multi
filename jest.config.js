@@ -1,53 +1,30 @@
 module.exports = {
-  // Test environment
   testEnvironment: 'node',
-  
-  // Test match patterns (include __tests__ and bin/lib unit tests)
   testMatch: [
-    '**/__tests__/**/*.test.js',
-    '**/bin/lib/**/*.test.js',
-    '**/bin/*.test.js'  // Integration tests in bin root
+    '**/__tests__/**/*.test.js',   // Integration tests
+    '**/bin/**/*.test.js',          // Unit tests (colocated)
   ],
-  
-  // Ignore node_modules and standalone test runners
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/bin/lib/orchestration/.*\\.test\\.js$',  // Standalone orchestration test runners
-    '/bin/lib/template-system/.*\\.test\\.js$',  // Standalone template-system test runners (old location)
-    '/bin/lib/templating/.*\\.test\\.js$'  // Standalone templating test runners (new location)
-  ],
-  
-  // Coverage configuration
   collectCoverageFrom: [
     'bin/**/*.js',
-    'specs/**/*.js',
-    '!bin/**/*.test.js',
-    '!bin/lib/orchestration/test-scenarios/**',
-    '!**/node_modules/**'
+    'lib-ghcc/**/*.js',
+    '!bin/**/*.test.js',            // Exclude tests from coverage
+    '!**/node_modules/**',
+    '!**/coverage/**',
   ],
-  
-  // Coverage thresholds (start low, increase over time)
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/coverage/',
+    '/bin/lib/orchestration/.*\\.test\\.js$',  // Standalone orchestration test runners
+    '/bin/lib/templating/.*\\.test\\.js$',      // Standalone templating test runners
+  ],
   coverageThreshold: {
     global: {
-      statements: 0,
-      branches: 0,
-      functions: 0,
-      lines: 0
-    }
+      statements: 80,
+      branches: 75,
+      functions: 80,
+      lines: 80,
+    },
   },
-  
-  // Timeout for async tests
-  testTimeout: 30000,
-  
-  // Clear mocks between tests
-  clearMocks: true,
-  
-  // Verbose output
-  verbose: true,
-  
-  // Transform (none needed for CommonJS)
-  transform: {},
-  
-  // Module file extensions
-  moduleFileExtensions: ['js', 'json', 'node']
 };
