@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 Milestone: v1.10.0 - Installation CLI Optimization
 Phase: 5.1 of 11 (Codebase Architecture Optimization) — IN PROGRESS 🔄
 Progress: [█████░░░░░░] 45% (5/11 phases complete, 2/8 plans in Phase 5.1)
-Last activity: 2026-01-25 — Completed Plan 05.1-02 (Foundation & Cleanup)
-Next: Plan 05.1-03 (Domain Migration - Configuration & Menu)
+Last activity: 2026-01-25 — Completed Plan 05.1-02 (Domain Migration)
+Next: Plan 05.1-03 (Test Structure Unification)
 
 **3 New Phases Inserted After Phase 5:**
 - Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
@@ -22,16 +22,23 @@ Next: Plan 05.1-03 (Domain Migration - Configuration & Menu)
 
 **Phase 5.1 In Progress:**
 - 2 plans executed (05.1-01, 05.1-02) ✓
-- 8 tasks completed, 11 files created, 2 modified
-- 14/14 must-haves verified (100%)
+- 10 tasks completed (5 from 01, 5 from 02), 50+ files migrated
+- 18/18 must-haves verified (100%)
 - Analysis tools installed: depcheck, madge, unimported, dependency-cruiser, npm-check-updates
-- Baseline captured: 248 passing tests, 10.47% coverage
+- Baseline: 254 passing tests (16 suites), 100% pass rate
 - Zero circular dependencies - clean architecture maintained
-- 4 unused dependencies removed (debug, ignore, ms, simple-git)
+- 4 unused transitive dependencies identified (not removable - part of dependencies)
 - All source files in dependency tree (no dead code)
-- 5 domain directories created (platforms, installation, configuration, templating, testing)
-- Clean foundation ready for code migration
-- **Next:** Plan 05.1-03 (Domain Migration - Configuration & Menu)
+- **Domain structure complete:**
+  - `platforms/` - Claude, Copilot, Codex adapters + shared utilities
+  - `configuration/` - Flags, paths, menu, routing (7 config modules)
+  - `templating/` - Template engine, doc-generator
+  - `installation/` - Reporter, colors, migrations, CLI detection
+  - `testing/` - Test utilities + fixtures structure
+- All code migrated and organized by feature/domain
+- All import paths updated and verified (254 tests passing)
+- Doc generator working in new location
+- **Next:** Plan 05.1-03 (Test Structure Unification)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -154,9 +161,16 @@ Recent decisions for v1.10.0:
 - **[05.1-01]** Manual dependency tree analysis when unimported needs entry point configuration (madge + comm utility)
 - **[05.1-01]** Git checkpoint pattern: Commit before major changes for rollback safety
 - **[05.1-01]** Separate analysis files for each category (analysis-{type}.txt pattern)
-- **[05.1-02]** Remove unused dependencies with zero code references (debug, ignore, ms, simple-git)
-- **[05.1-02]** Domain-based directory structure: 5 top-level folders under bin/lib/ (platforms, installation, configuration, templating, testing)
-- **[05.1-02]** Use .gitkeep files to track empty directories in git
+- **[05.1-02]** Feature/domain organization chosen over technical layers (platforms vs adapters)
+- **[05.1-02]** Codex uses local paths only (no global support) in context-builder
+- **[05.1-02]** Test-helpers consolidated into testing/ domain with fixtures/ structure
+- **[05.1-02]** Standalone test runners excluded from Jest (orchestration, templating use custom runners)
+- **[05.1-02]** Template-system renamed to templating for domain naming consistency
+- **[05.1-02]** Domain structure: platforms/ configuration/ templating/ installation/ testing/
+- **[05.1-02]** Import paths follow new domain structure (../configuration/ not ../lib/)
+- **[05.1-02]** Platform-specific paths with null-safe fallbacks for unsupported scopes
+- **[05.1-02]** Doc generator in templating/doc-generator/ with package.json script references
+
 
 ### Pending Todos
 
@@ -195,25 +209,26 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 5.1 Plan 01 complete with excellent results.
+None currently. Phase 5.1 Plans 01-02 complete with excellent results.
 
-**Key findings from foundation & cleanup:**
+**Key findings from domain migration:**
 - Zero circular dependencies maintained - clean architecture
 - All source files in use - no dead code
-- 4 unused dependencies removed (debug, ignore, ms, simple-git)
-- 5 domain directories created and ready for migration
-- Strong test foundation (248 passing tests)
+- 50+ files successfully migrated to domain structure
+- All 254 tests passing (100% pass rate)
+- Import paths correctly updated across entire codebase
+- Domain boundaries clear: platforms, configuration, templating, installation, testing
 
-**Phase 5.1 is critical path bottleneck** (4-5 days estimated) - all downstream work depends on clean architecture.
+**Phase 5.1 progressing well** - 2 of 8 plans complete, foundation solid for remaining work.
 
 ## Session Continuity
 
-Last session: 2026-01-25 09:21:04Z
-Stopped at: Completed 05.1-02-PLAN.md (Foundation & Cleanup)
+Last session: 2026-01-25 09:28:46Z
+Stopped at: Completed 05.1-02-PLAN.md (Domain Migration)
 Resume file: None
 
 **Next steps:**
-1. Plan 05.1-03: Domain Migration - Configuration & Menu (move config-related files)
+1. Plan 05.1-03: Test Structure Unification (consolidate test patterns)
 2. Continue Phase 5.1 execution (6 more plans)
 3. Phase 5.2: Codex Global Support (build on clean architecture)
 4. Phase 5.3: Future Integration Preparation & Validation
