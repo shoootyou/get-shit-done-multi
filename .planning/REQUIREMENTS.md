@@ -25,9 +25,11 @@
 
 **INSTALL-03: Template Rendering**
 - Load templates from `/templates/skills/` and `/templates/agents/` directories
+- Templates are COPIES of existing `.github/skills/` and `.github/agents/` files with variables
 - Replace template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`)
 - Use EJS for JavaScript/JSON files (supports conditionals)
-- Use plain string replacement for XML/Markdown (avoid syntax conflicts)
+- Use plain string replacement for Markdown files (avoid syntax conflicts)
+- Maintain directory structure: skills are `.xxx/skills/gsd-<name>/SKILL.md`
 - **Rationale:** Transform universal templates to platform-specific
 
 **INSTALL-04: Atomic Operations with Rollback**
@@ -212,10 +214,22 @@
 ### Category: Template Structure (TEMPLATE)
 
 **TEMPLATE-01: Skill and Agent Templates**
-- Store skill templates in `/templates/skills/`
-- Store agent templates in `/templates/agents/`
-- Include: skill definitions, agent definitions, shared libraries
-- **Rationale:** Clear separation of template types
+- **Source:** Use existing files from `.github/skills/` and `.github/agents/` as source of truth
+- **Process:** Copy to `/templates/` and convert to templates by adding `{{VARIABLES}}`
+- **Do NOT:** Generate new skills or agents from scratch
+- **Skills structure:** `/templates/skills/gsd-<skill-name>/SKILL.md` (directory-based)
+- **Agents structure:** `/templates/agents/gsd-<agent-name>.agent.md` (flat files)
+- **Rationale:** Reuse existing tested skills/agents, ensure consistency
+
+**TEMPLATE-01B: Template Conversion Process**
+- Replace hardcoded values with template variables:
+  - Platform roots: `.github/` → `{{PLATFORM_ROOT}}`
+  - Command prefixes: `/gsd-` → `{{COMMAND_PREFIX}}`
+  - Version numbers: `1.9.1` → `{{VERSION}}`
+  - Platform names: `copilot` → `{{PLATFORM_NAME}}`
+- Preserve all other content exactly as-is
+- Maintain directory structure for skills
+- **Rationale:** Systematic conversion ensures no content loss
 
 **TEMPLATE-02: Platform-Specific Transformations**
 - Handle platform differences via adapters (not template duplication)
@@ -325,6 +339,7 @@
 | SAFETY-01 | Phase 6 | Pending |
 | SAFETY-02 | Phase 1 | Pending |
 | TEMPLATE-01 | Phase 1 | Pending |
+| TEMPLATE-01B | Phase 1 | Pending |
 | TEMPLATE-02 | Phase 2 | Pending |
 | TEMPLATE-03 | Phase 1 | Pending |
 | DOCS-01 | Phase 7 | Pending |
@@ -333,7 +348,7 @@
 | TEST-01 | All Phases | Pending |
 | TEST-02 | All Phases | Pending |
 
-**Total v2.0 Requirements:** 33 (was 31, added TEST-01, TEST-02)
+**Total v2.0 Requirements:** 34 (was 33, added TEMPLATE-01B)
 **Total v2.x Requirements:** 4 (deferred enhancements)
 
 ---

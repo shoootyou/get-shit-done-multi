@@ -68,7 +68,8 @@ Project succeeds when:
 
 ## Out of Scope (v2.0)
 
-- Custom template repositories (only bundled templates)
+- Custom template repositories (only bundled templates from `.github/`)
+- Generating new skills/agents (use existing `.github/skills/` and `.github/agents/` as source)
 - Plugin system for external adapters (future work)
 - Web-based configuration UI
 - Telemetry or usage analytics

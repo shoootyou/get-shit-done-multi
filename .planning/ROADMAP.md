@@ -54,28 +54,34 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 **Requirements Mapped:**
 - INSTALL-01: NPX entry point (version 2.0.0)
 - INSTALL-02: File system operations
-- INSTALL-03: Template rendering (basic string replacement)
+- INSTALL-03: Template rendering (copy from `.github/` and convert)
 - CLI-02: Platform selection flags (`--claude`)
 - CLI-05: Help and version flags
 - SAFETY-02: Path normalization
-- TEMPLATE-01: Skill and agent templates (`/templates/skills/`, `/templates/agents/`)
+- TEMPLATE-01: Use `.github/skills/` and `.github/agents/` as source
+- TEMPLATE-01B: Convert to templates with {{VARIABLES}}
 - TEMPLATE-03: Template variables
+- TEST-01: Testing isolation
+- TEST-02: Test cleanup
 
 **Success Criteria:**
-1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd/`
-2. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/` with manifest template
-3. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
-4. Installation completes in <30 seconds for typical setup
-5. `--help` and `--version` flags show correct information
-6. Version displays as 2.0.0
+1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd-*/`
+2. All 29 skills from `.github/skills/` converted to templates and installed
+3. All 13 agents from `.github/agents/` converted to templates and installed
+4. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/` with manifest template
+5. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
+6. Skill structure: `.claude/skills/gsd-<name>/SKILL.md` (directory-based)
+7. Installation completes in <30 seconds for typical setup
+8. `--help` and `--version` flags show correct information
+9. Version displays as 2.0.0
 
 **Key Deliverables:**
 - `/bin/install.js` (entry point with shebang)
 - `/bin/lib/io/file-operations.js` (copy, create directories)
 - `/bin/lib/rendering/template-renderer.js` (string replacement)
 - `/bin/lib/paths/path-resolver.js` (normalization, validation)
-- `/templates/skills/` (skill templates)
-- `/templates/agents/` (agent templates)
+- `/templates/skills/gsd-*/SKILL.md` (29 skills copied from `.github/skills/` and converted)
+- `/templates/agents/gsd-*.agent.md` (13 agents copied from `.github/agents/` and converted)
 - `/get-shit-done/.gsd-install-manifest.json` (template)
 - Basic error handling and logging
 
@@ -420,7 +426,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 
 | Phase | Requirements Covered | Count |
 |-------|---------------------|-------|
-| 1 - Core Installer | INSTALL-01, INSTALL-02, INSTALL-03, CLI-02, CLI-05, SAFETY-02, TEMPLATE-01, TEMPLATE-03, TEST-01, TEST-02 | 10 |
+| 1 - Core Installer | INSTALL-01, INSTALL-02, INSTALL-03, CLI-02, CLI-05, SAFETY-02, TEMPLATE-01, TEMPLATE-01B, TEMPLATE-03, TEST-01, TEST-02 | 11 |
 | 2 - Multi-Platform | PLATFORM-01, PLATFORM-01B, PLATFORM-02, PLATFORM-03, PLATFORM-04, PLATFORM-04B, PLATFORM-05, CLI-03, TEMPLATE-02 | 9 |
 | 3 - Interactive UX | CLI-01, CLI-04, UX-01, UX-02, UX-03 | 5 |
 | 4 - Transactions | INSTALL-04, INSTALL-05, VERSION-01 | 3 |
