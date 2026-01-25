@@ -2,7 +2,7 @@
 const prompts = require('prompts');
 const symbols = require('./symbols');
 const { indent } = require('./formatter');
-const { cyan, green, yellow, dim, reset } = require('../colors');
+const { cyan, green, yellow, dim, reset } = require('./colors');
 
 // Lazy-load boxen to support Jest mocking
 let boxen;

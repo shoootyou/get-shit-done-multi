@@ -1,5 +1,5 @@
 const prompts = require('prompts');
-const { cyan, green, yellow, dim, reset } = require('../colors');
+const { cyan, green, yellow, dim, reset } = require('./colors');
 
 async function confirmMigration(detectedStructures) {
   console.log(`  ${cyan}Old GSD detected:${reset}`);

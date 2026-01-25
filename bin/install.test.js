@@ -3,7 +3,7 @@
  * Phase 5, Plan 2 - Verify Reporter integration and exit code logic
  */
 
-const Reporter = require('./lib/output/reporter');
+const Reporter = require('./lib/installation/reporter');
 
 describe('install.js integration', () => {
   describe('Reporter integration', () => {

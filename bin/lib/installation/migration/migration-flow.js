@@ -2,7 +2,7 @@ const { detectAllPlatforms } = require('./detect-old-structure');
 const { createBackup, addToGitignore } = require('./backup-handler');
 const { confirmMigration } = require('./migration-prompts');
 const { createProgressBar } = require('../../../scripts/shared/progress-display');
-const { cyan, green, yellow, dim, reset } = require('../colors');
+const { cyan, green, yellow, dim, reset } = require('./colors');
 const fs = require('fs-extra');
 
 async function runMigration() {

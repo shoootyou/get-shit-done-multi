@@ -9,7 +9,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 const { AgentRegistry } = require('./agent-registry');
-const { detectCLI } = require('../cli-detection/detect');
+const { detectCLI } = require('../installation/cli-detection/detect');
 const { PerformanceTracker } = require('./performance-tracker');
 
 // Import state management integration (ES modules)
