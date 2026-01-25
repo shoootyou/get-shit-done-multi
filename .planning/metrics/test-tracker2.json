@@ -124,5 +124,17 @@
     "cli": "claude",
     "duration": 50.75087499999995,
     "timestamp": "2026-01-25T09:21:02.384Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 55.507292000000234,
+    "timestamp": "2026-01-25T09:29:27.879Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 50.66195799999991,
+    "timestamp": "2026-01-25T09:29:36.757Z"
   }
 ]

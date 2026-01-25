@@ -1,6 +1,6 @@
 # CLI Comparison Matrix
 
-**Last generated:** 2026-01-25 09:26 UTC
+**Last generated:** 2026-01-25 09:46 UTC
 
 This document compares GSD (Get Shit Done) feature availability across Claude Code, GitHub Copilot CLI, and Codex CLI.
 

@@ -1,6 +1,6 @@
 const cliProgress = require('cli-progress');
 const chalk = require('chalk');
-const { green, reset } = require('../../bin/lib/colors');
+const { green, reset } = require('../../bin/lib/installation/colors');
 
 function createProgressBar(label, total) {
   // Detect CI/non-TTY environment (per RESEARCH.md Pitfall 1)
