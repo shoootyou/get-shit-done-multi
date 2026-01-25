@@ -10,16 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 4 of 8 (Platform Paths) — IN PROGRESS
-Progress: [██████░░░░] 43.75% (3.5/8 phases complete - Plan 04-01 complete)
-Last activity: 2026-01-25 — Completed 04-01-PLAN.md (Path Resolution & Validation)
+Phase: 4 of 8 (Platform Paths) — COMPLETE ✓
+Progress: [█████████░] 50% (4/8 phases complete)
+Last activity: 2026-01-25 — Completed Phase 4 (Platform Paths)
 
-**Phase 4 Progress:**
-- Plan 04-01 complete: Path resolution with breaking change to ~/.claude/
-- 3 tasks completed, 4 files modified (1 modified, 3 created)
-- 98.8% test coverage (53 tests passing)
-- Cross-platform validation (Windows/macOS/Linux/WSL)
-- Ready for Plan 04-02: Conflict resolution
+**Phase 4 Complete:**
+- 2 plans executed (04-01, 04-02)
+- 7 tasks completed, 8 files modified (2 created, 6 modified)
+- 11/11 must-haves verified (100%)
+- 84 tests passing, 98.8% coverage
+- Cross-platform path resolution working (Windows/macOS/Linux/WSL)
+- Conflict detection and auto-cleanup implemented
+- Old Claude path migration warning added
+- Config-dir flag support enabled
+- **Next:** Phase 5 (Message Optimization)
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
@@ -28,11 +32,13 @@ Last activity: 2026-01-25 — Completed 04-01-PLAN.md (Path Resolution & Validat
 - Scope modifiers: `--global`, `--local` (combine with platform flags)
 - Interactive menu with checkbox multi-select ✅ COMPLETE
 - **Path resolution updated:** Claude global now `~/.claude/` (breaking change) ✅ COMPLETE
+- **Conflict resolution:** Auto-cleanup GSD content, old path detection ✅ COMPLETE
+- **Config-dir support:** Custom installation directories ✅ COMPLETE
 - Uninstall.js implementation (P0, not deferred)
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [██████░░░░] 43.75% (3 complete, 1 in progress - Phase 4 Plan 1 complete)
+Progress: [█████████░] 50% (4/8 phases complete)
 
 ## Performance Metrics
 
