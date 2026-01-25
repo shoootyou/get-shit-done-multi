@@ -195,20 +195,114 @@ if (hasHelp) {
     process.exit(0);
   }
 
-  // Effective scope helper (Codex always local)
-  const effectiveScope = (platform) => {
-    return platform === 'codex' ? 'local' : scope;
-  };
+  // ============================================================================
+  // PHASE 4: PATH RESOLUTION & CONFLICT HANDLING
+  // ============================================================================
 
-  // Display parsed configuration (temporary - will be replaced in Phase 4)
-  console.log(`  ${cyan}Flag parsing complete:${reset}`);
-  platforms.forEach(platform => {
+  const { validatePath } = require('./lib/path-validator');
+  const { ensureInstallDir } = require('./lib/paths');
+  const { 
+    analyzeInstallationConflicts, 
+    cleanupGSDContent, 
+    detectOldClaudePath 
+  } = require('./lib/conflict-resolver');
+
+  // Validate --config-dir with --global conflict
+  if (explicitConfigDir && scope === 'global') {
+    console.error(`  ${yellow}Error: Cannot use --config-dir with --global${reset}`);
+    console.error(`  ${dim}--config-dir is only valid with --local or when no scope is specified${reset}`);
+    process.exit(1);
+  }
+
+  // Detect old Claude path (only if installing Claude globally)
+  if (platforms.includes('claude') && scope === 'global') {
+    const oldPathCheck = await detectOldClaudePath();
+    if (oldPathCheck.exists) {
+      console.warn(`\n${oldPathCheck.warning}\n`);
+    }
+  }
+
+  // Run migration check (before installation)
+  try {
+    const migrationResult = await runMigration();
+    // No message needed - migration output is self-contained
+  } catch (err) {
+    console.error(`  ${yellow}Migration failed:${reset} ${err.message}`);
+    console.error(`  ${dim}Please backup manually and try again.${reset}`);
+    process.exit(1);
+  }
+
+  /**
+   * Helper function to validate and prepare for platform installation
+   */
+  async function validateAndPrepareInstall(platform, finalScope) {
+    // Get target path
+    const targetPath = getConfigPaths(platform, finalScope, explicitConfigDir);
+    
+    // Validate path
+    const validation = validatePath(targetPath);
+    if (!validation.valid) {
+      console.error(`  ${yellow}Invalid path for ${platform}: ${validation.errors.join(', ')}${reset}`);
+      process.exit(1);
+    }
+    
+    // Analyze conflicts
+    const conflicts = await analyzeInstallationConflicts(targetPath);
+    
+    // Auto-cleanup GSD content
+    if (conflicts.gsdFiles.length > 0 && conflicts.canAutoClean) {
+      const { removed } = await cleanupGSDContent(conflicts.gsdFiles);
+      console.log(`  ${dim}Cleaned up ${removed} directories from previous installation${reset}`);
+    }
+    
+    // Handle user file conflicts
+    if (conflicts.hasConflicts && !conflicts.canAutoClean) {
+      console.error(`  ${yellow}Error: User files exist in ${targetPath}${reset}`);
+      console.error(`  ${dim}User files: ${conflicts.userFiles.join(', ')}${reset}`);
+      console.error(`  ${dim}Manual cleanup required before installation.${reset}`);
+      process.exit(1);
+    }
+    
+    // Create directory with permission checking
+    const dirResult = await ensureInstallDir(targetPath, finalScope);
+    if (!dirResult.success) {
+      console.error(`  ${yellow}Error: ${dirResult.error}${reset}`);
+      console.error(`  ${dim}Suggestion: ${dirResult.suggestion}${reset}`);
+      process.exit(1);
+    }
+    
+    return targetPath;
+  }
+
+  // Install each platform
+  console.log(`  ${cyan}Installing GSD for ${platforms.length} platform(s)...${reset}\n`);
+  
+  for (const platform of platforms) {
     const finalScope = effectiveScope(platform);
-    console.log(`    ${platform} → ${finalScope}`);
-  });
-  console.log('');
-  console.log(`  ${dim}Installation logic will be updated in Phase 4${reset}`);
-  console.log(`  ${dim}For now, exiting after successful flag parsing${reset}`);
+    console.log(`  ${cyan}Installing ${platform} (${finalScope})...${reset}`);
+    
+    // Validate and prepare (creates dir, checks conflicts, etc.)
+    await validateAndPrepareInstall(platform, finalScope);
+    
+    // Call existing installation function with adapted parameters
+    // Note: These functions now internally use updated adapters with new signatures
+    if (platform === 'claude') {
+      // Convert scope to isGlobal for legacy parameter
+      const isGlobal = (finalScope === 'global');
+      install(isGlobal, finalScope, explicitConfigDir);
+    } else if (platform === 'copilot') {
+      // Get project directory (configDir or cwd)
+      const projectDir = explicitConfigDir ? path.resolve(explicitConfigDir) : process.cwd();
+      installCopilot(projectDir, finalScope, explicitConfigDir);
+    } else if (platform === 'codex') {
+      const isGlobal = (finalScope === 'global');
+      installCodex(isGlobal, finalScope, explicitConfigDir);
+    }
+    
+    console.log(`  ${green}✓ ${platform} installed successfully${reset}\n`);
+  }
+  
+  console.log(`  ${green}Installation complete!${reset}`);
   process.exit(0);
 })();
 
@@ -692,17 +786,22 @@ function copyCopilotAgents(srcDir, destDir, pathPrefix) {
 }
 
 /**
- * Install to the specified directory
+ * Install to the specified directory (updated for Phase 4)
+ * @param {boolean} isGlobal - Legacy parameter for compatibility
+ * @param {string} scope - New scope parameter: 'global' or 'local'
+ * @param {string|null} configDir - Optional custom config directory
  */
-function install(isGlobal) {
+function install(isGlobal, scope = null, configDir = null) {
+  // Use scope if provided, otherwise fall back to isGlobal
+  const effectiveScope = scope || (isGlobal ? 'global' : 'local');
+  
   const src = path.join(__dirname, '..');
   
-  // Get target directories from adapter
-  const dirs = claudeAdapter.getTargetDirs(isGlobal);
+  // Get target directories from adapter with new signature
+  const dirs = claudeAdapter.getTargetDirs(effectiveScope, configDir);
   
   // Determine base directory (for display and settings)
-  const { global, local } = getConfigPaths('claude');
-  const claudeDir = isGlobal ? global : local;
+  const claudeDir = getConfigPaths('claude', effectiveScope, configDir);
 
   const locationLabel = isGlobal
     ? claudeDir.replace(os.homedir(), '~')
@@ -962,11 +1061,11 @@ function install(isGlobal) {
 /**
  * Install to GitHub Copilot CLI local directories
  */
-function installCopilot(projectDir = process.cwd()) {
+function installCopilot(projectDir = process.cwd(), scope = 'local', configDir = null) {
   const src = path.join(__dirname, '..');
   
-  // Get target directories from adapter (always local for Copilot)
-  const dirs = copilotAdapter.getTargetDirs(false, projectDir);
+  // Get target directories from adapter (with new signature)
+  const dirs = copilotAdapter.getTargetDirs(scope, configDir);
   
   const githubDir = path.join(projectDir, '.github');
 
@@ -1142,14 +1241,16 @@ function installCopilot(projectDir = process.cwd()) {
 /**
  * Install to Codex CLI directories
  */
-function installCodex(isGlobal) {
+function installCodex(isGlobal, scope = null, configDir = null) {
+  // Use scope if provided, otherwise fall back to isGlobal
+  const effectiveScope = scope || (isGlobal ? 'global' : 'local');
+  
   const src = path.join(__dirname, '..');
   
-  // Get target directories from adapter
-  const dirs = codexAdapter.getTargetDirs(isGlobal);
+  // Get target directories from adapter with new signature
+  const dirs = codexAdapter.getTargetDirs(effectiveScope, configDir);
   
-  const { global, local } = getConfigPaths('codex');
-  const codexDir = isGlobal ? global : local;
+  const codexDir = getConfigPaths('codex', effectiveScope, configDir);
   
   const locationLabel = isGlobal
     ? codexDir.replace(os.homedir(), '~')
