@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 Milestone: v1.10.0 - Installation CLI Optimization
 Phase: 5.1 of 11 (Codebase Architecture Optimization) — IN PROGRESS 🔄
-Progress: [█████░░░░░░] 45% (5/11 phases complete, 1/8 plans in Phase 5.1)
-Last activity: 2026-01-25 — Completed Plan 05.1-01 (Codebase Audit & Dependency Analysis)
-Next: Plan 05.1-02 (File Organization & Cleanup)
+Progress: [█████░░░░░░] 45% (5/11 phases complete, 2/8 plans in Phase 5.1)
+Last activity: 2026-01-25 — Completed Plan 05.1-02 (Foundation & Cleanup)
+Next: Plan 05.1-03 (Domain Migration - Configuration & Menu)
 
 **3 New Phases Inserted After Phase 5:**
 - Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
@@ -21,15 +21,17 @@ Next: Plan 05.1-02 (File Organization & Cleanup)
 - Phase 5.3: Future Integration Preparation & Validation (2-3 days)
 
 **Phase 5.1 In Progress:**
-- 1 plan executed (05.1-01) ✓
-- 5 tasks completed, 6 files created, 1 modified
-- 8/8 must-haves verified (100%)
+- 2 plans executed (05.1-01, 05.1-02) ✓
+- 8 tasks completed, 11 files created, 2 modified
+- 14/14 must-haves verified (100%)
 - Analysis tools installed: depcheck, madge, unimported, dependency-cruiser, npm-check-updates
-- Baseline captured: 247 passing tests, 10.47% coverage
-- Zero circular dependencies found - clean architecture
-- 4 unused dependencies identified for cleanup
+- Baseline captured: 248 passing tests, 10.47% coverage
+- Zero circular dependencies - clean architecture maintained
+- 4 unused dependencies removed (debug, ignore, ms, simple-git)
 - All source files in dependency tree (no dead code)
-- **Next:** Plan 05.1-02 (File Organization & Cleanup)
+- 5 domain directories created (platforms, installation, configuration, templating, testing)
+- Clean foundation ready for code migration
+- **Next:** Plan 05.1-03 (Domain Migration - Configuration & Menu)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -152,14 +154,19 @@ Recent decisions for v1.10.0:
 - **[05.1-01]** Manual dependency tree analysis when unimported needs entry point configuration (madge + comm utility)
 - **[05.1-01]** Git checkpoint pattern: Commit before major changes for rollback safety
 - **[05.1-01]** Separate analysis files for each category (analysis-{type}.txt pattern)
+- **[05.1-02]** Remove unused dependencies with zero code references (debug, ignore, ms, simple-git)
+- **[05.1-02]** Domain-based directory structure: 5 top-level folders under bin/lib/ (platforms, installation, configuration, templating, testing)
+- **[05.1-02]** Use .gitkeep files to track empty directories in git
 
 ### Pending Todos
 
-**Phase 5.1 - Wave 2 (File Organization & Cleanup):**
-- Restructure bin/lib/ by feature/domain (5 top-level folders per CONTEXT.md)
-- Remove 4 unused dependencies (debug, ignore, ms, simple-git)
-- Validate restructuring with `npx madge --circular` after moves
-- Update import paths after file organization
+**Phase 5.1 - Wave 3 (Domain Migration - Configuration & Menu):**
+- Migrate flag-parser.js to configuration/
+- Migrate old-flag-detector.js to configuration/
+- Migrate flag-validator.js to configuration/
+- Migrate conflict-resolver.js to configuration/
+- Migrate interactive-menu.js to configuration/
+- Update import paths after migration
 
 ### Roadmap Evolution
 
@@ -190,23 +197,24 @@ Recent decisions for v1.10.0:
 
 None currently. Phase 5.1 Plan 01 complete with excellent results.
 
-**Key findings from analysis:**
-- Zero circular dependencies - clean architecture
+**Key findings from foundation & cleanup:**
+- Zero circular dependencies maintained - clean architecture
 - All source files in use - no dead code
-- Only 4 unused dependencies to remove
-- Strong test foundation (247 passing tests)
+- 4 unused dependencies removed (debug, ignore, ms, simple-git)
+- 5 domain directories created and ready for migration
+- Strong test foundation (248 passing tests)
 
 **Phase 5.1 is critical path bottleneck** (4-5 days estimated) - all downstream work depends on clean architecture.
 
 ## Session Continuity
 
-Last session: 2026-01-25 09:17:01Z
-Stopped at: Completed 05.1-01-PLAN.md (Codebase Audit & Dependency Analysis)
+Last session: 2026-01-25 09:21:04Z
+Stopped at: Completed 05.1-02-PLAN.md (Foundation & Cleanup)
 Resume file: None
 
 **Next steps:**
-1. Plan 05.1-02: File Organization & Cleanup (restructure by feature/domain)
-2. Continue Phase 5.1 execution (7 more plans)
+1. Plan 05.1-03: Domain Migration - Configuration & Menu (move config-related files)
+2. Continue Phase 5.1 execution (6 more plans)
 3. Phase 5.2: Codex Global Support (build on clean architecture)
 4. Phase 5.3: Future Integration Preparation & Validation
 
