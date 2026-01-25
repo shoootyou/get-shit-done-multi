@@ -10,6 +10,7 @@ const { getConfigPaths } = require('../paths');
  * Build template rendering context for a specific platform
  * @param {string} platform - Target platform: 'claude', 'copilot', or 'codex'
  * @param {Object} options - Configuration options
+ * @param {string} options.scope - Installation scope: 'global' or 'local' (optional, defaults to 'global')
  * @param {Object} options.paths - Path overrides (optional)
  * @param {string} options.workDir - Working directory (optional, defaults to cwd)
  * @param {Object} options.additionalVars - Additional variables to merge (optional)
@@ -24,8 +25,9 @@ function buildContext(platform, options = {}) {
     );
   }
 
-  // Get default paths from existing paths.js logic
-  const configPaths = getConfigPaths(platform);
+  // Get default paths from existing paths.js logic (use 'global' as default scope for template generation)
+  const scope = options.scope || 'global';
+  const configPaths = getConfigPaths(platform, scope);
   
   // Build platform-specific paths
   const agentsPath = options.paths?.agents || getAgentsPath(platform, configPaths);

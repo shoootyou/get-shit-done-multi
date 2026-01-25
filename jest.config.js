@@ -9,9 +9,11 @@ module.exports = {
     '**/bin/*.test.js'  // Integration tests in bin root
   ],
   
-  // Ignore node_modules only
+  // Ignore node_modules and standalone test runners
   testPathIgnorePatterns: [
-    '/node_modules/'
+    '/node_modules/',
+    '/bin/lib/orchestration/.*\\.test\\.js$',  // Standalone orchestration test runners
+    '/bin/lib/template-system/.*\\.test\\.js$'  // Standalone template-system test runners
   ],
   
   // Coverage configuration

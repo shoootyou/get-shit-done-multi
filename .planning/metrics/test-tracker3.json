@@ -178,5 +178,113 @@
     "cli": "claude",
     "duration": 51.128625000000056,
     "timestamp": "2026-01-25T09:14:24.630Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 30.222541999999976,
+    "timestamp": "2026-01-25T09:19:51.356Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.25429200000008,
+    "timestamp": "2026-01-25T09:19:51.398Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 51.15404199999989,
+    "timestamp": "2026-01-25T09:19:51.451Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 30.79670800000008,
+    "timestamp": "2026-01-25T09:20:07.949Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.455625000000055,
+    "timestamp": "2026-01-25T09:20:07.991Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 50.51416700000004,
+    "timestamp": "2026-01-25T09:20:08.043Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 30.94441699999993,
+    "timestamp": "2026-01-25T09:20:47.733Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 41.905917000000045,
+    "timestamp": "2026-01-25T09:20:47.776Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 51.28258300000016,
+    "timestamp": "2026-01-25T09:20:47.829Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 31.11220800000001,
+    "timestamp": "2026-01-25T09:20:52.523Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.42770799999994,
+    "timestamp": "2026-01-25T09:20:52.565Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 51.60370899999998,
+    "timestamp": "2026-01-25T09:20:52.618Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 31.022834000000103,
+    "timestamp": "2026-01-25T09:20:56.238Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.54116700000009,
+    "timestamp": "2026-01-25T09:20:56.280Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 50.907333999999764,
+    "timestamp": "2026-01-25T09:20:56.332Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 30.83829199999991,
+    "timestamp": "2026-01-25T09:21:02.425Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 40.81404100000009,
+    "timestamp": "2026-01-25T09:21:02.467Z"
+  },
+  {
+    "agent": "avg-agent",
+    "cli": "claude",
+    "duration": 52.32020800000009,
+    "timestamp": "2026-01-25T09:21:02.521Z"
   }
 ]
