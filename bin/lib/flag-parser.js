@@ -29,6 +29,7 @@ function parseFlags(argv) {
     .option('--all', 'install for all platforms')
     .option('-g, --global', 'install globally (user home directory)')
     .option('-l, --local', 'install locally (current directory, default)')
+    .option('-c, --config-dir <path>', 'custom config directory (local only)')
     .allowUnknownOption(false)  // Strict mode
     .exitOverride();  // Don't exit process, throw errors instead
   
@@ -77,10 +78,14 @@ function parseFlags(argv) {
   // Otherwise, use flag or default to 'local'
   const scope = needsMenu && scopeFlag === null ? null : (scopeFlag || 'local');
   
+  // Extract config directory if provided
+  const configDir = parsedOptions.configDir || null;
+  
   return {
     platforms,
     scope,
-    needsMenu
+    needsMenu,
+    configDir
   };
 }
 

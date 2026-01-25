@@ -9,7 +9,7 @@
  */
 
 const prompts = require('prompts');
-const { yellow, cyan, reset } = require('./colors');
+const { yellow, cyan, dim, reset } = require('./colors');
 const path = require('path');
 
 /**

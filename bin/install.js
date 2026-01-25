@@ -173,7 +173,7 @@ if (hasHelp) {
   validateFlags(process.argv, flagConfig);
 
   // Extract parsed configuration
-  let { platforms, scope, needsMenu } = flagConfig;
+  let { platforms, scope, needsMenu, configDir } = flagConfig;
 
   // Handle interactive menu mode (Phase 3 integration point)
   if (needsMenu) {
@@ -208,7 +208,7 @@ if (hasHelp) {
   } = require('./lib/conflict-resolver');
 
   // Validate --config-dir with --global conflict
-  if (explicitConfigDir && scope === 'global') {
+  if (configDir && scope === 'global') {
     console.error(`  ${yellow}Error: Cannot use --config-dir with --global${reset}`);
     console.error(`  ${dim}--config-dir is only valid with --local or when no scope is specified${reset}`);
     process.exit(1);
@@ -237,7 +237,7 @@ if (hasHelp) {
    */
   async function validateAndPrepareInstall(platform, finalScope) {
     // Get target path
-    const targetPath = getConfigPaths(platform, finalScope, explicitConfigDir);
+    const targetPath = getConfigPaths(platform, finalScope, configDir);
     
     // Validate path
     const validation = validatePath(targetPath);
