@@ -10,24 +10,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5.1 of 11 (Codebase Architecture Optimization) — COMPLETE ✅
-Progress: [█████░░░░░░] 45% (5/11 phases complete, 4/4 plans in Phase 5.1 complete)
+Phase: 5.2 of 11 (Codex Global Support & Path Unification) — READY
+Progress: [█████░░░░░░] 50% (6/11 phases complete)
 Last activity: 2026-01-25 — Completed Phase 5.1 (Codebase Architecture Optimization)
 Next: Phase 5.2 (Codex Global Support & Path Unification)
 
-**3 New Phases Inserted After Phase 5:**
-- Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
-- Phase 5.2: Codex Global Support & Path Unification (1-2 days)
-- Phase 5.3: Future Integration Preparation & Validation (2-3 days)
-
-**Phase 5.1 Complete:** ✅
-- 4 plans executed (05.1-01, 05.1-02-01, 05.1-02-02, 05.1-02-03, 05.1-03-01) ✓
+**Phase 5.1 Complete:** ✅ 2026-01-25
+- 5 plans executed (01-01, 02-01, 02-02, 02-03, 03-01)
 - All 3 waves complete: Analysis, Migration, Modernization
-- 16 tasks completed, 90+ files modified
-- 37/37 must-haves verified (100%)
+- 8/8 ARCH-OPT requirements verified (100%)
 - **Test results:** 254 passing tests (16 suites), 100% pass rate ✨
 - **Coverage:** 12.64% (improved from 10.47% baseline, +2.17%)
-- **Architecture:** Zero circular dependencies verified
+- **Architecture:** Zero circular dependencies, clean domain structure
+- **Import paths:** All fixed and verified working
+- **Report:** PHASE-5.1-REPORT.md (381 lines, comprehensive documentation)
 - **Cleanup:** 4 unused dependencies removed, 9 unused files removed
 - **Dependencies:** 7 packages updated to latest stable (boxen 8.x, chalk 5.x, execa 9.x, jest 30.x)
 - **Domain structure complete and populated:**

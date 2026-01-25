@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-01-25T09:46:58.845Z",
+    "generated": "2026-01-25T10:00:50.181Z",
     "version": "1.0.0",
     "source": "bin/lib/orchestration/capability-matrix.js",
     "generator": "bin/doc-generator/extract-capabilities.js",
