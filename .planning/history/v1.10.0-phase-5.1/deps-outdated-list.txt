@@ -1,0 +1,9 @@
+Package     Current  Wanted  Latest  Location                 Depended by
+boxen         6.2.1   6.2.1   8.0.1  node_modules/boxen       workspace
+chalk         4.1.2   4.1.2   5.6.2  node_modules/chalk       workspace
+diff          5.2.2   5.2.2   8.0.3  node_modules/diff        workspace
+execa         5.1.1   5.1.1   9.6.1  node_modules/execa       workspace
+jest         29.7.0  29.7.0  30.2.0  node_modules/jest        workspace
+p-map         4.0.0   4.0.0   7.0.4  node_modules/p-map       workspace
+unimported   1.31.1  1.31.1  1.31.0  node_modules/unimported  workspace
+which         3.0.1   3.0.1   6.0.0  node_modules/which       workspace
