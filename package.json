@@ -79,6 +79,8 @@
     "node": ">=16.7.0"
   },
   "devDependencies": {
+    "@babel/parser": "^7.28.6",
+    "acorn": "^8.15.0",
     "depcheck": "^1.4.7",
     "dependency-cruiser": "^17.3.7",
     "diff": "^8.0.3",
