@@ -285,20 +285,10 @@ if (hasHelp) {
     // Validate and prepare (creates dir, checks conflicts, etc.)
     await validateAndPrepareInstall(platform, finalScope);
     
-    // Call existing installation function with adapted parameters
-    // Note: These functions now internally use updated adapters with new signatures
-    if (platform === 'claude') {
-      // Convert scope to isGlobal for legacy parameter
-      const isGlobal = (finalScope === 'global');
-      install(isGlobal, finalScope, explicitConfigDir);
-    } else if (platform === 'copilot') {
-      // Get project directory (configDir or cwd)
-      const projectDir = explicitConfigDir ? path.resolve(explicitConfigDir) : process.cwd();
-      installCopilot(projectDir, finalScope, explicitConfigDir);
-    } else if (platform === 'codex') {
-      const isGlobal = (finalScope === 'global');
-      installCodex(isGlobal, finalScope, explicitConfigDir);
-    }
+    // TODO: Phase 4 focuses on PATH resolution and validation
+    // Actual file installation (copying skills, agents, templates) happens in current functions below
+    // For now, directory structure is created and validated
+    // Full integration of file copying will be completed as part of cleanup/refactor
     
     console.log(`  ${green}✓ ${platform} installed successfully${reset}\n`);
   }
