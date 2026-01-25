@@ -242,6 +242,30 @@ This document captures implementation decisions from phase discussion. Use this 
 
 ## Technical Constraints
 
+### Testing Constraints (CRITICAL)
+**ALL testing activities MUST follow these rules:**
+
+- **Test Location:** ALL tests execute under `/tmp` directory only
+- **Folder Structure:** Each test gets unique folder `/tmp/gsd-test-{timestamp}/`
+- **Never Test In:** Source directory, current working directory, or any subdirectory of repo
+- **Source Protection:** CANNOT execute installation in current source directory
+- **No Modification:** CANNOT modify source files (.github/, .claude/, .codex/, get-shit-done/)
+- **Applies To:** ALL phases, ALL testing activities throughout the project
+- **Cleanup:** Test folders cleaned after success, may leave failed tests for debugging
+
+**Example Test Pattern:**
+```bash
+# Correct: Create isolated test environment
+TEST_DIR="/tmp/gsd-test-$(date +%s)"
+mkdir -p "$TEST_DIR"
+cd "$TEST_DIR"
+npx /path/to/source/package --claude
+
+# Incorrect: Testing in source directory
+cd /path/to/source
+npx . --claude  # ❌ NEVER DO THIS
+```
+
 ### Dependencies
 - **Required:** Node.js ≥16.7.0 (for native ESM)
 - **Allowed:** fs-extra, chalk, minimist/commander (CLI parsing)
@@ -266,7 +290,7 @@ This document captures implementation decisions from phase discussion. Use this 
 
 ---
 
-## Success Criteria Refinement
+### Success Criteria Refinement
 
 ### From Roadmap
 1. ✓ User runs `npx get-shit-done-multi --claude` → installs to `~/.claude/skills/gsd/`
@@ -287,6 +311,11 @@ This document captures implementation decisions from phase discussion. Use this 
 14. ✓ Permission errors fail with clear message
 15. ✓ Invalid flags suggest closest match
 16. ✓ Template validation happens before file writes
+
+### Testing Requirements
+17. ✓ ALL tests execute in `/tmp` directory (not source)
+18. ✓ Each test has unique isolated folder
+19. ✓ Source files never modified during testing
 
 ---
 
