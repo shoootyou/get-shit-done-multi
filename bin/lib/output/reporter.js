@@ -1,9 +1,17 @@
 // bin/lib/output/reporter.js
-const boxen = require('boxen').default;
 const prompts = require('prompts');
 const symbols = require('./symbols');
 const { indent } = require('./formatter');
 const { cyan, green, yellow, dim, reset } = require('../colors');
+
+// Lazy-load boxen to support Jest mocking
+let boxen;
+function getBoxen() {
+  if (!boxen) {
+    boxen = require('boxen').default;
+  }
+  return boxen;
+}
 
 /**
  * Centralized message manager for CLI output
@@ -68,7 +76,7 @@ class Reporter {
    * Display warning box with optional confirmation
    */
   async warning(message, options = {}) {
-    const box = boxen(`${symbols.WARNING}  WARNING\n${message}`, {
+    const box = getBoxen()(`${symbols.WARNING}  WARNING\n${message}`, {
       padding: 1,
       borderStyle: 'single',
       borderColor: 'yellow'
