@@ -6,10 +6,20 @@
  * user attempts --codex --global or --all --global
  * 
  * Part of v1.10.0 flag system redesign - Phase 2, Plan 2
+ * Updated in Phase 5, Plan 2 to use boxen for warning display
  */
 
 const prompts = require('prompts');
 const { yellow, cyan, dim, reset } = require('./colors');
+
+// Lazy-load boxen to support testing
+let boxen;
+function getBoxen() {
+  if (!boxen) {
+    boxen = require('boxen').default;
+  }
+  return boxen;
+}
 const path = require('path');
 
 /**
@@ -24,9 +34,19 @@ async function warnAndConfirmCodexLocal(platforms, scope) {
     return true;  // No warning needed
   }
   
-  // Show warning (MSG-02)
-  console.log(`  ${yellow}⚠️  Global installation not supported for Codex.${reset}`);
-  console.log(`  ${dim}Installing locally in current folder instead.${reset}\n`);
+  // Show warning in boxed format (MSG-02)
+  const warningText = `⚠️  WARNING
+
+Global installation not supported for Codex.
+Installing locally in current folder instead.`;
+
+  const box = getBoxen()(warningText, {
+    padding: 1,
+    borderStyle: 'single',
+    borderColor: 'yellow'
+  });
+
+  console.log('\n' + box + '\n');
   
   // Show installation plan
   console.log('  Installation plan:');
