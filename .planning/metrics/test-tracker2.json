@@ -40,5 +40,41 @@
     "cli": "claude",
     "duration": 201.99620800000002,
     "timestamp": "2026-01-25T01:03:08.370Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 164.15654199999972,
+    "timestamp": "2026-01-25T01:42:18.448Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 157.04170900000008,
+    "timestamp": "2026-01-25T01:42:19.703Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 165.6242089999996,
+    "timestamp": "2026-01-25T01:42:20.369Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 222.54391699999996,
+    "timestamp": "2026-01-25T09:14:02.654Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 230.26537499999995,
+    "timestamp": "2026-01-25T09:14:04.344Z"
+  },
+  {
+    "agent": "test-agent",
+    "cli": "claude",
+    "duration": 50.79337500000008,
+    "timestamp": "2026-01-25T09:14:24.493Z"
   }
 ]
