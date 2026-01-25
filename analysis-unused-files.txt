@@ -1,0 +1,35 @@
+=== Unimported tool results ===
+Unable to locate entry points - using manual dependency tree analysis instead
+
+=== Files NOT in madge dependency tree ===
+
+=== Test files (review separately) ===
+bin/lib/flag-validator.test.js
+bin/lib/conflict-resolver.test.js
+bin/lib/output/reporter.test.js
+bin/lib/paths.test.js
+bin/lib/flag-parser.test.js
+bin/lib/path-validator.test.js
+bin/lib/menu/interactive-menu.test.js
+bin/lib/old-flag-detector.test.js
+bin/lib/codex-warning.test.js
+bin/lib/orchestration/result-validator.test.js
+bin/lib/orchestration/parallel-spawn-validator.test.js
+bin/lib/orchestration/sequential-spawn-validator.test.js
+bin/lib/orchestration/structured-return-parser.test.js
+bin/lib/orchestration/performance-tracker.test.js
+bin/lib/orchestration/reference-resolver.test.js
+bin/lib/template-system/context-builder.test.js
+bin/lib/template-system/spec-parser.test.js
+bin/lib/template-system/field-transformer.test.js
+bin/lib/template-system/integration.test.js
+bin/lib/template-system/validators.test.js
+bin/lib/template-system/engine.test.js
+bin/lib/template-system/tool-mapper.test.js
+bin/install.test.js
+__tests__/spec-parsing.test.js
+__tests__/yaml-parser-compatibility.test.js
+__tests__/conditional-rendering.test.js
+__tests__/frontmatter-validation.test.js
+__tests__/metadata-generation.test.js
+__tests__/platform-integration.test.js
