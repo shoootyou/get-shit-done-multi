@@ -11,16 +11,18 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 Milestone: v1.10.0 - Installation CLI Optimization
 Phase: 5 of 8 (Message Optimization) — IN PROGRESS
-Progress: [█████████░] 56% (4.5/8 phases complete)
-Last activity: 2026-01-25 — Completed 05-01-PLAN.md (Reporter Infrastructure)
+Progress: [█████████░] 62% (5/8 phases complete)
+Last activity: 2026-01-25 — Completed 05-02-PLAN.md (Integration & Optimization)
 
 **Phase 5 Progress:**
 - Plan 1 complete: Reporter infrastructure (4 min, 5 tasks)
-- 21 tests passing, 91.37% coverage
-- Reporter class with context-aware message management
-- boxen@^6.2.1 integration for warning boxes
-- Standardized Unicode symbols (✓ ✗ ⚠️ ⠿)
-- **Next:** Plan 2 (Install.js integration)
+- Plan 2 complete: Install.js integration (5 min, 5 tasks)
+- 31 tests passing (Reporter + codex-warning + install integration)
+- Install.js uses Reporter for all output
+- Multi-platform error resilience (continue on failure)
+- Boxen warning display for Codex global fallback
+- POSIX exit codes (0=success, 1=any failure)
+- **Next:** Plan 3 (Message template optimization)
 
 **Phase 4 Complete:**
 - 2 plans executed (04-01, 04-02)
@@ -62,7 +64,7 @@ Progress: [█████████░] 50% (4/8 phases complete)
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
 | 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
 | 4 | Platform Paths | 2-3 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: TBD) |
-| 5 | Message Optimization | 2 days | **In Progress** (Plan 1: 4 min) |
+| 5 | Message Optimization | 2 days | **In Progress** (Plan 1: 4 min, Plan 2: 5 min) |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
 | 7 | Testing & QA | 3-4 days | Pending |
 | 8 | Documentation & Migration | 2-3 days | Pending |
@@ -114,10 +116,15 @@ Recent decisions for v1.10.0:
 - **[05-01]** Lazy-load boxen with getBoxen() to support Jest mocking
 - **[05-01]** Inject write function in Reporter constructor for testability
 - **[05-01]** Reporter manages indentation state for hierarchical output (2 spaces per level)
+- **[05-02]** Convert validateAndPrepareInstall errors to thrown exceptions for error resilience
+- **[05-02]** Mock boxen in tests using jest.mock() for ESM compatibility
+- **[05-02]** Update jest.config.js to include bin/*.test.js pattern for integration tests
+- **[05-02]** Error collection pattern: results array with { platform, success, details/error }
+- **[05-02]** POSIX exit codes: 0 for all success, 1 for any failure
 
 ### Pending Todos
 
-None currently. Phase 5 Plan 1 complete. Ready for Plan 2 (install.js integration).
+None currently. Phase 5 Plan 2 complete. Ready for Plan 3 (message template optimization).
 
 ### Roadmap Evolution
 
@@ -141,16 +148,18 @@ None currently. Phase 5 Plan 1 complete. Ready for Plan 2 (install.js integratio
 
 ### Blockers/Concerns
 
-None currently. Phase 5 Plan 1 complete (Reporter infrastructure). Ready for Plan 2 (install.js integration).
+None currently. Phase 5 Plan 2 complete (Install.js integration). Ready for Plan 3 (message template optimization).
 
 ## Session Continuity
 
-Last session: 2026-01-25 02:31:49Z
-Stopped at: Completed Phase 5, Plan 1 - 05-01-PLAN.md (Reporter Infrastructure)
+Last session: 2026-01-25 02:39:06Z
+Stopped at: Completed Phase 5, Plan 2 - 05-02-PLAN.md (Integration & Optimization)
 Resume file: None
 
 **Next steps:**
-1. Phase 5 Plan 2: Install.js integration with Reporter
+1. Phase 5 Plan 3: Message template optimization
+2. Phase 6: Uninstall implementation
+3. Continue through remaining phases
 2. Phase 5 Plan 3: Message template optimization
 3. Continue through remaining phases
 
