@@ -10,9 +10,15 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5 of 8 (Message Optimization) — COMPLETE ✓
-Progress: [██████████░] 62% (5/8 phases complete)
+Phase: 5 of 11 (Message Optimization) — COMPLETE ✓
+Progress: [█████░░░░░░] 45% (5/11 phases complete)
 Last activity: 2026-01-25 — Completed Phase 5 (Message Optimization)
+Next: Phase 5.1 (Codex Global Support & Path Unification)
+
+**3 New Phases Inserted After Phase 5:**
+- Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - DO FIRST
+- Phase 5.2: Codex Global Support & Path Unification (1-2 days)
+- Phase 5.3: Future Integration Preparation & Validation (2-3 days)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -37,6 +43,8 @@ Last activity: 2026-01-25 — Completed Phase 5 (Message Optimization)
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
+**NEW: Architecture Optimization Added** - 3 phases inserted before Uninstall to restructure codebase, implement Codex global, and prepare for future AI tool integrations (GPT-4All, Mistral, Gemini).
+
 **Key Changes:**
 - Platform flags: `--claude`, `--copilot`, `--codex`, `--all`
 - Scope modifiers: `--global`, `--local` (combine with platform flags)
@@ -48,7 +56,7 @@ Last activity: 2026-01-25 — Completed Phase 5 (Message Optimization)
 - Codex local only (global shows warning)
 - Hard removal of old flags (no backward compatibility)
 
-Progress: [█████████░] 50% (4/8 phases complete)
+Progress: [█████░░░░░░] 45% (5/11 phases complete)
 
 ## Performance Metrics
 
@@ -65,14 +73,17 @@ Progress: [█████████░] 50% (4/8 phases complete)
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
 | 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
 | 4 | Platform Paths | 2-3 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: TBD) |
-| 5 | Message Optimization | 2 days | **In Progress** (Plan 1: 4 min, Plan 2: 5 min) |
+| 5 | Message Optimization | 2 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: 5 min) |
+| 5.1 | Architecture Optimization | 4-5 days | **Next** 🔄 ⚠️ CRITICAL |
+| 5.2 | Codex Global & Path Unification | 1-2 days | Pending |
+| 5.3 | Future Integration Prep | 2-3 days | Pending |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
 | 7 | Testing & QA | 3-4 days | Pending |
 | 8 | Documentation & Migration | 2-3 days | Pending |
 
 **Coverage:**
-- Total requirements: 29 (all P0)
-- Requirements mapped: 29/29 (100%)
+- Total requirements: 44 (29 original + 15 new architecture)
+- Requirements mapped: 44/44 (100%)
 - Orphaned requirements: 0
 
 *Metrics will be updated after each phase completion*
@@ -122,25 +133,41 @@ Recent decisions for v1.10.0:
 - **[05-02]** Update jest.config.js to include bin/*.test.js pattern for integration tests
 - **[05-02]** Error collection pattern: results array with { platform, success, details/error }
 - **[05-02]** POSIX exit codes: 0 for all success, 1 for any failure
+- **[ROADMAP-EVOLUTION]** Phase 5.1 inserted: Architecture optimization (restructure bin/ and lib-ghcc/, SOLID principles, prepare for GPT-4All/Mistral/Gemini)
+- **[ROADMAP-EVOLUTION]** Phase 5.2 inserted: Codex global support (implement `--codex --global` to `~/.codex/` on clean architecture)
+- **[ROADMAP-EVOLUTION]** Phase 5.3 inserted: Future integration preparation and comprehensive validation
+- **[ROADMAP-EVOLUTION]** Phase order corrected: Architecture optimization MUST happen before Codex global to avoid refactoring new code
 
 ### Pending Todos
 
-None currently. Phase 5 Plan 2 complete. Ready for Plan 3 (message template optimization).
+None currently. Phase 5 complete.
+
+**Next:** Phase 5.1 - Codebase Architecture Optimization
+- Restructure bin/ and lib-ghcc/ following SOLID
+- Evaluate and remove low-value files
+- Modernize dependencies
+- **DO THIS FIRST** before implementing Codex global
+- All tests in `/tmp` (never touch real config directories)
 
 ### Roadmap Evolution
 
-**Current roadmap:** v1.10.0 with 8 phases
-- Phase 1: Dependency Setup (DEPS-01, DEPS-02)
-- Phase 2: Flag System Redesign (FLAG-01 to FLAG-06)
-- Phase 3: Interactive Menu (MENU-01 to MENU-04)
-- Phase 4: Platform Paths (PATH-01 to PATH-03)
-- Phase 5: Message Optimization (MSG-01 to MSG-03)
+**Current roadmap:** v1.10.0 with 11 phases (8 original + 3 inserted)
+- Phase 1: Dependency Setup (DEPS-01, DEPS-02) ✅
+- Phase 2: Flag System Redesign (FLAG-01 to FLAG-06) ✅
+- Phase 3: Interactive Menu (MENU-01 to MENU-04) ✅
+- Phase 4: Platform Paths (PATH-01 to PATH-03) ✅
+- Phase 5: Message Optimization (MSG-01 to MSG-03) ✅
+- **Phase 5.1: Codebase Architecture Optimization (ARCH-OPT-01 to ARCH-OPT-08) 🔄 NEXT ⚠️ CRITICAL**
+- **Phase 5.2: Codex Global & Path Unification (CODEX-GLOBAL-01, CODEX-GLOBAL-02, PATH-UNIF-01)**
+- **Phase 5.3: Future Integration Preparation (FUTURE-PREP-01 to FUTURE-PREP-04)**
 - Phase 6: Uninstall Implementation (UNINST-01 to UNINST-03)
 - Phase 7: Testing & QA (TEST-01 to TEST-04)
 - Phase 8: Documentation & Migration (DOCS-01 to DOCS-04)
 
 **Scope changes from original research:**
-- Codex global: NOT implemented (show warning only)
+- Codex global: ~~NOT implemented (show warning only)~~ → ✅ NOW IMPLEMENTING (Phase 5.2, after architecture cleanup)
+- Architecture optimization: ✅ ADDED (Phase 5.1) - restructure FIRST, then add features
+- Future AI tools prep: ✅ ADDED (Phase 5.3) - GPT-4All, Mistral, Gemini
 - Backward compatibility: NONE (hard removal, not soft deprecation)
 - Migration guide: Simplified (basic flag transition only)
 - Uninstall: NOW P0 (was considered for deferral)
@@ -149,20 +176,26 @@ None currently. Phase 5 Plan 2 complete. Ready for Plan 3 (message template opti
 
 ### Blockers/Concerns
 
-None currently. Phase 5 Plan 2 complete (Install.js integration). Ready for Plan 3 (message template optimization).
+None currently. Phase 5 complete.
+
+**Strategic decision made:** 3 phases inserted before Uninstall to optimize architecture first. This prevents refactoring new code.
+
+**Phase order critical:** Architecture optimization (5.1) MUST happen before Codex global (5.2) to avoid refactoring the Codex code we just wrote.
+
+**Phase 5.1 is critical path bottleneck** (4-5 days estimated) - all downstream work depends on clean architecture.
 
 ## Session Continuity
 
-Last session: 2026-01-25 02:39:06Z
-Stopped at: Completed Phase 5, Plan 2 - 05-02-PLAN.md (Integration & Optimization)
+Last session: 2026-01-25 03:02:00Z
+Stopped at: Corrected phase order - Architecture optimization MUST be 5.1, Codex global becomes 5.2
 Resume file: None
 
 **Next steps:**
-1. Phase 5 Plan 3: Message template optimization
-2. Phase 6: Uninstall implementation
-3. Continue through remaining phases
-2. Phase 5 Plan 3: Message template optimization
-3. Continue through remaining phases
+1. Plan Phase 5.1: Codebase Architecture Optimization (CRITICAL - do first)
+2. Plan Phase 5.2: Codex Global Support (build on clean architecture)
+3. Plan Phase 5.3: Future Integration Preparation & Validation
+4. Execute phases sequentially
+5. Continue with Phase 6 (Uninstall) on optimized codebase
 
 ---
 
