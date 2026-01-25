@@ -10,15 +10,26 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5 of 11 (Message Optimization) — COMPLETE ✓
-Progress: [█████░░░░░░] 45% (5/11 phases complete)
-Last activity: 2026-01-25 — Completed Phase 5 (Message Optimization)
-Next: Phase 5.1 (Codex Global Support & Path Unification)
+Phase: 5.1 of 11 (Codebase Architecture Optimization) — IN PROGRESS 🔄
+Progress: [█████░░░░░░] 45% (5/11 phases complete, 1/8 plans in Phase 5.1)
+Last activity: 2026-01-25 — Completed Plan 05.1-01 (Codebase Audit & Dependency Analysis)
+Next: Plan 05.1-02 (File Organization & Cleanup)
 
 **3 New Phases Inserted After Phase 5:**
-- Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - DO FIRST
+- Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
 - Phase 5.2: Codex Global Support & Path Unification (1-2 days)
 - Phase 5.3: Future Integration Preparation & Validation (2-3 days)
+
+**Phase 5.1 In Progress:**
+- 1 plan executed (05.1-01) ✓
+- 5 tasks completed, 6 files created, 1 modified
+- 8/8 must-haves verified (100%)
+- Analysis tools installed: depcheck, madge, unimported, dependency-cruiser, npm-check-updates
+- Baseline captured: 247 passing tests, 10.47% coverage
+- Zero circular dependencies found - clean architecture
+- 4 unused dependencies identified for cleanup
+- All source files in dependency tree (no dead code)
+- **Next:** Plan 05.1-02 (File Organization & Cleanup)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -137,17 +148,18 @@ Recent decisions for v1.10.0:
 - **[ROADMAP-EVOLUTION]** Phase 5.2 inserted: Codex global support (implement `--codex --global` to `~/.codex/` on clean architecture)
 - **[ROADMAP-EVOLUTION]** Phase 5.3 inserted: Future integration preparation and comprehensive validation
 - **[ROADMAP-EVOLUTION]** Phase order corrected: Architecture optimization MUST happen before Codex global to avoid refactoring new code
+- **[05.1-01]** Analysis-driven cleanup: Use mature npm tools (depcheck, madge, unimported) for data-driven restructuring decisions
+- **[05.1-01]** Manual dependency tree analysis when unimported needs entry point configuration (madge + comm utility)
+- **[05.1-01]** Git checkpoint pattern: Commit before major changes for rollback safety
+- **[05.1-01]** Separate analysis files for each category (analysis-{type}.txt pattern)
 
 ### Pending Todos
 
-None currently. Phase 5 complete.
-
-**Next:** Phase 5.1 - Codebase Architecture Optimization
-- Restructure bin/ and lib-ghcc/ following SOLID
-- Evaluate and remove low-value files
-- Modernize dependencies
-- **DO THIS FIRST** before implementing Codex global
-- All tests in `/tmp` (never touch real config directories)
+**Phase 5.1 - Wave 2 (File Organization & Cleanup):**
+- Restructure bin/lib/ by feature/domain (5 top-level folders per CONTEXT.md)
+- Remove 4 unused dependencies (debug, ignore, ms, simple-git)
+- Validate restructuring with `npx madge --circular` after moves
+- Update import paths after file organization
 
 ### Roadmap Evolution
 
@@ -176,26 +188,27 @@ None currently. Phase 5 complete.
 
 ### Blockers/Concerns
 
-None currently. Phase 5 complete.
+None currently. Phase 5.1 Plan 01 complete with excellent results.
 
-**Strategic decision made:** 3 phases inserted before Uninstall to optimize architecture first. This prevents refactoring new code.
-
-**Phase order critical:** Architecture optimization (5.1) MUST happen before Codex global (5.2) to avoid refactoring the Codex code we just wrote.
+**Key findings from analysis:**
+- Zero circular dependencies - clean architecture
+- All source files in use - no dead code
+- Only 4 unused dependencies to remove
+- Strong test foundation (247 passing tests)
 
 **Phase 5.1 is critical path bottleneck** (4-5 days estimated) - all downstream work depends on clean architecture.
 
 ## Session Continuity
 
-Last session: 2026-01-25 03:02:00Z
-Stopped at: Corrected phase order - Architecture optimization MUST be 5.1, Codex global becomes 5.2
+Last session: 2026-01-25 09:17:01Z
+Stopped at: Completed 05.1-01-PLAN.md (Codebase Audit & Dependency Analysis)
 Resume file: None
 
 **Next steps:**
-1. Plan Phase 5.1: Codebase Architecture Optimization (CRITICAL - do first)
-2. Plan Phase 5.2: Codex Global Support (build on clean architecture)
-3. Plan Phase 5.3: Future Integration Preparation & Validation
-4. Execute phases sequentially
-5. Continue with Phase 6 (Uninstall) on optimized codebase
+1. Plan 05.1-02: File Organization & Cleanup (restructure by feature/domain)
+2. Continue Phase 5.1 execution (7 more plans)
+3. Phase 5.2: Codex Global Support (build on clean architecture)
+4. Phase 5.3: Future Integration Preparation & Validation
 
 ---
 
