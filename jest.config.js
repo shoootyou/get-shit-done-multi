@@ -13,7 +13,8 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/bin/lib/orchestration/.*\\.test\\.js$',  // Standalone orchestration test runners
-    '/bin/lib/template-system/.*\\.test\\.js$'  // Standalone template-system test runners
+    '/bin/lib/template-system/.*\\.test\\.js$',  // Standalone template-system test runners (old location)
+    '/bin/lib/templating/.*\\.test\\.js$'  // Standalone templating test runners (new location)
   ],
   
   // Coverage configuration

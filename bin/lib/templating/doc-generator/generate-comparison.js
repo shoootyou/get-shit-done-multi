@@ -72,7 +72,7 @@ function generateLegend() {
 async function generateComparison(outputPath) {
   try {
     // Load capability matrix data
-    const matrixPath = path.join(__dirname, '../lib/orchestration/capability-matrix.js');
+    const matrixPath = path.join(__dirname, '../../orchestration/capability-matrix.js');
     const { AGENT_CAPABILITIES, CLI_LIMITATIONS, generateCapabilityMatrix } = require(matrixPath);
     
     const matrix = generateCapabilityMatrix();
@@ -176,7 +176,7 @@ async function generateComparison(outputPath) {
 
 // CLI usage
 if (require.main === module) {
-  const outputPath = path.join(__dirname, '../../docs/cli-comparison.md');
+  const outputPath = path.join(__dirname, '../../../../docs/cli-comparison.md');
   
   generateComparison(outputPath)
     .then(() => {

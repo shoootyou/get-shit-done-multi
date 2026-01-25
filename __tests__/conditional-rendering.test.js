@@ -1,4 +1,4 @@
-const { generateFromSpec } = require('../bin/lib/template-system/generator');
+const { generateFromSpec } = require('../bin/lib/templating/generator');
 
 describe('Conditional Rendering (TEST-02)', () => {
   const platforms = ['claude', 'copilot', 'codex'];

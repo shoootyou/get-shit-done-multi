@@ -13,9 +13,9 @@ const { cyan, green, yellow, dim, reset } = require('./lib/colors');
 const claudeAdapter = require('./lib/adapters/claude');
 const copilotAdapter = require('./lib/adapters/copilot');
 const codexAdapter = require('./lib/adapters/codex');
-const { generateAgent } = require('./lib/template-system/generator');
-const { buildContext } = require('./lib/template-system/context-builder');
-const { render } = require('./lib/template-system/engine');
+const { generateAgent } = require('./lib/templating/generator');
+const { buildContext } = require('./lib/templating/context-builder');
+const { render } = require('./lib/templating/engine');
 const { runMigration } = require('./lib/migration/migration-flow');
 const detectAndFilterOldFlags = require('./lib/configuration/old-flag-detector');
 const parseFlags = require('./lib/configuration/flag-parser');
@@ -949,7 +949,7 @@ function install(isGlobal, scope = null, configDir = null) {
   if (fs.existsSync(skillTemplateSrc)) {
     const skillTemplate = fs.readFileSync(skillTemplateSrc, 'utf8');
     // Generate platform-specific version using template system
-    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const { generateFromTemplate } = require('./lib/templating/generator');
     const skillContent = generateFromTemplate(skillTemplate, 'claude');
     fs.writeFileSync(skillTemplateDest, skillContent);
     if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
@@ -1117,7 +1117,7 @@ function installCopilot(projectDir = process.cwd(), scope = 'local', configDir =
   if (fs.existsSync(skillTemplateSrc)) {
     const skillTemplate = fs.readFileSync(skillTemplateSrc, 'utf8');
     // Generate platform-specific version using template system
-    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const { generateFromTemplate } = require('./lib/templating/generator');
     const skillContent = generateFromTemplate(skillTemplate, 'copilot');
     fs.writeFileSync(skillTemplateDest, skillContent);
     if (verifyFileInstalled(skillTemplateDest, 'skills/get-shit-done/SKILL.md')) {
@@ -1304,7 +1304,7 @@ function installCodex(isGlobal, scope = null, configDir = null) {
   if (fs.existsSync(skillMdSrc)) {
     const skillTemplate = fs.readFileSync(skillMdSrc, 'utf8');
     // Generate platform-specific version using template system
-    const { generateFromTemplate } = require('./lib/template-system/generator');
+    const { generateFromTemplate } = require('./lib/templating/generator');
     const skillContent = generateFromTemplate(skillTemplate, 'codex');
     fs.writeFileSync(skillMdDest, skillContent);
     console.log(`  ${green}✓${reset} Installed SKILL.md`);

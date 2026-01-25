@@ -56,7 +56,7 @@ function addMetadata(data) {
 async function generateMatrixData(outputPath) {
   try {
     // Load capability matrix
-    const matrixPath = path.join(__dirname, '../lib/orchestration/capability-matrix.js');
+    const matrixPath = path.join(__dirname, '../../orchestration/capability-matrix.js');
     const { AGENT_CAPABILITIES, CLI_LIMITATIONS } = require(matrixPath);
     
     const data = [];
@@ -139,7 +139,7 @@ async function generateMatrixData(outputPath) {
 
 // CLI usage
 if (require.main === module) {
-  const outputPath = path.join(__dirname, '../../docs/capability-data.json');
+  const outputPath = path.join(__dirname, '../../../../docs/capability-data.json');
   
   generateMatrixData(outputPath)
     .then(() => {

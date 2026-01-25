@@ -18,7 +18,7 @@ const path = require('path');
  * @returns {Array<Object>} Array of agent capability entries
  */
 function extractAgentCapabilities() {
-  const matrixPath = path.join(__dirname, '../lib/orchestration/capability-matrix.js');
+  const matrixPath = path.join(__dirname, '../../orchestration/capability-matrix.js');
   const { AGENT_CAPABILITIES } = require(matrixPath);
   
   const capabilities = [];
@@ -72,7 +72,7 @@ function getAgentDescription(agentName) {
  * @returns {Array<Object>} Array of command capability entries
  */
 function extractCommandCapabilities() {
-  const matrixPath = path.join(__dirname, '../lib/orchestration/capability-matrix.js');
+  const matrixPath = path.join(__dirname, '../../orchestration/capability-matrix.js');
   const { CLI_LIMITATIONS } = require(matrixPath);
   
   const capabilities = [];
@@ -143,7 +143,7 @@ function extractCommandCapabilities() {
  * @returns {Array<Object>} Array of state feature entries
  */
 function extractStateCapabilities() {
-  const matrixPath = path.join(__dirname, '../lib/orchestration/capability-matrix.js');
+  const matrixPath = path.join(__dirname, '../../orchestration/capability-matrix.js');
   const { CLI_LIMITATIONS } = require(matrixPath);
   
   const capabilities = [];
@@ -317,7 +317,7 @@ async function writeCapabilityData(outputPath) {
 
 // CLI usage
 if (require.main === module) {
-  const outputPath = path.join(__dirname, '../../docs/capability-data.json');
+  const outputPath = path.join(__dirname, '../../../../docs/capability-data.json');
   
   writeCapabilityData(outputPath)
     .then(() => {

@@ -59,9 +59,9 @@
     "install:copilot": "node bin/install.js --copilot",
     "install:claude": "node bin/install.js --local",
     "install:codex": "node bin/install.js --codex",
-    "docs:generate": "node bin/doc-generator/generate-comparison.js && node bin/doc-generator/generate-matrix.js && node bin/doc-generator/extract-capabilities.js",
+    "docs:generate": "node bin/lib/templating/doc-generator/generate-comparison.js && node bin/lib/templating/doc-generator/generate-matrix.js && node bin/lib/templating/doc-generator/extract-capabilities.js",
     "docs:validate": "node bin/validate-docs.js",
-    "docs:stamp": "node bin/doc-generator/add-version-stamps.js docs/cli-comparison.md",
+    "docs:stamp": "node bin/lib/templating/doc-generator/add-version-stamps.js docs/cli-comparison.md",
     "check-links": "node scripts/documentation/link-checker.js",
     "install-hooks": "cp hooks/pre-commit-docs .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit"
   },

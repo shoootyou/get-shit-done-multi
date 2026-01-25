@@ -1,4 +1,4 @@
-const { generateFromSpec } = require('../bin/lib/template-system/generator');
+const { generateFromSpec } = require('../bin/lib/templating/generator');
 
 describe('Metadata Generation (TEST-04)', () => {
   test('Copilot generates metadata fields', () => {

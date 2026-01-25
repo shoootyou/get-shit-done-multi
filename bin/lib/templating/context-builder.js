@@ -27,12 +27,25 @@ function buildContext(platform, options = {}) {
 
   // Get default paths from existing paths.js logic (use 'global' as default scope for template generation)
   const scope = options.scope || 'global';
-  const configPathGlobal = scope === 'global' || platform === 'claude' || platform === 'copilot' 
-    ? getConfigPaths(platform, 'global') 
-    : null;
-  const configPathLocal = scope === 'local' || platform === 'copilot'
-    ? getConfigPaths(platform, 'local')
-    : null;
+  
+  // Get config paths - codex doesn't support global scope
+  let configPathGlobal = null;
+  let configPathLocal = null;
+  
+  try {
+    if (platform !== 'codex') {  // Claude and Copilot support global
+      configPathGlobal = getConfigPaths(platform, 'global');
+    }
+  } catch (e) {
+    // If global not supported, leave as null
+  }
+  
+  try {
+    // All platforms support local
+    configPathLocal = getConfigPaths(platform, 'local');
+  } catch (e) {
+    // If local not supported, leave as null
+  }
   
   // Build configPaths object for helper functions
   const configPaths = {
@@ -92,9 +105,9 @@ function buildContext(platform, options = {}) {
  */
 function getAgentsPath(platform, configPaths) {
   const agentsPaths = {
-    claude: path.join(configPaths.global, 'agents'),
-    copilot: path.join(configPaths.local, 'copilot', 'agents'),
-    codex: path.join(configPaths.global, 'agents')
+    claude: path.join(configPaths.global || '~/.claude', 'agents'),
+    copilot: path.join(configPaths.local || '.github', 'copilot', 'agents'),
+    codex: path.join(configPaths.local || '.codex', 'agents')  // Codex uses local, not global
   };
   return agentsPaths[platform];
 }
@@ -105,9 +118,9 @@ function getAgentsPath(platform, configPaths) {
  */
 function getSkillsPath(platform, configPaths) {
   const skillsPaths = {
-    claude: path.join(configPaths.global, 'skills'),
-    copilot: path.join(configPaths.local, 'copilot', 'skills'),
-    codex: path.join(configPaths.global, 'skills')
+    claude: path.join(configPaths.global || '~/.claude', 'skills'),
+    copilot: path.join(configPaths.local || '.github', 'copilot', 'skills'),
+    codex: path.join(configPaths.local || '.codex', 'skills')  // Codex uses local, not global
   };
   return skillsPaths[platform];
 }
@@ -118,9 +131,9 @@ function getSkillsPath(platform, configPaths) {
  */
 function getGsdPath(platform, configPaths) {
   const gsdPaths = {
-    claude: path.join(configPaths.global, 'get-shit-done'),
-    copilot: path.join(configPaths.local, 'get-shit-done'),
-    codex: path.join(configPaths.global, 'skills', 'get-shit-done')
+    claude: path.join(configPaths.global || '~/.claude', 'get-shit-done'),
+    copilot: path.join(configPaths.local || '.github', 'get-shit-done'),
+    codex: path.join(configPaths.local || '.codex', 'skills', 'get-shit-done')  // Codex uses local, not global
   };
   return gsdPaths[platform];
 }
