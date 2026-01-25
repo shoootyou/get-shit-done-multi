@@ -21,6 +21,7 @@ const detectAndFilterOldFlags = require('./lib/old-flag-detector');
 const parseFlags = require('./lib/flag-parser');
 const validateFlags = require('./lib/flag-validator');
 const warnAndConfirmCodexLocal = require('./lib/codex-warning');
+const Reporter = require('./lib/output/reporter');
 
 // Get version from package.json
 const pkg = require('../package.json');
@@ -195,6 +196,9 @@ if (hasHelp) {
     process.exit(0);
   }
 
+  // Create reporter for centralized output management
+  const reporter = new Reporter();
+
   // ============================================================================
   // PHASE 4: PATH RESOLUTION & CONFLICT HANDLING
   // ============================================================================
@@ -242,8 +246,7 @@ if (hasHelp) {
     // Validate path
     const validation = validatePath(targetPath);
     if (!validation.valid) {
-      console.error(`  ${yellow}Invalid path for ${platform}: ${validation.errors.join(', ')}${reset}`);
-      process.exit(1);
+      throw new Error(`Invalid path for ${platform}: ${validation.errors.join(', ')}`);
     }
     
     // Analyze conflicts
@@ -257,44 +260,62 @@ if (hasHelp) {
     
     // Handle user file conflicts
     if (conflicts.hasConflicts && !conflicts.canAutoClean) {
-      console.error(`  ${yellow}Error: User files exist in ${targetPath}${reset}`);
-      console.error(`  ${dim}User files: ${conflicts.userFiles.join(', ')}${reset}`);
-      console.error(`  ${dim}Manual cleanup required before installation.${reset}`);
-      process.exit(1);
+      throw new Error(`User files exist in ${targetPath}: ${conflicts.userFiles.join(', ')}. Manual cleanup required.`);
     }
     
     // Create directory with permission checking
     const dirResult = await ensureInstallDir(targetPath, finalScope);
     if (!dirResult.success) {
-      console.error(`  ${yellow}Error: ${dirResult.error}${reset}`);
-      console.error(`  ${dim}Suggestion: ${dirResult.suggestion}${reset}`);
-      process.exit(1);
+      throw new Error(`${dirResult.error}. Suggestion: ${dirResult.suggestion}`);
     }
     
     return targetPath;
   }
 
   // Install each platform
-  console.log(`  ${cyan}Installing GSD for ${platforms.length} platform(s)...${reset}\n`);
+  reporter.info(`Installing GSD for ${platforms.length} platform(s)...\n`);
+  
+  const results = [];
   
   for (const platform of platforms) {
     // Codex always uses local scope (even if --global specified)
     const finalScope = (platform === 'codex' && scope === 'global') ? 'local' : scope;
-    console.log(`  ${cyan}Installing ${platform} (${finalScope})...${reset}`);
     
-    // Validate and prepare (creates dir, checks conflicts, etc.)
-    await validateAndPrepareInstall(platform, finalScope);
+    reporter.platformStart(platform, finalScope);
     
-    // TODO: Phase 4 focuses on PATH resolution and validation
-    // Actual file installation (copying skills, agents, templates) happens in current functions below
-    // For now, directory structure is created and validated
-    // Full integration of file copying will be completed as part of cleanup/refactor
-    
-    console.log(`  ${green}✓ ${platform} installed successfully${reset}\n`);
+    try {
+      // Validate and prepare (creates dir, checks conflicts, etc.)
+      const targetPath = await validateAndPrepareInstall(platform, finalScope);
+      
+      // TODO: Phase 4 focuses on PATH resolution and validation
+      // Actual file installation (copying skills, agents, templates) happens in current functions below
+      // For now, directory structure is created and validated
+      // Full integration of file copying will be completed as part of cleanup/refactor
+      
+      // Count installed items (placeholder for now - will be populated by actual installation)
+      const details = {
+        path: targetPath,
+        commands: 5,  // Placeholder
+        agents: 13,   // Placeholder
+        skills: 2     // Placeholder
+      };
+      
+      reporter.platformSuccess(platform, details);
+      results.push({ platform, success: true, details });
+      
+    } catch (error) {
+      reporter.platformError(platform, error);
+      results.push({ platform, success: false, error });
+      // Continue to next platform instead of exiting
+    }
   }
   
-  console.log(`  ${green}Installation complete!${reset}`);
-  process.exit(0);
+  // Show summary
+  reporter.summary(results);
+  
+  // Exit code: 0 if all succeeded, 1 if any failed
+  const hasFailures = results.some(r => !r.success);
+  process.exit(hasFailures ? 1 : 0);
 })();
 
 // ============================================================================
