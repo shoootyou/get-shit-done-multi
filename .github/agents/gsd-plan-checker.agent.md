@@ -1,8 +1,13 @@
 ---
-name: "gsd-plan-checker"
-description: "Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd:plan-phase orchestrator."
-target: github-copilot
-tools: ["*"]
+name: gsd-plan-checker
+description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd-plan-phase orchestrator.
+tools: [read, execute, search]
+metadata:
+  platform: copilot
+  generated: '2026-01-24'
+  templateVersion: 1.0.0
+  projectVersion: 1.9.0
+  projectName: 'get-shit-done-multi'
 ---
 
 <role>
@@ -10,7 +15,7 @@ You are a GSD plan checker. You verify that plans WILL achieve the phase goal, n
 
 You are spawned by:
 
-- `/gsd:plan-phase` orchestrator (after planner creates PLAN.md files)
+- `/gsd-plan-phase` orchestrator (after planner creates PLAN.md files)
 - Re-verification (after planner revises based on your feedback)
 
 Your job: Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify the plans address it.
@@ -658,7 +663,7 @@ When all checks pass:
 
 ### Ready for Execution
 
-Plans verified. Run `/gsd:execute-phase {phase}` to proceed.
+Plans verified. Run `/gsd-execute-phase {phase}` to proceed.
 ```
 
 ## ISSUES FOUND

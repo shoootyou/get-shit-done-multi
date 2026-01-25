@@ -28,7 +28,6 @@
       "url": "original creator, https://github.com/shoootyou/get-shit-done-multi"
     }
   ],
-  "type": "commonjs",
   "main": "index.js",
   "bin": {
     "get-shit-done-multi": "bin/install.js"
@@ -46,19 +45,6 @@
     "docs",
     "github"
   ],
-  "scripts": {
-    "docs:generate": "node bin/doc-generator/generate-comparison.js && node bin/doc-generator/generate-matrix.js && node bin/doc-generator/extract-capabilities.js",
-    "docs:validate": "node bin/validate-docs.js",
-    "docs:stamp": "node bin/doc-generator/add-version-stamps.js docs/cli-comparison.md",
-    "install-hooks": "cp hooks/pre-commit-docs .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit"
-  },
-  "dependencies": {
-    "debug": "^4.4.3",
-    "ignore": "^7.0.5",
-    "ms": "^2.1.3",
-    "simple-git": "^3.30.0"
-  },
-  "devDependencies": {},
   "engines": {
     "node": ">=16.7.0"
   }
