@@ -134,9 +134,9 @@ async function detectOldClaudePath() {
     return {
       exists: true,
       path: oldPath,
-      warning: `⚠️  Old installation detected at ${oldPath}
-   Manual cleanup recommended to avoid conflicts.
-   New installation will use: ~/.claude/`
+      warning: `  ⚠️  Old installation detected at ${oldPath}
+      Manual cleanup recommended to avoid conflicts.
+      New installation will use: ~/.claude/`
     };
   }
   

@@ -278,7 +278,8 @@ if (hasHelp) {
   console.log(`  ${cyan}Installing GSD for ${platforms.length} platform(s)...${reset}\n`);
   
   for (const platform of platforms) {
-    const finalScope = effectiveScope(platform);
+    // Codex always uses local scope (even if --global specified)
+    const finalScope = (platform === 'codex' && scope === 'global') ? 'local' : scope;
     console.log(`  ${cyan}Installing ${platform} (${finalScope})...${reset}`);
     
     // Validate and prepare (creates dir, checks conflicts, etc.)

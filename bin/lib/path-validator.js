@@ -59,11 +59,19 @@ function validatePath(targetPath) {
   
   // Windows-specific validation
   if (effectivePlatform === 'win32') {
-    // Check for invalid characters: < > : " | ? * and control chars (0x00-0x1f)
-    const invalidCharsRegex = /[<>:"|?*\x00-\x1f]/;
+    // Check for invalid characters: < > " | ? * and control chars (0x00-0x1f)
+    // Note: : is only valid after drive letter (e.g., C:)
+    const invalidCharsRegex = /[<>"|?*\x00-\x1f]/;
+    
+    // Check for invalid colons (not after drive letter)
+    const invalidColonRegex = /(?!^[A-Za-z]:)[:<]/;
+    
     if (invalidCharsRegex.test(targetPath)) {
       const matches = targetPath.match(invalidCharsRegex);
       errors.push(`Path contains invalid Windows characters: ${matches ? matches.join(', ') : 'control characters'}`);
+    } else if (invalidColonRegex.test(targetPath.slice(2))) {
+      // Check for colons after the drive letter position
+      errors.push(`Path contains invalid Windows characters: :`);
     }
     
     // Check for reserved names (case-insensitive)

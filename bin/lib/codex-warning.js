@@ -25,11 +25,11 @@ async function warnAndConfirmCodexLocal(platforms, scope) {
   }
   
   // Show warning (MSG-02)
-  console.log(`${yellow}⚠️  Global installation not supported for Codex.${reset}`);
-  console.log(`    Installing locally in current folder instead.\n`);
+  console.log(`  ${yellow}⚠️  Global installation not supported for Codex.${reset}`);
+  console.log(`  ${dim}Installing locally in current folder instead.${reset}\n`);
   
   // Show installation plan
-  console.log('Installation plan:');
+  console.log('  Installation plan:');
   
   platforms.forEach(platform => {
     let installPath;
