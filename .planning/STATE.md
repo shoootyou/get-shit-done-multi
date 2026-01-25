@@ -10,25 +10,26 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 5.1 of 11 (Codebase Architecture Optimization) — IN PROGRESS 🔄
-Progress: [█████░░░░░░] 45% (5/11 phases complete, 3/8 plans in Phase 5.1)
-Last activity: 2026-01-25 — Completed Plan 05.1-02-03 (Test Unification & Verification)
-Next: Plan 05.1-03 (Dependency Modernization)
+Phase: 5.1 of 11 (Codebase Architecture Optimization) — COMPLETE ✅
+Progress: [█████░░░░░░] 45% (5/11 phases complete, 4/4 plans in Phase 5.1 complete)
+Last activity: 2026-01-25 — Completed Phase 5.1 (Codebase Architecture Optimization)
+Next: Phase 5.2 (Codex Global Support & Path Unification)
 
 **3 New Phases Inserted After Phase 5:**
 - Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
 - Phase 5.2: Codex Global Support & Path Unification (1-2 days)
 - Phase 5.3: Future Integration Preparation & Validation (2-3 days)
 
-**Phase 5.1 In Progress:**
-- 3 plans executed (05.1-01, 05.1-02-01, 05.1-02-02, 05.1-02-03) ✓
-- Wave 2 complete: Foundation, Migration, Verification
-- 11 tasks completed, 90+ files modified
-- 26/26 must-haves verified (100%)
+**Phase 5.1 Complete:** ✅
+- 4 plans executed (05.1-01, 05.1-02-01, 05.1-02-02, 05.1-02-03, 05.1-03-01) ✓
+- All 3 waves complete: Analysis, Migration, Modernization
+- 16 tasks completed, 90+ files modified
+- 37/37 must-haves verified (100%)
 - **Test results:** 254 passing tests (16 suites), 100% pass rate ✨
 - **Coverage:** 12.64% (improved from 10.47% baseline, +2.17%)
 - **Architecture:** Zero circular dependencies verified
-- **Cleanup:** 4 unused dependencies removed (debug, ignore, ms, simple-git)
+- **Cleanup:** 4 unused dependencies removed, 9 unused files removed
+- **Dependencies:** 7 packages updated to latest stable (boxen 8.x, chalk 5.x, execa 9.x, jest 30.x)
 - **Domain structure complete and populated:**
   - `platforms/` - 5 files (Claude, Copilot, Codex adapters + shared utilities)
   - `configuration/` - 7 files (Flags, paths, menu, routing, validation)
@@ -38,8 +39,9 @@ Next: Plan 05.1-03 (Dependency Modernization)
 - All code migrated and organized by feature/domain
 - All import paths updated and verified
 - Doc generator working in new location
-- Architecture diagrams: before (analysis-arch.png) and after (architecture-after.png)
-- **Next:** Plan 05.1-03 (Dependency Modernization)
+- Architecture diagrams: before/after comparison
+- **Documentation:** Comprehensive PHASE-5.1-REPORT.md (381 lines)
+- **Next:** Phase 5.2 (Codex Global Support & Path Unification)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -176,15 +178,24 @@ Recent decisions for v1.10.0:
 - **[05.1-02-03]** Coverage thresholds set to 80% (statements/functions/lines), 75% (branches)
 - **[05.1-02-03]** Standalone test runners (orchestration, templating) excluded via testPathIgnorePatterns
 - **[05.1-02-03]** Coverage tracked in both bin/ and lib-ghcc/ directories
+- **[05.1-03]** Aggressive dependency update strategy successful with zero breaking changes
+- **[05.1-03]** ESM-only packages (chalk 5.x, execa 9.x, boxen 8.x) work in CommonJS project
+- **[05.1-03]** No reverts needed despite ESM-only marketing (packages provide compatibility)
+- **[05.1-03]** Comprehensive Phase 5.1 report provides audit trail and future integration guidance
 
 
 ### Pending Todos
 
-**Phase 5.1 - Wave 3 (Dependency Modernization):**
-- Update all dependencies to latest stable versions
-- Fix any breaking changes from updates
-- Run full test suite after each update
-- Document update decisions and any incompatibilities found
+**Phase 5.2 - Codex Global Support:**
+- Implement `--codex --global` support
+- Add codex global path to paths.js
+- Create codex global installation logic
+- Test codex global installation flow
+
+**Phase 5.3 - Future Integration Preparation:**
+- Document extension points for future platforms
+- Validate architecture extensibility
+- Create platform adapter template
 
 ### Roadmap Evolution
 
@@ -194,8 +205,8 @@ Recent decisions for v1.10.0:
 - Phase 3: Interactive Menu (MENU-01 to MENU-04) ✅
 - Phase 4: Platform Paths (PATH-01 to PATH-03) ✅
 - Phase 5: Message Optimization (MSG-01 to MSG-03) ✅
-- **Phase 5.1: Codebase Architecture Optimization (ARCH-OPT-01 to ARCH-OPT-08) 🔄 NEXT ⚠️ CRITICAL**
-- **Phase 5.2: Codex Global & Path Unification (CODEX-GLOBAL-01, CODEX-GLOBAL-02, PATH-UNIF-01)**
+- **Phase 5.1: Codebase Architecture Optimization (ARCH-OPT-01 to ARCH-OPT-08) ✅ COMPLETE**
+- **Phase 5.2: Codex Global & Path Unification (CODEX-GLOBAL-01, CODEX-GLOBAL-02, PATH-UNIF-01) 🔄 NEXT**
 - **Phase 5.3: Future Integration Preparation (FUTURE-PREP-01 to FUTURE-PREP-04)**
 - Phase 6: Uninstall Implementation (UNINST-01 to UNINST-03)
 - Phase 7: Testing & QA (TEST-01 to TEST-04)
@@ -203,8 +214,8 @@ Recent decisions for v1.10.0:
 
 **Scope changes from original research:**
 - Codex global: ~~NOT implemented (show warning only)~~ → ✅ NOW IMPLEMENTING (Phase 5.2, after architecture cleanup)
-- Architecture optimization: ✅ ADDED (Phase 5.1) - restructure FIRST, then add features
-- Future AI tools prep: ✅ ADDED (Phase 5.3) - GPT-4All, Mistral, Gemini
+- Architecture optimization: ✅ COMPLETE (Phase 5.1) - restructure FIRST, then add features
+- Future AI tools prep: ✅ READY (Phase 5.3) - GPT-4All, Mistral, Gemini
 - Backward compatibility: NONE (hard removal, not soft deprecation)
 - Migration guide: Simplified (basic flag transition only)
 - Uninstall: NOW P0 (was considered for deferral)
@@ -213,32 +224,34 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 5.1 Wave 2 complete with excellent results.
+None currently. Phase 5.1 complete with excellent results.
 
-**Key findings from Wave 2 (Plans 02-01, 02-02, 02-03):**
+**Key achievements from Phase 5.1 (all 4 plans):**
 - Zero circular dependencies maintained - clean architecture
 - All source files in use - no dead code  
-- 40 files organized across 5 domains
+- 50 files organized across 5 domains
 - All 254 tests passing (100% pass rate) ✨
 - Coverage improved: 12.64% (baseline 10.47%, +2.17%)
 - Import paths correctly updated across entire codebase
 - Domain boundaries clear and well-populated
 - Doc generator working in new location
 - Architecture diagrams generated for before/after comparison
+- 7 dependencies updated to latest stable versions
+- Comprehensive documentation (PHASE-5.1-REPORT.md, 381 lines)
 
-**Phase 5.1 progressing excellently** - Wave 2 complete (3 plans), Wave 3 next (dependency modernization).
+**Phase 5.1 complete** - Ready for Phase 5.2 (Codex Global Support).
 
 ## Session Continuity
 
-Last session: 2026-01-25 09:32:22Z
-Stopped at: Completed 05.1-02-03-PLAN.md (Test Unification & Verification)
+Last session: 2026-01-25 09:42:00Z
+Stopped at: Completed Phase 5.1 (Codebase Architecture Optimization)
 Resume file: None
 
 **Next steps:**
-1. Plan 05.1-03: Dependency Modernization (update all deps to latest stable)
-2. Continue Phase 5.1 execution (6 more plans)
-3. Phase 5.2: Codex Global Support (build on clean architecture)
-4. Phase 5.3: Future Integration Preparation & Validation
+1. Phase 5.2: Codex Global Support (implement `--codex --global` to `~/.codex/`)
+2. Phase 5.3: Future Integration Preparation (document extension points)
+3. Phase 6: Uninstall Implementation
+4. Phase 7: Testing & QA
 
 ---
 
