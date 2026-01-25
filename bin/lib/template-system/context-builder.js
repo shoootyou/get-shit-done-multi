@@ -4,7 +4,7 @@
  */
 
 const path = require('path');
-const { getConfigPaths } = require('../paths');
+const { getConfigPaths } = require('../configuration/paths');
 
 /**
  * Build template rendering context for a specific platform
@@ -27,7 +27,18 @@ function buildContext(platform, options = {}) {
 
   // Get default paths from existing paths.js logic (use 'global' as default scope for template generation)
   const scope = options.scope || 'global';
-  const configPaths = getConfigPaths(platform, scope);
+  const configPathGlobal = scope === 'global' || platform === 'claude' || platform === 'copilot' 
+    ? getConfigPaths(platform, 'global') 
+    : null;
+  const configPathLocal = scope === 'local' || platform === 'copilot'
+    ? getConfigPaths(platform, 'local')
+    : null;
+  
+  // Build configPaths object for helper functions
+  const configPaths = {
+    global: configPathGlobal,
+    local: configPathLocal
+  };
   
   // Build platform-specific paths
   const agentsPath = options.paths?.agents || getAgentsPath(platform, configPaths);

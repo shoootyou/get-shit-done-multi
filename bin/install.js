@@ -5,7 +5,7 @@ const path = require('path');
 const os = require('os');
 const readline = require('readline');
 const { detectInstalledCLIs } = require('./lib/cli-detection/detect');
-const { getConfigPaths } = require('./lib/paths');
+const { getConfigPaths } = require('./lib/configuration/paths');
 const { preserveUserData, restoreUserData } = require('./lib/upgrade');
 const { replaceClaudePaths } = require('./lib/adapters/shared/path-rewriter');
 const { getRecommendations } = require('./lib/cli-detection/recommender');
@@ -17,9 +17,9 @@ const { generateAgent } = require('./lib/template-system/generator');
 const { buildContext } = require('./lib/template-system/context-builder');
 const { render } = require('./lib/template-system/engine');
 const { runMigration } = require('./lib/migration/migration-flow');
-const detectAndFilterOldFlags = require('./lib/old-flag-detector');
-const parseFlags = require('./lib/flag-parser');
-const validateFlags = require('./lib/flag-validator');
+const detectAndFilterOldFlags = require('./lib/configuration/old-flag-detector');
+const parseFlags = require('./lib/configuration/flag-parser');
+const validateFlags = require('./lib/configuration/flag-validator');
 const warnAndConfirmCodexLocal = require('./lib/codex-warning');
 const Reporter = require('./lib/output/reporter');
 
@@ -178,7 +178,7 @@ if (hasHelp) {
 
   // Handle interactive menu mode (Phase 3 integration point)
   if (needsMenu) {
-    const { showInteractiveMenu } = require('./lib/menu/interactive-menu');
+    const { showInteractiveMenu } = require('./lib/configuration/interactive-menu');
     try {
       const menuConfig = await showInteractiveMenu(scope);
       platforms = menuConfig.platforms;
@@ -203,13 +203,13 @@ if (hasHelp) {
   // PHASE 4: PATH RESOLUTION & CONFLICT HANDLING
   // ============================================================================
 
-  const { validatePath } = require('./lib/path-validator');
-  const { ensureInstallDir } = require('./lib/paths');
+  const { validatePath } = require('./lib/configuration/path-validator');
+  const { ensureInstallDir } = require('./lib/configuration/paths');
   const { 
     analyzeInstallationConflicts, 
     cleanupGSDContent, 
     detectOldClaudePath 
-  } = require('./lib/conflict-resolver');
+  } = require('./lib/configuration/conflict-resolver');
 
   // Validate --config-dir with --global conflict
   if (configDir && scope === 'global') {

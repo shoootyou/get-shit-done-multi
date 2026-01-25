@@ -10,7 +10,7 @@ const path = require('path');
 const os = require('os');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { getConfigPaths } = require('../paths');
+const { getConfigPaths } = require('../configuration/paths');
 const { replaceClaudePaths } = require('./shared/path-rewriter');
 const { agentToSkill } = require('./shared/format-converter');
 

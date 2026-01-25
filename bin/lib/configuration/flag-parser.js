@@ -8,7 +8,7 @@
  */
 
 const { Command } = require('commander');
-const { cyan, yellow, reset } = require('./colors');
+const { cyan, yellow, reset } = require('../colors');
 
 /**
  * Parse command-line flags into structured configuration

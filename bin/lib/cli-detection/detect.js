@@ -4,7 +4,7 @@
  */
 
 const fs = require('fs');
-const { getConfigPaths } = require('../paths');
+const { getConfigPaths } = require('../configuration/paths');
 
 /**
  * Detect which CLIs are currently installed on the system

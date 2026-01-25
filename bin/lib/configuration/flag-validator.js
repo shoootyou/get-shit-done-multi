@@ -11,7 +11,7 @@
  * - Scope without platform: ALLOWED - triggers menu (needsMenu: true)
  */
 
-const { red, reset } = require('./colors');
+const { red, reset } = require('../colors');
 
 /**
  * Validate flag combinations

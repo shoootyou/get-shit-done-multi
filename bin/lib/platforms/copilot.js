@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { getConfigPaths } = require('../paths');
+const { getConfigPaths } = require('../configuration/paths');
 const { replaceClaudePaths } = require('./shared/path-rewriter');
 
 const execFileAsync = promisify(execFile);

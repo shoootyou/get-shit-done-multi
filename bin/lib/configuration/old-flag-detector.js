@@ -7,7 +7,7 @@
  * Part of v1.10.0 flag system redesign - Phase 2, Task 1
  */
 
-const { yellow, reset } = require('./colors');
+const { yellow, reset } = require('../colors');
 
 // Old flags and their migration examples
 const OLD_FLAGS = {
