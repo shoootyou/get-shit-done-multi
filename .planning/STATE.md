@@ -10,9 +10,17 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Milestone: v1.10.0 - Installation CLI Optimization
-Phase: 4 of 8 (Platform Paths) — COMPLETE ✓
-Progress: [█████████░] 50% (4/8 phases complete)
-Last activity: 2026-01-25 — Completed Phase 4 (Platform Paths)
+Phase: 5 of 8 (Message Optimization) — IN PROGRESS
+Progress: [█████████░] 56% (4.5/8 phases complete)
+Last activity: 2026-01-25 — Completed 05-01-PLAN.md (Reporter Infrastructure)
+
+**Phase 5 Progress:**
+- Plan 1 complete: Reporter infrastructure (4 min, 5 tasks)
+- 21 tests passing, 91.37% coverage
+- Reporter class with context-aware message management
+- boxen@^6.2.1 integration for warning boxes
+- Standardized Unicode symbols (✓ ✗ ⚠️ ⠿)
+- **Next:** Plan 2 (Install.js integration)
 
 **Phase 4 Complete:**
 - 2 plans executed (04-01, 04-02)
@@ -23,7 +31,6 @@ Last activity: 2026-01-25 — Completed Phase 4 (Platform Paths)
 - Conflict detection and auto-cleanup implemented
 - Old Claude path migration warning added
 - Config-dir flag support enabled
-- **Next:** Phase 5 (Message Optimization)
 
 **Milestone Context:** Redesign installation CLI from implicit platform assumptions (`--local` = Claude) to explicit platform selection (`--claude --local`) with multi-platform support and interactive menu. **BREAKING CHANGE**: Hard removal of old flags (`--local`, `--global`, `--codex-global`).
 
@@ -54,8 +61,8 @@ Progress: [█████████░] 50% (4/8 phases complete)
 | 1 | Dependency Setup | 1 day | **Complete** ✓ (2 min) |
 | 2 | Flag System Redesign | 3-4 days | **Complete** ✓ (15 min) |
 | 3 | Interactive Menu | 2-3 days | **Complete** ✓ (45 min) |
-| 4 | Platform Paths | 2-3 days | **In Progress** (Plan 1: 4 min) |
-| 5 | Message Optimization | 2 days | Pending |
+| 4 | Platform Paths | 2-3 days | **Complete** ✓ (Plan 1: 4 min, Plan 2: TBD) |
+| 5 | Message Optimization | 2 days | **In Progress** (Plan 1: 4 min) |
 | 6 | Uninstall Implementation | 2-3 days | Pending |
 | 7 | Testing & QA | 3-4 days | Pending |
 | 8 | Documentation & Migration | 2-3 days | Pending |
@@ -103,11 +110,14 @@ Recent decisions for v1.10.0:
 - **[04-01]** configDir parameter uses absolute path resolution with platform subdirectories
 - **[04-01]** Permission errors provide actionable suggestions (--local for global, --config-dir for local)
 - **[04-01]** Windows validation allows : only after drive letter (C:)
+- **[05-01]** Use boxen v6.2.1 (not v8.0.1) for CommonJS compatibility
+- **[05-01]** Lazy-load boxen with getBoxen() to support Jest mocking
+- **[05-01]** Inject write function in Reporter constructor for testability
+- **[05-01]** Reporter manages indentation state for hierarchical output (2 spaces per level)
 
 ### Pending Todos
 
-- Phase 4 Plan 2: Conflict resolution and old path migration warning
-- Phase 4 Plan 3: Install.js integration
+None currently. Phase 5 Plan 1 complete. Ready for Plan 2 (install.js integration).
 
 ### Roadmap Evolution
 
@@ -131,17 +141,17 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 4 Plan 1 complete. Ready for Plan 2 (conflict resolution).
+None currently. Phase 5 Plan 1 complete (Reporter infrastructure). Ready for Plan 2 (install.js integration).
 
 ## Session Continuity
 
-Last session: 2026-01-25 00:47:43Z
-Stopped at: Completed Phase 4, Plan 1 - 04-01-PLAN.md (Path Resolution & Validation)
+Last session: 2026-01-25 02:31:49Z
+Stopped at: Completed Phase 5, Plan 1 - 05-01-PLAN.md (Reporter Infrastructure)
 Resume file: None
 
 **Next steps:**
-1. Phase 4 Plan 2: Conflict resolution and old path migration warning
-2. Phase 4 Plan 3: Install.js integration
+1. Phase 5 Plan 2: Install.js integration with Reporter
+2. Phase 5 Plan 3: Message template optimization
 3. Continue through remaining phases
 
 ---
