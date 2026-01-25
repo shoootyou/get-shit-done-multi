@@ -25,7 +25,8 @@ const execFileAsync = promisify(execFile);
  * - Agents converted to skills in ~/.codex/skills/get-shit-done/agents/ or .codex/skills/get-shit-done/agents/
  * - Commands (prompts) ONLY for global: ~/.codex/prompts/gsd/ (null for local per research)
  * 
- * @param {boolean} isGlobal - If true, returns global installation paths, else local (.codex/)
+ * @param {string} scope - Installation scope: 'global' or 'local'
+ * @param {string|null} [configDir=null] - Optional custom config directory
  * @returns {Object} Target directories with skills, agents, commands paths
  * @returns {string} return.skills - Skills directory path
  * @returns {string} return.agents - Agents directory path (nested in skills)
@@ -33,9 +34,8 @@ const execFileAsync = promisify(execFile);
  * @returns {string} return.gsdSkill - GSD skill directory (SKILL.md, CHANGELOG.md, VERSION only)
  * @returns {string|null} return.commands - Commands directory path (null for local installations)
  */
-function getTargetDirs(isGlobal) {
-  const { global, local } = getConfigPaths('codex');
-  const basePath = isGlobal ? global : local;
+function getTargetDirs(scope, configDir = null) {
+  const basePath = getConfigPaths('codex', scope, configDir);
   
   const skillsPath = path.join(basePath, 'skills', 'get-shit-done');
   

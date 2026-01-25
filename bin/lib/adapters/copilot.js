@@ -24,16 +24,15 @@ const execFileAsync = promisify(execFile);
  * - Agents in ~/.copilot/agents/ or .github/agents/
  * - Commands embedded in skills (no separate commands directory)
  * 
- * @param {boolean} isGlobal - If true, returns global installation paths, else local (.github/)
- * @param {string} [projectDir] - Optional project directory override (defaults to process.cwd())
+ * @param {string} scope - Installation scope: 'global' or 'local'
+ * @param {string|null} [configDir=null] - Optional custom config directory
  * @returns {Object} Target directories with skills, agents, commands paths
  * @returns {string} return.skills - Skills directory path
  * @returns {string} return.agents - Agents directory path
  * @returns {string|null} return.commands - Commands directory path (null for Copilot)
  */
-function getTargetDirs(isGlobal, projectDir = null) {
-  const { global, local } = getConfigPaths('copilot', projectDir);
-  const basePath = isGlobal ? global : local;
+function getTargetDirs(scope, configDir = null) {
+  const basePath = getConfigPaths('copilot', scope, configDir);
   
   return {
     skills: path.join(basePath, 'skills', 'get-shit-done'),

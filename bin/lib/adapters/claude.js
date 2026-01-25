@@ -16,15 +16,15 @@ const execFileAsync = promisify(execFile);
 /**
  * Get target installation directories for Claude CLI
  * 
- * @param {boolean} isGlobal - If true, returns global installation paths, else local (.claude/)
+ * @param {string} scope - Installation scope: 'global' or 'local'
+ * @param {string|null} [configDir=null] - Optional custom config directory
  * @returns {Object} Target directories with skills, agents, commands paths
  * @returns {string} return.skills - Skills directory path
  * @returns {string} return.agents - Agents directory path
  * @returns {string} return.commands - Commands directory path
  */
-function getTargetDirs(isGlobal) {
-  const { global, local } = getConfigPaths('claude');
-  const basePath = isGlobal ? global : local;
+function getTargetDirs(scope, configDir = null) {
+  const basePath = getConfigPaths('claude', scope, configDir);
   
   return {
     skills: path.join(basePath, 'skills'),
