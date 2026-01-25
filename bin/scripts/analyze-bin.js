@@ -4,7 +4,6 @@
 const fs = require('fs-extra');
 const glob = require('glob');
 const prompts = require('prompts');
-const chalk = require('chalk');
 
 // Import analysis utilities (all with resolved research questions)
 const { extractFunctions } = require('../lib/analysis/ast-parser.js');
@@ -20,6 +19,9 @@ const { generateAnalysisDocument } = require('../lib/analysis/doc-generator.js')
  * Applies all 5 resolved research questions during analysis
  */
 async function analyzeAllFunctions() {
+  // Dynamic import for chalk (ES module)
+  const chalk = (await import('chalk')).default;
+  
   console.log(chalk.bold('\n🔍 Phase 5.2: Function-level Inventory (Stage 1)\n'));
   console.log(chalk.cyan('Using resolved research questions:'));
   console.log(`  1. Thresholds: Simple < ${COMPLEXITY_THRESHOLDS.SIMPLE}, Complex >= ${COMPLEXITY_THRESHOLDS.MODERATE}`);
@@ -130,7 +132,7 @@ async function analyzeAllFunctions() {
   console.log();
   
   // Step 6: Interactive confirmation workflow
-  const confirmed = await confirmAnalyses(simple, moderate, complex, lowConfidence);
+  const confirmed = await confirmAnalyses(simple, moderate, complex, lowConfidence, chalk);
   
   if (!confirmed) {
     console.log(chalk.yellow('\n⚠️  Analysis cancelled by user\n'));
@@ -167,7 +169,7 @@ async function analyzeAllFunctions() {
 /**
  * Interactive confirmation workflow with progressive disclosure
  */
-async function confirmAnalyses(simple, moderate, complex, lowConfidence) {
+async function confirmAnalyses(simple, moderate, complex, lowConfidence, chalk) {
   console.log(chalk.bold('\n👤 User Confirmation Required\n'));
   
   // Show low-confidence functions first for extra attention
@@ -285,7 +287,7 @@ async function confirmAnalyses(simple, moderate, complex, lowConfidence) {
 
 // Run analyzer
 analyzeAllFunctions().catch(err => {
-  console.error(chalk.red('\n✗ Analysis failed:', err.message));
+  console.error('\n✗ Analysis failed:', err.message);
   console.error(err.stack);
   process.exit(1);
 });
