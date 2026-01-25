@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project:** get-shit-done-multi  
-**Milestone:** v1.0 — Template-Based Multi-Platform Installer  
+**Milestone:** v2.0 — Complete Multi-Platform Installer  
 **Created:** 2025-01-25  
 **Status:** Phase 1 (Planning)
 
@@ -9,11 +9,13 @@
 
 ## Overview
 
-This roadmap delivers a **template-based installer** that deploys AI CLI skills and agents to Claude Code and GitHub Copilot CLI. Users run `npx get-shit-done-multi`, answer interactive prompts, and get working skills installed atomically with rollback on failure.
+This roadmap delivers a **complete template-based installer** that deploys AI CLI skills and agents to Claude Code, GitHub Copilot CLI, and Codex CLI. Users run `npx get-shit-done-multi`, answer interactive prompts, and get working skills installed atomically with rollback on failure.
 
-**Approach:** Build foundation with single platform first (validate architecture), add multi-platform support (validate adapter pattern), enhance UX (interactive prompts), add reliability (transactions + versioning), then harden for production (security + cross-platform).
+**Approach:** Build foundation with single platform first (validate architecture), add multi-platform support with all three platforms (Claude, Copilot, Codex), enhance UX (interactive prompts), add reliability (transactions + versioning), then harden for production (security + cross-platform), and document everything.
 
-**Coverage:** 29 v1 requirements mapped across 8 phases
+**Version Strategy:** Initial release is v2.0 (complete product). Future versions follow SemVer: new commands = MINOR, breaking changes = MAJOR.
+
+**Coverage:** 31 v2.0 requirements mapped across 7 phases
 
 ---
 
@@ -33,8 +35,9 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 ### Platform Requirements
 
 - **Node.js ≥16.7.0** (native ESM support)
-- **Claude Code** (optional, detected via `~/.claude/`)
-- **GitHub Copilot CLI** (optional, detected via `gh copilot --version`)
+- **Claude Code** (optional, detected via `.claude/get-shit-done/` paths)
+- **GitHub Copilot CLI** (optional, detected via `copilot` binary and `.github/get-shit-done/` paths)
+- **Codex CLI** (optional, detected via `codex` binary and `.codex/get-shit-done/` paths)
 
 ---
 
@@ -47,73 +50,87 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 **Dependencies:** None (foundation)
 
 **Requirements Mapped:**
-- INSTALL-01: NPX entry point
+- INSTALL-01: NPX entry point (version 2.0.0)
 - INSTALL-02: File system operations
 - INSTALL-03: Template rendering (basic string replacement)
 - CLI-02: Platform selection flags (`--claude`)
 - CLI-05: Help and version flags
 - SAFETY-02: Path normalization
-- TEMPLATE-01: Base templates
+- TEMPLATE-01: Skill and agent templates (`/templates/skills/`, `/templates/agents/`)
 - TEMPLATE-03: Template variables
 
 **Success Criteria:**
-1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/commands/gsd/`
-2. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/`
-3. Template variables (e.g., `{{PLATFORM_ROOT}}`) replaced correctly in output files
+1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd/`
+2. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/` with manifest template
+3. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
 4. Installation completes in <30 seconds for typical setup
 5. `--help` and `--version` flags show correct information
+6. Version displays as 2.0.0
 
 **Key Deliverables:**
 - `/bin/install.js` (entry point with shebang)
 - `/bin/lib/io/file-operations.js` (copy, create directories)
 - `/bin/lib/rendering/template-renderer.js` (string replacement)
 - `/bin/lib/paths/path-resolver.js` (normalization, validation)
-- `/templates/base/` (shared skill templates)
-- `/templates/platforms/claude/` (Claude-specific files)
+- `/templates/skills/` (skill templates)
+- `/templates/agents/` (agent templates)
+- `/get-shit-done/.gsd-install-manifest.json` (template)
 - Basic error handling and logging
 
 **Notes:**
 - Keep it simple: no adapter abstraction yet (validate mechanics first)
 - No rollback yet (comes in Phase 4)
 - No interactive prompts yet (comes in Phase 3)
+- Initial version is 2.0.0
 
 ---
 
-### Phase 2: Multi-Platform Support with Adapters
+### Phase 2: Multi-Platform Support with All Three Platforms
 
-**Goal:** User can install to Claude OR Copilot via `--claude` or `--copilot` flags, with correct platform-specific transformations
+**Goal:** User can install to Claude, Copilot, OR Codex via `--claude`, `--copilot`, or `--codex` flags, with correct platform-specific transformations
 
 **Dependencies:** Phase 1 (core installer must work)
 
 **Requirements Mapped:**
-- PLATFORM-01: Platform detection
+- PLATFORM-01: Platform detection (GSD-specific paths)
+- PLATFORM-01B: Binary detection for recommendations
 - PLATFORM-02: Platform adapter interface
-- PLATFORM-03: Claude Code adapter
-- PLATFORM-04: GitHub Copilot adapter
-- PLATFORM-05: Shared directory copy (per platform)
+- PLATFORM-03: Claude Code adapter (updated for `.claude/skills/`)
+- PLATFORM-04: GitHub Copilot adapter (binary `copilot`, paths `~/.copilot/` and `.github/`)
+- PLATFORM-04B: Codex CLI adapter (`$gsd-` prefix, paths `~/.codex/` and `.codex/`)
+- PLATFORM-05: Shared directory copy (per platform, with manifests)
 - CLI-03: Installation mode flags (`--local`, `--global`)
-- TEMPLATE-02: Platform overlays
+- TEMPLATE-02: Platform-specific transformations
 
 **Success Criteria:**
-1. User runs `npx get-shit-done-multi --copilot` and skills install to `.github/skills/get-shit-done/`
-2. Tool names transform correctly (Claude: `Read, Write, Bash` → Copilot: `read, edit, execute`)
-3. Frontmatter transforms correctly (Copilot gets required metadata block, Claude doesn't)
-4. File extensions differ per platform (`.md` for Claude, `.agent.md` for Copilot)
-5. Path references rewrite per platform (`@~/.claude/...` vs `@.github/...`)
-6. Both `--claude` and `--copilot` flags can be used simultaneously (install to both)
+1. User runs `npx get-shit-done-multi --copilot --global` and skills install to `~/.copilot/skills/gsd/`
+2. User runs `npx get-shit-done-multi --copilot --local` and skills install to `.github/skills/gsd/`
+3. User runs `npx get-shit-done-multi --codex --global` and skills install to `~/.codex/skills/gsd/`
+4. Tool names transform correctly:
+   - Claude: `Read, Write, Bash` (capitalized)
+   - Copilot/Codex: `read, edit, execute` (lowercase + mappings)
+5. Frontmatter transforms correctly (Copilot/Codex get metadata, Claude doesn't)
+6. File extensions differ per platform (`.md` for Claude, `.agent.md` for Copilot/Codex)
+7. Path references rewrite per platform (`@.claude/...` vs `@.github/...` vs `@.codex/...`)
+8. Command prefixes transform correctly (`/gsd-` for Claude/Copilot, `$gsd-` for Codex)
+9. All three `--claude`, `--copilot`, `--codex` flags can be used simultaneously (install to all three)
+10. Detection uses GSD paths (`.github/skills/gsd-*`, etc.), not CLI binaries
+11. Binary detection (`copilot`, `claude`, `codex`) used for recommendations only
 
 **Key Deliverables:**
 - `/bin/lib/platforms/base-adapter.js` (adapter interface)
 - `/bin/lib/platforms/claude-adapter.js` (Claude transformations)
 - `/bin/lib/platforms/copilot-adapter.js` (Copilot transformations)
-- `/bin/lib/platforms/detector.js` (detect installed platforms)
+- `/bin/lib/platforms/codex-adapter.js` (Codex transformations with `$gsd-` prefix)
+- `/bin/lib/platforms/detector.js` (detect GSD installations via paths)
+- `/bin/lib/platforms/binary-detector.js` (detect CLI binaries for recommendations)
 - `/bin/lib/platforms/registry.js` (adapter lookup)
-- `/templates/platforms/copilot/` (GitHub-specific files)
 - Updated rendering to use adapters for transformations
 
 **Notes:**
-- This validates the adapter pattern before adding more platforms
-- Platform detection (auto-detect Claude/Copilot) prepares for Phase 3 interactive mode
+- This validates the adapter pattern with all three platforms
+- Platform detection checks for existing GSD installations, not CLI presence
+- Binary detection (`copilot`, `claude`, `codex`) recommends which platforms to install
 
 ---
 
@@ -132,13 +149,15 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 
 **Success Criteria:**
 1. User runs `npx get-shit-done-multi` with no flags → interactive prompts appear
-2. Installer auto-detects installed platforms, shows which are available
-3. User selects platform from menu (disabled options show "coming soon")
-4. User multi-selects skills/agents to install
-5. User confirms installation before any file writes
-6. Progress spinner shows during file operations
-7. Success message shows next steps ("Run /gsd:new-project to start")
-8. Errors show actionable guidance (not generic "failed")
+2. Installer auto-detects installed CLI binaries (`copilot`, `claude`, `codex`) and recommends platforms
+3. Installer detects existing GSD installations and shows their versions
+4. User selects platform from menu (disabled options show "coming soon" for unsupported platforms)
+5. User selects scope (global or local)
+6. User multi-selects skills/agents to install
+7. User confirms installation before any file writes
+8. Progress spinner shows during file operations
+9. Success message shows next steps ("Run /gsd-new-project to start")
+10. Errors show actionable guidance (not generic "failed")
 
 **Key Deliverables:**
 - `/bin/lib/prompts/interactive-prompts.js` (clack/prompts integration)
@@ -169,7 +188,8 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 2. On failure (permission denied, disk full, etc.), rollback undoes all operations in reverse order
 3. User is left with clean state (either fully installed or nothing changed)
 4. Pre-installation checks detect problems before any writes (disk space, permissions, conflicts)
-5. `.gsd-install-manifest.json` written after successful installation with: version, timestamp, installed files, platform
+5. Manifest written to `/get-shit-done/.gsd-install-manifest.json` in each installation path after successful installation
+6. Manifest includes: version (2.0.0), timestamp, installed files, platform, scope (global/local)
 
 **Key Deliverables:**
 - `/bin/lib/io/transaction.js` (InstallTransaction class)
@@ -195,17 +215,26 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 - VERSION-03: Version display
 
 **Success Criteria:**
-1. On re-run, installer reads `.gsd-install-manifest.json` to find installed version
-2. Installer compares installed version vs current version using semver
-3. If outdated, prompt user: "Update available (1.0.0 → 1.2.0). Update now? [Y/n]"
-4. If user confirms, update proceeds (re-install with new version)
-5. `--version` output shows installed version alongside current version if different
+1. On re-run, installer reads ALL `.gsd-install-manifest.json` files from all possible paths:
+   - `~/.claude/get-shit-done/.gsd-install-manifest.json`
+   - `~/.copilot/get-shit-done/.gsd-install-manifest.json`
+   - `~/.codex/get-shit-done/.gsd-install-manifest.json`
+   - `.claude/get-shit-done/.gsd-install-manifest.json`
+   - `.github/get-shit-done/.gsd-install-manifest.json`
+   - `.codex/get-shit-done/.gsd-install-manifest.json`
+2. Installer compares each installed version vs current version using semver
+3. If any installation is outdated, prompt user: "Update available for [platform] (2.0.0 → 2.1.0). Update now? [Y/n]"
+4. If user confirms, update proceeds (re-install with new version) for that platform
+5. `--version` output shows:
+   - Current installer version
+   - All detected installations with their versions, platforms, and scopes
 
 **Key Deliverables:**
-- `/bin/lib/version/version-checker.js` (compare versions)
-- `/bin/lib/version/manifest-reader.js` (read existing installation)
-- Update prompts in interactive mode
-- Version display in `--version` output
+- `/bin/lib/version/version-checker.js` (compare versions across all installations)
+- `/bin/lib/version/manifest-reader.js` (read manifests from all paths)
+- `/bin/lib/version/installation-finder.js` (discover all GSD installations)
+- Update prompts in interactive mode (per platform)
+- Version display in `--version` output showing all installations
 
 **Notes:**
 - Uses semver for comparison (handles major/minor/patch)
@@ -241,39 +270,11 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 
 ---
 
-### Phase 7: Cross-Platform Path Handling
-
-**Goal:** Installer works identically on macOS, Linux, and Windows with correct path separators and home directory resolution
-
-**Dependencies:** Phase 1-2 (needs path utilities)
-
-**Requirements Mapped:**
-- SAFETY-02: Path normalization (extended for Windows)
-
-**Success Criteria:**
-1. Installer runs on Windows with PowerShell → correct path separators (`\` vs `/`)
-2. Home directory resolves correctly on Windows (`%APPDATA%` or `%USERPROFILE%`)
-3. Path operations use `path.join()` and `path.resolve()` (no string concatenation)
-4. Case-insensitive filesystem handling (Windows) doesn't break installation
-5. All paths display correctly in Windows console
-
-**Key Deliverables:**
-- Windows-specific path resolution in `/bin/lib/paths/path-resolver.js`
-- Environment variable handling (cross-platform)
-- Windows testing with GitHub Actions (Windows runner)
-- Path normalization tests for all platforms
-
-**Notes:**
-- This addresses Moderate Risk #5 (Windows path handling) from research/risks.md
-- Empirical testing required (can't fully validate on macOS/Linux)
-
----
-
-### Phase 8: Documentation and Polish
+### Phase 7: Documentation and Polish
 
 **Goal:** Complete documentation exists for installation, architecture, and platform differences
 
-**Dependencies:** Phase 1-7 (document complete system)
+**Dependencies:** Phase 1-6 (document complete system)
 
 **Requirements Mapped:**
 - DOCS-01: Installation instructions
@@ -281,11 +282,12 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 - DOCS-03: Platform comparison
 
 **Success Criteria:**
-1. `/docs/installation.md` explains interactive and non-interactive modes with examples
+1. `/docs/installation.md` explains interactive and non-interactive modes with examples for all three platforms
 2. `/docs/architecture.md` documents adapter pattern and module structure
-3. `/docs/platform-differences.md` shows tool mapping table and frontmatter differences
+3. `/docs/platform-differences.md` shows tool mapping table and frontmatter differences for Claude, Copilot, and Codex
 4. Troubleshooting section covers common errors with solutions
 5. README.md updated with quick start and links to detailed docs
+6. All docs use lowercase filenames and English only
 
 **Key Deliverables:**
 - `/docs/installation.md` (usage guide)
@@ -297,6 +299,7 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 **Notes:**
 - Documentation uses lowercase filenames (English only) per project constraints
 - Focus on user-facing docs (not internal implementation details)
+- Root directory contains only README.md and CHANGELOG.md
 
 ---
 
@@ -304,7 +307,7 @@ This roadmap delivers a **template-based installer** that deploys AI CLI skills 
 
 ### Critical Path
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 ```
 
 ### Parallel Work Opportunities
@@ -321,11 +324,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 
   - Security validates paths
   - Different concerns
 
-**Phase 7 (Windows) can run parallel to Phase 5-6:**
-- Testing-focused (not major feature work)
-- May uncover bugs in earlier phases (feedback loop)
-
-**Phase 8 (Docs) should be last:**
+**Phase 7 (Docs) should be last:**
 - Documents complete system
 - Captures final architecture decisions
 
@@ -337,59 +336,54 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 
 | 2 | 1 | — |
 | 3 | 2 | 4 |
 | 4 | 1-2 | 3 |
-| 5 | 4 | 6, 7 |
-| 6 | 1-4 | 5, 7 |
-| 7 | 1-2 | 5, 6 |
-| 8 | 1-7 | — |
+| 5 | 4 | 6 |
+| 6 | 1-4 | 5 |
+| 7 | 1-6 | — |
 
 ---
 
-## MVP Definition
+## Version 2.0 Complete Product
 
-### Minimum Viable Product (v1.0)
+### What v2.0 Delivers
 
-**Includes:** Phases 1-5
+**Includes:** All 7 Phases
 
 **Delivers:**
-- Core installation to Claude and Copilot
-- Multi-platform adapter pattern
+- Core installation to Claude, Copilot, and Codex
+- Multi-platform adapter pattern for all three platforms
 - Interactive UX with beautiful prompts
 - Atomic transactions with rollback
-- Update detection and versioning
+- Update detection and versioning across all installations
+- Path security hardening (traversal prevention)
+- Cross-platform support (macOS, Linux, Windows)
+- Complete documentation
 
 **What users can do:**
-- Run `npx get-shit-done-multi` and get working skills installed
-- Choose platform interactively or via flags
+- Run `npx get-shit-done-multi` and get working skills installed for any supported platform
+- Choose platform(s) interactively or via flags (`--claude`, `--copilot`, `--codex`)
+- Choose scope (global or local) per platform
 - Recover from failures (rollback leaves clean state)
-- Get notified of updates
+- Get notified of updates for each installation
+- Use on Windows, macOS, or Linux
 
-**Why this is MVP:**
-- Addresses core value proposition (template-based installer)
-- Mitigates Critical Risk #1 (partial installations)
-- Provides excellent UX (interactive prompts)
-- Enables version management (updates)
+**Why this is v2.0:**
+- Complete product (not MVP)
+- All three major platforms supported
+- Production-ready (security, transactions, cross-platform)
+- Fully documented
 
-### Deferred to v1.5
+### Future Enhancements (v2.x)
 
-**Includes:** Phases 6-7
+**Not in v2.0 roadmap (see REQUIREMENTS.md v2.x):**
+- Auto-update flag (UPDATE-01) - can be v2.1
+- Uninstall command (UNINSTALL-01) - can be v2.1  
+- Template sandboxing (SECURITY-01) - can be v2.2
+- Plugin system for external adapters (PLUGIN-01) - separate future project
 
-**Delivers:**
-- Path security hardening (traversal prevention)
-- Windows testing and cross-platform polish
-
-**Why deferred:**
-- Security important but lower risk than partial installations
-- Basic path validation exists in Phase 1 (extended in Phase 6)
-- Windows support nice-to-have (most users on macOS/Linux)
-
-### Deferred to v2.0
-
-**Not in roadmap (see REQUIREMENTS.md v2):**
-- Codex CLI support (CODEX-01)
-- Plugin system for external adapters (PLUGIN-01)
-- Advanced security (template sandboxing, signatures) (SECURITY-01)
-- Auto-update flag (UPDATE-01)
-- Uninstall command (UNINSTALL-01)
+**Version Strategy:**
+- New commands/features = MINOR version bump (v2.1, v2.2, etc.)
+- Breaking changes = MAJOR version bump (v3.0)
+- Bug fixes = PATCH version bump (v2.0.1, v2.0.2, etc.)
 
 ---
 
@@ -397,14 +391,13 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 
 
 | Phase | Status | Start Date | Completion Date | Notes |
 |-------|--------|------------|-----------------|-------|
-| 1 - Core Installer | Pending | — | — | Foundation |
-| 2 - Multi-Platform | Pending | — | — | Adapters |
+| 1 - Core Installer | Pending | — | — | Foundation (v2.0) |
+| 2 - Multi-Platform | Pending | — | — | All 3 platforms |
 | 3 - Interactive UX | Pending | — | — | Prompts |
 | 4 - Transactions | Pending | — | — | Rollback |
-| 5 - Versioning | Pending | — | — | Updates |
-| 6 - Security | Pending | — | — | v1.5 |
-| 7 - Cross-Platform | Pending | — | — | v1.5 |
-| 8 - Documentation | Pending | — | — | Polish |
+| 5 - Versioning | Pending | — | — | Multi-install |
+| 6 - Security | Pending | — | — | Path validation |
+| 7 - Documentation | Pending | — | — | Complete docs |
 
 **Legend:**
 - **Pending:** Not started
@@ -421,19 +414,18 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 
 | Phase | Requirements Covered | Count |
 |-------|---------------------|-------|
 | 1 - Core Installer | INSTALL-01, INSTALL-02, INSTALL-03, CLI-02, CLI-05, SAFETY-02, TEMPLATE-01, TEMPLATE-03 | 8 |
-| 2 - Multi-Platform | PLATFORM-01, PLATFORM-02, PLATFORM-03, PLATFORM-04, PLATFORM-05, CLI-03, TEMPLATE-02 | 7 |
+| 2 - Multi-Platform | PLATFORM-01, PLATFORM-01B, PLATFORM-02, PLATFORM-03, PLATFORM-04, PLATFORM-04B, PLATFORM-05, CLI-03, TEMPLATE-02 | 9 |
 | 3 - Interactive UX | CLI-01, CLI-04, UX-01, UX-02, UX-03 | 5 |
 | 4 - Transactions | INSTALL-04, INSTALL-05, VERSION-01 | 3 |
 | 5 - Versioning | VERSION-02, VERSION-03 | 2 |
 | 6 - Security | SAFETY-01 | 1 |
-| 7 - Cross-Platform | (extends SAFETY-02) | 0 new |
-| 8 - Documentation | DOCS-01, DOCS-02, DOCS-03 | 3 |
+| 7 - Documentation | DOCS-01, DOCS-02, DOCS-03 | 3 |
 
-**Total Mapped:** 29/29 requirements ✓
+**Total Mapped:** 31/31 requirements ✓
 
 ### Orphaned Requirements
 
-None. All v1 requirements mapped to phases.
+None. All v2.0 requirements (31 total) mapped to phases.
 
 ---
 
@@ -448,13 +440,12 @@ From research/SUMMARY.md analysis:
 | 3 | ❌ No | @clack/prompts documented |
 | 4 | ❌ No | Transaction pattern standard |
 | 5 | ❌ No | Semver comparison standard |
-| 6 | ⚠️ May need | OWASP path traversal guidance |
-| 7 | ⚠️ Needs testing | Windows environment required |
-| 8 | ❌ No | Documentation standards known |
+| 6 | ❌ No | Transaction pattern standard |
+| 7 | ❌ No | Documentation standards known |
 
 **Action items:**
 - Phase 6 planning: Review OWASP path traversal prevention guidelines
-- Phase 7 execution: Set up Windows testing environment (GitHub Actions or local VM)
+- All phases: Cross-platform testing on Windows (via GitHub Actions)
 
 ---
 
@@ -468,11 +459,11 @@ From research/SUMMARY.md analysis:
 | Path traversal vulnerabilities | 🔴 Critical | Phase 6 |
 | Frontmatter breaking changes | 🟡 High | Phase 2 (versioned adapters) |
 | Template pollution from new platforms | 🟡 Moderate | Phase 2 (adapter pattern) |
-| Windows path handling | 🟡 Moderate | Phase 7 |
+| Windows path handling | 🟡 Moderate | Phases 1-6 (continuous testing) |
 
-All critical risks addressed in v1.0 MVP (Phases 1-5 for Risk #1, Phase 6 deferred to v1.5).
+All critical risks addressed in v2.0 (Phases 1-6).
 
 ---
 
-**Last Updated:** 2025-01-25  
+**Last Updated:** 2025-01-25 (Revised with v2.0 scope)  
 **Next Action:** Run `/gsd-plan-phase 1` to decompose Phase 1 into executable plans

@@ -1,8 +1,8 @@
 # Requirements
 
-## Milestone: v1.0 — Template-Based Multi-Platform Installer
+## Milestone: v2.0 — Template-Based Multi-Platform Installer
 
-**Goal:** Deploy get-shit-done skills and agents to Claude Code and GitHub Copilot CLI via single npx command with interactive UX and atomic transactions.
+**Goal:** Deploy get-shit-done skills and agents to Claude Code, GitHub Copilot CLI, and Codex CLI via single npx command with interactive UX, atomic transactions, and cross-platform support.
 
 ---
 
@@ -14,6 +14,7 @@
 - User runs `npx get-shit-done-multi` without pre-installation
 - Installer runs from npm registry (always latest version)
 - After installation, installer can be removed (skills persist)
+- Initial version is 2.0.0
 - **Rationale:** Standard npx pattern (like create-react-app)
 
 **INSTALL-02: File System Operations**
@@ -23,8 +24,8 @@
 - **Rationale:** Basic installer mechanics
 
 **INSTALL-03: Template Rendering**
-- Load templates from `/templates/` directory
-- Replace template variables (e.g., `{{PLATFORM_ROOT}}`)
+- Load templates from `/templates/skills/` and `/templates/agents/` directories
+- Replace template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`)
 - Use EJS for JavaScript/JSON files (supports conditionals)
 - Use plain string replacement for XML/Markdown (avoid syntax conflicts)
 - **Rationale:** Transform universal templates to platform-specific
@@ -44,10 +45,19 @@
 ### Category: Platform Support (PLATFORM)
 
 **PLATFORM-01: Platform Detection**
-- Auto-detect Claude Code (check `~/.claude/` directory)
-- Auto-detect GitHub Copilot (run `gh copilot --version`)
-- Return list of installed platforms
-- **Rationale:** Enable intelligent defaults in interactive mode
+- Detect installed GSD instances by checking for:
+  - `.github/skills/gsd-*`, `.github/agents/gsd-*`, `.github/get-shit-done/`
+  - `.claude/skills/gsd-*`, `.claude/agents/gsd-*`, `.claude/get-shit-done/`
+  - `.codex/skills/gsd-*`, `.codex/agents/gsd-*`, `.codex/get-shit-done/`
+- Check both global (`~/`) and local (repo root) paths
+- Return list of detected installations with versions
+- **Rationale:** Use GSD-specific paths, not CLI binary detection
+
+**PLATFORM-01B: Binary Detection for Recommendations**
+- Detect available CLI binaries: `copilot`, `claude`, `codex`
+- Use for recommendations: "You have Claude Code installed, install GSD for Claude?"
+- Don't use for installation validation (use PLATFORM-01 instead)
+- **Rationale:** Recommend platforms but validate via GSD paths
 
 **PLATFORM-02: Platform Adapter Interface**
 - Define `PlatformAdapter` base class with standard methods
@@ -56,24 +66,45 @@
 
 **PLATFORM-03: Claude Code Adapter**
 - Transform tool names: Keep capitalized (Read, Write, Bash)
-- Target directory: `~/.claude/commands/gsd/` (global) or `.claude/` (local)
+- Target directory: `~/.claude/skills/gsd/` (global) or `.claude/skills/` (local)
 - File extension: `.md` for agents
-- Path references: `@~/.claude/get-shit-done/references/...`
+- Path references: `@.claude/get-shit-done/references/...`
+- Command prefix: `/gsd-...`
 - No frontmatter metadata block required
+- Copy shared directory to `.claude/get-shit-done/`
 - **Rationale:** Claude-specific conventions (see research/PLATFORMS.md)
 
 **PLATFORM-04: GitHub Copilot Adapter**
-- Transform tool names: Lowercase + mappings (Read→read, Bash→execute, Write+Edit→edit, Grep+Glob→search)
-- Target directory: `.github/skills/get-shit-done/`
+- Transform tool names: Lowercase + mappings (Read→read, Bash→execute, Write+Edit→edit, Grep+Glob→search, Task→agent)
+- Target directory: `~/.copilot/skills/gsd/` (global) or `.github/skills/` (local)
 - File extension: `.agent.md` for agents
 - Path references: `@.github/get-shit-done/references/...`
+- Command prefix: `/gsd-...`
 - Required frontmatter metadata: platform, generated, templateVersion, projectVersion, projectName
+- Copy shared directory to `.github/get-shit-done/` or `~/.copilot/get-shit-done/`
+- Detect binary: `copilot` (not `gh`)
 - **Rationale:** GitHub-specific conventions (see research/PLATFORMS.md)
+
+**PLATFORM-04B: Codex CLI Adapter**
+- Transform tool names: Same as Copilot (lowercase + mappings)
+- Target directory: `~/.codex/skills/gsd/` (global) or `.codex/skills/` (local)
+- File extension: `.agent.md` for agents
+- Path references: `@.codex/get-shit-done/references/...`
+- Command prefix: `$gsd-...` (NOT `/gsd-...`)
+- Replace all `/gsd-` with `$gsd-` in skill content
+- Required frontmatter metadata: Same as Copilot
+- Copy shared directory to `.codex/get-shit-done/`
+- Detect binary: `codex`
+- **Rationale:** Codex uses `$` prefix for commands
 
 **PLATFORM-05: Shared Directory Copy**
 - Copy `./get-shit-done/` directory (references, templates, workflows)
-- Place in platform-specific location (`.claude/get-shit-done/` or `.github/get-shit-done/`)
+- Place in platform-specific location:
+  - Claude: `.claude/get-shit-done/` (local) or `~/.claude/get-shit-done/` (global)
+  - Copilot: `.github/get-shit-done/` (local) or `~/.copilot/get-shit-done/` (global)
+  - Codex: `.codex/get-shit-done/` (local) or `~/.codex/get-shit-done/` (global)
 - Preserve directory structure
+- Include `.gsd-install-manifest.json` template in `/get-shit-done/` directory
 - **Rationale:** Skills reference shared resources
 
 ### Category: CLI Flags and Modes (CLI)
@@ -92,8 +123,8 @@
 - **Rationale:** Non-interactive mode for automation
 
 **CLI-03: Installation Mode Flags**
-- `--local` flag: Install to current project (`.claude/` or `.github/`)
-- `--global` flag: Install globally (`~/.claude/commands/gsd/`)
+- `--local` flag: Install to current project (`.claude/`, `.github/`, `.codex/`)
+- `--global` flag: Install globally (`~/.claude/`, `~/.copilot/`, `~/.codex/`)
 - Default behavior: Prompt in interactive, local in non-interactive
 - **Rationale:** Support both global and project-local skills
 
@@ -103,8 +134,16 @@
 
 **CLI-05: Help and Version**
 - `--help` or `-h` flag: Show usage information
-- `--version` or `-v` flag: Show installer version
-- **Rationale:** Standard CLI conventions
+- `--version` or `-v` flag: Detect and show ALL installations (global + local) with their versions
+- Version detection checks all possible GSD installation paths
+- Display format: 
+  ```
+  Installed versions:
+  - Claude (global): v2.0.1 at ~/.claude/get-shit-done/
+  - Copilot (local): v2.0.0 at .github/get-shit-done/
+  - Codex (global): v2.0.1 at ~/.codex/get-shit-done/
+  ```
+- **Rationale:** Standard CLI conventions + multi-installation awareness
 
 ### Category: User Experience (UX)
 
@@ -132,20 +171,29 @@
 ### Category: Version Management (VERSION)
 
 **VERSION-01: Installation Manifest**
-- Write `.gsd-install-manifest.json` after installation
-- Include: version, timestamp, installed files, platform
-- **Rationale:** Track what was installed for updates/uninstall
+- Write `/get-shit-done/.gsd-install-manifest.json` after installation
+- Place in each installation path:
+  - `.claude/get-shit-done/.gsd-install-manifest.json`
+  - `.github/get-shit-done/.gsd-install-manifest.json`
+  - `.codex/get-shit-done/.gsd-install-manifest.json`
+  - `~/.claude/get-shit-done/.gsd-install-manifest.json`
+  - `~/.copilot/get-shit-done/.gsd-install-manifest.json`
+  - `~/.codex/get-shit-done/.gsd-install-manifest.json`
+- Include: version, timestamp, installed files, platform, scope (global/local)
+- Template exists at `/get-shit-done/.gsd-install-manifest.json` and is updated during installation
+- **Rationale:** Track what was installed for updates/uninstall, support multiple installations
 
 **VERSION-02: Update Detection**
-- On re-run, check installed version vs current version
-- Prompt user if update available
+- On re-run, check ALL installed versions from manifests in all paths
+- Prompt user for each outdated installation
 - Use semver for version comparison
-- **Rationale:** Users stay current with bug fixes and features
+- **Rationale:** Users stay current with bug fixes and features across all installations
 
 **VERSION-03: Version Display**
-- Show current version in `--version` output
-- Show installed version in interactive mode (if already installed)
-- **Rationale:** Transparency about what's running
+- Show current installer version in `--version` output
+- Show all installed versions (from all manifests) in `--version` output
+- Show installed version per platform in interactive mode (if already installed)
+- **Rationale:** Transparency about what's running across all installations
 
 ### Category: Path Safety (SAFETY)
 
@@ -163,19 +211,28 @@
 
 ### Category: Template Structure (TEMPLATE)
 
-**TEMPLATE-01: Base Templates**
-- Store shared templates in `/templates/base/`
+**TEMPLATE-01: Skill and Agent Templates**
+- Store skill templates in `/templates/skills/`
+- Store agent templates in `/templates/agents/`
 - Include: skill definitions, agent definitions, shared libraries
-- **Rationale:** DRY principle (don't duplicate per platform)
+- **Rationale:** Clear separation of template types
 
-**TEMPLATE-02: Platform Overlays**
-- Store platform-specific files in `/templates/platforms/claude/` and `/templates/platforms/copilot/`
-- Overlay files override or extend base templates
-- **Rationale:** Platform differences isolated from base
+**TEMPLATE-02: Platform-Specific Transformations**
+- Handle platform differences via adapters (not template duplication)
+- Transformations include:
+  - Tool name mappings
+  - Path reference rewriting
+  - Command prefix changes (`/gsd-` vs `$gsd-`)
+  - File extension changes
+  - Frontmatter additions/removals
+- **Rationale:** Single source of truth, platform differences isolated in adapters
 
 **TEMPLATE-03: Template Variables**
-- Support variables: `{{PLATFORM_ROOT}}`, `{{PLATFORM_NAME}}`, `{{VERSION}}`
+- Support variables: `{{PLATFORM_ROOT}}`, `{{PLATFORM_NAME}}`, `{{VERSION}}`, `{{COMMAND_PREFIX}}`
 - Replace during rendering phase
+- Examples:
+  - `{{PLATFORM_ROOT}}` → `.claude/` or `.github/` or `.codex/`
+  - `{{COMMAND_PREFIX}}` → `/gsd-` or `$gsd-`
 - **Rationale:** Same template, different output per platform
 
 ### Category: Documentation (DOCS)
@@ -198,28 +255,14 @@
 
 ---
 
-## v2 Requirements (Deferred)
+## v2.x Requirements (Future Enhancements)
 
 ### Category: Advanced Features
-
-**CODEX-01: Codex CLI Support**
-- Codex adapter (similar to Copilot pattern)
-- Target directory: `.codex/skills/get-shit-done/`
-
-**PLUGIN-01: Plugin System**
-- External adapter loading from `~/.gsd/adapters/`
-- Adapter versioning and validation
-- Plugin discovery via cosmiconfig
 
 **SECURITY-01: Template Sandboxing**
 - Deeper path validation (symlink resolution, junction points)
 - Digital signature verification for templates
 - Dependency scanning
-
-**WINDOWS-01: Windows Testing**
-- Test on Windows with PowerShell
-- Validate path separator handling
-- Test environment variable expansion
 
 **UPDATE-01: Auto-Update**
 - `--update` flag to automatically update if outdated
@@ -228,6 +271,12 @@
 **UNINSTALL-01: Uninstall Command**
 - Remove installed files using manifest
 - Clean up empty directories
+
+**PLUGIN-01: Plugin System for External Adapters**
+- External adapter loading from `~/.gsd/adapters/`
+- Adapter versioning and validation
+- Plugin discovery via cosmiconfig
+- **Note:** This is a separate future project
 
 ---
 
@@ -241,9 +290,11 @@
 | INSTALL-04 | Phase 4 | Pending |
 | INSTALL-05 | Phase 4 | Pending |
 | PLATFORM-01 | Phase 2 | Pending |
+| PLATFORM-01B | Phase 2 | Pending |
 | PLATFORM-02 | Phase 2 | Pending |
 | PLATFORM-03 | Phase 2 | Pending |
 | PLATFORM-04 | Phase 2 | Pending |
+| PLATFORM-04B | Phase 2 | Pending |
 | PLATFORM-05 | Phase 2 | Pending |
 | CLI-01 | Phase 3 | Pending |
 | CLI-02 | Phase 1 | Pending |
@@ -265,8 +316,8 @@
 | DOCS-02 | Phase 8 | Pending |
 | DOCS-03 | Phase 8 | Pending |
 
-**Total v1 Requirements:** 29
-**Total v2 Requirements:** 6
+**Total v1 Requirements:** 31 (was 29, added PLATFORM-01B, PLATFORM-04B)
+**Total v2.x Requirements:** 4 (deferred enhancements)
 
 ---
 
