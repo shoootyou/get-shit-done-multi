@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 Milestone: v1.10.0 - Installation CLI Optimization
 Phase: 5.1 of 11 (Codebase Architecture Optimization) — IN PROGRESS 🔄
-Progress: [█████░░░░░░] 45% (5/11 phases complete, 2/8 plans in Phase 5.1)
-Last activity: 2026-01-25 — Completed Plan 05.1-02 (Domain Migration)
-Next: Plan 05.1-03 (Test Structure Unification)
+Progress: [█████░░░░░░] 45% (5/11 phases complete, 3/8 plans in Phase 5.1)
+Last activity: 2026-01-25 — Completed Plan 05.1-02-03 (Test Unification & Verification)
+Next: Plan 05.1-03 (Dependency Modernization)
 
 **3 New Phases Inserted After Phase 5:**
 - Phase 5.1: Codebase Architecture Optimization (4-5 days) ⚠️ CRITICAL - IN PROGRESS
@@ -21,24 +21,25 @@ Next: Plan 05.1-03 (Test Structure Unification)
 - Phase 5.3: Future Integration Preparation & Validation (2-3 days)
 
 **Phase 5.1 In Progress:**
-- 2 plans executed (05.1-01, 05.1-02) ✓
-- 10 tasks completed (5 from 01, 5 from 02), 50+ files migrated
-- 18/18 must-haves verified (100%)
-- Analysis tools installed: depcheck, madge, unimported, dependency-cruiser, npm-check-updates
-- Baseline: 254 passing tests (16 suites), 100% pass rate
-- Zero circular dependencies - clean architecture maintained
-- 4 unused transitive dependencies identified (not removable - part of dependencies)
-- All source files in dependency tree (no dead code)
-- **Domain structure complete:**
-  - `platforms/` - Claude, Copilot, Codex adapters + shared utilities
-  - `configuration/` - Flags, paths, menu, routing (7 config modules)
-  - `templating/` - Template engine, doc-generator
-  - `installation/` - Reporter, colors, migrations, CLI detection
-  - `testing/` - Test utilities + fixtures structure
+- 3 plans executed (05.1-01, 05.1-02-01, 05.1-02-02, 05.1-02-03) ✓
+- Wave 2 complete: Foundation, Migration, Verification
+- 11 tasks completed, 90+ files modified
+- 26/26 must-haves verified (100%)
+- **Test results:** 254 passing tests (16 suites), 100% pass rate ✨
+- **Coverage:** 12.64% (improved from 10.47% baseline, +2.17%)
+- **Architecture:** Zero circular dependencies verified
+- **Cleanup:** 4 unused dependencies removed (debug, ignore, ms, simple-git)
+- **Domain structure complete and populated:**
+  - `platforms/` - 5 files (Claude, Copilot, Codex adapters + shared utilities)
+  - `configuration/` - 7 files (Flags, paths, menu, routing, validation)
+  - `templating/` - 15 files (Template engine, doc-generator, spec parser)
+  - `installation/` - 12 files (Reporter, colors, migrations, CLI detection)
+  - `testing/` - 1 file (CLI invoker + fixtures directory)
 - All code migrated and organized by feature/domain
-- All import paths updated and verified (254 tests passing)
+- All import paths updated and verified
 - Doc generator working in new location
-- **Next:** Plan 05.1-03 (Test Structure Unification)
+- Architecture diagrams: before (analysis-arch.png) and after (architecture-after.png)
+- **Next:** Plan 05.1-03 (Dependency Modernization)
 
 **Phase 5 Complete:**
 - 2 plans executed (05-01, 05-02)
@@ -170,17 +171,20 @@ Recent decisions for v1.10.0:
 - **[05.1-02]** Import paths follow new domain structure (../configuration/ not ../lib/)
 - **[05.1-02]** Platform-specific paths with null-safe fallbacks for unsupported scopes
 - **[05.1-02]** Doc generator in templating/doc-generator/ with package.json script references
+- **[05.1-02-03]** Split test strategy: integration in __tests__/, unit tests colocated in bin/lib/
+- **[05.1-02-03]** Jest multi-location support via testMatch patterns (not multiple configs)
+- **[05.1-02-03]** Coverage thresholds set to 80% (statements/functions/lines), 75% (branches)
+- **[05.1-02-03]** Standalone test runners (orchestration, templating) excluded via testPathIgnorePatterns
+- **[05.1-02-03]** Coverage tracked in both bin/ and lib-ghcc/ directories
 
 
 ### Pending Todos
 
-**Phase 5.1 - Wave 3 (Domain Migration - Configuration & Menu):**
-- Migrate flag-parser.js to configuration/
-- Migrate old-flag-detector.js to configuration/
-- Migrate flag-validator.js to configuration/
-- Migrate conflict-resolver.js to configuration/
-- Migrate interactive-menu.js to configuration/
-- Update import paths after migration
+**Phase 5.1 - Wave 3 (Dependency Modernization):**
+- Update all dependencies to latest stable versions
+- Fix any breaking changes from updates
+- Run full test suite after each update
+- Document update decisions and any incompatibilities found
 
 ### Roadmap Evolution
 
@@ -209,26 +213,29 @@ Recent decisions for v1.10.0:
 
 ### Blockers/Concerns
 
-None currently. Phase 5.1 Plans 01-02 complete with excellent results.
+None currently. Phase 5.1 Wave 2 complete with excellent results.
 
-**Key findings from domain migration:**
+**Key findings from Wave 2 (Plans 02-01, 02-02, 02-03):**
 - Zero circular dependencies maintained - clean architecture
-- All source files in use - no dead code
-- 50+ files successfully migrated to domain structure
-- All 254 tests passing (100% pass rate)
+- All source files in use - no dead code  
+- 40 files organized across 5 domains
+- All 254 tests passing (100% pass rate) ✨
+- Coverage improved: 12.64% (baseline 10.47%, +2.17%)
 - Import paths correctly updated across entire codebase
-- Domain boundaries clear: platforms, configuration, templating, installation, testing
+- Domain boundaries clear and well-populated
+- Doc generator working in new location
+- Architecture diagrams generated for before/after comparison
 
-**Phase 5.1 progressing well** - 2 of 8 plans complete, foundation solid for remaining work.
+**Phase 5.1 progressing excellently** - Wave 2 complete (3 plans), Wave 3 next (dependency modernization).
 
 ## Session Continuity
 
-Last session: 2026-01-25 09:28:46Z
-Stopped at: Completed 05.1-02-PLAN.md (Domain Migration)
+Last session: 2026-01-25 09:32:22Z
+Stopped at: Completed 05.1-02-03-PLAN.md (Test Unification & Verification)
 Resume file: None
 
 **Next steps:**
-1. Plan 05.1-03: Test Structure Unification (consolidate test patterns)
+1. Plan 05.1-03: Dependency Modernization (update all deps to latest stable)
 2. Continue Phase 5.1 execution (6 more plans)
 3. Phase 5.2: Codex Global Support (build on clean architecture)
 4. Phase 5.3: Future Integration Preparation & Validation
