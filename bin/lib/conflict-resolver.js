@@ -88,7 +88,7 @@ async function analyzeInstallationConflicts(targetPath) {
     hasConflicts: gsdFiles.length > 0 || userFiles.length > 0,
     gsdFiles,
     userFiles,
-    canAutoClean: userFiles.length === 0 && gsdFiles.length > 0
+    canAutoClean: userFiles.length === 0  // Can auto-clean if no user files (even if empty)
   };
 }
 
