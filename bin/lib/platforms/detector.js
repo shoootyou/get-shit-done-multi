@@ -59,3 +59,20 @@ export async function getInstalledPlatforms() {
   
   return installed;
 }
+
+/**
+ * Get installed version for a platform
+ * @param {string} platform - Platform name (claude, copilot, codex)
+ * @returns {Promise<string|null>} Version string or null if not installed
+ */
+export async function getInstalledVersion(platform) {
+  const detections = await detectInstallations();
+  const detection = detections[platform];
+  
+  if (!detection) {
+    return null;
+  }
+  
+  // Return version from detection (currently always null until Phase 6)
+  return detection.version;
+}
