@@ -71,7 +71,9 @@ The replacement is a simple string replace, so it transforms command references 
 
 **User Question:** "What do you mean with extending copilot adapter?"
 
-### Answer: Use JavaScript class inheritance to avoid duplicating code
+**USER DECISION (2026-01-26):** ❌ DO NOT use inheritance. Each platform gets its own complete adapter.
+
+### Answer: ~~Use JavaScript class inheritance~~ Create separate adapters per platform (UPDATED)
 
 **Background:**
 
@@ -162,10 +164,43 @@ CodexAdapter (inherits 95%, overrides 5%)
 - ⚠️ Inheritance coupling: If Copilot adapter changes, Codex affected
 - ⚠️ Inheritance depth: 2 levels deep (not too bad, but not flat either)
 
-**Decision:** Use Option B (extend CopilotAdapter) because:
-1. 95% code similarity makes duplication unacceptable
-2. Inheritance depth is only 2 levels (shallow enough)
-3. Changes to Copilot logic SHOULD apply to Codex (they're nearly identical platforms)
+**~~Decision:~~ ❌ REJECTED - Use Option B (extend CopilotAdapter)**
+
+**✅ ACTUAL DECISION (User override):** Use Option A (separate adapters) because:
+1. **Platform isolation** is more important than DRY
+2. If Copilot CLI changes, only CopilotAdapter should be affected
+3. If Codex CLI changes, only CodexAdapter should be affected
+4. Code duplication is acceptable and preferred over coupling
+5. Easier to maintain: clear boundaries, no inheritance surprises
+
+**ARCHITECTURAL RULE (added to REQUIREMENTS.md):**
+- Each platform MUST have its own complete adapter
+- NO inheritance between platform adapters
+- Changes to one platform should NOT affect others
+- Code duplication between adapters is ACCEPTABLE and PREFERRED
+
+**Implementation:**
+```javascript
+// bin/lib/platforms/copilot-adapter.js
+export class CopilotAdapter extends PlatformAdapter {
+  transformTools(tools) { /* 50 lines */ }
+  transformFrontmatter(fm) { /* 30 lines */ }
+  getFileExtension() { return '.agent.md'; }
+  getCommandPrefix() { return '/gsd-'; }
+  // ... 200 lines - COMPLETE implementation
+}
+
+// bin/lib/platforms/codex-adapter.js
+export class CodexAdapter extends PlatformAdapter {
+  transformTools(tools) { /* 50 lines DUPLICATED */ }
+  transformFrontmatter(fm) { /* 30 lines DUPLICATED */ }
+  getFileExtension() { return '.agent.md'; }
+  getCommandPrefix() { return '$gsd-'; } // ONLY difference
+  // ... 200 lines DUPLICATED - ISOLATED implementation
+}
+```
+
+**Rationale:** Platform specifications can diverge over time. Keeping adapters isolated makes the codebase more maintainable and predictable.
 
 ---
 
@@ -202,11 +237,13 @@ async function detectBinary(binaryName) {
 - Transformation happens everywhere (text, inline code, code blocks) - this is CORRECT
 - Document as expected behavior in tests
 
-**Question 2 (CodexAdapter inheritance):** ✅ CLARIFIED
-- JavaScript class inheritance: `class CodexAdapter extends CopilotAdapter`
-- Codex inherits 95% of Copilot's code, overrides only command prefix
-- Avoids 200 lines of duplication, maintains single source of truth
-- Shallow inheritance (2 levels), acceptable trade-off
+**Question 2 (CodexAdapter inheritance):** ✅ CLARIFIED ➜ ❌ REJECTED ➜ ✅ UPDATED
+- ~~JavaScript class inheritance: `class CodexAdapter extends CopilotAdapter`~~
+- **USER DECISION:** Each platform gets its own complete adapter (NO inheritance)
+- CodexAdapter and CopilotAdapter are SEPARATE implementations
+- Code duplication between adapters is ACCEPTABLE and PREFERRED
+- Platform isolation over DRY principle
+- **ARCHITECTURAL RULE added to REQUIREMENTS.md (PLATFORM-02)**
 
 **Question 3 (Binary timeout):** ✅ CONFIRMED
 - Use 2-second timeout on exec() for binary detection

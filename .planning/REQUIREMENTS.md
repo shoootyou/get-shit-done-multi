@@ -64,7 +64,11 @@
 **PLATFORM-02: Platform Adapter Interface**
 - Define `PlatformAdapter` base class with standard methods
 - Methods: `transformFrontmatter()`, `transformTools()`, `transformPath()`, `getFileExtension()`, `getTargetDir()`
-- **Rationale:** Abstraction for platform differences
+- **ARCHITECTURAL RULE:** Each platform MUST have its own complete adapter implementation
+- **NO INHERITANCE** between platform adapters (ClaudeAdapter, CopilotAdapter, CodexAdapter)
+- Each adapter is ISOLATED - changes to one platform should NOT affect others
+- Code duplication between adapters is ACCEPTABLE and PREFERRED over coupling
+- **Rationale:** Platform isolation over DRY - if CLI specifications change, only one adapter needs updating
 
 **PLATFORM-03: Claude Code Adapter**
 - Transform tool names: Keep capitalized (Read, Write, Bash)
@@ -97,7 +101,9 @@
 - Required frontmatter metadata: Same as Copilot
 - Copy shared directory to `.codex/get-shit-done/`
 - Detect binary: `codex`
-- **Rationale:** Codex uses `$` prefix for commands
+- **IMPORTANT:** CodexAdapter is SEPARATE implementation, NOT inheritance from CopilotAdapter
+- Code similarity with CopilotAdapter is acceptable duplication (per PLATFORM-02 rule)
+- **Rationale:** Codex uses `$` prefix for commands; adapter isolation per architectural rule
 
 **PLATFORM-05: Shared Directory Copy**
 - Copy `./get-shit-done/` directory (references, templates, workflows)

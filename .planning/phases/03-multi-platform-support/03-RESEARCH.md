@@ -220,12 +220,24 @@ export class CopilotAdapter extends PlatformAdapter {
 }
 
 // bin/lib/platforms/codex-adapter.js
-import { CopilotAdapter } from './copilot-adapter.js';
+import { PlatformAdapter } from './base-adapter.js';
 
-export class CodexAdapter extends CopilotAdapter {
+// ARCHITECTURAL RULE: NO inheritance from CopilotAdapter
+// Each platform adapter is ISOLATED - code duplication is ACCEPTABLE
+export class CodexAdapter extends PlatformAdapter {
   constructor() {
     super();
     this.platformName = 'codex';
+    // Tool mappings (DUPLICATED from CopilotAdapter - this is INTENTIONAL)
+    this.toolMappings = {
+      'Read': 'read',
+      'Edit': 'edit',
+      'Write': 'edit',
+      'Bash': 'execute',
+      'Grep': 'search',
+      'Glob': 'search',
+      'Task': 'agent'
+    };
   }
   
   getTargetDir(isGlobal) {
@@ -240,11 +252,34 @@ export class CodexAdapter extends CopilotAdapter {
     return '.codex';
   }
   
+  getFileExtension(type) {
+    return type === 'agent' ? '.agent.md' : '.md';
+  }
+  
+  transformTools(tools) {
+    // Convert Claude capitalized tools to lowercase Codex format
+    // DUPLICATED from CopilotAdapter - platform isolation over DRY
+    const toolsArray = tools.split(',').map(t => t.trim());
+    const reverseMap = Object.fromEntries(
+      Object.entries(this.toolMappings).map(([k, v]) => [v, k])
+    );
+    return toolsArray.map(t => reverseMap[t] || t.toLowerCase());
+  }
+  
   transformFrontmatter(data) {
-    // Same as Copilot but different metadata
-    const result = super.transformFrontmatter(data);
-    result.metadata.platform = 'codex';
-    return result;
+    // DUPLICATED from CopilotAdapter with different metadata
+    return {
+      name: data.name,
+      description: data.description,
+      tools: this.transformTools(data.tools),
+      metadata: {
+        platform: 'codex',
+        generated: new Date().toISOString().split('T')[0],
+        templateVersion: '1.0.0',
+        projectVersion: '2.0.0',
+        projectName: 'get-shit-done-multi'
+      }
+    };
   }
 }
 ```
