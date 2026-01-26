@@ -216,10 +216,11 @@
 **TEMPLATE-01: Skill and Agent Templates**
 - **Source:** Use existing files from `.github/skills/` and `.github/agents/` as source of truth
 - **Process:** Copy to `/templates/` and convert to templates by adding `{{VARIABLES}}`
+- **Do NOT:** Modify original source files in `.github/`, `.claude/`, or `.codex/` directories
 - **Do NOT:** Generate new skills or agents from scratch
 - **Skills structure:** `/templates/skills/gsd-<skill-name>/SKILL.md` (directory-based)
 - **Agents structure:** `/templates/agents/gsd-<agent-name>.agent.md` (flat files)
-- **Rationale:** Reuse existing tested skills/agents, ensure consistency
+- **Rationale:** Reuse existing tested skills/agents, ensure consistency, preserve originals
 
 **TEMPLATE-01B: Template Conversion Process**
 - Replace hardcoded values with template variables:
@@ -231,15 +232,63 @@
 - Maintain directory structure for skills
 - **Rationale:** Systematic conversion ensures no content loss
 
+**TEMPLATE-01C: Frontmatter Format Correction**
+- **Fix invalid frontmatter fields** during template conversion (NOT on source files):
+  - **Remove unsupported fields:** `skill_version`, `requires_version`, `platforms`, `metadata`
+  - **Rename field:** `tools` → `allowed-tools`
+  - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
+  - **Normalize tool names:** Apply proper capitalization (read→Read, bash→Bash, execute→Bash, etc.)
+- **Create version.json** in each template skill/agent directory:
+  - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata`
+  - Used for version tracking and platform compatibility checks
+  - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}}`
+- **Official supported frontmatter fields** (per https://code.claude.com/docs/en/slash-commands#frontmatter-reference):
+  - `name` (optional): Display name
+  - `description` (recommended): What the skill does
+  - `argument-hint` (optional): Autocomplete hint
+  - `disable-model-invocation` (optional): Prevent auto-loading
+  - `user-invocable` (optional): Show in `/` menu
+  - `allowed-tools` (optional): Tools Claude can use - **comma-separated string, one line**
+  - `model` (optional): Model to use
+  - `context` (optional): Set to `fork` for subagent
+  - `agent` (optional): Subagent type when context is fork
+  - `hooks` (optional): Lifecycle hooks
+- **Rationale:** Current frontmatter has unsupported fields per official Claude docs, corrections must apply during template generation
+
 **TEMPLATE-02: Platform-Specific Transformations**
 - Handle platform differences via adapters (not template duplication)
 - Transformations include:
-  - Tool name mappings
+  - **Tool name mappings** with proper formatting per platform:
+    - Claude/Copilot/Codex: Comma-separated string in `allowed-tools` field
+    - Tool capitalization: Read, Write, Edit, Bash, Grep, Glob, Task, etc.
+    - Cross-platform mappings handled by adapters
   - Path reference rewriting
   - Command prefix changes (`/gsd-` vs `$gsd-`)
   - File extension changes
   - Frontmatter additions/removals
 - **Rationale:** Single source of truth, platform differences isolated in adapters
+
+**TEMPLATE-02B: Tool Name Reference Table**
+- Official tool names per Claude docs (https://code.claude.com/docs/en/settings#tools-available-to-claude):
+  - `AskUserQuestion` - Multiple choice questions
+  - `Bash` - Shell commands (requires permission)
+  - `TaskOutput` - Background task output
+  - `Edit` - Targeted file edits (requires permission)
+  - `ExitPlanMode` - Exit plan mode (requires permission)
+  - `Glob` - File pattern matching
+  - `Grep` - Content search
+  - `KillShell` - Kill background shell
+  - `MCPSearch` - MCP tool search
+  - `NotebookEdit` - Jupyter notebook edits (requires permission)
+  - `Read` - Read file contents
+  - `Skill` - Execute skill (requires permission)
+  - `Task` - Run sub-agent
+  - `TaskCreate`, `TaskGet`, `TaskList`, `TaskUpdate` - Task management
+  - `WebFetch` - Fetch URL (requires permission)
+  - `WebSearch` - Web search (requires permission)
+  - `Write` - Create/overwrite files (requires permission)
+  - `LSP` - Language server protocol
+- **Rationale:** Use official tool names, avoid invented/incorrect mappings
 
 **TEMPLATE-03: Template Variables**
 - Support variables: `{{PLATFORM_ROOT}}`, `{{PLATFORM_NAME}}`, `{{VERSION}}`, `{{COMMAND_PREFIX}}`
@@ -340,7 +389,9 @@
 | SAFETY-02 | Phase 1 | Pending |
 | TEMPLATE-01 | Phase 1 | Pending |
 | TEMPLATE-01B | Phase 1 | Pending |
+| TEMPLATE-01C | Phase 1 | Pending |
 | TEMPLATE-02 | Phase 2 | Pending |
+| TEMPLATE-02B | Phase 2 | Pending |
 | TEMPLATE-03 | Phase 1 | Pending |
 | DOCS-01 | Phase 7 | Pending |
 | DOCS-02 | Phase 7 | Pending |
@@ -348,7 +399,7 @@
 | TEST-01 | All Phases | Pending |
 | TEST-02 | All Phases | Pending |
 
-**Total v2.0 Requirements:** 34 (was 33, added TEMPLATE-01B)
+**Total v2.0 Requirements:** 36 (added TEMPLATE-01C and TEMPLATE-02B)
 **Total v2.x Requirements:** 4 (deferred enhancements)
 
 ---

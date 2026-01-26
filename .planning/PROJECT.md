@@ -39,6 +39,7 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 - **Rollback on failure** (transaction pattern)
 - **Pre-install checks** (disk space, permissions, conflicts)
 - **Testing isolation** (ALL tests run in `/tmp`, never in source directory)
+- **Source file protection** (NEVER modify original files in `.github/`, `.claude/`, `.codex/`)
 
 ### Testing Constraints (CRITICAL)
 - **Test directory:** ALL tests MUST execute under `/tmp` directory
@@ -46,6 +47,13 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 - **Source protection:** CANNOT execute installation in current source directory
 - **No source modification:** CANNOT modify source files (.github/, .claude/, .codex/, get-shit-done/)
 - **Applies to:** ALL phases, ALL testing activities throughout the project
+
+### Template Conversion Constraints (CRITICAL)
+- **Source files are READ-ONLY:** Never modify `.github/`, `.claude/`, or `.codex/` directories
+- **Work in templates/:** All conversions and corrections happen in `/templates/` directory
+- **Frontmatter corrections:** Applied during template generation, NOT on source files
+- **Preserve originals:** Keep source files as reference and backup
+- **Applies to:** ALL phases, ALL template operations throughout the project
 
 ### Extensibility
 - **Adapter pattern** for platform differences
@@ -70,6 +78,7 @@ Project succeeds when:
 
 - Custom template repositories (only bundled templates from `.github/`)
 - Generating new skills/agents (use existing `.github/skills/` and `.github/agents/` as source)
+- **Modifying source files** (`.github/`, `.claude/`, `.codex/` are READ-ONLY)
 - Plugin system for external adapters (future work)
 - Web-based configuration UI
 - Telemetry or usage analytics
