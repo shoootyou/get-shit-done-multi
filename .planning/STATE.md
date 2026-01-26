@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-26  
-**Updated By:** GSD Phase Orchestrator (Phase 3 Complete)
+**Updated By:** GSD Phase Orchestrator (Phase 4 Complete)
 
 ---
 
@@ -11,24 +11,24 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 3 Complete (Multi-Platform Support)! Three platform adapters (Claude, Copilot, Codex) fully implemented with isolated code (no cross-inheritance per PLATFORM-02). Multi-platform CLI working: --claude, --copilot, --codex flags with --global/--local scope. Command prefix transformations verified: /gsd- for Claude/Copilot, $gsd- for Codex. All 23 must-haves passed verification. Ready for Phase 4: Interactive UX.
+**Current Focus:** ✅ Phase 4 Complete (Interactive CLI with Beautiful UX)! Interactive mode implemented with @clack/prompts. Users run `npx get-shit-done-multi` without flags → beautiful prompts for platform and scope selection. Architecture refactored to Adapter → Core pattern: both CLI and Interactive modes share same installation core. Zero CLI detection warning added. 32/32 must-haves passed verification. Ready for Phase 5: Atomic Transactions and Rollback.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 3 of 8 (Multi-Platform Support) ✅ COMPLETE  
-**Phase Goal:** Adapter pattern for Claude, Copilot, Codex with platform-specific transformations  
+**Current Phase:** 4 of 8 (Interactive CLI with Beautiful UX) ✅ COMPLETE  
+**Phase Goal:** User runs `npx get-shit-done-multi` (no flags), sees beautiful interactive prompts, selects platform and skills, confirms installation  
 **Started:** 2026-01-26  
 **Completed:** 2026-01-26  
-**Verification:** ✅ Multi-platform installation tested successfully  
-**Last Activity:** 2026-01-26 - Completed Plan 03-03 (Orchestrator Integration)
+**Verification:** ✅ 12/12 must-haves verified (100%) — PASSED  
+**Last Activity:** 2026-01-26 - Completed Plan 04-01 (Interactive Mode with @clack/prompts)
 
 ### Plan Status
-**Completed Plans:** 13/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3)  
-**Current Plan:** Phase 4 - Plan 01 (Interactive Mode)  
-**Status:** Ready for Phase 4 planning
+**Completed Plans:** 14/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1)  
+**Current Plan:** Phase 5 - Plan 01 (Atomic Transactions)  
+**Status:** Ready for Phase 5 planning
 
 ### Progress Bar
 ```
@@ -36,9 +36,10 @@ Milestone v2.0: Complete Multi-Platform Installer
 Phase 1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 3: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
+Phase 4: [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 
 Overall Progress:
-[█████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 37% (13/35 total plans)
+[████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 40% (14/35 total plans)
 ```
 
 ---
@@ -46,15 +47,11 @@ Overall Progress:
 ## Performance Metrics
 
 ### Velocity
-- **Phases Completed:** 3 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support)
+- **Phases Completed:** 4 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX)
 - **Phases In Progress:** 0
-- **Plans Completed:** 13/35
-- **Plans Completed:** 9/35
+- **Plans Completed:** 14/35
 - **Days Active:** 2
-- **Plans Today:** 9
-- **Plans Completed:** 8/35
-- **Days Active:** 2
-- **Plans Today:** 8
+- **Plans Today:** 14
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -64,7 +61,7 @@ Overall Progress:
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 26/37 (70% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 3 partial)
+- **Requirements Completed:** 31/37 (84% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 3 pending)
 
 ---
 
@@ -308,6 +305,43 @@ Overall Progress:
     - Impact: Was causing ENAMETOOLONG errors during installation
     - Rationale: Critical bug blocking all installation functionality (RULE 1 auto-fix)
 
+40. **2026-01-26 (04-01):** Adapter → Core pattern for installation (INTERACTIVE-ARCH-01)
+    - Both CLI mode and Interactive mode gather parameters, then call shared installPlatforms() function
+    - installation-core.js contains shared logic used by both entry points
+    - Eliminates code duplication (removed 123 lines)
+    - Rationale: DRY principle while maintaining clean separation of concerns
+
+41. **2026-01-26 (04-01):** @clack/prompts for interactive UX (INTERACTIVE-UX-01)
+    - Used @clack/prompts for beautiful terminal prompts
+    - TTY detection via process.stdin.isTTY determines eligibility
+    - Exit code 0 for user cancellation (not an error, user choice)
+    - Rationale: Modern, accessible UX for primary installation method
+
+42. **2026-01-26 (04-01):** Streamlined installation flow (INTERACTIVE-UX-02)
+    - Install ALL skills/agents by default (no selection prompts)
+    - No confirmation prompt before installation
+    - Platform + scope selection only
+    - Rationale: Simpler UX, most users want everything installed
+
+43. **2026-01-26 (04-01):** Sequential multi-platform installation (INTERACTIVE-EXEC-01)
+    - Multi-platform installs happen one at a time (not parallel)
+    - Platform-labeled progress bars ("claude Skills" not just "Skills")
+    - Clear section headers (Warnings, Installing..., Next Steps)
+    - Rationale: Clearer output, easier debugging, prevents I/O contention
+
+44. **2026-01-26 (04-01):** Command prefix centralization (INTERACTIVE-REFACTOR-01)
+    - Created platform-names.js for platform name utilities
+    - Single source of truth for platformNames mapping
+    - getPlatformName() and getCliName() shared functions
+    - Rationale: Eliminated 38 lines of duplication across 3 files
+
+45. **2026-01-26 (04-01):** Extracted CLI utilities (INTERACTIVE-REFACTOR-02)
+    - usage.js - Help and usage messages
+    - flag-parser.js - Platform/scope flag parsing
+    - mode-detector.js - Interactive mode detection
+    - Reduced install.js from 119 to 97 lines
+    - Rationale: Clean code organization, single responsibility per module
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -319,12 +353,13 @@ Overall Progress:
 - [x] Validation and manual review (01-04)
 - [x] Phase 2 Plan 01: Foundation & Project Structure (02-01)
 - [x] Phase 2 Plan 02: Core Modules (02-02)
-- [ ] Phase 2 Plan 03: CLI Orchestration
-- [ ] Phase 2 Plan 04: Installation Flow
+- [x] Phase 2 Plan 03: CLI Orchestration (02-03)
+- [x] Phase 2 Plan 04: Installation Flow (02-04)
 - [x] Phase 3 Plan 01: Platform Foundation (03-01)
 - [x] Phase 3 Plan 02: Concrete Platform Adapters (03-02)
 - [x] Phase 3 Plan 03: Orchestrator Integration (03-03)
-- [ ] Phase 4: Interactive UX (pending)
+- [x] Phase 4 Plan 01: Interactive Mode (04-01)
+- [ ] Phase 5: Atomic Transactions and Rollback (pending)
 
 ### Blockers
 None
@@ -334,24 +369,24 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 03-03 Complete!** Orchestrator integration with multi-platform CLI in 316 seconds (5m 16s): (1) CLI flags added (bin/install.js) - --claude, --copilot, --codex flags (multiple supported), --global/--local scope flags (default: local), platform validation via adapterRegistry; (2) Orchestrator integration (bin/lib/installer/orchestrator.js) - uses adapterRegistry.get(platform), calls adapter.getTargetDir(), adapter.getCommandPrefix(), adapter.getPathReference() for template variables, passes platform to generateManifest(); (3) Template renderer refactor (bin/lib/rendering/template-renderer.js) - split into renderTemplate(filePath, variables) for file-based rendering and replaceVariables(content, variables) for string processing, removed hardcoded getClaudeVariables(); (4) Critical bug fix - processTemplateFile was calling renderTemplate(content) but signature changed to expect filePath, fixed to use replaceVariables(content) instead (RULE 1 auto-fix). Testing: Multi-platform installation verified in /tmp - Claude (29 skills, 13 agents, /gsd- prefix), Codex (29 skills, 13 agents, $gsd- prefix), Copilot (29 skills, 13 agents, /gsd- prefix), simultaneous multi-platform (--claude --codex) works correctly. Four atomic commits (f4220c9, e7bd12b, fb0debf, 0d5d031). Phase 3 complete!
+✅ **Plan 04-01 Complete!** Interactive CLI with beautiful UX implemented: (1) Interactive orchestrator (bin/lib/cli/interactive.js) - @clack/prompts integration with platform/scope selection, global detection warning when zero CLIs detected, graceful cancellation (exit code 0); (2) Adapter → Core pattern (bin/lib/cli/installation-core.js) - shared installPlatforms() function used by both CLI and interactive modes, eliminated 123 lines of duplication; (3) Extracted utilities - usage.js (help), flag-parser.js (flags), mode-detector.js (TTY detection), platform-names.js (name mappings), reduced install.js from 119 to 97 lines; (4) Multi-platform improvements (bin/lib/installer/orchestrator.js) - platform-labeled progress bars, sequential installation, clean section headers; (5) Next steps display (bin/lib/cli/next-steps.js) - command prefix handling (/gsd- vs $gsd-), dynamic CLI name. Extensive refinement through 7 checkpoint iterations. Testing: Interactive mode, CLI mode, multi-platform all verified. Thirteen commits (bef4da9 through eaa773a). Phase 4 complete!
 
 ### What's Next
-1. **Immediate:** Phase 4 - Interactive UX (when no platform flags provided)
-2. **Phase 4 Focus:** Add interactive platform selection, confirmation prompts, improved progress feedback
-3. **Phase 3 Achievement:** Complete multi-platform installer working end-to-end
-4. **Ready:** Users can install to any platform combination with correct transformations
+1. **Immediate:** Phase 5 - Atomic Transactions and Rollback
+2. **Phase 5 Focus:** Track operations, rollback on failure, pre-installation validation, installation manifests
+3. **Phase 4 Achievement:** Complete interactive UX with beautiful prompts and shared installation core
+4. **Ready:** Users can install interactively (no flags) or with CLI flags (automation)
 
 ### Context for Next Session
-- **Phase 3 complete:** ✅ Platform adapters, orchestrator integration, multi-platform CLI all working
-- **Multi-platform tested:** ✅ Claude, Copilot, Codex installations verified with correct prefixes
-- **Bug fixed:** ✅ Critical processTemplateFile signature mismatch resolved (RULE 1)
-- **Template variables:** ✅ Command prefix transformations working (/gsd- vs $gsd-)
-- **Manifests:** ✅ Installation manifests written with correct platform and scope metadata
-- **Next action:** Begin Phase 4 - Interactive UX for better user experience
+- **Phase 4 complete:** ✅ Interactive mode, adapter pattern, extracted utilities, multi-platform improvements
+- **Interactive UX:** ✅ @clack/prompts integration, platform/scope selection, zero CLI warning, graceful cancellation
+- **Architecture:** ✅ Adapter → Core pattern eliminates duplication, clean separation of concerns
+- **Refactoring:** ✅ Code extracted to libraries (usage, flag-parser, mode-detector, platform-names)
+- **Multi-platform:** ✅ Sequential installation, platform-labeled progress bars, clean output
+- **Next action:** Begin Phase 5 - Atomic Transactions and Rollback
 
 ### Handoff Notes
-✅ Plan 03-03 complete! Multi-platform installer working end-to-end. CLI accepts --claude, --copilot, --codex flags with --global/--local scope. Orchestrator uses adapters for platform-specific operations (getTargetDir, getCommandPrefix, getPathReference). Template renderer split into file-based (renderTemplate) and string-based (replaceVariables) functions. Critical bug fixed: processTemplateFile signature mismatch causing ENAMETOOLONG errors. Testing verified: Claude/Copilot use /gsd- prefix, Codex uses $gsd- prefix, multi-platform installation (--claude --codex) works, manifests have correct metadata. Phase 3 complete (3/3 plans). Ready for Phase 4: Interactive UX. See 03-03-SUMMARY.md for details. No blockers.
+✅ Plan 04-01 complete! Interactive CLI with beautiful UX implemented. @clack/prompts integration for platform/scope selection. TTY detection routes to interactive mode when no flags provided. Architecture refactored to Adapter → Core pattern: both CLI and interactive modes call shared installPlatforms() function (eliminated 123 lines duplication). Code extracted to libraries: usage.js, flag-parser.js, mode-detector.js, platform-names.js (reduced install.js 119→97 lines). Multi-platform output improved: sequential installation, platform-labeled progress bars, clean section headers. Next steps display with command prefix handling (/gsd- vs $gsd-). Extensive refinement (7 checkpoint iterations) for indentation, output format, missing info. Testing verified: interactive mode, CLI mode, multi-platform all working. Phase 4 complete (1/1 plans). Ready for Phase 5: Atomic Transactions and Rollback. See 04-01-SUMMARY.md for details. No blockers.
 
 ---
 
@@ -382,23 +417,35 @@ None
 - **Phase 1: ✅ COMPLETE**
 - `.planning/phases/02-core-installer-foundation/02-01-SUMMARY.md` — Foundation & Project Structure (✅ Complete)
 - `.planning/phases/02-core-installer-foundation/02-02-SUMMARY.md` — Core Modules (✅ Complete)
-- **Phase 2: ⚙️ IN PROGRESS** (2/4 plans complete)
-- Next: Plan 02-03 - CLI Orchestration
+- `.planning/phases/02-core-installer-foundation/02-03-SUMMARY.md` — CLI Orchestration (✅ Complete)
+- `.planning/phases/02-core-installer-foundation/02-04-SUMMARY.md` — Installation Flow (✅ Complete)
+- **Phase 2: ✅ COMPLETE** (4/4 plans complete)
 - `.planning/phases/03-multi-platform-support/03-01-SUMMARY.md` — Platform Foundation (✅ Complete)
 - `.planning/phases/03-multi-platform-support/03-02-SUMMARY.md` — Concrete Platform Adapters (✅ Complete)
 - `.planning/phases/03-multi-platform-support/03-03-SUMMARY.md` — Orchestrator Integration (✅ Complete)
 - **Phase 3: ✅ COMPLETE** (3/3 plans complete)
-- Next: Phase 4 - Interactive UX
+- `.planning/phases/04-interactive-cli-ux/04-01-SUMMARY.md` — Interactive Mode (✅ Complete)
+- `.planning/phases/04-interactive-cli-ux/04-VERIFICATION.md` — Phase 4 verification report
+- **Phase 4: ✅ COMPLETE** (1/1 plans complete)
+- Next: Phase 5 - Atomic Transactions and Rollback
 
 ### Project Files
-- `package.json` — Project metadata (updated with cli-progress, chalk, fs-extra dependencies)
-- `bin/install.js` — NPM entry point with shebang (✅ Created in 02-01)
+- `package.json` — Project metadata (updated with @clack/prompts, cli-progress, chalk, fs-extra)
+- `bin/install.js` — NPM entry point (✅ Updated in 04-01, refactored to 97 lines)
 - `bin/lib/errors/install-error.js` — Custom error types (✅ Created in 02-01)
 - `bin/lib/io/file-operations.js` — File operations with fs-extra (✅ Created in 02-02)
 - `bin/lib/paths/path-resolver.js` — Path validation and security (✅ Created in 02-02)
 - `bin/lib/rendering/template-renderer.js` — Template variable replacement (✅ Created in 02-02)
 - `bin/lib/cli/progress.js` — Progress bar utilities (✅ Created in 02-02)
 - `bin/lib/cli/logger.js` — Logging with chalk (✅ Created in 02-02)
+- `bin/lib/cli/interactive.js` — Interactive mode orchestrator (✅ Created in 04-01)
+- `bin/lib/cli/installation-core.js` — Shared installation logic (✅ Created in 04-01)
+- `bin/lib/cli/next-steps.js` — Next steps display (✅ Created in 04-01)
+- `bin/lib/cli/usage.js` — Usage/help messages (✅ Created in 04-01)
+- `bin/lib/cli/flag-parser.js` — Platform/scope flag parsing (✅ Created in 04-01)
+- `bin/lib/cli/mode-detector.js` — Interactive mode detection (✅ Created in 04-01)
+- `bin/lib/cli/README.md` — CLI architecture documentation (✅ Created in 04-01)
+- `bin/lib/platforms/platform-names.js` — Platform name utilities (✅ Created in 04-01)
 - `bin/lib/platforms/base-adapter.js` — Base adapter interface (✅ Created in 03-01)
 - `bin/lib/platforms/registry.js` — Adapter registry singleton (✅ Created in 03-01, updated in 03-02)
 - `bin/lib/platforms/detector.js` — GSD installation detector (✅ Created in 03-01)
@@ -406,6 +453,7 @@ None
 - `bin/lib/platforms/claude-adapter.js` — Claude platform adapter (✅ Created in 03-02)
 - `bin/lib/platforms/copilot-adapter.js` — Copilot platform adapter (✅ Created in 03-02)
 - `bin/lib/platforms/codex-adapter.js` — Codex platform adapter (✅ Created in 03-02)
+- `bin/lib/installer/orchestrator.js` — Installation orchestrator (✅ Updated in 04-01)
 - `scripts/migrate-to-templates.js` — Main migration entry point (✅ Complete, preserved in git)
 - `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
 - `scripts/lib/validator.js` — Error collection engine (✅ Created)
@@ -429,27 +477,25 @@ None
 ### v2.0 — Complete Multi-Platform Installer
 **Goal:** Deploy skills to Claude + Copilot + Codex via npx with interactive UX and atomic transactions  
 **Status:** Implementation Phase  
-**Progress:** 2/7 phases complete (29%)  
+**Progress:** 4/8 phases complete (50%)  
 **Started:** 2026-01-25  
 **Target Completion:** TBD
 
 **Phase Breakdown:**
 - Phase 0: Documentation & Planning (✅ Complete - requirements documented)
 - Phase 1: Template Migration (✅ Complete - all skills/agents migrated and validated)
-- Phase 2: Core Installer Foundation (⚙️ In Progress - 2/4 plans complete)
+- Phase 2: Core Installer Foundation (✅ Complete - 4/4 plans complete)
 - Phase 3: Multi-Platform Support (✅ Complete - 3/3 plans complete)
-- Phase 4: Interactive UX (Pending)
+- Phase 4: Interactive CLI with Beautiful UX (✅ Complete - 1/1 plans complete)
 - Phase 5: Atomic Transactions (Pending)
 - Phase 6: Update Detection (Pending)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 3 complete - Multi-platform installer working end-to-end. CLI accepts --claude, --copilot, --codex flags with --global/--local scope. Orchestrator uses adapters for platform-specific transformations. Command prefixes: Claude/Copilot use /gsd-, Codex uses $gsd-. Tested and verified with multi-platform installation. Phase 4: Interactive UX next.
-
-**Current Scope:** Phase 3 complete - Multi-platform installer working end-to-end. CLI accepts --claude, --copilot, --codex flags with --global/--local scope. Orchestrator uses adapters for platform-specific transformations. Command prefixes: Claude/Copilot use /gsd-, Codex uses $gsd-. Tested and verified with multi-platform installation. Phase 4: Interactive UX next.
+**Current Scope:** Phase 4 complete - Interactive UX with @clack/prompts. Users run `npx get-shit-done-multi` without flags → beautiful prompts. Architecture refactored to Adapter → Core pattern. Both CLI and interactive modes share installation core. Zero CLI detection warning implemented. 32/32 must-haves verified. Phase 5: Atomic Transactions and Rollback next.
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Phase 4 - Interactive UX
+**Ready for:** Phase 5 - Atomic Transactions and Rollback
