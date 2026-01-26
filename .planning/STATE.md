@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-26  
-**Updated By:** GSD Phase Executor (Plan 02-02 complete - Core Modules)
+**Updated By:** GSD Phase Executor (Plan 03-01 complete - Platform Foundation)
 
 ---
 
@@ -11,33 +11,34 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ⚙️ Phase 2 In Progress (Plan 02/04 complete). Core modules created: file operations (fs-extra), path security, template rendering, progress bars, and logging. CLI orchestration next.
+**Current Focus:** ⚙️ Phase 3 In Progress (Plan 01/03 complete). Platform foundation created: base adapter interface, registry singleton, GSD detector, binary detector. Concrete adapters next.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 2 of 8 (Core Installer Foundation) ⚙️ IN PROGRESS  
-**Phase Goal:** Platform detection, file copy engine, and template rendering for Claude installation  
+**Current Phase:** 3 of 8 (Multi-Platform Support) ⚙️ IN PROGRESS  
+**Phase Goal:** Adapter pattern for Claude, Copilot, Codex with platform-specific transformations  
 **Started:** 2026-01-26  
 **Completed:** In progress  
 **Verification:** TBD  
-**Last Activity:** 2026-01-26 - Completed Plan 02-02 (Core Modules)
+**Last Activity:** 2026-01-26 - Completed Plan 03-01 (Platform Foundation)
 
 ### Plan Status
-**Completed Plans:** 6/35 total (Phase 1: 4/4, Phase 2: 2/4)  
-**Current Plan:** Phase 2 - Plan 03 (CLI Orchestration)  
-**Status:** Ready for Plan 02-03
+**Completed Plans:** 7/35 total (Phase 1: 4/4, Phase 2: 2/4, Phase 3: 1/3)  
+**Current Plan:** Phase 3 - Plan 02 (Concrete Platform Adapters)  
+**Status:** Ready for Plan 03-02
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
 Phase 1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 2: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (2/4 plans) ⚙️ IN PROGRESS
+Phase 3: [█████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans) ⚙️ IN PROGRESS
 
 Overall Progress:
-[█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (6/35 total plans)
+[██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (7/35 total plans)
 ```
 
 ---
@@ -46,10 +47,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 1 (Phase 1 - Template Migration)
-- **Phases In Progress:** 1 (Phase 2 - Core Installer Foundation)
-- **Plans Completed:** 6/35
+- **Phases In Progress:** 2 (Phase 2 - Core Installer Foundation, Phase 3 - Multi-Platform Support)
+- **Plans Completed:** 7/35
 - **Days Active:** 2
-- **Plans Today:** 6
+- **Plans Today:** 7
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -220,6 +221,30 @@ Overall Progress:
     - Good cross-platform support
     - Rationale: Cleaner API than raw ANSI codes, better compatibility
 
+26. **2026-01-26 (03-01):** Base adapter as abstract interface (PLATFORM-ABSTRACTION-01)
+    - PlatformAdapter defines 6 required methods but not used as parent class
+    - Concrete adapters (Claude, Copilot, Codex) will be ISOLATED
+    - No inheritance between concrete adapters
+    - Rationale: Code duplication preferred over coupling per PLATFORM-02 architectural rule
+
+27. **2026-01-26 (03-01):** Registry singleton pattern (PLATFORM-ABSTRACTION-02)
+    - AdapterRegistry uses Map storage for efficient lookups
+    - Single instance exported and shared across modules
+    - Prevents registration conflicts
+    - Rationale: Central lookup point, O(1) access, consistent adapter access
+
+28. **2026-01-26 (03-01):** GSD detection via manifest files (PLATFORM-ABSTRACTION-03)
+    - Check for .gsd-install-manifest.json in platform directories
+    - Supports future version tracking in Phase 6
+    - Works across platforms without external dependencies
+    - Rationale: Reliable installation detection, extensible for metadata
+
+29. **2026-01-26 (03-01):** Binary detection separate from validation (PLATFORM-ABSTRACTION-04)
+    - detectBinaries() used for recommendations only
+    - detectInstallations() used for actual validation
+    - User can install for platform they don't have yet
+    - Rationale: Binary presence suggests intent but doesn't validate installation per PLATFORM-01B
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -233,6 +258,9 @@ Overall Progress:
 - [x] Phase 2 Plan 02: Core Modules (02-02)
 - [ ] Phase 2 Plan 03: CLI Orchestration
 - [ ] Phase 2 Plan 04: Installation Flow
+- [x] Phase 3 Plan 01: Platform Foundation (03-01)
+- [ ] Phase 3 Plan 02: Concrete Platform Adapters
+- [ ] Phase 3 Plan 03: Orchestrator Integration
 
 ### Blockers
 None
@@ -242,24 +270,24 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 02-02 Complete!** Created five core installer modules in 173 seconds: (1) File operations module (bin/lib/io/file-operations.js) with fs-extra for recursive directory copy, ensureDirectory, writeFile, readFile, pathExists, and error conversion to InstallError, (2) Path resolver (bin/lib/paths/path-resolver.js) with security validation preventing path traversal attacks via startsWith and .. detection, (3) Template renderer (bin/lib/rendering/template-renderer.js) with simple RegExp-based {{VARIABLE}} replacement for PLATFORM_ROOT, COMMAND_PREFIX, VERSION, PLATFORM_NAME, (4) Progress utilities (bin/lib/cli/progress.js) with cli-progress MultiBar for multi-phase displays using █/░ characters, (5) Logger utilities (bin/lib/cli/logger.js) with chalk for colored output using unicode symbols ℹ ✓ ⚠ ✗ →. All modules tested independently and integration test passed (template rendering verified). Five atomic commits (8cf755e, 6e9f698, 50459fd, 8d6fd89, 27eda36). No deviations from plan.
+✅ **Plan 03-01 Complete!** Created platform foundation in 154 seconds: (1) Base adapter interface (bin/lib/platforms/base-adapter.js) - PlatformAdapter abstract class with 6 required methods (getFileExtension, getTargetDir, getCommandPrefix, transformTools, transformFrontmatter, getPathReference), each throwing descriptive error until implemented, (2) Adapter registry (bin/lib/platforms/registry.js) - AdapterRegistry singleton with Map storage providing register(), get(), has(), getSupportedPlatforms() methods for efficient adapter lookup, (3) GSD detector (bin/lib/platforms/detector.js) - detectInstallations() checks 6 paths (3 platforms × 2 scopes) for .gsd-install-manifest.json presence, found 1 global Claude installation, (4) Binary detector (bin/lib/platforms/binary-detector.js) - detectBinaries() uses which/where with 2-second timeout, found all 3 CLI tools. All verification checks passed. Four atomic commits (cae40b8, fdb454d, c0a7be8, 54d28b2). No deviations from plan.
 
 ### What's Next
-1. **Immediate:** Plan 02-03 - CLI Orchestration (wire modules together in bin/install.js with commander argument parsing)
-2. **Phase 2 Focus:** Complete installer foundation with command-line interface and installation orchestration
-3. **Critical:** Commander integration for --global, --dry-run, --verbose flags
-4. **Critical:** Main installation flow connecting file ops, path resolver, and template renderer
+1. **Immediate:** Plan 03-02 - Concrete Platform Adapters (ClaudeAdapter, CopilotAdapter, CodexAdapter implementing base interface)
+2. **Phase 3 Focus:** Complete multi-platform support with isolated adapters and orchestration integration
+3. **Critical:** Each adapter implements all 6 methods from base interface independently (no inheritance)
+4. **Critical:** Adapters register themselves on import for Wave 3 orchestrator lookup
 
 ### Context for Next Session
-- **Core modules complete:** ✅ All 5 modules created and tested (io, paths, rendering, cli/progress, cli/logger)
-- **Security:** Path traversal validation in place, permission error handling ready
-- **Error handling:** All modules convert system errors to InstallError with semantic codes
-- **Template variables:** Claude variables defined (PLATFORM_ROOT, COMMAND_PREFIX, VERSION, PLATFORM_NAME)
-- **Next action:** Add commander for CLI parsing and create installation orchestration logic in bin/install.js
-- **Integration ready:** File ops, path resolver, and template renderer tested working together
+- **Platform foundation complete:** ✅ Base adapter, registry, two detectors all created and tested
+- **Adapter pattern ready:** Interface defined, registry singleton available for lookup
+- **Detection working:** Found 1 GSD installation (Claude global), all 3 CLI binaries detected
+- **Isolation rule:** Per PLATFORM-02, concrete adapters must be isolated (no inheritance between them)
+- **Next action:** Create ClaudeAdapter, CopilotAdapter, CodexAdapter extending PlatformAdapter
+- **Registration pattern:** Each adapter imports adapterRegistry and registers itself on load
 
 ### Handoff Notes
-✅ Plan 02-02 complete! Five core modules created and independently verified. File operations module handles recursive copy with fs-extra and permission error conversion. Path resolver validates paths and prevents traversal attacks. Template renderer replaces {{VARIABLES}} with platform-specific values. Progress utilities create multi-bar displays with cli-progress. Logger provides colored output with chalk. Integration test passed: template rendering correctly injects variables. All modules use ESM imports and follow separation of concerns pattern. Ready for CLI orchestration in next plan. See 02-02-SUMMARY.md for complete details. No blockers.
+✅ Plan 03-01 complete! Platform foundation established with four modules. Base adapter defines contract with 6 abstract methods. Registry provides singleton lookup pattern with Map storage. GSD detector checks manifest files in 6 locations (verified working - found Claude global). Binary detector uses cross-platform which/where with timeout (verified - found all CLIs). All modules follow ESM patterns and project conventions. Ready for Wave 2 concrete adapters. See 03-01-SUMMARY.md for complete details. No blockers.
 
 ---
 
@@ -292,6 +320,9 @@ None
 - `.planning/phases/02-core-installer-foundation/02-02-SUMMARY.md` — Core Modules (✅ Complete)
 - **Phase 2: ⚙️ IN PROGRESS** (2/4 plans complete)
 - Next: Plan 02-03 - CLI Orchestration
+- `.planning/phases/03-multi-platform-support/03-01-SUMMARY.md` — Platform Foundation (✅ Complete)
+- **Phase 3: ⚙️ IN PROGRESS** (1/3 plans complete)
+- Next: Plan 03-02 - Concrete Platform Adapters
 
 ### Project Files
 - `package.json` — Project metadata (updated with cli-progress, chalk, fs-extra dependencies)
@@ -302,6 +333,10 @@ None
 - `bin/lib/rendering/template-renderer.js` — Template variable replacement (✅ Created in 02-02)
 - `bin/lib/cli/progress.js` — Progress bar utilities (✅ Created in 02-02)
 - `bin/lib/cli/logger.js` — Logging with chalk (✅ Created in 02-02)
+- `bin/lib/platforms/base-adapter.js` — Base adapter interface (✅ Created in 03-01)
+- `bin/lib/platforms/registry.js` — Adapter registry singleton (✅ Created in 03-01)
+- `bin/lib/platforms/detector.js` — GSD installation detector (✅ Created in 03-01)
+- `bin/lib/platforms/binary-detector.js` — CLI binary detector (✅ Created in 03-01)
 - `scripts/migrate-to-templates.js` — Main migration entry point (✅ Complete, preserved in git)
 - `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
 - `scripts/lib/validator.js` — Error collection engine (✅ Created)
@@ -333,17 +368,17 @@ None
 - Phase 0: Documentation & Planning (✅ Complete - requirements documented)
 - Phase 1: Template Migration (✅ Complete - all skills/agents migrated and validated)
 - Phase 2: Core Installer Foundation (⚙️ In Progress - 2/4 plans complete)
-- Phase 3: Multi-Platform Support (Pending)
+- Phase 3: Multi-Platform Support (⚙️ In Progress - 1/3 plans complete)
 - Phase 4: Interactive UX (Pending)
 - Phase 5: Atomic Transactions (Pending)
 - Phase 6: Update Detection (Pending)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 2 Plan 02 complete - Five core modules created (file ops, path resolver, template renderer, progress, logger). CLI orchestration next.
+**Current Scope:** Phase 3 Plan 01 complete - Platform foundation established (base adapter interface, registry singleton, GSD detector, binary detector). Concrete adapters next.
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Phase 2 Plan 03 - CLI Orchestration
+**Ready for:** Phase 3 Plan 02 - Concrete Platform Adapters
