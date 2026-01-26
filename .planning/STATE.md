@@ -1,7 +1,7 @@
 # Project State
 
-**Last Updated:** 2025-01-25  
-**Updated By:** gsd-roadmapper (initial creation)
+**Last Updated:** 2026-01-25  
+**Updated By:** gsd-executor (plan 01-01 completion)
 
 ---
 
@@ -11,31 +11,31 @@
 
 **Current Milestone:** v1.0 — Template-Based Multi-Platform Installer
 
-**Current Focus:** Project initialization and roadmap planning complete. Ready to begin Phase 1 (Core Installer Foundation).
+**Current Focus:** Phase 1 (Core Installer Foundation) in progress. Plan 01-01 (Foundation & Core Modules) complete - built 6 core modules, build script, and generated templates.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** None (roadmap created, planning pending)  
-**Phase Goal:** N/A  
-**Started:** N/A  
-**Last Activity:** 2025-01-25 (roadmap creation)
+**Current Phase:** 1 of 8 (Core Installer Foundation)  
+**Phase Goal:** Build foundational modules for file operations, path resolution, template rendering, and CLI output  
+**Started:** 2026-01-25  
+**Last Activity:** 2026-01-25 (completed plan 01-01)
 
 ### Plan Status
-**Current Plan:** None  
-**Plan Goal:** N/A  
-**Plan Files:** N/A  
-**Status:** N/A
+**Current Plan:** 01-01 of 3 (Foundation & Core Modules)  
+**Plan Goal:** Create foundational modules for file ops, paths, templates, CLI output/errors, and build script  
+**Plan Files:** .planning/phases/01-core-installer/01-01-PLAN.md, 01-01-SUMMARY.md  
+**Status:** Complete
 
 ### Progress Bar
 ```
 Milestone v1.0: Template-Based Multi-Platform Installer
-[                                                  ] 0% (0/8 phases)
+[█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 3% (1/29 plans)
 
 Phase 1: Core Installer Foundation
-[                                                  ] 0% (not started)
+[████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans)
 ```
 
 ---
@@ -44,20 +44,20 @@ Phase 1: Core Installer Foundation
 
 ### Velocity
 - **Phases Completed:** 0
-- **Plans Completed:** 0
-- **Days Active:** 0
-- **Average Phase Duration:** N/A
+- **Plans Completed:** 1
+- **Days Active:** 1
+- **Average Plan Duration:** 5 minutes
 
 ### Quality
 - **Plans Failed:** 0
 - **Plans Retried:** 0
 - **Rollbacks:** 0
-- **Success Rate:** N/A
+- **Success Rate:** 100% (1/1 plans completed successfully)
 
 ### Coverage
 - **Requirements Mapped:** 29/29 (100%)
-- **Requirements Completed:** 0/29 (0%)
-- **Success Criteria Met:** 0/44 (0%)
+- **Requirements Completed:** 8/29 (28%)
+- **Success Criteria Met:** 7/44 (16%)
 
 ---
 
@@ -79,6 +79,27 @@ Phase 1: Core Installer Foundation
 
 4. **2025-01-25:** Deferred Codex CLI to v2.0
    - Rationale: Focus MVP on Claude + Copilot (largest user bases), add Codex after validation
+
+5. **2026-01-25:** Use ESM modules exclusively for entire codebase
+   - Added type: "module" to package.json
+   - All imports/exports use ESM syntax with explicit .js extensions
+   - Rationale: Modern Node.js standard, better for tree-shaking, cleaner async/await
+
+6. **2026-01-25:** Use fs-extra instead of native fs for file operations
+   - Promise-based API eliminates callback complexity
+   - Automatic parent directory creation with ensureDir()
+   - Better error handling with descriptive codes
+   - Rationale: Reduces boilerplate, handles edge cases automatically
+
+7. **2026-01-25:** Build custom template renderer vs using library (EJS/Handlebars)
+   - Single-pass regex for {{UPPERCASE}} variable replacement
+   - Nullish coalescing for missing variables → [MISSING:VAR_NAME]
+   - Rationale: Simple substitution sufficient for Phase 1, avoids heavy dependency
+
+8. **2026-01-25:** Pre-build templates at package time using prepublishOnly hook
+   - Generate templates/ from .github/ source before npm publish
+   - Runtime uses pre-built templates (no conversion needed)
+   - Rationale: Faster installation, templates validated before publish, no source file risks
 
 ### Open Questions
 1. Should Phase 3 (Interactive UX) precede Phase 4 (Transactions)?
@@ -108,20 +129,23 @@ None
 ## Session Continuity
 
 ### What Just Happened
-Roadmap created with 8 phases mapping all 29 v1 requirements. Phase structure derived from research recommendations in `.planning/research/SUMMARY.md`. Full requirement coverage validated (no orphans). 44 success criteria defined across 8 phases.
+Completed Plan 01-01 (Foundation & Core Modules). Built 6 foundational modules: file operations (fs-extra), path resolution (home directory expansion, platform paths), template rendering ({{VAR}} replacement), template validation (syntax checking), CLI output (chalk colors), and CLI errors (actionable messages). Created build script that generates templates/ from .github/ source with variable substitution. All modules tested in isolation, all verification criteria passed. Generated 96 template files (28 skills, 13 agents, shared directory).
 
 ### What's Next
-1. **Immediate:** Review roadmap, confirm phase structure and requirement mappings
-2. **Next Step:** Run `/gsd-plan-phase 1` to decompose Phase 1 into executable plans
-3. **After Phase 1:** Execute Phase 1 plans, then plan Phase 2
+1. **Immediate:** Continue Phase 1 with Plan 01-02 (Installer Orchestrator & CLI Interface)
+2. **After 01-02:** Plan 01-03 (Integration Tests)
+3. **After Phase 1:** Plan Phase 2 (Multi-Platform Support)
 
 ### Context for Next Session
-- **If continuing roadmap work:** All planning artifacts exist (PROJECT.md, REQUIREMENTS.md, ROADMAP.md, config.json)
+- **Foundation modules ready:** All 6 core modules exportable and tested
+- **Templates generated:** templates/ directory with 96 files ready for copying
+- **Build infrastructure:** prepublishOnly hook configured, ESM setup complete
+- **Next plan inputs:** Plan 01-02 will import and use all foundation modules
 - **If starting Phase 1 planning:** Phase 1 goals and success criteria documented in ROADMAP.md
 - **If revising roadmap:** Requirements are in REQUIREMENTS.md with REQ-IDs, can remap to different phases
 
 ### Handoff Notes
-This is the **initial state** after roadmap creation. No plans executed yet. Next agent should be `/gsd-plan-phase` to decompose Phase 1 into atomic task plans.
+Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) should build the installer orchestrator that uses these modules to copy templates, render variables, and handle installation flow.
 
 ---
 
@@ -142,12 +166,20 @@ This is the **initial state** after roadmap creation. No plans executed yet. Nex
 - `.planning/research/risks.md` — Critical risks and mitigation
 
 ### Phase Plans
-None yet (planning pending)
+- `.planning/phases/01-core-installer/01-01-PLAN.md` — Foundation & Core Modules (complete)
+- `.planning/phases/01-core-installer/01-01-SUMMARY.md` — Plan 01-01 summary
 
 ### Project Files
-- `package.json` — Project metadata and bin entry
-- `bin/install.js` — Entry point (to be created)
-- `templates/` — Template files (base + platform overlays)
+- `package.json` — Project metadata, dependencies, ESM configuration
+- `bin/lib/io/file-operations.js` — File copy and directory operations
+- `bin/lib/paths/path-resolver.js` — Path resolution and platform paths
+- `bin/lib/templates/template-renderer.js` — Template variable rendering
+- `bin/lib/templates/template-validator.js` — Template syntax validation
+- `bin/lib/cli/output.js` — Colored terminal output
+- `bin/lib/cli/errors.js` — Error formatting with fixes
+- `scripts/build-templates.js` — Template generation script
+- `templates/` — Pre-built templates (96 files: 28 skills, 13 agents, shared)
+- `bin/install.js` — Entry point (to be created in 01-02)
 - `get-shit-done/` — Shared resources (references, workflows)
 - `docs/` — Documentation (to be created)
 
@@ -157,13 +189,13 @@ None yet (planning pending)
 
 ### v1.0 — Template-Based Multi-Platform Installer
 **Goal:** Deploy skills to Claude + Copilot via npx with interactive UX and atomic transactions  
-**Status:** Planning  
-**Progress:** 0/8 phases complete  
-**Started:** 2025-01-25  
+**Status:** In Progress  
+**Progress:** 1/29 plans complete (3%)  
+**Started:** 2026-01-25  
 **Target Completion:** TBD
 
 **Phase Breakdown:**
-- Phase 1: Core Installer Foundation (Pending)
+- Phase 1: Core Installer Foundation (In Progress - 1/3 plans complete)
 - Phase 2: Multi-Platform Support (Pending)
 - Phase 3: Interactive UX (Pending)
 - Phase 4: Atomic Transactions (Pending)
@@ -177,4 +209,5 @@ None yet (planning pending)
 ---
 
 **State initialized:** 2025-01-25  
-**Ready for:** Phase planning (`/gsd-plan-phase 1`)
+**Last updated:** 2026-01-25  
+**Ready for:** Plan 01-02 execution
