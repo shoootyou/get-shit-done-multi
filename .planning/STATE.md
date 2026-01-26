@@ -1,7 +1,7 @@
 # Project State
 
-**Last Updated:** 2026-01-25  
-**Updated By:** gsd-executor (plan 01-01 completion)
+**Last Updated:** 2026-01-26  
+**Updated By:** gsd-executor (plan 01-02 completion)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v1.0 — Template-Based Multi-Platform Installer
 
-**Current Focus:** Phase 1 (Core Installer Foundation) in progress. Plan 01-01 (Foundation & Core Modules) complete - built 6 core modules, build script, and generated templates.
+**Current Focus:** Phase 1 (Core Installer Foundation) in progress. Plan 01-02 (Installer Orchestrator & CLI Interface) complete - built CLI entry point, installer orchestrator, and platform detector for complete installation flow.
 
 ---
 
@@ -21,21 +21,21 @@
 **Current Phase:** 1 of 8 (Core Installer Foundation)  
 **Phase Goal:** Build foundational modules for file operations, path resolution, template rendering, and CLI output  
 **Started:** 2026-01-25  
-**Last Activity:** 2026-01-25 (completed plan 01-01)
+**Last Activity:** 2026-01-26 (completed plan 01-02)
 
 ### Plan Status
-**Current Plan:** 01-01 of 3 (Foundation & Core Modules)  
-**Plan Goal:** Create foundational modules for file ops, paths, templates, CLI output/errors, and build script  
-**Plan Files:** .planning/phases/01-core-installer/01-01-PLAN.md, 01-01-SUMMARY.md  
+**Current Plan:** 01-02 of 3 (Installer Orchestrator & CLI Interface)  
+**Plan Goal:** Build CLI entry point, installer orchestrator, and platform detector  
+**Plan Files:** .planning/phases/01-core-installer/01-02-PLAN.md, 01-02-SUMMARY.md  
 **Status:** Complete
 
 ### Progress Bar
 ```
 Milestone v1.0: Template-Based Multi-Platform Installer
-[█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 3% (1/29 plans)
+[███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 7% (2/29 plans)
 
 Phase 1: Core Installer Foundation
-[████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans)
+[████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 67% (2/3 plans)
 ```
 
 ---
@@ -44,9 +44,9 @@ Phase 1: Core Installer Foundation
 
 ### Velocity
 - **Phases Completed:** 0
-- **Plans Completed:** 1
-- **Days Active:** 1
-- **Average Plan Duration:** 5 minutes
+- **Plans Completed:** 2
+- **Days Active:** 2
+- **Average Plan Duration:** 6 minutes
 
 ### Quality
 - **Plans Failed:** 0
@@ -56,8 +56,8 @@ Phase 1: Core Installer Foundation
 
 ### Coverage
 - **Requirements Mapped:** 29/29 (100%)
-- **Requirements Completed:** 8/29 (28%)
-- **Success Criteria Met:** 7/44 (16%)
+- **Requirements Completed:** 15/29 (52%)
+- **Success Criteria Met:** 14/44 (32%)
 
 ---
 
@@ -101,6 +101,27 @@ Phase 1: Core Installer Foundation
    - Runtime uses pre-built templates (no conversion needed)
    - Rationale: Faster installation, templates validated before publish, no source file risks
 
+9. **2026-01-26:** Use Commander for CLI flag parsing
+   - Standard Node.js CLI framework with auto-generated help, typo suggestions
+   - Rationale: Proven pattern, reduces boilerplate, handles edge cases
+   - Alternative: yargs (rejected - more complex), manual parsing (rejected - reinventing wheel)
+
+10. **2026-01-26:** Installer orchestrator is thin coordination layer
+    - Delegates to domain modules, no business logic duplication
+    - Rationale: Maintains separation of concerns, follows SRP
+    - Alternative: Fat orchestrator (rejected - duplicates logic)
+
+11. **2026-01-26:** Platform detection uses GSD-specific paths not CLI binaries
+    - Checks for gsd-* directories in .claude/skills/, .github/skills/, etc.
+    - Rationale: Validates actual GSD installation, not just CLI tool presence
+    - Alternative: Binary detection (rejected - doesn't verify GSD installed)
+
+12. **2026-01-26:** Skip template validation for shared directory
+    - Shared directory contains code examples with {{}} that aren't template variables
+    - Only validate skills/ and agents/ directories
+    - Rationale: Code examples shouldn't fail validation
+    - Alternative: Markdown fence parsing (deferred - complex for Phase 1)
+
 ### Open Questions
 1. Should Phase 3 (Interactive UX) precede Phase 4 (Transactions)?
    - Current: Phase 3 before Phase 4
@@ -129,23 +150,23 @@ None
 ## Session Continuity
 
 ### What Just Happened
-Completed Plan 01-01 (Foundation & Core Modules). Built 6 foundational modules: file operations (fs-extra), path resolution (home directory expansion, platform paths), template rendering ({{VAR}} replacement), template validation (syntax checking), CLI output (chalk colors), and CLI errors (actionable messages). Created build script that generates templates/ from .github/ source with variable substitution. All modules tested in isolation, all verification criteria passed. Generated 96 template files (28 skills, 13 agents, shared directory).
+Completed Plan 01-02 (Installer Orchestrator & CLI Interface). Built CLI entry point with Commander (--claude, --help, --version flags), installer orchestrator coordinating validation→render→copy flow, and platform detector checking for existing GSD installations. Full installation flow now works: `npx get-shit-done-multi --claude` installs 28 skills + 13 agents to .claude/ directory. Fixed template validator false positives from JSX code examples. All verification criteria passed: templates validated, variables rendered, files copied, success message shown.
 
 ### What's Next
-1. **Immediate:** Continue Phase 1 with Plan 01-02 (Installer Orchestrator & CLI Interface)
-2. **After 01-02:** Plan 01-03 (Integration Tests)
-3. **After Phase 1:** Plan Phase 2 (Multi-Platform Support)
+1. **Immediate:** Continue Phase 1 with Plan 01-03 (Integration Tests)
+2. **After 01-03:** Complete Phase 1, move to Phase 2 (Multi-Platform Support)
+3. **After Phase 1:** Begin Phase 2 with Copilot adapter and platform-specific transformations
 
 ### Context for Next Session
-- **Foundation modules ready:** All 6 core modules exportable and tested
-- **Templates generated:** templates/ directory with 96 files ready for copying
-- **Build infrastructure:** prepublishOnly hook configured, ESM setup complete
-- **Next plan inputs:** Plan 01-02 will import and use all foundation modules
-- **If starting Phase 1 planning:** Phase 1 goals and success criteria documented in ROADMAP.md
-- **If revising roadmap:** Requirements are in REQUIREMENTS.md with REQ-IDs, can remap to different phases
+- **Foundation complete:** All 6 core modules + CLI + orchestrator + detector ready
+- **Installation flow working:** `npx get-shit-done-multi --claude` installs successfully
+- **Templates validated:** Skills and agents templates render correctly with variable substitution
+- **Next plan inputs:** Plan 01-03 will create integration tests for complete flow
+- **Phase 1 status:** 2/3 plans complete (Foundation + Orchestrator done, Integration tests remain)
+- **If starting Phase 2:** Multi-platform adapters will build on working Claude installation
 
 ### Handoff Notes
-Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) should build the installer orchestrator that uses these modules to copy templates, render variables, and handle installation flow.
+Plan 01-02 complete. CLI entry point, installer orchestrator, and platform detector built. Full installation flow working from CLI to deployed files. Next plan (01-03) should create comprehensive integration tests covering complete installation flow, error scenarios, and edge cases.
 
 ---
 
@@ -168,9 +189,14 @@ Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) shou
 ### Phase Plans
 - `.planning/phases/01-core-installer/01-01-PLAN.md` — Foundation & Core Modules (complete)
 - `.planning/phases/01-core-installer/01-01-SUMMARY.md` — Plan 01-01 summary
+- `.planning/phases/01-core-installer/01-02-PLAN.md` — Installer Orchestrator & CLI Interface (complete)
+- `.planning/phases/01-core-installer/01-02-SUMMARY.md` — Plan 01-02 summary
 
 ### Project Files
 - `package.json` — Project metadata, dependencies, ESM configuration
+- `bin/install.js` — CLI entry point with Commander
+- `bin/lib/installer/installer.js` — Installation orchestrator
+- `bin/lib/platforms/platform-detector.js` — Platform detection
 - `bin/lib/io/file-operations.js` — File copy and directory operations
 - `bin/lib/paths/path-resolver.js` — Path resolution and platform paths
 - `bin/lib/templates/template-renderer.js` — Template variable rendering
@@ -179,7 +205,6 @@ Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) shou
 - `bin/lib/cli/errors.js` — Error formatting with fixes
 - `scripts/build-templates.js` — Template generation script
 - `templates/` — Pre-built templates (96 files: 28 skills, 13 agents, shared)
-- `bin/install.js` — Entry point (to be created in 01-02)
 - `get-shit-done/` — Shared resources (references, workflows)
 - `docs/` — Documentation (to be created)
 
@@ -190,12 +215,12 @@ Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) shou
 ### v1.0 — Template-Based Multi-Platform Installer
 **Goal:** Deploy skills to Claude + Copilot via npx with interactive UX and atomic transactions  
 **Status:** In Progress  
-**Progress:** 1/29 plans complete (3%)  
+**Progress:** 2/29 plans complete (7%)  
 **Started:** 2026-01-25  
 **Target Completion:** TBD
 
 **Phase Breakdown:**
-- Phase 1: Core Installer Foundation (In Progress - 1/3 plans complete)
+- Phase 1: Core Installer Foundation (In Progress - 2/3 plans complete)
 - Phase 2: Multi-Platform Support (Pending)
 - Phase 3: Interactive UX (Pending)
 - Phase 4: Atomic Transactions (Pending)
@@ -209,5 +234,5 @@ Plan 01-01 complete. Foundation modules built and tested. Next plan (01-02) shou
 ---
 
 **State initialized:** 2025-01-25  
-**Last updated:** 2026-01-25  
-**Ready for:** Plan 01-02 execution
+**Last updated:** 2026-01-26  
+**Ready for:** Plan 01-03 execution
