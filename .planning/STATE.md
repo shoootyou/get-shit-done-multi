@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-26  
-**Updated By:** GSD Phase Executor (Plan 03-01 complete - Platform Foundation)
+**Updated By:** GSD Phase Executor (Plan 03-02 complete - Concrete Platform Adapters)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ⚙️ Phase 3 In Progress (Plan 01/03 complete). Platform foundation created: base adapter interface, registry singleton, GSD detector, binary detector. Concrete adapters next.
+**Current Focus:** ⚙️ Phase 3 In Progress (Plan 02/03 complete). Platform adapters created: ClaudeAdapter (capitalized tools, no metadata), CopilotAdapter (lowercase array with mappings, metadata), CodexAdapter (isolated duplicate of Copilot with $gsd- prefix). All registered in singleton registry. Orchestrator integration next.
 
 ---
 
@@ -23,22 +23,22 @@
 **Started:** 2026-01-26  
 **Completed:** In progress  
 **Verification:** TBD  
-**Last Activity:** 2026-01-26 - Completed Plan 03-01 (Platform Foundation)
+**Last Activity:** 2026-01-26 - Completed Plan 03-02 (Concrete Platform Adapters)
 
 ### Plan Status
-**Completed Plans:** 7/35 total (Phase 1: 4/4, Phase 2: 2/4, Phase 3: 1/3)  
-**Current Plan:** Phase 3 - Plan 02 (Concrete Platform Adapters)  
-**Status:** Ready for Plan 03-02
+**Completed Plans:** 8/35 total (Phase 1: 4/4, Phase 2: 2/4, Phase 3: 2/3)  
+**Current Plan:** Phase 3 - Plan 03 (Orchestrator Integration)  
+**Status:** Ready for Plan 03-03
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
 Phase 1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 2: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (2/4 plans) ⚙️ IN PROGRESS
-Phase 3: [█████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans) ⚙️ IN PROGRESS
+Phase 3: [██████████████████████████████████░░░░░░░░░░░░░░░░░░] 67% (2/3 plans) ⚙️ IN PROGRESS
 
 Overall Progress:
-[██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (7/35 total plans)
+[███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 23% (8/35 total plans)
 ```
 
 ---
@@ -48,9 +48,9 @@ Overall Progress:
 ### Velocity
 - **Phases Completed:** 1 (Phase 1 - Template Migration)
 - **Phases In Progress:** 2 (Phase 2 - Core Installer Foundation, Phase 3 - Multi-Platform Support)
-- **Plans Completed:** 7/35
+- **Plans Completed:** 8/35
 - **Days Active:** 2
-- **Plans Today:** 7
+- **Plans Today:** 8
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -60,7 +60,7 @@ Overall Progress:
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 11/37 (30% - Phase 1 complete + Phase 2 partial)
+- **Requirements Completed:** 14/37 (38% - Phase 1 complete + Phase 2 partial + Phase 3 partial)
 
 ---
 
@@ -245,6 +245,41 @@ Overall Progress:
     - User can install for platform they don't have yet
     - Rationale: Binary presence suggests intent but doesn't validate installation per PLATFORM-01B
 
+30. **2026-01-26 (03-02):** ClaudeAdapter tool and frontmatter format (ADAPTER-01)
+    - transformTools() keeps capitalized comma-separated string unchanged
+    - transformFrontmatter() returns only name, description, tools (no metadata block)
+    - Uses .md extension and /gsd- command prefix
+    - Rationale: Claude uses capitalized tool names, minimal frontmatter per Claude spec
+
+31. **2026-01-26 (03-02):** CopilotAdapter tool mappings and metadata (ADAPTER-02)
+    - transformTools() converts to lowercase array with mappings (Read→read, Bash→execute, etc.)
+    - transformFrontmatter() includes metadata block (platform, generated, versions)
+    - Uses .agent.md extension and /gsd- command prefix
+    - Rationale: Copilot uses lowercase tool aliases, requires metadata per Copilot spec
+
+32. **2026-01-26 (03-02):** CodexAdapter isolation over inheritance (ADAPTER-03)
+    - Extends ONLY PlatformAdapter, NOT CopilotAdapter
+    - Duplicates 95% of CopilotAdapter code (transformTools, transformFrontmatter, toolMappings)
+    - Only difference: uses $gsd- prefix instead of /gsd-
+    - Rationale: Platform isolation over DRY per PLATFORM-02 architectural rule
+
+33. **2026-01-26 (03-02):** Codex command prefix differentiation (ADAPTER-04)
+    - getCommandPrefix() returns '$gsd-' for Codex vs '/gsd-' for Claude/Copilot
+    - Only behavioral difference between Codex and Copilot adapters
+    - Rationale: Distinguishes Codex command invocation syntax from other platforms
+
+34. **2026-01-26 (03-02):** Tool mapping duplication (ADAPTER-05)
+    - toolMappings dictionary duplicated in both CopilotAdapter and CodexAdapter
+    - Could have been extracted to shared module
+    - Chose duplication for platform isolation
+    - Rationale: Platform-specific changes don't affect other platforms, enables independent evolution
+
+35. **2026-01-26 (03-02):** Registry auto-initialization (ADAPTER-06)
+    - AdapterRegistry constructor calls _initialize() method
+    - All three adapters (claude, copilot, codex) registered on construction
+    - Simple singleton pattern with immediate availability
+    - Rationale: All adapters available immediately on registry import, no manual registration needed
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -259,7 +294,7 @@ Overall Progress:
 - [ ] Phase 2 Plan 03: CLI Orchestration
 - [ ] Phase 2 Plan 04: Installation Flow
 - [x] Phase 3 Plan 01: Platform Foundation (03-01)
-- [ ] Phase 3 Plan 02: Concrete Platform Adapters
+- [x] Phase 3 Plan 02: Concrete Platform Adapters (03-02)
 - [ ] Phase 3 Plan 03: Orchestrator Integration
 
 ### Blockers
@@ -270,24 +305,24 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 03-01 Complete!** Created platform foundation in 154 seconds: (1) Base adapter interface (bin/lib/platforms/base-adapter.js) - PlatformAdapter abstract class with 6 required methods (getFileExtension, getTargetDir, getCommandPrefix, transformTools, transformFrontmatter, getPathReference), each throwing descriptive error until implemented, (2) Adapter registry (bin/lib/platforms/registry.js) - AdapterRegistry singleton with Map storage providing register(), get(), has(), getSupportedPlatforms() methods for efficient adapter lookup, (3) GSD detector (bin/lib/platforms/detector.js) - detectInstallations() checks 6 paths (3 platforms × 2 scopes) for .gsd-install-manifest.json presence, found 1 global Claude installation, (4) Binary detector (bin/lib/platforms/binary-detector.js) - detectBinaries() uses which/where with 2-second timeout, found all 3 CLI tools. All verification checks passed. Four atomic commits (cae40b8, fdb454d, c0a7be8, 54d28b2). No deviations from plan.
+✅ **Plan 03-02 Complete!** Created three concrete platform adapters in 281 seconds (4m 41s): (1) ClaudeAdapter (bin/lib/platforms/claude-adapter.js) - Extends PlatformAdapter, transformTools() keeps capitalized format unchanged, transformFrontmatter() returns minimal fields (no metadata), .md extension, /gsd- prefix; (2) CopilotAdapter (bin/lib/platforms/copilot-adapter.js) - Extends PlatformAdapter, transformTools() converts to lowercase array with mappings (Read→read, Bash→execute, etc.), transformFrontmatter() includes metadata block, .agent.md extension, /gsd- prefix; (3) CodexAdapter (bin/lib/platforms/codex-adapter.js) - Extends ONLY PlatformAdapter (NOT CopilotAdapter), duplicates 95% of Copilot code (intentional per PLATFORM-02), only difference is $gsd- prefix; (4) Registry integration - Added imports and _initialize() method to auto-register all three adapters on construction. getSupportedPlatforms() returns ['claude', 'copilot', 'codex']. All verification checks passed. Four atomic commits (6a95ab2, 588304b, 1a080d3, 7f73769). No deviations from plan.
 
 ### What's Next
-1. **Immediate:** Plan 03-02 - Concrete Platform Adapters (ClaudeAdapter, CopilotAdapter, CodexAdapter implementing base interface)
-2. **Phase 3 Focus:** Complete multi-platform support with isolated adapters and orchestration integration
-3. **Critical:** Each adapter implements all 6 methods from base interface independently (no inheritance)
-4. **Critical:** Adapters register themselves on import for Wave 3 orchestrator lookup
+1. **Immediate:** Plan 03-03 - Orchestrator Integration (Use adapters during installation flow)
+2. **Phase 3 Focus:** Complete multi-platform support by integrating adapters into installation orchestration
+3. **Critical:** Orchestrator will use adapterRegistry.get(platform) for adapter lookup
+4. **Critical:** Tool transformations and frontmatter transformations will be applied during installation
 
 ### Context for Next Session
-- **Platform foundation complete:** ✅ Base adapter, registry, two detectors all created and tested
-- **Adapter pattern ready:** Interface defined, registry singleton available for lookup
-- **Detection working:** Found 1 GSD installation (Claude global), all 3 CLI binaries detected
-- **Isolation rule:** Per PLATFORM-02, concrete adapters must be isolated (no inheritance between them)
-- **Next action:** Create ClaudeAdapter, CopilotAdapter, CodexAdapter extending PlatformAdapter
-- **Registration pattern:** Each adapter imports adapterRegistry and registers itself on load
+- **Platform adapters complete:** ✅ ClaudeAdapter, CopilotAdapter, CodexAdapter all created and registered
+- **Adapter isolation enforced:** ✅ Each adapter extends ONLY PlatformAdapter (no cross-inheritance)
+- **Tool transformations working:** ✅ Claude keeps capitalized, Copilot/Codex convert to lowercase array with mappings
+- **Registry populated:** ✅ All three adapters registered, getSupportedPlatforms() returns all platform names
+- **Code duplication intentional:** ✅ CodexAdapter duplicates Copilot (95% identical) per PLATFORM-02 isolation rule
+- **Next action:** Create orchestrator module that uses adapters for platform-specific installation
 
 ### Handoff Notes
-✅ Plan 03-01 complete! Platform foundation established with four modules. Base adapter defines contract with 6 abstract methods. Registry provides singleton lookup pattern with Map storage. GSD detector checks manifest files in 6 locations (verified working - found Claude global). Binary detector uses cross-platform which/where with timeout (verified - found all CLIs). All modules follow ESM patterns and project conventions. Ready for Wave 2 concrete adapters. See 03-01-SUMMARY.md for complete details. No blockers.
+✅ Plan 03-02 complete! Three isolated platform adapters created and registered. ClaudeAdapter keeps template format unchanged (capitalized tools, no metadata). CopilotAdapter converts to lowercase array with tool mappings and adds metadata block. CodexAdapter duplicates Copilot implementation (intentional) with only $gsd- prefix difference. Registry auto-initializes all adapters on construction. All 6 adapter methods implemented for each platform. All verification tests passed. Ready for Wave 3 orchestrator integration. See 03-02-SUMMARY.md for complete details. No blockers.
 
 ---
 
@@ -321,8 +356,9 @@ None
 - **Phase 2: ⚙️ IN PROGRESS** (2/4 plans complete)
 - Next: Plan 02-03 - CLI Orchestration
 - `.planning/phases/03-multi-platform-support/03-01-SUMMARY.md` — Platform Foundation (✅ Complete)
-- **Phase 3: ⚙️ IN PROGRESS** (1/3 plans complete)
-- Next: Plan 03-02 - Concrete Platform Adapters
+- `.planning/phases/03-multi-platform-support/03-02-SUMMARY.md` — Concrete Platform Adapters (✅ Complete)
+- **Phase 3: ⚙️ IN PROGRESS** (2/3 plans complete)
+- Next: Plan 03-03 - Orchestrator Integration
 
 ### Project Files
 - `package.json` — Project metadata (updated with cli-progress, chalk, fs-extra dependencies)
@@ -334,9 +370,12 @@ None
 - `bin/lib/cli/progress.js` — Progress bar utilities (✅ Created in 02-02)
 - `bin/lib/cli/logger.js` — Logging with chalk (✅ Created in 02-02)
 - `bin/lib/platforms/base-adapter.js` — Base adapter interface (✅ Created in 03-01)
-- `bin/lib/platforms/registry.js` — Adapter registry singleton (✅ Created in 03-01)
+- `bin/lib/platforms/registry.js` — Adapter registry singleton (✅ Created in 03-01, updated in 03-02)
 - `bin/lib/platforms/detector.js` — GSD installation detector (✅ Created in 03-01)
 - `bin/lib/platforms/binary-detector.js` — CLI binary detector (✅ Created in 03-01)
+- `bin/lib/platforms/claude-adapter.js` — Claude platform adapter (✅ Created in 03-02)
+- `bin/lib/platforms/copilot-adapter.js` — Copilot platform adapter (✅ Created in 03-02)
+- `bin/lib/platforms/codex-adapter.js` — Codex platform adapter (✅ Created in 03-02)
 - `scripts/migrate-to-templates.js` — Main migration entry point (✅ Complete, preserved in git)
 - `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
 - `scripts/lib/validator.js` — Error collection engine (✅ Created)
@@ -360,7 +399,7 @@ None
 ### v2.0 — Complete Multi-Platform Installer
 **Goal:** Deploy skills to Claude + Copilot + Codex via npx with interactive UX and atomic transactions  
 **Status:** Implementation Phase  
-**Progress:** 1.5/7 phases complete (21%)  
+**Progress:** 1.67/7 phases complete (24%)  
 **Started:** 2026-01-25  
 **Target Completion:** TBD
 
@@ -368,17 +407,17 @@ None
 - Phase 0: Documentation & Planning (✅ Complete - requirements documented)
 - Phase 1: Template Migration (✅ Complete - all skills/agents migrated and validated)
 - Phase 2: Core Installer Foundation (⚙️ In Progress - 2/4 plans complete)
-- Phase 3: Multi-Platform Support (⚙️ In Progress - 1/3 plans complete)
+- Phase 3: Multi-Platform Support (⚙️ In Progress - 2/3 plans complete)
 - Phase 4: Interactive UX (Pending)
 - Phase 5: Atomic Transactions (Pending)
 - Phase 6: Update Detection (Pending)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 3 Plan 01 complete - Platform foundation established (base adapter interface, registry singleton, GSD detector, binary detector). Concrete adapters next.
+**Current Scope:** Phase 3 Plan 02 complete - Three concrete platform adapters created (ClaudeAdapter, CopilotAdapter, CodexAdapter) with tool transformations, frontmatter transformations, and registry integration. Orchestrator integration next.
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Phase 3 Plan 02 - Concrete Platform Adapters
+**Ready for:** Phase 3 Plan 03 - Orchestrator Integration
