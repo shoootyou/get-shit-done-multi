@@ -108,7 +108,15 @@ async function main() {
     logger.success(`✓ ${platform} installation complete`, 1);
   }
   
+  console.log(); // Add spacing after installations
   logger.success('All installations complete!');
+  
+  // Add next actions
+  console.log();
+  logger.info('Next steps:', 1);
+  logger.info('  • Open your AI CLI and run /gsd-help to see available commands', 1);
+  logger.info('  • Try /gsd-diagnose to validate your setup', 1);
+  logger.info('  • Explore skills with /gsd-list-skills', 1);
 }
 
 // Execute with proper error handling

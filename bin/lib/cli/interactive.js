@@ -15,8 +15,12 @@ import { dirname } from 'path';
  * @returns {Promise<void>}
  */
 export async function runInteractive(options = {}) {
-  // Show intro
+  // Show banner
+  logger.banner();
+  
+  // Show intro with instructions
   p.intro('Get Shit Done - Multi-Platform Installer');
+  p.log.info('Use ↑/↓ to navigate, Space to select, Enter to continue');
   
   // Detect platforms
   const detected = await detectBinaries();
@@ -29,6 +33,10 @@ export async function runInteractive(options = {}) {
   
   // Prompt for selections (Pattern 5 from research)
   const { platforms, scope } = await promptSelections(detected);
+  
+  // Show installation start message
+  p.log.step('Installation starting...');
+  console.log(); // Add a jump line
   
   // Run installation (Pattern 3 from research)
   await runInstallation(platforms, scope);
@@ -129,32 +137,51 @@ async function runInstallation(platforms, scope) {
   const isGlobal = scope === 'global';
   const multiBar = createMultiBar();
   
-  // Track failures for partial success handling
+  // Map platform names for display
+  const platformNames = {
+    claude: 'Claude Code',
+    copilot: 'GitHub Copilot CLI',
+    codex: 'Codex CLI'
+  };
+  
+  // Track failures and successes for summary
   const failures = [];
+  const successes = [];
   
   for (const platform of platforms) {
     try {
-      logger.info(`Installing GSD for ${platform}...`);
+      const platformLabel = platformNames[platform] || platform;
+      console.log(); // Add spacing before each platform installation
+      logger.info(`Installing ${platformLabel}...`);
       
       const adapter = adapterRegistry.get(platform);
-      await install({
+      const stats = await install({
         platform,
         adapter,
         isGlobal,
         scriptDir,
-        multiBar
+        multiBar,
+        silent: true // Don't show command prefix logging
       });
       
-      logger.success(`${platform} installation complete`);
+      successes.push({ platform, platformLabel, stats });
     } catch (error) {
-      failures.push({ platform, error });
-      logger.error(`${platform} installation failed: ${error.message}`);
+      failures.push({ platform: platformNames[platform] || platform, error });
     }
   }
   
   multiBar.stop();
   
+  console.log(); // Add spacing after progress bars
+  
   // Show summary
+  if (successes.length > 0) {
+    p.log.success(`Successfully installed to ${successes.length} platform(s):`);
+    successes.forEach(({ platformLabel, stats }) => {
+      p.log.info(`  ✓ ${platformLabel}: ${stats.skills} skills, ${stats.agents} agents`);
+    });
+  }
+  
   if (failures.length > 0) {
     p.log.warn(`${failures.length} platform(s) failed to install:`);
     failures.forEach(f => p.log.error(`  - ${f.platform}: ${f.error.message}`));
@@ -163,6 +190,14 @@ async function runInstallation(platforms, scope) {
       // All failed - error exit
       process.exit(1);
     }
-    // Partial success - continue to outro
+  }
+  
+  // Add the next actions message
+  if (successes.length > 0) {
+    console.log();
+    p.log.info('Next steps:');
+    p.log.info('  • Open your AI CLI and run /gsd-help to see available commands');
+    p.log.info('  • Try /gsd-diagnose to validate your setup');
+    p.log.info('  • Explore skills with /gsd-list-skills');
   }
 }

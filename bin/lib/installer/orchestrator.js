@@ -20,10 +20,11 @@ import { readdir, readFile } from 'fs/promises';
  * @param {boolean} options.isVerbose - Verbose output
  * @param {string} options.scriptDir - Script directory path
  * @param {string} [options.targetDir] - Override target directory (for testing)
+ * @param {boolean} [options.silent] - Suppress command prefix and other logging
  * @returns {Promise<Object>} Installation statistics
  */
 export async function install(options) {
-  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride } = options;
+  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride, silent = false } = options;
   
   // Get platform adapter
   const adapter = adapterRegistry.get(platform);
@@ -47,9 +48,11 @@ export async function install(options) {
     PLATFORM_NAME: platform
   };
   
-  logger.info(`Target directory: ${targetDir}`, 1);
-  logger.info(`Templates source: ${templatesDir}`, 1);
-  logger.info(`Command prefix: ${commandPrefix}`, 1);
+  if (!silent) {
+    logger.info(`Target directory: ${targetDir}`, 1);
+    logger.info(`Templates source: ${templatesDir}`, 1);
+    logger.info(`Command prefix: ${commandPrefix}`, 1);
+  }
   
   // Validate templates exist
   await validateTemplates(templatesDir);
@@ -58,7 +61,7 @@ export async function install(options) {
   const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
   const hasExisting = await pathExists(manifestPath);
   
-  if (hasExisting) {
+  if (hasExisting && !silent) {
     logger.sectionTitle('Warnings');
     logger.warn('Existing installation detected', 1);
     logger.warn('Installation will overwrite existing files', 1);
@@ -73,11 +76,13 @@ export async function install(options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
   
   if (!isVerbose) {
-    // Add section title before progress bars
-    logger.sectionTitle('Installing...');
+    // Add section title before progress bars (only if not silent)
+    if (!silent) {
+      logger.sectionTitle('Installing...');
+    }
     
     // Multi-bar progress for non-verbose mode
-    const multiBar = createMultiBar();
+    const multiBar = options.multiBar || createMultiBar();
     
     try {
       // Phase 1: Install skills
@@ -89,9 +94,14 @@ export async function install(options) {
       // Phase 3: Install shared directory
       stats.shared = await installShared(templatesDir, targetDir, templateVars, multiBar, isVerbose);
       
-      stopAllProgress(multiBar);
+      // Only stop if we created it (not if passed from interactive mode)
+      if (!options.multiBar) {
+        stopAllProgress(multiBar);
+      }
     } catch (error) {
-      stopAllProgress(multiBar);
+      if (!options.multiBar) {
+        stopAllProgress(multiBar);
+      }
       throw error;
     }
   } else {
