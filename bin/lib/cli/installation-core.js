@@ -43,6 +43,11 @@ export async function installPlatforms(platforms, scope, options = {}) {
   // Create progress bar manager if needed
   const multiBar = useProgressBars ? createMultiBar() : null;
   
+  // Show "Installing..." header once for all platforms (in non-verbose mode)
+  if (multiBar && !verbose) {
+    logger.sectionTitle('Installing...');
+  }
+  
   // Track successes and failures
   const successes = [];
   const failures = [];

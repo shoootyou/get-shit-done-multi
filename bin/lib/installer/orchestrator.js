@@ -74,10 +74,7 @@ export async function install(options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
   
   if (!isVerbose) {
-    // Add section title before progress bars
-    logger.sectionTitle('Installing...');
-    
-    // Multi-bar progress for non-verbose mode
+    // Multi-bar progress for non-verbose mode (no section title - shown in installation-core.js)
     const multiBar = options.multiBar || createMultiBar();
     
     try {
@@ -85,10 +82,10 @@ export async function install(options) {
       stats.skills = await installSkills(templatesDir, targetDir, templateVars, multiBar, isVerbose, platform);
       
       // Phase 2: Install agents
-      stats.agents = await installAgents(templatesDir, targetDir, templateVars, multiBar, isVerbose);
+      stats.agents = await installAgents(templatesDir, targetDir, templateVars, multiBar, isVerbose, platform);
       
       // Phase 3: Install shared directory
-      stats.shared = await installShared(templatesDir, targetDir, templateVars, multiBar, isVerbose);
+      stats.shared = await installShared(templatesDir, targetDir, templateVars, multiBar, isVerbose, platform);
       
       // Only stop if we created it (not if passed from interactive mode)
       if (!options.multiBar) {
@@ -106,10 +103,10 @@ export async function install(options) {
     stats.skills = await installSkills(templatesDir, targetDir, templateVars, null, isVerbose, platform);
     
     logger.header('Installing Agents');
-    stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
+    stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose, platform);
     
     logger.header('Installing Shared Directory');
-    stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
+    stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose, platform);
   }
   
   // Generate installation manifest
@@ -154,7 +151,8 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
   const hasGetShitDone = await pathExists(getShitDoneTemplateDir);
   
   const total = skills.length + (hasGetShitDone ? 1 : 0);
-  const bar = multiBar ? createProgressBar(multiBar, 'Skills', total) : null;
+  const barLabel = platform ? `${platform} Skills` : 'Skills';
+  const bar = multiBar ? createProgressBar(multiBar, barLabel, total) : null;
   
   let count = 0;
   
@@ -198,7 +196,7 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
 /**
  * Install agents from templates
  */
-async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose) {
+async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose, platform) {
   const agentsTemplateDir = join(templatesDir, 'agents');
   const agentsTargetDir = join(targetDir, 'agents');
   
@@ -209,7 +207,8 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
   const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
   
   const total = agents.length; // versions.json doesn't count as an agent
-  const bar = multiBar ? createProgressBar(multiBar, 'Agents', total) : null;
+  const barLabel = platform ? `${platform} Agents` : 'Agents';
+  const bar = multiBar ? createProgressBar(multiBar, barLabel, total) : null;
   
   let count = 0;
   for (const agent of agents) {
@@ -246,11 +245,12 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
 /**
  * Install shared directory from templates
  */
-async function installShared(templatesDir, targetDir, variables, multiBar, isVerbose) {
+async function installShared(templatesDir, targetDir, variables, multiBar, isVerbose, platform) {
   const sharedTemplateDir = join(templatesDir, 'get-shit-done');
   const sharedTargetDir = join(targetDir, 'get-shit-done');
   
-  const bar = multiBar ? createProgressBar(multiBar, 'Shared', 1) : null;
+  const barLabel = platform ? `${platform} Shared` : 'Shared';
+  const bar = multiBar ? createProgressBar(multiBar, barLabel, 1) : null;
   
   logger.verboseInProgress('get-shit-done/', isVerbose);
   
