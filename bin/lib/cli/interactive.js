@@ -34,15 +34,14 @@ export async function runInteractive(options = {}) {
   // Prompt for selections (Pattern 5 from research)
   const { platforms, scope } = await promptSelections(detected);
   
-  // Show installation start message
+  // Close the lateral line with step message
   p.log.step('Installation starting...');
-  console.log(); // Add a jump line
   
   // Run installation (Pattern 3 from research)
   await runInstallation(platforms, scope);
   
-  // Show completion
-  p.outro('Installation complete! Run /gsd-help to get started.');
+  // Show completion with outro
+  p.outro('Installation complete!');
 }
 
 /**
@@ -50,9 +49,14 @@ export async function runInteractive(options = {}) {
  * @returns {Promise<void>}
  */
 async function showGlobalDetectionWarning() {
-  p.log.warn('No platform CLIs detected on your system.');
-  p.log.info('You can still proceed, but installation may fail without CLI binaries.');
-  p.log.info('Install Claude Code, GitHub Copilot CLI, or Codex CLI first for best results.');
+  // Close lateral line before showing warnings
+  console.log();
+  
+  // Use CLI logger format for warnings
+  logger.warn('No platform CLIs detected on your system.');
+  logger.info('You can still proceed, but installation may fail without CLI binaries.');
+  logger.info('Install Claude Code, GitHub Copilot CLI, or Codex CLI first for best results.');
+  console.log();
   
   const shouldContinue = await p.confirm({
     message: 'Continue anyway?',
@@ -174,17 +178,19 @@ async function runInstallation(platforms, scope) {
   
   console.log(); // Add spacing after progress bars
   
-  // Show summary
+  // Show summary using CLI logger format
   if (successes.length > 0) {
-    p.log.success(`Successfully installed to ${successes.length} platform(s):`);
+    console.log();
+    logger.success(`Successfully installed to ${successes.length} platform(s):`);
     successes.forEach(({ platformLabel, stats }) => {
-      p.log.info(`  ✓ ${platformLabel}: ${stats.skills} skills, ${stats.agents} agents`);
+      logger.info(`  ${platformLabel}: ${stats.skills} skills, ${stats.agents} agents`, 2);
     });
   }
   
   if (failures.length > 0) {
-    p.log.warn(`${failures.length} platform(s) failed to install:`);
-    failures.forEach(f => p.log.error(`  - ${f.platform}: ${f.error.message}`));
+    console.log();
+    logger.warn(`${failures.length} platform(s) failed to install:`);
+    failures.forEach(f => logger.error(`  ${f.platform}: ${f.error.message}`));
     
     if (failures.length === platforms.length) {
       // All failed - error exit
@@ -192,12 +198,13 @@ async function runInstallation(platforms, scope) {
     }
   }
   
-  // Add the next actions message
+  // Add the next actions message using CLI logger format
   if (successes.length > 0) {
     console.log();
-    p.log.info('Next steps:');
-    p.log.info('  • Open your AI CLI and run /gsd-help to see available commands');
-    p.log.info('  • Try /gsd-diagnose to validate your setup');
-    p.log.info('  • Explore skills with /gsd-list-skills');
+    logger.info('Next steps:');
+    logger.info('  • Open your AI CLI and run /gsd-help to see available commands', 2);
+    logger.info('  • Try /gsd-diagnose to validate your setup', 2);
+    logger.info('  • Explore skills with /gsd-list-skills', 2);
+    console.log();
   }
 }
