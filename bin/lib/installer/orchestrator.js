@@ -20,11 +20,11 @@ import { readdir, readFile } from 'fs/promises';
  * @param {boolean} options.isVerbose - Verbose output
  * @param {string} options.scriptDir - Script directory path
  * @param {string} [options.targetDir] - Override target directory (for testing)
- * @param {boolean} [options.silent] - Suppress command prefix and other logging
+ * @param {boolean} [options.hideInfo] - Hide info logs (target dir, templates source, command prefix)
  * @returns {Promise<Object>} Installation statistics
  */
 export async function install(options) {
-  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride, silent = false } = options;
+  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride, hideInfo = false } = options;
   
   // Get platform adapter
   const adapter = adapterRegistry.get(platform);
@@ -48,7 +48,7 @@ export async function install(options) {
     PLATFORM_NAME: platform
   };
   
-  if (!silent) {
+  if (!hideInfo) {
     logger.info(`Target directory: ${targetDir}`, 1);
     logger.info(`Templates source: ${templatesDir}`, 1);
     logger.info(`Command prefix: ${commandPrefix}`, 1);
@@ -61,7 +61,7 @@ export async function install(options) {
   const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
   const hasExisting = await pathExists(manifestPath);
   
-  if (hasExisting && !silent) {
+  if (hasExisting) {
     logger.sectionTitle('Warnings');
     logger.warn('Existing installation detected', 1);
     logger.warn('Installation will overwrite existing files', 1);
@@ -76,10 +76,8 @@ export async function install(options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
   
   if (!isVerbose) {
-    // Add section title before progress bars (only if not silent)
-    if (!silent) {
-      logger.sectionTitle('Installing...');
-    }
+    // Add section title before progress bars
+    logger.sectionTitle('Installing...');
     
     // Multi-bar progress for non-verbose mode
     const multiBar = options.multiBar || createMultiBar();

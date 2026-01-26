@@ -116,9 +116,9 @@ async function main() {
   console.log(); // One jump line before
   if (platforms.length > 1) {
     const names = platforms.join(', ');
-    logger.success(`${names} installation complete`);
+    logger.success(`${names} installation complete`, 1);
   } else {
-    logger.success(`${platforms[0]} installation complete`);
+    logger.success(`${platforms[0]} installation complete`, 1);
   }
   
   // Add next steps section with header

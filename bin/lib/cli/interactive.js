@@ -162,7 +162,7 @@ async function runInstallation(platforms, scope) {
         isGlobal,
         scriptDir,
         multiBar,
-        silent: true // Don't show command prefix logging
+        hideInfo: true // Hide target dir/templates info, but show section headers
       });
       
       successes.push({ platform, platformLabel, stats });
@@ -188,9 +188,9 @@ async function runInstallation(platforms, scope) {
   console.log(); // One jump line before
   if (successes.length > 1) {
     const names = successes.map(s => s.platform).join(', ');
-    logger.success(`${names} installation complete`);
+    logger.success(`${names} installation complete`, 1);
   } else if (successes.length === 1) {
-    logger.success(`${successes[0].platform} installation complete`);
+    logger.success(`${successes[0].platform} installation complete`, 1);
   }
   
   // Add next steps section with header
