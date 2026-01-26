@@ -38,15 +38,26 @@ export async function install(options) {
     }
     
     // 3. Validate templates (pre-flight)
+    // Only validate skills and agents directories, not shared directory
+    // (shared directory contains code examples with {{}} that aren't template variables)
     progress('Validating templates...');
     const templateDir = join(__dirname, '../../../templates');
-    const validationResult = await validateTemplateDirectory(templateDir, [
-      'PLATFORM_ROOT', 'VERSION', 'COMMAND_PREFIX', 
-      'INSTALL_DATE', 'USER', 'PLATFORM_NAME'
-    ]);
     
-    if (validationResult.issueCount > 0) {
-      throw new Error(`Template validation failed: ${validationResult.issueCount} issues found`);
+    // Validate skills
+    const skillsValidation = await validateTemplateDirectory(
+      join(templateDir, 'skills'), 
+      ['PLATFORM_ROOT', 'VERSION', 'COMMAND_PREFIX', 'INSTALL_DATE', 'USER', 'PLATFORM_NAME']
+    );
+    
+    // Validate agents
+    const agentsValidation = await validateTemplateDirectory(
+      join(templateDir, 'agents'), 
+      ['PLATFORM_ROOT', 'VERSION', 'COMMAND_PREFIX', 'INSTALL_DATE', 'USER', 'PLATFORM_NAME']
+    );
+    
+    const totalIssues = skillsValidation.issueCount + agentsValidation.issueCount;
+    if (totalIssues > 0) {
+      throw new Error(`Template validation failed: ${totalIssues} issues in skills/agents`);
     }
     
     // 4. Prepare variables

@@ -24,14 +24,20 @@ export function validateTemplate(content, filePath) {
   const lines = content.split('\n');
 
   lines.forEach((line, lineNum) => {
-    // Check for unclosed braces
-    const openCount = (line.match(/\{\{/g) || []).length;
-    const closeCount = (line.match(/\}\}/g) || []).length;
-    if (openCount !== closeCount) {
-      issues.push({
-        line: lineNum + 1,
-        message: 'Unclosed braces'
-      });
+    // Only validate lines that look like template variables ({{UPPERCASE}})
+    // Skip lines with just braces (like JSX: {{}} or () => {})
+    const templatePattern = /\{\{[A-Z_][A-Z0-9_]*\}\}/;
+    
+    // Check for unclosed braces only if line has template-like content
+    if (templatePattern.test(line)) {
+      const openCount = (line.match(/\{\{/g) || []).length;
+      const closeCount = (line.match(/\}\}/g) || []).length;
+      if (openCount !== closeCount) {
+        issues.push({
+          line: lineNum + 1,
+          message: 'Unclosed braces'
+        });
+      }
     }
 
     // Check for lowercase variables
