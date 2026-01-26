@@ -276,7 +276,7 @@ async function processTemplateFile(filePath, variables, isVerbose) {
   }
   
   // Replace template variables
-  const processed = renderTemplate(content, variables);
+  const processed = replaceVariables(content, variables);
   
   // Clean frontmatter (remove empty fields)
   const cleaned = cleanFrontmatter(processed);
