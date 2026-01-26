@@ -48,7 +48,7 @@ async function main() {
   }
   
   // Show banner
-  logger.header('get-shit-done-multi v2.0.0');
+  logger.banner();
   logger.info(`Installing to Claude Code (${isGlobal ? 'global' : 'local'})`);
   
   // Run installation
