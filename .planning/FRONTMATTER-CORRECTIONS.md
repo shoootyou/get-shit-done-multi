@@ -75,12 +75,6 @@ Create `version.json` in each **skill** directory (NOT in agents):
   "skill_version": "1.9.1",
   "requires_version": "1.9.0+",
   "platforms": ["claude", "copilot", "codex"],
-  "arguments": [{
-    "name": "domain",
-    "type": "string",
-    "required": false,
-    "description": "Project domain for research context"
-  }],
   "metadata": {
     "platform": "copilot",
     "generated": "2026-01-24",
@@ -90,6 +84,12 @@ Create `version.json` in each **skill** directory (NOT in agents):
   }
 }
 ```
+
+**Note about `arguments` field:**
+- Read from source to generate appropriate `argument-hint`
+- **DO NOT** store in version.json
+- Used as reference during conversion only
+- Discarded after generating hint
 
 **Agent Note:** Agents do NOT need version.json - they follow a simpler structure.
 
@@ -109,12 +109,16 @@ cp -r .github/skills/gsd-new-project templates/skills/
 - Rename: `tools` → `allowed-tools`
 - Convert format: `[read, edit]` → `Read, Edit, Bash`
 - Convert arguments to argument-hint:
-  - From: `arguments: [{name: domain, ...}]`
-  - To: `argument-hint: "[domain]"`
+  - Read `arguments` array from source
+  - Generate appropriate hint string (e.g., `[domain]`, `[filename] [format]`)
+  - Write to `argument-hint` field
+  - **Discard** original `arguments` array (do not preserve)
 
 #### Step 3: Create version.json (skills only)
 ```bash
-echo '{"skill_version": "1.9.1", ...}' > templates/skills/gsd-new-project/version.json
+# Only store: skill_version, requires_version, platforms, metadata
+# DO NOT include arguments field
+echo '{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": [...], "metadata": {...}}' > templates/skills/gsd-new-project/version.json
 ```
 
 ### 3. Tool Name Format
@@ -176,12 +180,15 @@ Per https://code.claude.com/docs/en/settings#tools-available-to-claude:
 
 1. **Read source files** from `.github/skills/` and `.github/agents/`
 2. **Parse frontmatter** and extract invalid fields
-3. **Create version.json** with extracted metadata
+3. **Create version.json** with extracted metadata (skills only):
+   - Include: `skill_version`, `requires_version`, `platforms`, `metadata`
+   - **Exclude:** `arguments` field (use as reference only, do not store)
 4. **Transform frontmatter**:
    - Remove unsupported fields
    - Rename `tools` → `allowed-tools`
    - Convert array to comma-separated string
    - Normalize tool names
+   - Convert `arguments` to `argument-hint` (discard original array)
 5. **Write to templates/** directory
 6. **Never modify** source files in `.github/`
 
@@ -211,10 +218,13 @@ Each adapter handles platform-specific tool name mappings:
 - [ ] Skill templates created in `/templates/skills/` directory
 - [ ] Each skill template has corrected frontmatter
 - [ ] Each skill directory has `version.json`
+- [ ] `version.json` contains: skill_version, requires_version, platforms, metadata ONLY
+- [ ] `version.json` does NOT contain `arguments` field
 - [ ] Tool names use official capitalization
 - [ ] `allowed-tools` is comma-separated string
 - [ ] No unsupported fields remain in skill frontmatter
 - [ ] `argument-hint` field used instead of `arguments` array
+- [ ] Original `arguments` array discarded after conversion
 
 **Agents:**
 - [ ] All source files in `.github/agents/` remain unchanged

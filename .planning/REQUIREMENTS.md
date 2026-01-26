@@ -239,10 +239,12 @@
   - **Rename field:** `tools` → `allowed-tools`
   - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
   - **Normalize tool names:** Apply proper capitalization (read→Read, bash→Bash, execute→Bash, etc.)
+  - **Convert arguments to argument-hint:** Use `arguments` array from source as reference to generate appropriate `argument-hint` string (e.g., `[domain]`, `[filename] [format]`)
 - **Create version.json** in each template skill directory (NOT in agents):
-  - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`
+  - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata` ONLY
+  - **DO NOT** store `arguments` field - use as reference only during conversion
   - Used for version tracking and platform compatibility checks
-  - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}, "arguments": [...]}`
+  - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}}`
 - **Official supported frontmatter fields for SKILLS** (per https://code.claude.com/docs/en/slash-commands#frontmatter-reference):
   - `name` (optional): Display name
   - `description` (recommended): What the skill does
