@@ -46,6 +46,27 @@ export function verbose(message, isVerbose) {
 }
 
 /**
+ * Log verbose in-progress message
+ * @param {string} message - Message to log
+ * @param {boolean} isVerbose - Verbose mode flag
+ */
+export function verboseInProgress(message, isVerbose) {
+  if (isVerbose) {
+    process.stdout.write(chalk.blue('  → ') + message);
+  }
+}
+
+/**
+ * Log verbose completed message (completes in-progress line)
+ * @param {boolean} isVerbose - Verbose mode flag
+ */
+export function verboseComplete(isVerbose) {
+  if (isVerbose) {
+    process.stdout.write(' ' + chalk.green('✓') + '\n');
+  }
+}
+
+/**
  * Print section header
  * @param {string} title - Section title
  */
@@ -53,6 +74,24 @@ export function header(title) {
   console.log();
   console.log(chalk.bold.cyan(title));
   console.log(chalk.cyan('─'.repeat(title.length)));
+}
+
+/**
+ * Print banner with ASCII art
+ */
+export function banner() {
+  console.log();
+  console.log(chalk.cyan('   ██████╗ ███████╗██████╗ '));
+  console.log(chalk.cyan('  ██╔════╝ ██╔════╝██╔══██╗'));
+  console.log(chalk.cyan('  ██║  ███╗███████╗██║  ██║'));
+  console.log(chalk.cyan('  ██║   ██║╚════██║██║  ██║'));
+  console.log(chalk.cyan('  ╚██████╔╝███████║██████╔╝'));
+  console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝'));
+  console.log(chalk.bold.white('  Get Shit Done v2.0.0'));
+  console.log(chalk.gray('  A meta-prompting, context engineering and spec-driven development system.'));
+  console.log(chalk.gray('   * Forked from TÂCHES/get-shit-done'));
+  console.log(chalk.gray('   * Maintained by shoootyou/get-shit-done-multi'));
+  console.log();
 }
 
 /**
