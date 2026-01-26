@@ -1,39 +1,83 @@
 # Project Research Summary
 
 **Project:** get-shit-done-multi  
-**Domain:** Template-based CLI installer for multi-platform AI skills & agents  
-**Researched:** 2025-01-26 (Re-researched with migration architecture)  
+**Domain:** npx-based installer for multi-platform AI skills & agents  
+**Researched:** 2025-01-26 (CORRECTED architecture)  
 **Overall Confidence:** HIGH
 
 ## Executive Summary
 
-**CRITICAL ARCHITECTURE INSIGHT:** This project has **TWO DISTINCT CONCERNS** that must be separated:
+**CRITICAL ARCHITECTURE CORRECTIONS:** This project is an **npx installer** (NOT a library) with a unique **two-phase architecture** where Phase 1 code is **completely deleted** after use.
 
-### Phase 1: ONE-TIME Migration (Temporary)
-- **Purpose:** Convert `.github/` → `/templates/` with frontmatter corrections
-- **Lifespan:** Used once, then **archived** (not deleted entirely)
-- **Technology:** YAML parsing (`gray-matter`, `js-yaml`), AST manipulation, validation (`ajv`)
-- **Architecture:** Batch transformation pipeline with comprehensive validation
-- **Output:** Clean `/templates/` directory ready for permanent use
+### Phase 1: ONE-TIME Migration (DELETED after approval)
+- **Purpose:** Convert `.github/` → `/templates/` with frontmatter corrections  
+- **Lifespan:** ONE-TIME use, then **completely deleted** (`rm -rf scripts/`)  
+- **Technology:** gray-matter (YAML parsing), ajv (validation) — temporary devDependencies  
+- **Architecture:** Simple modular script (5-6 files max), NOT reusable components  
+- **Critical gate:** **MANUAL VALIDATION REQUIRED** — Phase 1 PAUSES for user approval  
+- **After approval:** ALL Phase 1 code deleted (exists ONLY in git history)
 
-### Phase 2+: Installation (Permanent)
-- **Purpose:** Install from `/templates/` to user directories (`.claude/`, `.github/`)
-- **Lifespan:** Remains in codebase forever
-- **Technology:** Template rendering (simple string replacement), CLI UX (`@clack/prompts`), file operations (`fs-extra`)
-- **Architecture:** Interactive installer with platform adapters
-- **Input:** Uses corrected `/templates/` (NO conversion logic)
+### Phase 2+: Installation (PERMANENT, written FRESH)
+- **Purpose:** Install from `/templates/` → user directories (`.claude/`, `.github/`)  
+- **Lifespan:** Permanent (core product)  
+- **Technology:** commander, @inquirer/prompts, chalk, ora, execa — permanent dependencies  
+- **Architecture:** `/bin/install.js` (executable) + `/lib` (internal helpers)  
+- **NOT a library:** NO public API, NO index.js exports, NO reusable components  
+- **NO migration logic:** Phase 2+ assumes templates are ALREADY correct
 
-**Why this matters:** Phase 1 dependencies (gray-matter, js-yaml, ajv) are TEMPORARY. After migration completes and validation passes, these tools become dead weight. Phase 2+ never needs YAML parsing or frontmatter manipulation — templates are already correct.
+### CRITICAL ARCHITECTURAL CONSTRAINTS
 
-**Key finding:** Current `.github/` files contain 42 templates with **unsupported frontmatter fields** (`skill_version`, `requires_version`, `platforms`, `arguments`, `metadata`) that violate official Claude/Copilot specifications. Phase 1 must:
-1. Remove unsupported fields from frontmatter
+**1. Complete Deletion (NO preservation):**
+- After Phase 1 approval: `rm -rf scripts/`
+- NO `.archive/` directory
+- NO "emergency recovery" mechanisms
+- Migration code exists ONLY in git history (not executable)
+
+**2. Manual Validation Gate (MANDATORY):**
+- Phase 1 completes → outputs validation report → PAUSES
+- User manually reviews 42 generated templates
+- User explicitly approves (cannot be automated)
+- ONLY after approval: commit templates, delete migration code
+
+**3. NO Code Reuse Between Phases:**
+- Phase 1 and Phase 2+ are COMPLETELY SEPARATE
+- Phase 2+ does NOT import ANY Phase 1 code
+- MAY DUPLICATE LOGIC (that's OK, Phase 1 gets deleted)
+- NO shared stages, NO composition patterns
+
+**4. NOT a Library (npx installer pattern):**
+- Entry point: `/bin/install.js` (executable with shebang)
+- Internal helpers: `/lib/platforms/`, `/lib/templates/`, `/lib/io/`
+- NO public API, NO exports for external consumers
+- Users run `npx get-shit-done-multi`, NOT `import { install } from '...'`
+
+### Key Migration Requirements
+
+Current `.github/` files contain 42 templates with **unsupported frontmatter fields** that violate official specs. Phase 1 must:
+
+1. Remove unsupported fields: `skill_version`, `requires_version`, `platforms`, `arguments`, `metadata`
 2. Store metadata in separate `version.json` files
-3. Fix field naming (`tools` → `allowed-tools` for Claude skills)
+3. Fix field naming: `tools` → `allowed-tools` (Claude skills only)
 4. Convert tool arrays to platform-specific formats
 5. Replace `arguments` arrays with `argument-hint` strings
-6. Insert template variables (`{{INSTALL_DIR}}`) for Phase 2 rendering
+6. Insert template variables: `{{INSTALL_DIR}}`, `{{PLATFORM_ROOT}}`
+7. Generate validation report for manual review
+8. PAUSE for user approval before deletion
 
-**Critical migration risk:** Mass template corruption from bugs affecting all 42 files with no recovery path. Mitigation: Mandatory dry-run mode, incremental validation, archive migration code (don't delete), emergency re-migration procedure.
+### Critical Risks & Mitigation
+
+**RISK:** User approves migration with bugs → broken templates committed → Phase 1 deleted → cannot re-run  
+**MITIGATION:** Make manual validation FOOLPROOF:
+- Comprehensive automated pre-flight checks
+- Detailed validation checklist (what to inspect)
+- Test installation of 2+ templates before approval
+- Explicit approval command (cannot rush through)
+
+**RISK:** Bugs discovered after Phase 1 deletion → cannot re-run migration  
+**MITIGATION:** Accept the trade-off:
+- 1-3 files: Fix manually (faster than script)
+- 5+ files: Write new focused script (reference git history)
+- This is INTENTIONAL design (simplicity over recovery)
 
 ## Key Findings by Domain
 
@@ -43,55 +87,59 @@
 
 **CRITICAL: Two distinct technology stacks for two distinct phases.**
 
-#### Phase 1 Migration Stack (TEMPORARY - Will be archived)
+#### Phase 1 Migration Stack (TEMPORARY - DELETED after approval)
 
 ```json
 {
   "devDependencies": {
-    "gray-matter": "^4.0.3",    // Parse/modify frontmatter (TEMPORARY)
-    "js-yaml": "^4.1.1",        // YAML validation (TEMPORARY)
-    "ajv": "^8.17.1"            // JSON Schema validation (TEMPORARY)
+    "gray-matter": "^4.0.3",    // YAML frontmatter parsing (TEMPORARY)
+    "ajv": "^8.17.1",           // JSON Schema validation (TEMPORARY)
+    "ajv-formats": "^3.0.1"     // String format validation (TEMPORARY)
   }
 }
 ```
 
 **Why these libraries (Phase 1 only):**
-- **gray-matter** — Extract, modify, and re-serialize frontmatter while preserving formatting
-- **js-yaml** — Validate YAML structure after transformation
-- **ajv** — Validate against official Claude/Copilot frontmatter schemas
-- **Status:** These dependencies will be **archived after Phase 1 completes**
+- **gray-matter** — De facto standard for frontmatter parsing (stable since 2021)
+- **ajv** — JSON Schema validation (8.17.1 latest, well-maintained)
+- **ajv-formats** — Companion for date/URI validation
+- **Status:** These dependencies **DELETED from package.json** after Phase 1 approval
+- **NOT needed:** js-yaml (gray-matter handles YAML), fs-extra (native fs.promises sufficient)
 
 #### Phase 2+ Installation Stack (PERMANENT)
 
 ```json
 {
-  "dependencies": {
-    "commander": "^14.0.2",      // CLI argument parsing (PERMANENT)
-    "fs-extra": "^11.3.3",       // File operations with atomic writes (PERMANENT)
-    "chalk": "^5.6.2",           // Terminal colors (PERMANENT)
-    "@clack/prompts": "^0.11.0"  // Interactive CLI UX (PERMANENT)
+  "type": "module",
+  "bin": {
+    "get-shit-done-multi": "bin/install.js"
   },
-  "devDependencies": {
-    "vitest": "^4.0.18",         // Testing framework
-    "@vitest/ui": "^4.0.18"      // Test UI
+  "dependencies": {
+    "commander": "^14.0.2",      // CLI framework (industry standard)
+    "@inquirer/prompts": "^8.2.0", // Interactive prompts (modern rewrite)
+    "chalk": "^5.6.2",           // Terminal colors (universal standard)
+    "ora": "^9.1.0",             // Spinners/progress (standard)
+    "execa": "^9.6.1"            // Shell commands (better than child_process)
   }
 }
 ```
 
 **Why these libraries (Phase 2+):**
-- **commander** — ESM support, clean API for CLI args
-- **fs-extra** — Atomic writes, promise-based, cross-platform
-- **chalk** — Terminal colors for user feedback
-- **@clack/prompts** — Beautiful interactive prompts with spinners
-- **NO template engine** — Use simple string replacement for `{{VARIABLES}}`
+- **commander** — Industry standard CLI framework (used by Vue CLI, create-react-app)
+- **@inquirer/prompts** — Modern, tree-shakeable (replaces monolithic inquirer)
+- **chalk** — Universal terminal color library
+- **ora** — Standard CLI spinner library (used by all major npx tools)
+- **execa** — Promise-based shell commands (for git operations)
+- **NO template engine** — Native string replacement (`String.replace()`)
+- **NO fs-extra** — Native `fs.promises` sufficient (has `mkdir({ recursive: true })`)
 
-**Key decision:** Phase 2+ does **NOT include YAML parsing libraries**. Templates are pre-corrected by Phase 1. Installation only does string replacement and file copying.
+**Key decision:** Phase 2+ does **NOT include YAML parsing**. Templates are pre-corrected by Phase 1. Installation only does string replacement and file copying with native Node.js APIs.
 
 ### 2. Platform Specifications (PLATFORMS.md)
 
 **Confidence: HIGH** — All findings verified against official documentation.
 
-**CRITICAL DISCOVERY:** The current `.github/` codebase uses fields that are **NOT supported** by official specifications for either platform. Phase 1 must correct this.
+**CRITICAL DISCOVERY:** Current `.github/` files use fields **NOT supported** by official specifications.
 
 #### Unsupported Fields (Must Remove from Frontmatter)
 
@@ -114,269 +162,156 @@
 - `name`, `description`, `target`, `infer`, `mcp-servers`
 - **`tools`** — array or string, case-insensitive
 
-**Key correction:** Claude Skills use `allowed-tools` (string), GitHub uses `tools` (array). Current `.github/` incorrectly uses `tools` everywhere.
+**Key correction:** Claude Skills use `allowed-tools` (string), GitHub uses `tools` (array).
 
-#### Tool Name Mappings (Phase 1 Transformation)
+#### Tool Name Mappings
 
-| Current (Copilot) | Claude Canonical | GitHub Format |
-|-------------------|------------------|---------------|
-| `execute` | `Bash` | `execute` |
-| `read` | `Read` | `read` |
-| `edit` | `Edit` | `edit` |
-| `search` | `Grep` or `Glob` | `search` |
-| `agent` | `Task` | `agent` |
+| Copilot | Claude | Purpose |
+|---------|--------|---------|
+| `execute` | `Bash` | Execute shell command |
+| `read` | `Read` | Read file contents |
+| `edit` | `Edit` | File editing |
+| `search` | `Grep` | Search files/text |
+| `agent` | `Task` | Delegate to agent |
 
 **Phase 1 transformation:**
 - Convert `['execute', 'read']` → `'Bash, Read'` (Claude)
-- Keep `['execute', 'read']` (GitHub)
-- Capitalize for Claude, lowercase for GitHub
-
-#### Path References (Phase 2 Template Variables)
-
-Templates must use variables that Phase 2 replaces:
-
-- Claude: `@{{PLATFORM_ROOT}}/get-shit-done/references/...`
-- GitHub: `@{{PLATFORM_ROOT}}/get-shit-done/references/...`
-
-Phase 2 replaces `{{PLATFORM_ROOT}}` with `.claude` or `.github` based on target.
-
-#### File Extensions (Phase 2 Output)
-
-- Claude agents: `.md`
-- GitHub agents: `.agent.md`
-- Skills: `SKILL.md` (both platforms)
+- Keep `['execute', 'read']` unchanged (GitHub)
 
 ### 3. Architecture & Domain Patterns (DOMAIN.md)
 
-**Confidence: HIGH** — Based on migration patterns, ETL pipelines, and installer best practices.
+**Confidence: HIGH** — Based on npx installer patterns, one-time script architecture.
 
-**CRITICAL: Two separate architectures, not one pipeline.**
+**CRITICAL: This is an npx installer (NOT a library), with complete Phase separation.**
 
-#### Phase 1 Migration Architecture (Temporary)
+#### Phase 1 Migration Architecture (DELETED after approval)
 
-**Purpose:** One-time batch transformation of `.github/` → `/templates/` with corrections.
+**Purpose:** ONE-TIME script that converts `.github/` → `/templates/`.
 
-**Pipeline stages:**
+**Structure: Simple Modular Script (5-6 files max)**
 ```
-read → parse → transform → validate → generate → write → archive
+scripts/migrate/              # ALL OF THIS GETS DELETED
+├── index.js                  # Main orchestrator
+├── read.js                   # Read .github/ files
+├── parse.js                  # Parse frontmatter
+├── transform.js              # Apply corrections
+├── validate.js               # Validation report
+└── write.js                  # Write to /templates/
 ```
-
-**Stage details:**
-1. **Read** — Load all 42 files from `.github/skills/` and `.github/agents/`
-2. **Parse** — Extract frontmatter with `gray-matter`, preserve content
-3. **Transform** — Remove unsupported fields, rename `tools`, convert arrays
-4. **Validate** — Check against JSON schemas (ajv), verify no corruption
-5. **Generate** — Create `version.json` files from extracted metadata
-6. **Write** — Save to `/templates/` with template variables inserted
-7. **Archive** — Move migration scripts to `.archive/phase-1-migration/`
 
 **Key characteristics:**
-- Runs ONCE (not repeatable after deletion)
-- Processes ALL files in batch
-- Complex transformations (YAML AST manipulation)
-- Must be 100% correct (no recovery path after archiving)
-- Comprehensive validation at each stage
+- **Simple, not reusable** — Gets deleted, don't over-engineer
+- **5-6 files max** — One file per major step
+- **Synchronous is fine** — Performance doesn't matter
+- **Liberal logging** — console.log everywhere
+- **NO stage-based architecture** — Over-engineering for temporary code
+- **NO reusable components** — Nothing to reuse after deletion
 
-**Module structure (temporary):**
+**Lifecycle:**
+1. Run migration → generates `/templates/`
+2. Output validation report
+3. PAUSE for manual review
+4. User approves explicitly
+5. Commit templates to git
+6. `rm -rf scripts/migrate/` (complete deletion)
+7. Remove devDependencies from package.json
+8. Commit deletion
+
+#### Phase 2+ Installation Architecture (PERMANENT)
+
+**Purpose:** npx installer that installs from `/templates/`.
+
+**Structure: npx Installer (/bin + /lib)**
 ```
-scripts/
-└── migrate-to-templates.js     # Main migration script (archived after use)
-    ├── stages/
-    │   ├── read.js
-    │   ├── parse.js
-    │   ├── transform.js
-    │   ├── validate.js
-    │   ├── generate.js
-    │   └── write.js
-    └── lib/
-        ├── yaml-ast.js         # AST-based YAML manipulation
-        ├── tool-mappings.js    # Copilot → Claude tool conversions
-        └── schemas.js          # Official platform schemas
+/
+├── bin/
+│   └── install.js              # Executable entry point
+│
+├── lib/                        # Internal helpers (NO public API)
+│   ├── platforms/
+│   │   ├── detect.js           # detectPlatform()
+│   │   └── configs.js          # Platform configs
+│   │
+│   ├── templates/
+│   │   ├── loader.js           # loadTemplates()
+│   │   └── validator.js        # validateTemplate()
+│   │
+│   ├── rendering/
+│   │   └── render.js           # String replacement
+│   │
+│   ├── io/
+│   │   ├── copy.js             # copyFiles()
+│   │   └── write.js            # writeFile()
+│   │
+│   └── prompts/
+│       └── platform.js         # Interactive CLI
+│
+└── templates/                  # From Phase 1
+    ├── skills/
+    └── agents/
 ```
-
-#### Phase 2+ Installation Architecture (Permanent)
-
-**Purpose:** Install pre-corrected templates from `/templates/` to user directories.
-
-**Pipeline stages:**
-```
-detect → prompt → load → render → copy → validate → commit
-```
-
-**Stage details:**
-1. **Detect** — Find available platforms (Claude, Copilot)
-2. **Prompt** — Interactive selection with `@clack/prompts`
-3. **Load** — Read from `/templates/` (already correct)
-4. **Render** — Replace `{{VARIABLES}}` with actual values (simple string replacement)
-5. **Copy** — Write to target directories (`.claude/`, `.github/`)
-6. **Validate** — Check file integrity
-7. **Commit** — Write manifest, cleanup temp files
 
 **Key characteristics:**
-- Runs FOREVER (permanent codebase)
-- User-initiated (interactive or CI mode)
-- Simple transformations (string replacement only)
-- NO YAML parsing (templates already correct)
-- Transaction pattern for rollback
+- **Direct imports** — Files import each other
+- **NO index.js** — Not a library, no public API
+- **Internal only** — All code is implementation detail
+- **NO migration logic** — Assumes templates correct
 
-**Module structure (permanent):**
-```
-/bin/lib/
-├── platforms/          # Platform detection & config
-│   ├── detector.js    # Find available CLIs
-│   └── adapters/      # Claude, GitHub adapters
-├── templates/         # Template loading
-│   └── loader.js      # Read from /templates/
-├── rendering/         # Simple string replacement
-│   └── renderer.js    # Replace {{VARIABLES}}
-├── io/                # File operations
-│   ├── writer.js      # Atomic writes
-│   └── transaction.js # Rollback support
-└── prompts/           # Interactive UX
-    └── interactive.js # @clack/prompts flows
-```
-
-#### Why Separate Architectures?
-
-| Aspect | Phase 1 (Migration) | Phase 2+ (Installation) |
-|--------|---------------------|-------------------------|
-| **Complexity** | HIGH (YAML manipulation) | LOW (string replacement) |
-| **Dependencies** | gray-matter, js-yaml, ajv | fs-extra, chalk, prompts |
-| **Input** | `.github/` (needs correction) | `/templates/` (already correct) |
-| **Output** | `/templates/` (corrected) | User directories (rendered) |
-| **Lifespan** | ONE-TIME → archived | FOREVER → maintained |
-| **Risk** | Mass corruption | Partial installation |
-
-**Architectural principle:** Keep migration concerns COMPLETELY SEPARATE from installation concerns. No shared code except maybe validation utilities.
+**Anti-patterns to avoid:**
+- ❌ Public API pattern (this is NOT a library)
+- ❌ Stage reuse from Phase 1 (creates coupling)
+- ❌ Preserving Phase 1 code (violates complete deletion)
 
 ### 4. Critical Risks & Mitigations (RISKS.md)
 
-**Confidence: HIGH** — Risks identified from real-world migration and installer failures.
+**Confidence: HIGH** — Based on migration patterns and security best practices.
 
-**Risk categorization:** Phase 1 migration risks vs Phase 2+ installation risks are DIFFERENT.
+#### Phase 1 Migration Risks (BEFORE deletion)
 
-#### Phase 1 Migration Risks (ONE-TIME)
+**🔴 CRITICAL: User Approves Migration With Bugs**
 
-**🔴 CRITICAL #1: Mass Template Corruption from Migration Bugs**
+**Problem:** User approves without thorough review. Migration deleted. Later discover bugs in 13+ files.
 
-**What goes wrong:**
-- Migration bug corrupts frontmatter across all 42 files systematically
-- Incorrect regex matches (e.g., removing `platform` also removes `platformVersion`)
-- YAML structure breaks (multiline strings, comments, indentation)
-- Tool mappings with case mismatches
-- Can't re-run migration if code deleted
+**Mitigation: Make manual validation FOOLPROOF**
 
-**Why critical:**
-- Affects all files in batch (no incremental recovery)
-- If migration code archived, must manually fix 42 files
-- Easy to test on 1 file, miss edge cases across 42
+1. **Mandatory Validation Checklist:**
+   - [ ] All 42 files parse as valid YAML
+   - [ ] Pick 3 skills: Check `allowed-tools` correct
+   - [ ] Pick 3 agents: Check `skills` format correct
+   - [ ] Search for `{{INSTALL_DIR}}` - no typos
+   - [ ] Test install 2+ templates
+   - [ ] Review 10+ files in detail
 
-**Mitigation (P0):**
-```javascript
-// ❌ WRONG: Regex-based removal (dangerous)
-content = content.replace(/^metadata:.*$/gm, '')  // Breaks YAML
+2. **Explicit Approval Command:**
+   ```bash
+   npm run approve-migration
+   # Prompts: "Type 'DELETE MIGRATION' to proceed:"
+   ```
 
-// ✅ CORRECT: AST-based manipulation (safe)
-import matter from 'gray-matter'
-const { data, content } = matter(fileContent)
-delete data.metadata  // Safe deletion
-const output = matter.stringify(content, data)
-```
+3. **Automated Pre-Flight Checks:**
+   - All skill references valid
+   - All tool names valid
+   - No malformed variables
+   - YAML syntax valid
 
-**Additional safeguards:**
-1. **Mandatory dry-run mode** — Preview all changes before applying
-2. **Incremental validation** — Validate each file after transformation
-3. **Diff generation** — Show before/after for manual review
-4. **Emergency recovery** — Archive migration code, don't delete
-5. **Git snapshots** — Commit `.github/` before migration
+**🔴 CRITICAL: Bugs After Deletion**
 
----
+**Problem:** Bugs found after migration deleted. Cannot re-run.
 
-**🔴 CRITICAL #2: Premature Deletion of Migration Code**
+**Mitigation: Accept the trade-off**
 
-**What goes wrong:**
-- Migration code deleted after Phase 1 completes
-- Bug discovered in Phase 2 affecting templates
-- Need to re-run migration with fixes
-- Code no longer exists, must recreate from scratch
+Options when bugs found:
+1. **Fix manually** (1-3 files) — fastest
+2. **Write new script** (5+ files) — reference git history
+3. **Live with it** (non-critical) — document, fix in v2
 
-**Why critical:**
-- Migration errors may not surface until installation testing
-- Manual fixes to 42 templates error-prone
-- Lost institutional knowledge of transformation rules
+This is INTENTIONAL design (simplicity over recovery).
 
-**Mitigation (P0):**
-```bash
-# ❌ WRONG: Delete migration code
-rm -rf scripts/migrate-to-templates.js
+#### Phase 2+ Installation Risks (AFTER deletion)
 
-# ✅ CORRECT: Archive for emergency use
-mkdir -p .archive/phase-1-migration
-mv scripts/migrate-to-templates.js .archive/phase-1-migration/
-git add .archive/
-git commit -m "archive: preserve Phase 1 migration code for emergency recovery"
-```
+**🔴 CRITICAL: Partial Installations Without Rollback**
 
-**Archive strategy:**
-- Keep migration code in `.archive/phase-1-migration/`
-- Include emergency re-migration script
-- Document recovery procedure in README
-- Maintain for minimum 6 months post-launch
-
----
-
-**🔴 CRITICAL #3: Incomplete Validation Before Archiving**
-
-**What goes wrong:**
-- Migration completes, validation "passes"
-- Templates look correct in static analysis
-- Installation testing reveals broken references, invalid tool names
-- Migration code already archived/deleted
-
-**Why critical:**
-- Static validation insufficient (YAML structure valid but content wrong)
-- Need runtime validation (actual installation test)
-- Can't fix templates without re-running migration
-
-**Mitigation (P0):**
-```javascript
-// Three-tier validation before archiving
-
-// 1. Static validation (structure)
-validateYAMLStructure(template)
-validateRequiredFields(template)
-
-// 2. Semantic validation (content)
-validateToolNames(template.tools, platform)
-validateReferences(template.skills, availableSkills)
-validatePaths(template.paths)
-
-// 3. Runtime validation (actual installation)
-await testInstallation(template, platform)
-verifySkillLoads(installedPath)
-```
-
-**Validation checklist:**
-- [ ] All 42 files parse without YAML errors
-- [ ] No unsupported fields remain in frontmatter
-- [ ] All `version.json` files created correctly
-- [ ] Tool names match platform specifications
-- [ ] Agent → skill references valid
-- [ ] Path variables inserted correctly
-- [ ] Test installation succeeds on both platforms
-- [ ] Skills load without errors in actual CLIs
-
-#### Phase 2+ Installation Risks (ONGOING)
-
-**🔴 CRITICAL #4: Partial Installation Without Rollback**
-
-**What goes wrong:**
-- Installation fails midway (permission denied, disk full)
-- Some files written, others not
-- User left with broken state
-- Subsequent reinstalls fail due to partial state
-
-**Mitigation (P0):**
+**Mitigation: Transaction pattern**
 ```javascript
 class InstallTransaction {
   async commit() {
@@ -385,9 +320,8 @@ class InstallTransaction {
         await op.execute()
         this.completed.push(op)
       }
-      await this.writeManifest()
     } catch (error) {
-      await this.rollback()  // Undo in reverse order
+      await this.rollback()
       throw error
     }
   }
@@ -400,584 +334,232 @@ class InstallTransaction {
 }
 ```
 
----
+**🔴 CRITICAL: Path Traversal Vulnerability**
 
-**🔴 CRITICAL #5: Path Traversal Vulnerability**
-
-**What goes wrong:**
-- Malicious template uses `../../etc/passwd` in paths
-- Overwrites system files outside allowed directories
-- Security vulnerability
-
-**Mitigation (P0):**
+**Mitigation: Path validation**
 ```javascript
-function validatePath(targetPath, allowedRoot) {
-  const resolved = path.resolve(targetPath)
-  const normalized = path.normalize(resolved)
-  
-  if (!normalized.startsWith(allowedRoot)) {
-    throw new Error('Path traversal detected')
+function validateSkillName(name) {
+  if (name.includes('..') || name.includes('~')) {
+    throw new Error('Invalid characters')
   }
-  
-  // Check for symlinks
-  const stats = fs.lstatSync(normalized)
-  if (stats.isSymbolicLink()) {
-    throw new Error('Symbolic links not allowed')
+  if (!/^\/[a-z0-9-]+$/.test(name)) {
+    throw new Error('Invalid format')
   }
 }
 ```
 
----
+## Manual Validation Strategy (CRITICAL)
 
-**🟡 HIGH #6: Manual Edits to `/templates/` Diverge from Source**
+**The ONLY defense against bugs is manual validation before deletion.**
 
-**What goes wrong:**
-- After migration, developer manually edits `/templates/`
-- Original `.github/` files unchanged
-- Need to re-run migration (e.g., add new platform)
-- Manual edits lost, divergence between source and templates
+### Phase 1 Validation Checklist (REQUIRED before approval)
 
-**Mitigation:**
-- Document that `/templates/` is DERIVED, not source
-- Keep `.github/` as source of truth for 6 months
-- Eventual migration: delete `.github/`, use `/templates/` as source
-- Version control strategy in docs
+```markdown
+Migration complete. Before approving deletion:
 
----
+### YAML Syntax (Automated)
+- [ ] All 42 files parse as valid YAML
+- [ ] No syntax errors reported
 
-**Risk Priority Matrix:**
+### Frontmatter Correctness (MANUAL)
+- [ ] Pick 3 skills: `allowed-tools` use correct names
+- [ ] Pick 3 agents: `skills` format correct
+- [ ] version.json files have correct schema
 
-| Risk | Phase | Severity | Mitigation Priority |
-|------|-------|----------|---------------------|
-| Mass template corruption | Phase 1 | 🔴 CRITICAL | P0 (dry-run, AST validation) |
-| Premature code deletion | Phase 1 | 🔴 CRITICAL | P0 (archive, don't delete) |
-| Incomplete validation | Phase 1 | 🔴 CRITICAL | P0 (3-tier validation) |
-| Partial installation | Phase 2+ | 🔴 CRITICAL | P0 (transaction pattern) |
-| Path traversal | Phase 2+ | 🔴 CRITICAL | P0 (strict validation) |
-| Manual edits divergence | Post-migration | 🟡 HIGH | P1 (documentation) |
-| Platform spec changes | Phase 2+ | 🟡 MODERATE | P1 (versioned adapters) |
+### Template Variables (MANUAL)
+- [ ] Search for `{{INSTALL_DIR}}` - correctly formatted
+- [ ] No malformed variables (typos, partial replacements)
 
-## Technology Stack (Phase-Separated)
+### Test Installation (CRITICAL)
+- [ ] Install one skill: Renders correctly
+- [ ] Install one agent: Renders correctly
+- [ ] Both complete without errors
 
-**All versions verified against npm registry, Jan 2026.**
+### Manual Review (HIGH SCRUTINY)
+- [ ] Review 10+ files in detail (not just 2-3)
+- [ ] Look for patterns of error
+- [ ] Check both skills AND agents
 
-### Phase 1 Migration Stack (Temporary)
-
-**These dependencies will be ARCHIVED after Phase 1 completes.**
-
-```json
-{
-  "devDependencies": {
-    "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.1",
-    "ajv": "^8.17.1"
-  }
-}
+ONLY approve if ALL checks pass.
+After approval, migration code DELETED. Cannot re-run.
 ```
 
-| Library | Version | Purpose | Why | Lifespan |
-|---------|---------|---------|-----|----------|
-| **gray-matter** | 4.0.3 | Frontmatter parsing & modification | Extract, modify, re-stringify while preserving formatting | TEMPORARY |
-| **js-yaml** | 4.1.1 | YAML validation | Validate structure after transformation | TEMPORARY |
-| **ajv** | 8.17.1 | JSON Schema validation | Validate against official Claude/Copilot specs | TEMPORARY |
+### Validation Output Format
 
-**Why these are temporary:**
-- Only needed for one-time migration
-- Phase 2+ never parses YAML (templates already correct)
-- Dead weight after migration completes
-- Will be archived to `.archive/phase-1-migration/`
-
-### Phase 2+ Installation Stack (Permanent)
-
-**These dependencies remain in codebase forever.**
-
-```json
-{
-  "dependencies": {
-    "commander": "^14.0.2",
-    "fs-extra": "^11.3.3",
-    "chalk": "^5.6.2",
-    "@clack/prompts": "^0.11.0"
-  },
-  "devDependencies": {
-    "vitest": "^4.0.18",
-    "@vitest/ui": "^4.0.18"
-  }
-}
 ```
+✓ Migration executed successfully
 
-| Library | Version | Purpose | Why | Lifespan |
-|---------|---------|---------|-----|----------|
-| **commander** | 14.0.2 | CLI argument parsing | ESM support, clean API, widely used | PERMANENT |
-| **fs-extra** | 11.3.3 | File operations | Atomic writes, promise-based, cross-platform | PERMANENT |
-| **chalk** | 5.6.2 | Terminal colors | Simple, zero-config, ESM support | PERMANENT |
-| **@clack/prompts** | 0.11.0 | Interactive CLI | Beautiful UI, spinners, disabled menu options | PERMANENT |
-| **vitest** | 4.0.18 | Testing | ESM-native, fast, snapshot support | PERMANENT |
+📋 MANUAL VALIDATION REQUIRED
 
-**Why these are permanent:**
-- Core to installer functionality
-- No YAML parsing (simple string replacement only)
-- User-facing features (interactive prompts, colors)
-- Testing infrastructure
+Before approving (npm run approve-migration), CHECK:
 
-### What NOT to Use
+1. Frontmatter correctness:
+   - Open templates/skills/gsd-new-project.md
+   - Check allowed-tools: Read, Write, Bash (capitalized)
 
-| Avoid | Why | Alternative |
-|-------|-----|-------------|
-| **EJS/Handlebars** | Template syntax conflicts with frontmatter | Plain string replacement |
-| **ora** | Redundant | @clack/prompts has spinners |
-| **inquirer** | Older API | @clack/prompts is modern |
-| **yargs** | Worse ESM support | commander 14+ |
-| **js-yaml (Phase 2)** | Doesn't handle frontmatter | Not needed (templates correct) |
+2. Template variables:
+   - Search for {{INSTALL_DIR}} (correct)
+   - Ensure no {{installdir}} (wrong)
 
-### Bundle Size Impact
+3. Test installation:
+   - Run: npm run test:install
+   - Should complete without errors
 
-**Phase 1 (temporary):**
-- gray-matter + js-yaml + ajv: ~180 KB minified
-- Only during development, never shipped to users
+4. Review at least 10 files manually
 
-**Phase 2+ (permanent):**
-- commander + fs-extra + chalk + prompts: ~220 KB minified, ~60 KB gzipped
-- Acceptable for npx usage (downloads fast)
+⚠️  After approval, migration code will be DELETED.
+   You cannot re-run it. Validate thoroughly.
+
+When ready: npm run approve-migration
+```
 
 ## Implications for Roadmap
 
 ### Recommended Phase Structure
 
-Based on combined research, the roadmap should follow this strict separation:
+#### Phase 1: One-Time Migration (DELETED after approval)
 
-#### Phase 1: One-Time Migration (TEMPORARY CODE)
-
-**Goal:** Convert `.github/` → `/templates/` with all corrections applied.
+**Goal:** Convert `.github/` → `/templates/` with all corrections.
 
 **Deliverables:**
-- Migration script: `scripts/migrate-to-templates.js`
-- Dry-run mode with diff preview
+- Migration script: `scripts/migrate/index.js`
 - 42 corrected template files in `/templates/`
-- 42 `version.json` files with extracted metadata
-- Validation report (all checks passed)
-- Archived migration code in `.archive/phase-1-migration/`
+- 42 `version.json` files with metadata
+- Validation report
+- Approved and DELETED migration code
 
-**Technologies:** gray-matter, js-yaml, ajv (temporary)
+**Technologies:** gray-matter, ajv (temporary devDependencies)
 
-**Key features from FEATURES.md:**
+**Key features:**
 - ✅ Remove unsupported frontmatter fields
 - ✅ Fix field naming (`tools` → `allowed-tools` for Claude)
 - ✅ Convert tool arrays to platform formats
 - ✅ Replace `arguments` with `argument-hint`
 - ✅ Generate version files
-- ✅ Insert template variables (`{{INSTALL_DIR}}`)
-- ✅ Comprehensive validation
+- ✅ Insert template variables
+- ✅ Manual validation gate
 
-**Critical pitfalls to avoid (from PITFALLS.md):**
-- ⚠️ Regex-based field removal (use AST)
-- ⚠️ Mass corruption from bugs (dry-run mode mandatory)
-- ⚠️ Premature code deletion (archive, don't delete)
-- ⚠️ Incomplete validation (3-tier: static, semantic, runtime)
+**Critical pitfalls to avoid:**
+- ⚠️ Premature approval (incomplete validation)
+- ⚠️ Preserving migration code (violates deletion)
+- ⚠️ Over-engineering (it gets deleted anyway)
 
-**Duration:** 3-5 days  
-**Status:** After completion, code ARCHIVED (not deleted entirely)
+#### Phase 2: Installer MVP (Claude Desktop only)
 
----
-
-#### Phase 2: Installation Pipeline (PERMANENT CODE)
-
-**Goal:** Build installer that deploys templates to user directories.
+**Goal:** npx installer for single platform.
 
 **Deliverables:**
-- CLI tool: `bin/install.js` (npx-compatible)
-- Platform detection & adapters
-- Interactive prompts with `@clack/prompts`
-- Template rendering (simple string replacement)
-- Atomic file operations with rollback
-- Installation manifest & version tracking
-- Cross-platform testing (macOS, Linux, Windows)
+- `/bin/install.js` (executable)
+- `/lib` helpers (platforms, templates, rendering, io, prompts)
+- Transaction-based installation
+- Path traversal protection
+- Basic error handling
 
-**Technologies:** commander, fs-extra, chalk, @clack/prompts (permanent)
+**Technologies:** commander, @inquirer/prompts, chalk, ora, execa
 
-**Key features from FEATURES.md:**
-- ✅ Platform detection (Claude, GitHub, Codex)
-- ✅ Interactive mode (no flags = prompts)
-- ✅ Non-interactive mode (CI/CD support)
-- ✅ Template rendering (`{{VARIABLES}}` replacement)
-- ✅ Atomic writes with rollback
-- ✅ Progress indicators & spinners
-- ✅ Version detection & upgrade path
+**Key features:**
+- ✅ Interactive platform selection
+- ✅ Template loading from `/templates/`
+- ✅ Variable rendering (string replacement)
+- ✅ File copying with rollback
+- ✅ Basic validation
 
-**Critical pitfalls to avoid (from PITFALLS.md):**
-- ⚠️ Partial installation (transaction pattern)
-- ⚠️ Path traversal (strict validation)
-- ⚠️ Directory conflicts (pre-flight checks)
-- ⚠️ Overwriting user customizations (backup first)
+**Critical pitfalls to avoid:**
+- ⚠️ Public API pattern (it's NOT a library)
+- ⚠️ Stage reuse from Phase 1 (no coupling)
+- ⚠️ Partial installations without rollback
 
-**Duration:** 5-7 days  
-**Status:** Permanent codebase, maintained forever
+#### Phase 3: Multi-Platform Support
 
----
-
-#### Phase 3: Multi-Platform Support (PERMANENT ENHANCEMENT)
-
-**Goal:** Extend to all platforms (Claude, GitHub, Codex, future).
+**Goal:** Support GitHub Copilot, add platform adapters.
 
 **Deliverables:**
-- Platform adapters for Claude, GitHub, Codex
-- Platform-specific validation
-- Cross-platform testing suite
-- Documentation per platform
+- Platform detection
+- GitHub adapter
+- Platform-specific rendering
+- Extended validation
 
-**Technologies:** Extends Phase 2 stack (no new dependencies)
+**Technologies:** Same as Phase 2
 
-**Key features from FEATURES.md:**
-- ✅ All three platforms supported
-- ✅ Platform-specific frontmatter transformations
-- ✅ Tool name mapping per platform
-- ✅ File extension handling
-- ✅ Path reference corrections
+**Key features:**
+- ✅ Multiple platform support
+- ✅ Platform adapters
+- ✅ Auto-detection
+- ✅ Platform-specific validation
 
-**Duration:** 3-4 days  
-**Status:** Permanent enhancement
+#### Phase 4+: Advanced Features
 
----
+**Goal:** Polish, optimization, additional platforms.
 
-### Phase Dependencies
-
-**Sequential (must follow order):**
-1. Phase 1 MUST complete before Phase 2 (templates required)
-2. Phase 2 MUST work on one platform before Phase 3 (validate core)
-
-**Parallel opportunities:**
-- None — phases are strictly sequential
-
-**Migration notes:**
-- Phase 1 code is ARCHIVED after completion, not deleted entirely
-- Emergency re-migration procedure documented
-- Keep `.github/` as source of truth for 6 months
-- Eventually delete `.github/`, use `/templates/` as source
+**Deliverables:**
+- Additional platforms (Codex CLI)
+- CI/CD mode (non-interactive)
+- Update checking
+- Telemetry (opt-in)
 
 ### Research Flags
 
-**Phase 1: No additional research needed** ✅
-- All frontmatter corrections documented (PLATFORMS.md)
-- Tool mappings verified (PLATFORMS.md)
-- YAML manipulation patterns established (ECOSYSTEM.md)
-- Validation strategy defined (RISKS.md)
+**Needs deeper research:**
+- Phase 3: Platform detection mechanisms
+- Phase 4: Codex CLI frontmatter specs
 
-**Phase 2: No additional research needed** ✅
-- Template rendering approach decided (simple string replacement)
-- Interactive CLI library selected (@clack/prompts)
-- Transaction pattern documented (RISKS.md)
-- Path validation strategy defined (RISKS.md)
-
-**Phase 3: Minor research needed** ⚠️
-- Codex-specific frontmatter specs (if different from GitHub)
-- Platform detection methods for all three CLIs
-- Cross-platform path handling edge cases (Windows)
-
-**Later phases: Plugin system research needed** 📋
-- Plugin discovery mechanisms (Phase 4+)
-- ESLint vs Babel plugin patterns (Phase 4+)
-
-### Confidence Levels by Phase
-
-| Phase | Technology | Architecture | Risks | Overall |
-|-------|------------|--------------|-------|---------|
-| **Phase 1** | HIGH | HIGH | HIGH | **HIGH** ✅ |
-| **Phase 2** | HIGH | HIGH | HIGH | **HIGH** ✅ |
-| **Phase 3** | MEDIUM-HIGH | HIGH | MEDIUM | **MEDIUM-HIGH** ⚠️ |
-
-**Ready to start:** Phase 1 (all research complete)  
-**Blocked:** None
-
-## Validation Strategy (Before Archiving Migration Code)
-
-**CRITICAL:** Phase 1 migration code cannot be archived until ALL validation passes.
-
-### Three-Tier Validation
-
-#### Tier 1: Static Validation (Structure)
-
-**Run after:** Each file transformation  
-**Checks:**
-- [ ] YAML parses without syntax errors
-- [ ] Required fields present (`name`, `description`)
-- [ ] No unsupported fields in frontmatter
-- [ ] Field types correct (string vs array vs object)
-- [ ] Template variables inserted correctly
-
-**Tools:** js-yaml parser, ajv schema validation
-
-```javascript
-// Example validation
-const schema = {
-  type: 'object',
-  required: ['name', 'description'],
-  properties: {
-    name: { type: 'string' },
-    description: { type: 'string' },
-    'allowed-tools': { type: 'string' },  // Claude skills
-    tools: { type: ['array', 'string'] }  // GitHub
-  },
-  additionalProperties: false  // No unsupported fields
-}
-
-const valid = ajv.validate(schema, frontmatter)
-```
-
-#### Tier 2: Semantic Validation (Content)
-
-**Run after:** All files transformed  
-**Checks:**
-- [ ] Tool names match platform specifications
-- [ ] Agent → skill references valid (skills exist)
-- [ ] Path variables use correct format (`{{VAR}}`)
-- [ ] File extensions match platform conventions
-- [ ] Version files created for each template
-- [ ] No duplicate names across templates
-
-**Tools:** Custom validators with platform specs
-
-```javascript
-// Example semantic validation
-function validateToolNames(tools, platform) {
-  const allowedTools = {
-    claude: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'Task'],
-    github: ['read', 'edit', 'execute', 'search', 'agent']
-  }
-  
-  const toolList = Array.isArray(tools) 
-    ? tools 
-    : tools.split(',').map(t => t.trim())
-  
-  for (const tool of toolList) {
-    if (!allowedTools[platform].includes(tool)) {
-      throw new Error(`Invalid tool: ${tool} for ${platform}`)
-    }
-  }
-}
-```
-
-#### Tier 3: Runtime Validation (Actual Installation)
-
-**Run after:** Semantic validation passes  
-**Checks:**
-- [ ] Test installation succeeds for both platforms
-- [ ] Skills load without errors in Claude CLI
-- [ ] Agents load without errors in GitHub CLI
-- [ ] Slash commands appear in menus
-- [ ] Agent invocation works
-- [ ] No path resolution errors
-
-**Tools:** Integration tests with real CLIs
-
-```bash
-# Test installation script
-#!/bin/bash
-
-# Install to test directory
-INSTALL_DIR="/tmp/gsd-test-install"
-rm -rf "$INSTALL_DIR"
-
-# Run installer
-node bin/install.js --platform=claude --target="$INSTALL_DIR/.claude"
-
-# Validate Claude skills load
-claude --list-skills | grep "gsd-new-project" || exit 1
-
-# Validate agents load
-claude --list-agents | grep "gsd-executor" || exit 1
-
-echo "✓ All runtime validation passed"
-```
-
-### Validation Checklist (Before Archiving)
-
-**All must pass before archiving migration code:**
-
-**Static (Structure):**
-- [ ] All 42 template files parse without YAML errors
-- [ ] All required fields present
-- [ ] No unsupported fields remain
-- [ ] Field types match platform specifications
-
-**Semantic (Content):**
-- [ ] All tool names valid for each platform
-- [ ] All agent → skill references valid
-- [ ] All path variables use correct syntax
-- [ ] All version files created correctly (42 total)
-- [ ] No duplicate template names
-
-**Runtime (Installation):**
-- [ ] Test installation succeeds (Claude)
-- [ ] Test installation succeeds (GitHub)
-- [ ] Skills load in Claude CLI without errors
-- [ ] Agents load in GitHub CLI without errors
-- [ ] Slash commands visible and functional
-- [ ] Agent delegation works correctly
-
-**Documentation:**
-- [ ] Emergency recovery procedure documented
-- [ ] Archive location documented in README
-- [ ] Validation results saved to report file
-- [ ] Manual review completed by at least one developer
-
-### Emergency Recovery Procedure
-
-**When to use:** Template bugs discovered after archiving.
-
-**Prerequisites:**
-- Migration code archived in `.archive/phase-1-migration/`
-- Original `.github/` files unchanged in git history
-- Emergency script: `scripts/emergency-remigrate.sh`
-
-**Procedure:**
-
-```bash
-#!/bin/bash
-# scripts/emergency-remigrate.sh
-
-set -e
-
-echo "⚠️  EMERGENCY RE-MIGRATION"
-echo ""
-echo "This will:"
-echo "  1. Backup current /templates/"
-echo "  2. Restore migration script from archive"
-echo "  3. Re-run migration with latest fixes"
-echo ""
-read -p "Continue? [y/N] " -n 1 -r
-echo
-
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  exit 1
-fi
-
-# 1. Backup current templates
-BACKUP_DIR="templates.backup.$(date +%Y%m%d-%H%M%S)"
-mv templates "$BACKUP_DIR"
-echo "✓ Backed up to $BACKUP_DIR"
-
-# 2. Restore migration script
-cp .archive/phase-1-migration/migrate-to-templates.js scripts/
-echo "✓ Restored migration script"
-
-# 3. Re-run migration
-node scripts/migrate-to-templates.js --dry-run
-echo ""
-read -p "Dry-run looks good? Apply migration? [y/N] " -n 1 -r
-echo
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  node scripts/migrate-to-templates.js --apply
-  echo "✓ Re-migration complete"
-else
-  echo "❌ Aborted. Restoring backup..."
-  rm -rf templates
-  mv "$BACKUP_DIR" templates
-fi
-```
-
-**Recovery checklist:**
-- [ ] Backup current `/templates/` before re-migration
-- [ ] Restore migration script from `.archive/`
-- [ ] Apply fixes to migration script
-- [ ] Run dry-run mode first
-- [ ] Manually review diff output
-- [ ] Run full 3-tier validation
-- [ ] Test installations on both platforms
-- [ ] Commit corrected templates
-- [ ] Update archive with fixed migration code
+**Standard patterns (skip research):**
+- Phase 2: Transaction pattern (well-documented)
+- Phase 2: Path validation (security standard)
 
 ## Ready for Phase 1
 
-### What We Know (High Confidence) ✅
+**Prerequisites met:**
+- ✅ Architecture understood (complete deletion, no reuse)
+- ✅ Technology stack identified (gray-matter, ajv)
+- ✅ Platform specs documented (unsupported fields)
+- ✅ Validation strategy defined (manual gate)
+- ✅ Risks identified (approval with bugs)
+- ✅ Mitigations defined (comprehensive checklist)
 
-✅ **Phase separation architecture** — Two distinct concerns, two distinct stacks  
-✅ **Technology stack** — Phase 1 temporary (gray-matter, js-yaml, ajv), Phase 2+ permanent (commander, prompts)  
-✅ **Official frontmatter specs** — Verified against Claude & GitHub docs, unsupported fields identified  
-✅ **Tool name mappings** — Complete mapping table from official docs  
-✅ **Critical risks** — Identified with concrete mitigations for both phases  
-✅ **Migration risks** — Mass corruption, premature deletion, incomplete validation  
-✅ **Installation risks** — Partial installation, path traversal, directory conflicts  
-✅ **Validation strategy** — 3-tier validation (static, semantic, runtime)  
-✅ **Emergency recovery** — Documented procedure, archived migration code
-
-### What to Build First (Phase 1 MVP)
-
-**Goal:** Validate core migration pipeline with comprehensive safeguards.
-
-**Scope:**
-1. Read 42 template files from `.github/`
-2. Parse YAML frontmatter with `gray-matter`
-3. Remove unsupported fields (AST-based, NOT regex)
-4. Fix field naming (`tools` → `allowed-tools` for Claude)
-5. Convert tool arrays to platform-specific formats
-6. Replace `arguments` with `argument-hint`
-7. Generate `version.json` for extracted metadata
-8. Insert template variables (`{{INSTALL_DIR}}`, etc.)
-9. Write transformed files to `/templates/`
-10. Run 3-tier validation
-11. Generate validation report
-12. Archive migration code to `.archive/phase-1-migration/`
-
-**Success Criteria:**
-- [ ] All 42 templates migrate without errors
-- [ ] Dry-run mode shows accurate diffs
-- [ ] All 3-tier validation checks pass
-- [ ] Test installation succeeds on both platforms
-- [ ] Skills load without errors in real CLIs
-- [ ] Emergency recovery procedure tested
-- [ ] Migration code archived (not deleted)
-- [ ] Validation report committed to git
-
-**What to Defer:**
-- ❌ Interactive prompts (Phase 2)
-- ❌ Multi-platform support beyond Claude/GitHub (Phase 3)
-- ❌ Plugin system (Phase 4+)
-- ❌ CI/CD integration (Phase 2)
-
-**Estimated Duration:** 3-5 days for Phase 1 (migration + validation + archiving)
-
-### Next Steps
-
-1. **Implement migration script** — `scripts/migrate-to-templates.js` with dry-run mode
-2. **Add 3-tier validation** — Static (ajv), semantic (custom), runtime (integration tests)
-3. **Test emergency recovery** — Verify archive and re-migration procedure works
-4. **Run full migration** — Convert all 42 files with validation
-5. **Test installations** — Verify on both Claude and GitHub platforms
-6. **Archive migration code** — Move to `.archive/phase-1-migration/`
-7. **Document recovery procedure** — Add to README and script comments
-8. **Commit everything** — Templates, version files, validation report, archive
-
-**Blocked by:** Nothing — all research complete, ready to start Phase 1 ✅
-
----
+**Next steps:**
+1. Create Phase 1 migration script (simple modular structure)
+2. Implement automated pre-flight checks
+3. Create manual validation checklist
+4. Run migration (output to `/templates/`)
+5. PAUSE for manual review
+6. Explicit approval (npm run approve-migration)
+7. Delete migration code (rm -rf scripts/migrate/)
+8. Remove devDependencies from package.json
+9. Commit deletion
+10. Proceed to Phase 2
 
 ## Confidence Assessment
 
-| Area | Confidence | Source Quality | Notes |
-|------|------------|----------------|-------|
-| **Phase separation** | **HIGH** | Migration patterns, ETL pipelines | Clear architectural boundary |
-| **Technology stack (Phase 1)** | **HIGH** | npm registry, package docs | All versions verified |
-| **Technology stack (Phase 2)** | **HIGH** | npm registry, package docs | All versions verified |
-| **Platform specs** | **HIGH** | Official Claude & GitHub docs | Comprehensive field tables |
-| **Tool mappings** | **HIGH** | Official tool alias docs | Complete mapping verified |
-| **Migration risks** | **HIGH** | Real-world migration failures | Concrete examples, proven mitigations |
-| **Installation risks** | **HIGH** | Real-world installer failures | Transaction pattern established |
-| **Validation strategy** | **HIGH** | Testing best practices | 3-tier approach proven in industry |
-| **Emergency recovery** | **MEDIUM-HIGH** | Git workflows, backup patterns | Procedure documented but untested |
+| Area | Confidence | Notes |
+|------|------------|-------|
+| **Architecture** | HIGH | Corrected: Complete deletion, no reuse, npx installer |
+| **Stack** | HIGH | Verified versions (Jan 2026), minimal dependencies |
+| **Platform specs** | HIGH | Based on official documentation |
+| **Risks** | HIGH | Based on migration patterns, security best practices |
+| **Manual validation** | HIGH | Comprehensive checklist, explicit approval |
 
-**Overall Confidence: HIGH** — Sufficient to start Phase 1 implementation immediately.
+### Gaps Identified
 
-**Gaps:**
-- Emergency recovery untested (test during Phase 1)
-- Windows-specific edge cases (test during Phase 2)
-- Codex platform specs (research during Phase 3)
+- Manual validation is critical but imperfect (human error possible)
+- Bugs found after deletion require manual fixes (trade-off accepted)
+- Platform specs may change (version detection needed in Phase 3)
 
----
+### Overall Assessment
+
+Research is comprehensive and actionable. Architecture corrections are critical:
+
+**CORRECTED:**
+- ❌ Stage-based reuse → ✅ Complete phase separation
+- ❌ Public API pattern → ✅ npx installer with internal helpers
+- ❌ Archive migration code → ✅ Complete deletion (rm -rf)
+- ❌ Automatic approval → ✅ Manual validation gate
+
+**Confidence to proceed:** HIGH
+
+Roadmap can be created based on this research. Phase 1 is well-defined with clear constraints and validation strategy.
 
 ## Sources
-
-### Primary Sources (HIGH Confidence)
 
 **Official Documentation:**
 - Claude Code skills: https://code.claude.com/docs/en/slash-commands#frontmatter-reference
@@ -985,49 +567,14 @@ fi
 - GitHub Copilot agents: https://docs.github.com/en/copilot/reference/custom-agents-configuration
 - GitHub tool aliases: https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
 
-**Package Documentation:**
-- gray-matter: https://github.com/jonschlinkert/gray-matter
-- js-yaml: https://github.com/nodeca/js-yaml
-- ajv: https://ajv.js.org/
-- commander: https://github.com/tj/commander.js
-- fs-extra: https://github.com/jprichardson/node-fs-extra
-- @clack/prompts: https://github.com/bombshell-dev/clack
-- vitest: https://vitest.dev/
+**Package Verification:**
+- npm registry (verified Jan 2026): gray-matter 4.0.3, ajv 8.17.1, commander 14.0.2, @inquirer/prompts 8.2.0, chalk 5.6.2, ora 9.1.0, execa 9.6.1
 
-**npm Registry:**
-- All package versions verified against npm (2025-01-26)
-- Bundle sizes measured from registry data
+**Architecture Patterns:**
+- npx installer patterns (create-react-app, create-vite)
+- One-time migration scripts (database migrations, codemod tools)
+- Transaction patterns (database ACID, rollback mechanisms)
+- Path traversal prevention (OWASP security)
 
-### Secondary Sources (MEDIUM Confidence)
-
-**Design Patterns:**
-- Database migration patterns (Flyway, Liquibase)
-- ETL pipeline architecture
-- Domain-driven design principles
-- Functional pipeline architecture
-- Adapter pattern (Gang of Four)
-- Transaction pattern (database systems)
-
-**Reference Implementations:**
-- create-vite: https://github.com/vitejs/vite/tree/main/packages/create-vite
-- ESLint plugin system: https://eslint.org/docs/latest/extend/plugins
-- Babel plugin system: https://babeljs.io/docs/en/plugins
-
-**Security:**
-- OWASP Path Traversal: https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Cheat_Sheet.html
-- npm security best practices
-
-### Tertiary Sources (Needs Validation)
-
-- Codex platform specifications (not yet researched)
-- Windows path handling edge cases (not tested on real Windows)
-- Plugin system for Phase 4+ (not researched yet)
-
----
-
-**Research Date:** 2025-01-26  
-**Re-researched Date:** 2025-01-26 (with migration architecture)  
-**Synthesized By:** gsd-research-synthesizer  
-**Status:** ✅ READY FOR PHASE 1 PLANNING
-
-**Key Insight:** This project has TWO DISTINCT PHASES with different technology needs. Phase 1 (migration) is temporary code that will be archived. Phase 2+ (installation) is permanent code with no YAML parsing. Do NOT mix these concerns.
+**Research Date:** 2025-01-26
+**Confidence:** HIGH (verified against official docs, established patterns)
