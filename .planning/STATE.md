@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-26  
-**Updated By:** Manual documentation update
+**Updated By:** GSD Plan Executor (01-01 complete)
 
 ---
 
@@ -11,30 +11,30 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Documentation and planning phase - defining frontmatter corrections for skills and agents based on official Claude and Copilot specifications.
+**Current Focus:** Phase 1 Template Migration - building foundation for ONE-TIME migration of 29 skills and 13 agents to templates/ directory with frontmatter corrections.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 0 (Pre-implementation - Documentation)  
-**Phase Goal:** Document all requirements and corrections needed before Phase 1 execution  
-**Started:** 2026-01-25  
-**Last Activity:** 2026-01-26 (completed frontmatter and agent corrections documentation)
+**Current Phase:** 1 of 7 (Template Migration)  
+**Phase Goal:** ONE-TIME migration of skills/agents to templates/ with frontmatter corrections  
+**Started:** 2026-01-26  
+**Last Activity:** 2026-01-26 - Completed 01-01-PLAN.md
 
 ### Plan Status
-**Current Plan:** None (documentation phase)  
-**Plan Goal:** Complete specification of template corrections  
-**Status:** Documentation complete, ready for Phase 1 planning
+**Current Plan:** 1 of 4 in Phase 1  
+**Plan Goal:** Migration script foundation (parser, validator, injector)  
+**Status:** ✅ Complete - Ready for 01-02 (Skills Migration)
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
-[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (documentation phase)
+Phase 1: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans)
 
-Phase 0: Documentation & Planning
-[████████████████████████████████████████████████] 100% (requirements documented)
+Overall Progress:
+[██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 3% (1/35 total plans)
 ```
 
 ---
@@ -42,10 +42,10 @@ Phase 0: Documentation & Planning
 ## Performance Metrics
 
 ### Velocity
-- **Phases Completed:** 0 (documentation phase)
-- **Plans Completed:** 0
+- **Phases Completed:** 0 (Phase 1 in progress)
+- **Plans Completed:** 1/35
 - **Days Active:** 2
-- **Documentation Created:** 4 files
+- **Plans Today:** 1
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -93,17 +93,32 @@ Phase 0: Documentation & Planning
    - Installer reads from templates/, not from source
    - Rationale: Clear separation between development source and distribution templates
 
-### Open Questions
-None - all specifications documented
+6. **2026-01-26 (01-01):** Use gray-matter for YAML parsing (MIGRATION-01)
+   - Industry-standard library for frontmatter parsing
+   - Handles edge cases better than manual parsing
+   - Version 4.0.3 is stable release
+   - Rationale: Battle-tested, reliable, widely used in ecosystem
+
+7. **2026-01-26 (01-01):** Collect-all-errors validation pattern (MIGRATION-02)
+   - Validator accumulates all errors before reporting
+   - Better UX: see all issues at once, not fail-fast
+   - Comprehensive reports grouped by file
+   - Rationale: More efficient developer experience, faster iteration
+
+8. **2026-01-26 (01-01):** ESM imports throughout migration scripts (MIGRATION-03)
+   - All scripts use modern import/export syntax
+   - Matches project conventions
+   - Better static analysis support
+   - Rationale: Modern Node.js standard, future-proof
 
 ### Technical Debt
-None yet (pre-implementation)
+- Migration scripts are ONE-TIME code (will be deleted post-approval)
 
 ### Todos
-- [ ] Execute Phase 1 planning with updated requirements
-- [ ] Update research/PLATFORMS.md with correct field specifications
-- [ ] Create template generation scripts
-- [ ] Implement skill reference extraction for agents
+- [x] Create migration script foundation (01-01)
+- [ ] Migrate 29 skills to templates/ (01-02)
+- [ ] Migrate 13 agents to templates/ (01-03)
+- [ ] Validation and manual review (01-04)
 
 ### Blockers
 None
@@ -113,23 +128,22 @@ None
 ## Session Continuity
 
 ### What Just Happened
-Completed comprehensive documentation of frontmatter corrections for both skills (29 files) and agents (13 files). Created FRONTMATTER-CORRECTIONS.md and AGENT-CORRECTIONS.md with detailed specifications. Updated REQUIREMENTS.md with TEMPLATE-01C (skills) and TEMPLATE-01D (agents) requirements. Total requirements now 37 (was 36, was 34 before agent corrections).
+Completed Plan 01-01: Migration Script & Frontmatter Parsing foundation. Created main migration script with 3 helper modules: frontmatter-parser (YAML validation), validator (collect-all-errors), template-injector (variable replacement). Installed gray-matter, @inquirer/prompts, and open dependencies. All scripts use ESM imports. Foundation ready for skills migration (01-02).
 
 ### What's Next
-1. **Immediate:** Update ROADMAP.md Phase 1 with new requirements
-2. **After documentation:** Begin Phase 1 execution with template generation
-3. **Future:** Research phase may need updates based on new findings
+1. **Immediate:** Execute Plan 01-02 - Skills Migration (29 files)
+2. **After skills:** Plan 01-03 - Agents Migration (13 files)
+3. **Then:** Plan 01-04 - Validation and manual review
 
 ### Context for Next Session
-- **Documentation complete:** All frontmatter corrections documented
-- **Requirements updated:** 37 total v2.0 requirements
-- **Corrections specified:** 29 skills + 13 agents need frontmatter fixes
-- **version.json strategy:** Per-skill for skills, consolidated for agents
-- **Tool mappings:** Copilot → Claude mappings documented
-- **Next action:** Execute research/planning with updated specs
+- **Migration foundation complete:** Parser, validator, injector ready
+- **Dependencies installed:** gray-matter, @inquirer/prompts, open
+- **Migration utilities created:** 4 new scripts in scripts/ and scripts/lib/
+- **Validation specs:** Skills and agents have different frontmatter requirements
+- **Next action:** Execute 01-02 to migrate 29 skills to templates/
 
 ### Handoff Notes
-All frontmatter correction requirements documented. Skills need: allowed-tools, argument-hint, version.json per skill, remove metadata. Agents need: tools string, skills auto-generated, single versions.json, remove metadata. Tool name mappings from Copilot to Claude defined. Source files protected (read-only). Templates are source of truth. Ready for Phase 1 planning and execution.
+Plan 01-01 complete. Migration foundation ready: scripts/migrate-to-templates.js provides entry point. Frontmatter parser validates skills (allowed-tools, argument-hint) vs agents (tools, skills). Validator collects all errors before reporting. Template injector replaces .github/, .claude/, .codex/ with {{PLATFORM_ROOT}} and command prefixes with {{COMMAND_PREFIX}}. Ready for 01-02 skills migration.
 
 ---
 
@@ -152,10 +166,15 @@ All frontmatter correction requirements documented. Skills need: allowed-tools, 
 - `.planning/research/RISKS.md` — Critical risks
 
 ### Phase Plans
-- None yet (documentation phase)
+- `.planning/phases/01-template-migration/01-01-SUMMARY.md` — Migration foundation (✅ Complete)
+- Next: 01-02 Skills Migration, 01-03 Agents Migration, 01-04 Validation
 
 ### Project Files
-- `package.json` — Project metadata (needs creation)
+- `package.json` — Project metadata (updated with migration dependencies)
+- `scripts/migrate-to-templates.js` — Main migration entry point (✅ Created)
+- `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
+- `scripts/lib/validator.js` — Error collection engine (✅ Created)
+- `scripts/lib/template-injector.js` — Variable replacement (✅ Created)
 - `bin/install.js` — CLI entry point (needs creation)
 - `.github/skills/` — Source skills (29 files, read-only)
 - `.github/agents/` — Source agents (13 files, read-only)
@@ -190,4 +209,4 @@ All frontmatter correction requirements documented. Skills need: allowed-tools, 
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Phase 1 planning with updated requirements
+**Ready for:** Plan 01-02 (Skills Migration)
