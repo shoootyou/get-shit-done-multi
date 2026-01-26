@@ -220,6 +220,7 @@
 - **Do NOT:** Generate new skills or agents from scratch
 - **Skills structure:** `/templates/skills/gsd-<skill-name>/SKILL.md` (directory-based)
 - **Agents structure:** `/templates/agents/gsd-<agent-name>.agent.md` (flat files)
+- **Agent versions:** `/templates/agents/versions.json` (consolidated metadata for all agents)
 - **Rationale:** Reuse existing tested skills/agents, ensure consistency, preserve originals
 
 **TEMPLATE-01B: Template Conversion Process**
@@ -260,6 +261,40 @@
   - Agents have simpler structure and different validation rules
   - Agent corrections (if any) will be defined separately
 - **Rationale:** Current skill frontmatter has unsupported fields per official Claude docs, corrections must apply during template generation. Agents follow different spec.
+
+**TEMPLATE-01D: Agent Frontmatter Correction**
+- **APPLIES TO AGENTS ONLY** (13 files) - Separate from Skills
+- **Fix agent frontmatter fields** during template conversion (NOT on source files):
+  - **Remove unsupported field:** `metadata` block
+  - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
+  - **Map tool names:** Copilot aliases → Claude official (execute→Bash, search→Grep, agent→Task)
+  - **Add skills field (Claude only):** Scan agent content for `/gsd-` references, add all found skills
+  - **Keep supported fields:** name, description, tools, disallowedTools, model, permissionMode, skills, hooks (Claude) | name, description, target, tools, infer, mcp-servers (Copilot)
+- **Create versions.json** in templates/agents/ (NOT per-agent):
+  - Consolidated file with all agents: `{"agent-name": {version, platforms, metadata}, ...}`
+  - Template with {{VARIABLES}} for platform-specific values
+  - Copied to `.xxx/agents/versions.json` during installation (one per platform)
+  - Format: `{"gsd-executor": {"version": "1.9.1", "requires_version": "1.9.0+", "platforms": [...], "metadata": {...}}}`
+- **Official supported frontmatter fields for AGENTS:**
+  - **Claude** (per https://code.claude.com/docs/en/sub-agents):
+    - `name` (required): Unique identifier
+    - `description` (required): When to delegate to subagent
+    - `tools` (optional): Comma-separated string
+    - `disallowedTools` (optional): Tools to deny
+    - `model` (optional): sonnet/opus/haiku/inherit
+    - `permissionMode` (optional): default/acceptEdits/dontAsk/bypassPermissions/plan
+    - `skills` (optional): Skills to pre-load at startup
+    - `hooks` (optional): Lifecycle hooks
+  - **Copilot** (per https://docs.github.com/en/copilot/reference/custom-agents-configuration):
+    - `name` (optional): Display name
+    - `description` (required): Purpose and capabilities
+    - `target` (optional): vscode/github-copilot
+    - `tools` (optional): List or string
+    - `infer` (optional): Auto-invoke (default true)
+    - `mcp-servers` (optional): Additional MCP servers
+    - `metadata` (optional but remove): Use versions.json instead
+- **Skill reference extraction:** Scan agent content for `/gsd-*`, `$gsd-*`, `gsd-*` patterns, cross-reference with skills directory, add to `skills` field (Claude only)
+- **Rationale:** Agents have platform-specific requirements, metadata should be centralized in versions.json, skills must be pre-loaded for Claude agents to reference them
 
 **TEMPLATE-02: Platform-Specific Transformations**
 - Handle platform differences via adapters (not template duplication)
@@ -396,6 +431,7 @@
 | TEMPLATE-01 | Phase 1 | Pending |
 | TEMPLATE-01B | Phase 1 | Pending |
 | TEMPLATE-01C | Phase 1 | Pending |
+| TEMPLATE-01D | Phase 1 | Pending |
 | TEMPLATE-02 | Phase 2 | Pending |
 | TEMPLATE-02B | Phase 2 | Pending |
 | TEMPLATE-03 | Phase 1 | Pending |
@@ -405,7 +441,7 @@
 | TEST-01 | All Phases | Pending |
 | TEST-02 | All Phases | Pending |
 
-**Total v2.0 Requirements:** 36 (added TEMPLATE-01C and TEMPLATE-02B)
+**Total v2.0 Requirements:** 37 (added TEMPLATE-01D for agents)
 **Total v2.x Requirements:** 4 (deferred enhancements)
 
 ---
