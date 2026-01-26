@@ -419,9 +419,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INSTALL-01 | Phase 1 | Pending |
-| INSTALL-02 | Phase 1 | Pending |
-| INSTALL-03 | Phase 1 | Pending |
+| INSTALL-01 | Phase 2 | ✅ Complete |
+| INSTALL-02 | Phase 2 | ✅ Complete |
+| INSTALL-03 | Phase 2 | ✅ Complete |
 | INSTALL-04 | Phase 4 | Pending |
 | INSTALL-05 | Phase 4 | Pending |
 | PLATFORM-01 | Phase 3 | ✅ Complete |
@@ -432,10 +432,10 @@
 | PLATFORM-04B | Phase 3 | ✅ Complete |
 | PLATFORM-05 | Phase 3 | ✅ Complete |
 | CLI-01 | Phase 3 | Pending |
-| CLI-02 | Phase 1 | Pending |
+| CLI-02 | Phase 2 | ✅ Complete |
 | CLI-03 | Phase 3 | ✅ Complete |
 | CLI-04 | Phase 3 | Pending |
-| CLI-05 | Phase 1 | Pending |
+| CLI-05 | Phase 2 | ✅ Complete |
 | UX-01 | Phase 3 | Pending |
 | UX-02 | Phase 3 | Pending |
 | UX-03 | Phase 3 | Pending |
@@ -443,7 +443,7 @@
 | VERSION-02 | Phase 5 | Pending |
 | VERSION-03 | Phase 5 | Pending |
 | SAFETY-01 | Phase 6 | Pending |
-| SAFETY-02 | Phase 1 | Pending |
+| SAFETY-02 | Phase 2 | ✅ Complete |
 | TEMPLATE-01 | Phase 1 | ✅ Complete |
 | TEMPLATE-01B | Phase 1 | ✅ Complete |
 | TEMPLATE-01C | Phase 1 | ✅ Complete |
