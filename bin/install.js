@@ -13,6 +13,7 @@ import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
 import { install } from './lib/installer/orchestrator.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
+import { runInteractive } from './lib/cli/interactive.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -27,7 +28,8 @@ async function main() {
   program
     .name('get-shit-done-multi')
     .version(pkg.version)
-    .description('Install get-shit-done skills and agents to AI coding assistants');
+    .description('Install get-shit-done skills and agents to AI coding assistants')
+    .addHelpText('after', '\nRun without flags for interactive mode with beautiful prompts.');
   
   // Platform flags
   program
@@ -55,11 +57,20 @@ async function main() {
   if (options.copilot) platforms.push('copilot');
   if (options.codex) platforms.push('codex');
   
-  // If no platform flags, enter interactive mode (Phase 4)
-  if (platforms.length === 0) {
-    logger.info('No platform specified. Interactive mode coming in Phase 4.');
-    logger.info('Usage: npx get-shit-done-multi --claude --global');
+  // Check for interactive mode eligibility
+  const hasFlags = platforms.length > 0;
+  const isInteractive = !hasFlags && process.stdin.isTTY;
+  
+  if (isInteractive) {
+    // Phase 4: Interactive mode
+    await runInteractive(options);
     process.exit(0);
+  } else if (!hasFlags && !process.stdin.isTTY) {
+    // No flags and no TTY - show usage
+    logger.error('No platform specified and not running in interactive mode.');
+    logger.info('Usage: npx get-shit-done-multi --claude --global');
+    logger.info('   or: npx get-shit-done-multi (interactive mode in terminal)');
+    process.exit(EXIT_CODES.INVALID_ARGS);
   }
   
   // Validate platforms
