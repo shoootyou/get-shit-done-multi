@@ -1,7 +1,7 @@
 ---
 name: gsd-research-phase
 description: Research implementation approach for phase before planning
-allowed-tools: 'Task, Read, Edit, Bash'
+allowed-tools: Task, Read, Edit, Bash
 ---
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.

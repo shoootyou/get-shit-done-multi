@@ -1,8 +1,8 @@
 ---
 name: gsd-restore-milestone
 description: Restore archived milestone from .planning/history/ back to active workspace
-allowed-tools: 'Read, Edit, Bash'
-argument-hint: '[version]'
+allowed-tools: Read, Edit, Bash
+argument-hint: [version]
 ---
 
 <objective>

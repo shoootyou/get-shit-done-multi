@@ -170,10 +170,10 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    </objective>
 
    <execution_context>
-   @~/.claude/get-shit-done/workflows/execute-plan.md
-   @~/.claude/get-shit-done/templates/summary.md
-   @~/.claude/get-shit-done/references/checkpoints.md
-   @~/.claude/get-shit-done/references/tdd.md
+   @{{PLATFORM_ROOT}}/get-shit-done/workflows/execute-plan.md
+   @{{PLATFORM_ROOT}}/get-shit-done/templates/summary.md
+   @{{PLATFORM_ROOT}}/get-shit-done/references/checkpoints.md
+   @{{PLATFORM_ROOT}}/get-shit-done/references/tdd.md
    </execution_context>
 
    <context>

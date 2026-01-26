@@ -1,9 +1,7 @@
 ---
 name: gsd-research-synthesizer
-description: >-
-  Synthesizes research outputs from parallel researcher agents into SUMMARY.md.
-  Spawned by /gsd-new-project after 4 researcher agents complete.
-tools: 'Read, Edit, Bash'
+description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd-new-project after 4 researcher agents complete.
+tools: Read, Edit, Bash
 skills:
   - gsd-new-project
   - gsd-research-phase
@@ -30,7 +28,7 @@ Your job: Create a unified research summary that informs roadmap creation. Extra
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/workspace/{{PLATFORM_ROOT}}get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @/workspace/{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -130,7 +128,7 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 ## Step 6: Write SUMMARY.md
 
-Use template: /workspace/{{PLATFORM_ROOT}}get-shit-done/templates/research-project/SUMMARY.md
+Use template: /workspace/{{PLATFORM_ROOT}}/get-shit-done/templates/research-project/SUMMARY.md
 
 Write to `.planning/research/SUMMARY.md`
 
@@ -143,7 +141,7 @@ git add .planning/research/
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/{{PLATFORM_ROOT}}get-shit-done/workflows/git-identity-helpers.sh
+    source /workspace/{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -170,7 +168,7 @@ Return brief confirmation with key points for the orchestrator.
 
 <output_format>
 
-Use template: /workspace/{{PLATFORM_ROOT}}get-shit-done/templates/research-project/SUMMARY.md
+Use template: /workspace/{{PLATFORM_ROOT}}/get-shit-done/templates/research-project/SUMMARY.md
 
 Key sections:
 - Executive Summary (2-3 paragraphs)

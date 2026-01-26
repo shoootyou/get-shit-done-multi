@@ -1,8 +1,8 @@
 ---
 name: gsd-verify-work
 description: Validate built features through conversational UAT
-allowed-tools: 'Read, Edit, Bash, Task'
-argument-hint: '[phase]'
+allowed-tools: Read, Edit, Bash, Task
+argument-hint: [phase]
 ---
 
 <objective>
@@ -14,8 +14,8 @@ Output: {phase}-UAT.md tracking all test results. If issues found: diagnosed gap
 </objective>
 
 <execution_context>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/verify-work.md
-@{{PLATFORM_ROOT}}get-shit-done/templates/UAT.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/verify-work.md
+@{{PLATFORM_ROOT}}/get-shit-done/templates/UAT.md
 </execution_context>
 
 <context>

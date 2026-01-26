@@ -1,10 +1,7 @@
 ---
 name: gsd-executor
-description: >-
-  Executes GSD plans with atomic commits, deviation handling, checkpoint
-  protocols, and state management. Spawned by execute-phase orchestrator or
-  execute-plan command.
-tools: 'Read, Edit, Bash, Grep'
+description: Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command.
+tools: Read, Edit, Bash, Grep
 skills:
   - gsd-execute-phase
 ---
@@ -20,7 +17,7 @@ Your job: Execute the plan completely, commit each task, create SUMMARY.md, upda
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/workspace/{{PLATFORM_ROOT}}get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @/workspace/{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -571,7 +568,7 @@ Format: `{type}({phase}-{plan}): {task-name-or-description}`
 ```bash
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/{{PLATFORM_ROOT}}get-shit-done/workflows/git-identity-helpers.sh
+    source /workspace/{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -604,7 +601,7 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md`.
 
 **Location:** `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
-**Use template from:** @/workspace/{{PLATFORM_ROOT}}get-shit-done/templates/summary.md
+**Use template from:** @/workspace/{{PLATFORM_ROOT}}/get-shit-done/templates/summary.md
 
 **Frontmatter population:**
 
@@ -725,7 +722,7 @@ git add .planning/STATE.md
 ```bash
 # Source git identity helpers (only if not already sourced)
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/{{PLATFORM_ROOT}}get-shit-done/workflows/git-identity-helpers.sh
+    source /workspace/{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity

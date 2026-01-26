@@ -1,8 +1,8 @@
 ---
 name: gsd-archive-milestone
 description: Move completed milestone files to .planning/history/ for long-term storage
-allowed-tools: 'Read, Edit, Bash'
-argument-hint: '[version]'
+allowed-tools: Read, Edit, Bash
+argument-hint: [version]
 ---
 
 <objective>

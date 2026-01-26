@@ -1,6 +1,6 @@
 # Phase Prompt Template
 
-> **Note:** Planning methodology is in `agents/gsd-planner.md`.
+> **Note:** Planning methodology is in `agents{{COMMAND_PREFIX}}planner.md`.
 > This template defines the PLAN.md output format that the agent produces.
 
 Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phase plans optimized for parallel execution.
@@ -37,10 +37,10 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/execute-plan.md
+@{{PLATFORM_ROOT}}/get-shit-done/templates/summary.md
 [If plan contains checkpoint tasks (type="checkpoint:*"), add:]
-@~/.claude/get-shit-done/references/checkpoints.md
+@{{PLATFORM_ROOT}}/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -278,7 +278,7 @@ TDD features get dedicated plans with `type: tdd`.
 → Yes: Create a TDD plan
 → No: Standard task in standard plan
 
-See `~/.claude/get-shit-done/references/tdd.md` for TDD plan structure.
+See `{{PLATFORM_ROOT}}/get-shit-done/references/tdd.md` for TDD plan structure.
 
 ---
 
@@ -382,9 +382,9 @@ Output: Working dashboard component.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
-@~/.claude/get-shit-done/references/checkpoints.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/execute-plan.md
+@{{PLATFORM_ROOT}}/get-shit-done/templates/summary.md
+@{{PLATFORM_ROOT}}/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -506,7 +506,7 @@ user_setup:
 
 **Result:** Execute-plan generates `{phase}-USER-SETUP.md` with checklist for the user.
 
-See `~/.claude/get-shit-done/templates/user-setup.md` for full schema and examples
+See `{{PLATFORM_ROOT}}/get-shit-done/templates/user-setup.md` for full schema and examples
 
 ---
 
@@ -573,4 +573,4 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 5. Gaps found → fix plans created → execute → re-verify
 6. All must_haves pass → phase complete
 
-See `~/.claude/get-shit-done/workflows/verify-phase.md` for verification logic.
+See `{{PLATFORM_ROOT}}/get-shit-done/workflows/verify-phase.md` for verification logic.

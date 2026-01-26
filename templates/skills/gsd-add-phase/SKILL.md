@@ -1,8 +1,8 @@
 ---
 name: gsd-add-phase
 description: Add new integer phase to end of current milestone in roadmap
-allowed-tools: 'Read, Edit, Bash'
-argument-hint: '[description]'
+allowed-tools: Read, Edit, Bash
+argument-hint: [description]
 ---
 
 <objective>

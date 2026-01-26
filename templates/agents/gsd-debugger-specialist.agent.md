@@ -1,9 +1,7 @@
 ---
 name: gsd-debugger-specialist
-description: >-
-  Debugging methodology specialist. Provides deep analysis and investigation
-  strategies for complex debugging scenarios. Spawned by gsd-debugger.
-tools: 'Read, Bash, Grep'
+description: Debugging methodology specialist. Provides deep analysis and investigation strategies for complex debugging scenarios. Spawned by gsd-debugger.
+tools: Read, Bash, Grep
 ---
 
 <role>

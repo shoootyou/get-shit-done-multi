@@ -1,8 +1,8 @@
 ---
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
-allowed-tools: 'Read, Bash, Edit'
-argument-hint: ''
+allowed-tools: Read, Bash, Edit
+argument-hint:
 ---
 
 <objective>
@@ -18,11 +18,11 @@ Routes to the resume-project workflow which handles:
   </objective>
 
 <execution_context>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/resume-project.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/resume-project.md
 </execution_context>
 
 <process>
-**Follow the resume-project workflow** from `@{{PLATFORM_ROOT}}get-shit-done/workflows/resume-project.md`.
+**Follow the resume-project workflow** from `@{{PLATFORM_ROOT}}/get-shit-done/workflows/resume-project.md`.
 
 The workflow handles all resumption logic including:
 

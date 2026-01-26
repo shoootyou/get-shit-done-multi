@@ -2,7 +2,7 @@
 name: gsd-help
 description: Show available GSD commands and usage guide
 allowed-tools: Read
-argument-hint: ''
+argument-hint:
 ---
 
 <objective>

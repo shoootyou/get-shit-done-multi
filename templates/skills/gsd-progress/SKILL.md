@@ -1,10 +1,8 @@
 ---
 name: gsd-progress
-description: >-
-  Check project progress, show context, and route to next action (execute or
-  plan)
-allowed-tools: 'Read, Bash, Task'
-argument-hint: ''
+description: Check project progress, show context, and route to next action (execute or plan)
+allowed-tools: Read, Bash, Task
+argument-hint:
 ---
 
 <objective>

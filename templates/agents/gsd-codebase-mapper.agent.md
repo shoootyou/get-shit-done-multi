@@ -1,10 +1,7 @@
 ---
 name: gsd-codebase-mapper
-description: >-
-  Explores codebase and writes structured analysis documents. Spawned by
-  map-codebase with a focus area (tech, arch, quality, concerns). Writes
-  documents directly to reduce orchestrator context load.
-tools: 'Read, Bash, Grep, Edit'
+description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
+tools: Read, Bash, Grep, Edit
 skills:
   - gsd-execute-phase
   - gsd-map-codebase
@@ -94,7 +91,7 @@ Extract comma-separated list and store for use in exploration commands.
 
 **For Bash commands:**
 - Convert each dir to `-not -path '*/DIR/*'` format
-- Example: `.github` becomes `-not -path '*/{{PLATFORM_ROOT}}*'`
+- Example: `.github` becomes `-not -path '*/{{PLATFORM_ROOT}}/*'`
 
 **For Grep commands:**
 - Use `--exclude-dir={dir1,dir2,...}` format
@@ -140,9 +137,9 @@ grep -r "import.*stripe\|import.*supabase\|import.*aws\|import.*@" src/ \
 find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.tsx" -o -name "*.jsx" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -158,9 +155,9 @@ tree -L 3 -I 'node_modules|.git|.github|.claude|.codex|dist|build|out|target|cov
   find . -type d \
     -not -path '*/node_modules/*' \
     -not -path '*/.git/*' \
-    -not -path '*/{{PLATFORM_ROOT}}*' \
-    -not -path '*/{{PLATFORM_ROOT}}*' \
-    -not -path '*/{{PLATFORM_ROOT}}*' \
+    -not -path '*/{{PLATFORM_ROOT}}/*' \
+    -not -path '*/{{PLATFORM_ROOT}}/*' \
+    -not -path '*/{{PLATFORM_ROOT}}/*' \
     -not -path '*/dist/*' \
     -not -path '*/build/*' \
     -not -path '*/out/*' \
@@ -172,9 +169,9 @@ tree -L 3 -I 'node_modules|.git|.github|.claude|.codex|dist|build|out|target|cov
 find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -185,9 +182,9 @@ find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx"
 find . -type f \( -name "*.test.*" -o -name "*.spec.*" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -199,9 +196,9 @@ find . -type f \( -name "*.test.*" -o -name "*.spec.*" \) \
 find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -213,9 +210,9 @@ find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx"
 find . -type d \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -244,9 +241,9 @@ ls jest.config.* vitest.config.* 2>/dev/null
 find . \( -name "*.test.*" -o -name "*.spec.*" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -266,9 +263,9 @@ find src/ -name "*.ts" -o -name "*.tsx" \
 find . -type f \( -name "*.ts" -o -name "*.js" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -281,9 +278,9 @@ find . -type f \( -name "*.ts" -o -name "*.js" \) \
 find . -type f \( -name "*.test.*" -o -name "*.spec.*" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \
@@ -321,9 +318,9 @@ grep -r "TODO\|FIXME\|HACK" . --include="*.ts" --include="*.js" \
 find . -type f \( -name "*.ts" -o -name "*.js" \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.git/*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
-  -not -path '*/{{PLATFORM_ROOT}}*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
+  -not -path '*/{{PLATFORM_ROOT}}/*' \
   -not -path '*/dist/*' \
   -not -path '*/build/*' \
   -not -path '*/out/*' \

@@ -1,12 +1,12 @@
 ---
 name: gsd-plan-phase
-description: 'Orchestrate phase planning with research, planning, and verification loop'
-allowed-tools: 'Task, Read, Edit, Bash'
-argument-hint: '[phase] [--research] [--skip-research] [--gaps] [--skip-verify]'
+description: Orchestrate phase planning with research, planning, and verification loop
+allowed-tools: Task, Read, Edit, Bash
+argument-hint: [phase] [--research] [--skip-research] [--gaps] [--skip-verify]
 ---
 
 <execution_context>
-@{{PLATFORM_ROOT}}get-shit-done/references/ui-brand.md
+@{{PLATFORM_ROOT}}/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <objective>

@@ -1,8 +1,8 @@
 ---
 name: gsd-list-milestones
 description: Display milestone registry showing all archived milestones with status
-allowed-tools: 'Read, Bash'
-argument-hint: ''
+allowed-tools: Read, Bash
+argument-hint:
 ---
 
 <objective>

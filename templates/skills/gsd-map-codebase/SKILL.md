@@ -1,10 +1,8 @@
 ---
 name: gsd-map-codebase
-description: >-
-  Analyze codebase with parallel mapper agents to produce structured
-  documentation
-allowed-tools: 'Task, Read, Edit, Bash, Grep'
-argument-hint: '[area]'
+description: Analyze codebase with parallel mapper agents to produce structured documentation
+allowed-tools: Task, Read, Edit, Bash, Grep
+argument-hint: [area]
 ---
 
 <objective>
@@ -16,7 +14,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/map-codebase.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/map-codebase.md
 </execution_context>
 
 <context>
@@ -67,7 +65,7 @@ Map codebase technology stack and integrations
 </writes>
 
 <workflow>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/map-codebase.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -91,7 +89,7 @@ Map codebase architecture and structure
 </writes>
 
 <workflow>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/map-codebase.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -115,7 +113,7 @@ Map codebase conventions and testing practices
 </writes>
 
 <workflow>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/map-codebase.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -138,7 +136,7 @@ Identify codebase concerns and issues
 </writes>
 
 <workflow>
-@{{PLATFORM_ROOT}}get-shit-done/workflows/map-codebase.md
+@{{PLATFORM_ROOT}}/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",

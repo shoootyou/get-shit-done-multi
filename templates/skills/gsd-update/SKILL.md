@@ -1,8 +1,8 @@
 ---
 name: gsd-update
 description: Update GSD installation to latest version from npm
-allowed-tools: 'Read, Bash'
-argument-hint: ''
+allowed-tools: Read, Bash
+argument-hint:
 ---
 
 <objective>
@@ -13,8 +13,8 @@ Output: Version comparison, changelog, and updated installation.
 </objective>
 
 <execution_context>
-@/workspace/{{PLATFORM_ROOT}}copilot/skills/get-shit-done/VERSION
-@/workspace/{{PLATFORM_ROOT}}copilot/skills/get-shit-done/CHANGELOG.md
+@/workspace/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/VERSION
+@/workspace/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/CHANGELOG.md
 </execution_context>
 
 <process>
@@ -24,29 +24,29 @@ Detect which platform is being used:
 
 ```bash
 # Detect platform based on installation directory
-if [ -d "${HOME}/{{PLATFORM_ROOT}}skills" ] || [ -d "./{{PLATFORM_ROOT}}skills" ]; then
+if [ -d "${HOME}/{{PLATFORM_ROOT}}/skills" ] || [ -d "./{{PLATFORM_ROOT}}/skills" ]; then
   PLATFORM="claude"
   INSTALL_CMD="npx get-shit-done-multi@latest"
-  if [ -f "./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/{{PLATFORM_ROOT}}skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}skills/get-shit-done/VERSION"
+  if [ -f "./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION"
   fi
-elif [ -d "./{{PLATFORM_ROOT}}skills" ] || [ -d "${HOME}/{{PLATFORM_ROOT}}copilot/skills" ]; then
+elif [ -d "./{{PLATFORM_ROOT}}/skills" ] || [ -d "${HOME}/{{PLATFORM_ROOT}}/copilot/skills" ]; then
   PLATFORM="copilot"
   INSTALL_CMD="npx get-shit-done-multi@latest --copilot"
-  if [ -f "./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/{{PLATFORM_ROOT}}copilot/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}copilot/skills/get-shit-done/VERSION"
+  if [ -f "./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/VERSION"
   fi
-elif [ -d "./{{PLATFORM_ROOT}}skills" ] || [ -d "${HOME}/{{PLATFORM_ROOT}}skills" ]; then
+elif [ -d "./{{PLATFORM_ROOT}}/skills" ] || [ -d "${HOME}/{{PLATFORM_ROOT}}/skills" ]; then
   PLATFORM="codex"
   INSTALL_CMD="npx get-shit-done-multi@latest --codex"
-  if [ -f "./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./{{PLATFORM_ROOT}}skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/{{PLATFORM_ROOT}}skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}skills/get-shit-done/VERSION"
+  if [ -f "./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="./{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION"
+  elif [ -f "${HOME}/{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION" ]; then
+    VERSION_FILE="${HOME}/{{PLATFORM_ROOT}}/skills/get-shit-done/VERSION"
   fi
 else
   echo "Error: GSD installation not found"
