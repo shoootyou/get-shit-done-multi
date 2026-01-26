@@ -61,13 +61,18 @@ function convertToolsToString(toolsArray) {
  * Examples:
  *   ['domain'] → '[domain]'
  *   ['filename', 'format'] → '[filename] [format]'
+ *   [{name: 'domain', ...}] → '[domain]'
  */
 function convertArgumentsToHint(argsArray) {
   if (!Array.isArray(argsArray)) {
     return argsArray || '';
   }
   
-  return argsArray.map(arg => `[${arg}]`).join(' ');
+  return argsArray.map(arg => {
+    // Handle both string and object formats
+    const argName = typeof arg === 'string' ? arg : (arg.name || arg);
+    return `[${argName}]`;
+  }).join(' ');
 }
 
 /**
@@ -111,7 +116,7 @@ export function correctSkillFrontmatter(data) {
 
 /**
  * Migrate a single skill
- * @param {string} sourcePath - Path to source skill file (.github/skills/gsd-*/SKILL.md)
+ * @param {string} sourcePath - Path to source skill file (.github/skills/gsd-xx/SKILL.md)
  * @param {string} targetDir - Target directory (templates/skills/)
  * @param {object} validator - Validator instance for error collection
  * @returns {object} - Migration result {success, file, errors}
