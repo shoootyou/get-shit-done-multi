@@ -15,7 +15,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Version Strategy:** Initial release is v2.0 (complete product). Future versions follow SemVer: new commands = MINOR, breaking changes = MAJOR.
 
-**Coverage:** 31 v2.0 requirements mapped across 7 phases
+**Coverage:** 37 v2.0 requirements mapped across 7 phases
 
 ---
 
@@ -60,30 +60,45 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - SAFETY-02: Path normalization
 - TEMPLATE-01: Use `.github/skills/` and `.github/agents/` as source
 - TEMPLATE-01B: Convert to templates with {{VARIABLES}}
+- TEMPLATE-01C: Frontmatter format correction (skills only)
+- TEMPLATE-01D: Agent frontmatter correction
 - TEMPLATE-03: Template variables
 - TEST-01: Testing isolation
 - TEST-02: Test cleanup
 
 **Success Criteria:**
 1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd-*/`
-2. All 29 skills from `.github/skills/` converted to templates and installed
-3. All 13 agents from `.github/agents/` converted to templates and installed
+2. All 29 skills from `.github/skills/` converted to templates with corrected frontmatter
+3. All 13 agents from `.github/agents/` converted to templates with corrected frontmatter
 4. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/` with manifest template
 5. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
 6. Skill structure: `.claude/skills/gsd-<name>/SKILL.md` (directory-based)
-7. Installation completes in <30 seconds for typical setup
-8. `--help` and `--version` flags show correct information
-9. Version displays as 2.0.0
+7. Skill frontmatter corrections applied: `allowed-tools`, `argument-hint`, removed unsupported fields
+8. Agent frontmatter corrections applied: `tools` string, `skills` auto-generated, removed metadata
+9. version.json created per skill (29 files)
+10. versions.json created for all agents (1 file)
+11. Tool names mapped correctly (Copilot aliases → Claude official)
+12. Installation completes in <30 seconds for typical setup
+13. `--help` and `--version` flags show correct information
+14. Version displays as 2.0.0
 
 **Key Deliverables:**
 - `/bin/install.js` (entry point with shebang)
 - `/bin/lib/io/file-operations.js` (copy, create directories)
 - `/bin/lib/rendering/template-renderer.js` (string replacement)
 - `/bin/lib/paths/path-resolver.js` (normalization, validation)
-- `/templates/skills/gsd-*/SKILL.md` (29 skills copied from `.github/skills/` and converted)
-- `/templates/agents/gsd-*.agent.md` (13 agents copied from `.github/agents/` and converted)
+- `/templates/skills/gsd-*/SKILL.md` (29 skills with corrected frontmatter)
+- `/templates/skills/gsd-*/version.json` (29 version files)
+- `/templates/agents/gsd-*.agent.md` (13 agents with corrected frontmatter)
+- `/templates/agents/versions.json` (1 consolidated versions file)
 - `/get-shit-done/.gsd-install-manifest.json` (template)
+- Skill reference extraction script (scan agent content for /gsd-* patterns)
+- Tool name mapping utilities
 - Basic error handling and logging
+
+**References:**
+- See `.planning/FRONTMATTER-CORRECTIONS.md` for skill corrections spec
+- See `.planning/AGENT-CORRECTIONS.md` for agent corrections spec
 
 **Plans:**
 - [ ] 01-01-PLAN.md — Foundation & Core Modules (Wave 1)

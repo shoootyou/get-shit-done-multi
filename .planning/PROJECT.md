@@ -105,12 +105,19 @@ Project succeeds when:
 
 **v2.0:** Initial complete product release
 - Foundation + Multi-Platform (Claude, Copilot, Codex)
+- Frontmatter corrections for skills and agents (see FRONTMATTER-CORRECTIONS.md and AGENT-CORRECTIONS.md)
 - Interactive UX with beautiful prompts
 - Atomic transactions with rollback
 - Version tracking and update detection
 - Path security
 - Cross-platform support (macOS, Linux, Windows)
 - Complete documentation
+
+**Key Documentation:**
+- `.planning/FRONTMATTER-CORRECTIONS.md` — Skills frontmatter specifications
+- `.planning/AGENT-CORRECTIONS.md` — Agents frontmatter specifications  
+- `.planning/REQUIREMENTS.md` — 37 v2.0 requirements
+- `.planning/ROADMAP.md` — 7-phase execution plan
 
 **v2.x:** Future enhancements (new commands = MINOR, breaking changes = MAJOR)
 
