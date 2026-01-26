@@ -21,20 +21,20 @@
 **Current Phase:** 1 of 7 (Template Migration)  
 **Phase Goal:** ONE-TIME migration of skills/agents to templates/ with frontmatter corrections  
 **Started:** 2026-01-26  
-**Last Activity:** 2026-01-26 - Completed 01-01-PLAN.md
+**Last Activity:** 2026-01-26 - Completed 01-02-PLAN.md
 
 ### Plan Status
-**Current Plan:** 1 of 4 in Phase 1  
-**Plan Goal:** Migration script foundation (parser, validator, injector)  
-**Status:** ✅ Complete - Ready for 01-02 (Skills Migration)
+**Current Plan:** 2 of 4 in Phase 1  
+**Plan Goal:** Skills migration (28 skills to templates/)  
+**Status:** ✅ Complete - Ready for 01-03 (Agents Migration)
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
-Phase 1: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans)
+Phase 1: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (2/4 plans)
 
 Overall Progress:
-[██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 3% (1/35 total plans)
+[████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 6% (2/35 total plans)
 ```
 
 ---
@@ -43,9 +43,9 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 0 (Phase 1 in progress)
-- **Plans Completed:** 1/35
+- **Plans Completed:** 2/35
 - **Days Active:** 2
-- **Plans Today:** 1
+- **Plans Today:** 2
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -111,12 +111,24 @@ Overall Progress:
    - Better static analysis support
    - Rationale: Modern Node.js standard, future-proof
 
+9. **2026-01-26 (01-02):** Object-based argument conversion (MIGRATION-04)
+   - Arguments can be simple strings OR objects with {name, type, required, description}
+   - Converter extracts `name` property from objects for argument-hint
+   - Handles both legacy simple format and modern structured format
+   - Rationale: Skills use complex argument metadata that needs proper extraction
+
+10. **2026-01-26 (01-02):** Confirmed 28 skills (not 29) (MIGRATION-05)
+    - Source has 28 gsd-* skill directories
+    - get-shit-done directory exists but is not a skill
+    - Plan stated 29 but actual count is 28
+    - Rationale: Accurate inventory for validation and tracking
+
 ### Technical Debt
 - Migration scripts are ONE-TIME code (will be deleted post-approval)
 
 ### Todos
 - [x] Create migration script foundation (01-01)
-- [ ] Migrate 29 skills to templates/ (01-02)
+- [x] Migrate 28 skills to templates/ (01-02)
 - [ ] Migrate 13 agents to templates/ (01-03)
 - [ ] Validation and manual review (01-04)
 
@@ -128,22 +140,22 @@ None
 ## Session Continuity
 
 ### What Just Happened
-Completed Plan 01-01: Migration Script & Frontmatter Parsing foundation. Created main migration script with 3 helper modules: frontmatter-parser (YAML validation), validator (collect-all-errors), template-injector (variable replacement). Installed gray-matter, @inquirer/prompts, and open dependencies. All scripts use ESM imports. Foundation ready for skills migration (01-02).
+Completed Plan 01-02: Skills Migration & Correction. Migrated all 28 skills from .github/skills/ to templates/skills/ with frontmatter corrections. Created skill-migrator.js with tool name normalization (Copilot aliases → Claude names), argument-hint conversion (handles both string and object formats), unsupported field extraction to version.json, and template variable injection. Fixed two bugs: object-based argument conversion and JSDoc syntax error. All 28 skills validated successfully.
 
 ### What's Next
-1. **Immediate:** Execute Plan 01-02 - Skills Migration (29 files)
-2. **After skills:** Plan 01-03 - Agents Migration (13 files)
-3. **Then:** Plan 01-04 - Validation and manual review
+1. **Immediate:** Execute Plan 01-03 - Agents Migration (13 files)
+2. **After agents:** Plan 01-04 - Validation and manual review
+3. **Then:** Phase 1 complete, ready for Phase 2 (Core Installer Foundation)
 
 ### Context for Next Session
-- **Migration foundation complete:** Parser, validator, injector ready
-- **Dependencies installed:** gray-matter, @inquirer/prompts, open
-- **Migration utilities created:** 4 new scripts in scripts/ and scripts/lib/
-- **Validation specs:** Skills and agents have different frontmatter requirements
-- **Next action:** Execute 01-02 to migrate 29 skills to templates/
+- **Skills migration complete:** 28 skills in templates/skills/ with corrected frontmatter
+- **Skill migrator pattern validated:** Can be adapted for agents with different field rules
+- **Key differences for agents:** Use `tools` (not `allowed-tools`), auto-generate `skills` field, single versions.json for all agents
+- **Deviations handled:** Object-based argument conversion, JSDoc syntax fix
+- **Next action:** Execute 01-03 to migrate 13 agents to templates/
 
 ### Handoff Notes
-Plan 01-01 complete. Migration foundation ready: scripts/migrate-to-templates.js provides entry point. Frontmatter parser validates skills (allowed-tools, argument-hint) vs agents (tools, skills). Validator collects all errors before reporting. Template injector replaces .github/, .claude/, .codex/ with {{PLATFORM_ROOT}} and command prefixes with {{COMMAND_PREFIX}}. Ready for 01-02 skills migration.
+Plan 01-02 complete. Skills migration complete: 28 skills migrated to templates/skills/ with frontmatter corrections (tools→allowed-tools, arguments→argument-hint, tool name normalization). Fixed two bugs during migration: object-based argument conversion and JSDoc syntax error. Each skill has SKILL.md + version.json. Template variables injected throughout. Ready for 01-03 agents migration which follows same pattern but uses different field mappings (tools not allowed-tools, single versions.json for all agents, auto-generated skills field).
 
 ---
 
@@ -167,18 +179,21 @@ Plan 01-01 complete. Migration foundation ready: scripts/migrate-to-templates.js
 
 ### Phase Plans
 - `.planning/phases/01-template-migration/01-01-SUMMARY.md` — Migration foundation (✅ Complete)
-- Next: 01-02 Skills Migration, 01-03 Agents Migration, 01-04 Validation
+- `.planning/phases/01-template-migration/01-02-SUMMARY.md` — Skills migration (✅ Complete)
+- Next: 01-03 Agents Migration, 01-04 Validation
 
 ### Project Files
 - `package.json` — Project metadata (updated with migration dependencies)
-- `scripts/migrate-to-templates.js` — Main migration entry point (✅ Created)
+- `scripts/migrate-to-templates.js` — Main migration entry point (✅ Updated with skills)
 - `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
 - `scripts/lib/validator.js` — Error collection engine (✅ Created)
 - `scripts/lib/template-injector.js` — Variable replacement (✅ Created)
+- `scripts/lib/skill-migrator.js` — Skills migration engine (✅ Created)
 - `bin/install.js` — CLI entry point (needs creation)
-- `.github/skills/` — Source skills (29 files, read-only)
+- `.github/skills/` — Source skills (28 files, read-only)
 - `.github/agents/` — Source agents (13 files, read-only)
-- `templates/` — Target for corrected templates (needs creation)
+- `templates/skills/` — Migrated skills (28 directories, ✅ Created)
+- `templates/agents/` — Target for agents (needs creation)
 - `get-shit-done/` — Shared resources
 - `docs/` — Documentation (needs creation)
 
@@ -209,4 +224,4 @@ Plan 01-01 complete. Migration foundation ready: scripts/migrate-to-templates.js
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Plan 01-02 (Skills Migration)
+**Ready for:** Plan 01-03 (Agents Migration)
