@@ -457,24 +457,44 @@ function validatePath(targetPath, allowedRoot) {
 | Manual edits divergence | Post-migration | 🟡 HIGH | P1 (documentation) |
 | Platform spec changes | Phase 2+ | 🟡 MODERATE | P1 (versioned adapters) |
 
-## Technology Stack (Prescriptive)
+## Technology Stack (Phase-Separated)
 
 **All versions verified against npm registry, Jan 2026.**
 
-### Core Dependencies
+### Phase 1 Migration Stack (Temporary)
+
+**These dependencies will be ARCHIVED after Phase 1 completes.**
 
 ```json
 {
-  "name": "get-shit-done-multi",
-  "version": "1.0.0",
-  "type": "module",
-  "bin": {
-    "gsd-install": "./bin/install.js"
-  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.1",
+    "ajv": "^8.17.1"
+  }
+}
+```
+
+| Library | Version | Purpose | Why | Lifespan |
+|---------|---------|---------|-----|----------|
+| **gray-matter** | 4.0.3 | Frontmatter parsing & modification | Extract, modify, re-stringify while preserving formatting | TEMPORARY |
+| **js-yaml** | 4.1.1 | YAML validation | Validate structure after transformation | TEMPORARY |
+| **ajv** | 8.17.1 | JSON Schema validation | Validate against official Claude/Copilot specs | TEMPORARY |
+
+**Why these are temporary:**
+- Only needed for one-time migration
+- Phase 2+ never parses YAML (templates already correct)
+- Dead weight after migration completes
+- Will be archived to `.archive/phase-1-migration/`
+
+### Phase 2+ Installation Stack (Permanent)
+
+**These dependencies remain in codebase forever.**
+
+```json
+{
   "dependencies": {
     "commander": "^14.0.2",
-    "gray-matter": "^4.0.3",
-    "yaml": "^2.6.1",
     "fs-extra": "^11.3.3",
     "chalk": "^5.6.2",
     "@clack/prompts": "^0.11.0"
@@ -486,315 +506,449 @@ function validatePath(targetPath, allowedRoot) {
 }
 ```
 
-### Why Each Library
+| Library | Version | Purpose | Why | Lifespan |
+|---------|---------|---------|-----|----------|
+| **commander** | 14.0.2 | CLI argument parsing | ESM support, clean API, widely used | PERMANENT |
+| **fs-extra** | 11.3.3 | File operations | Atomic writes, promise-based, cross-platform | PERMANENT |
+| **chalk** | 5.6.2 | Terminal colors | Simple, zero-config, ESM support | PERMANENT |
+| **@clack/prompts** | 0.11.0 | Interactive CLI | Beautiful UI, spinners, disabled menu options | PERMANENT |
+| **vitest** | 4.0.18 | Testing | ESM-native, fast, snapshot support | PERMANENT |
 
-| Library | Version | Purpose | Why This Specific One |
-|---------|---------|---------|------------------------|
-| **commander** | 14.0.2 | CLI argument parsing | ESM support, Oct 2025 release, already in use |
-| **gray-matter** | 4.0.3 | Frontmatter parsing | Battle-tested (Gatsby, 11ty), extract + modify + stringify |
-| **yaml** | 2.6.1 | AST-based YAML manipulation | **CRITICAL for safe transformation**, preserves structure |
-| **fs-extra** | 11.3.3 | File operations | Atomic writes, promise-based, cross-platform |
-| **chalk** | 5.6.2 | Terminal colors | Simple, zero-config, ESM support |
-| **@clack/prompts** | 0.11.0 | Interactive CLI | Beautiful UI, built-in spinners, disabled options |
-| **vitest** | 4.0.18 | Testing | ESM-native, faster than Jest, snapshot support |
+**Why these are permanent:**
+- Core to installer functionality
+- No YAML parsing (simple string replacement only)
+- User-facing features (interactive prompts, colors)
+- Testing infrastructure
 
 ### What NOT to Use
 
-| Avoid | Why |
-|-------|-----|
-| **EJS/Handlebars** | Template syntax conflicts with frontmatter content |
-| **ora** | @clack/prompts has built-in spinners |
-| **inquirer** | Older API, @clack/prompts is more modern |
-| **yargs** | commander has better ESM support |
-| **js-yaml** | Doesn't handle frontmatter delimiters |
+| Avoid | Why | Alternative |
+|-------|-----|-------------|
+| **EJS/Handlebars** | Template syntax conflicts with frontmatter | Plain string replacement |
+| **ora** | Redundant | @clack/prompts has spinners |
+| **inquirer** | Older API | @clack/prompts is modern |
+| **yargs** | Worse ESM support | commander 14+ |
+| **js-yaml (Phase 2)** | Doesn't handle frontmatter | Not needed (templates correct) |
 
-### Bundle Size
+### Bundle Size Impact
 
-- **Total minified:** 222 KB
-- **Total gzipped:** 58 KB
-- **Acceptable for npx:** ✅ Downloads fast, no global pollution
+**Phase 1 (temporary):**
+- gray-matter + js-yaml + ajv: ~180 KB minified
+- Only during development, never shipped to users
 
-## Critical Risks & Mitigations
+**Phase 2+ (permanent):**
+- commander + fs-extra + chalk + prompts: ~220 KB minified, ~60 KB gzipped
+- Acceptable for npx usage (downloads fast)
 
-### Risk Priority Matrix
+## Implications for Roadmap
 
-| Risk | Severity | Mitigation | Phase |
-|------|----------|------------|-------|
-| YAML transformation errors | 🔴 P0 | Use `yaml` AST manipulation, not regex | Phase 1 |
-| Partial installation rollback | 🔴 P0 | Transaction pattern with manifest | Phase 2 |
-| Path traversal vulnerability | 🔴 P0 | Strict validation, no symlinks | Phase 1 |
-| Directory conflicts | 🟡 P1 | Pre-flight checks, version detection | Phase 2 |
-| Platform spec changes | 🟡 P1 | Versioned adapters, schema validation | Phase 3 |
-| Windows path handling | 🟡 P1 | `path.join()`, test on Windows | Phase 3 |
-| Malicious template content | 🔴 P0 | Content validation, sandboxing | Phase 3 |
+### Recommended Phase Structure
 
-### Implementation Requirements
+Based on combined research, the roadmap should follow this strict separation:
 
-**P0 (Must have for MVP):**
-1. **AST-based YAML manipulation** — Use `yaml` package, never regex
-2. **Path validation** — Check every path before writing
-3. **Atomic file operations** — Write to temp, rename atomically
-4. **Transaction tracking** — Manifest of operations for rollback
+#### Phase 1: One-Time Migration (TEMPORARY CODE)
 
-**P1 (Important for production):**
-1. **Pre-flight checks** — Detect existing installations, disk space
-2. **Version detection** — Read `.gsd-version`, compare with current
-3. **Backup on update** — Create `.backup/` before overwriting
-4. **Cross-platform testing** — Validate on Windows, macOS, Linux
+**Goal:** Convert `.github/` → `/templates/` with all corrections applied.
 
-## Architecture Recommendations
+**Deliverables:**
+- Migration script: `scripts/migrate-to-templates.js`
+- Dry-run mode with diff preview
+- 42 corrected template files in `/templates/`
+- 42 `version.json` files with extracted metadata
+- Validation report (all checks passed)
+- Archived migration code in `.archive/phase-1-migration/`
 
-### Pattern: Functional Pipeline with Adapters
+**Technologies:** gray-matter, js-yaml, ajv (temporary)
 
-**Core philosophy:** Pure functions for transformation, I/O at edges only.
+**Key features from FEATURES.md:**
+- ✅ Remove unsupported frontmatter fields
+- ✅ Fix field naming (`tools` → `allowed-tools` for Claude)
+- ✅ Convert tool arrays to platform formats
+- ✅ Replace `arguments` with `argument-hint`
+- ✅ Generate version files
+- ✅ Insert template variables (`{{INSTALL_DIR}}`)
+- ✅ Comprehensive validation
 
-```
-┌─────────┐   ┌────────┐   ┌───────────┐   ┌──────────┐   ┌──────────┐   ┌────────┐
-│ Reader  │ → │ Parser │ → │ Transform │ → │ Validate │ → │ Generate │ → │ Writer │
-└─────────┘   └────────┘   └───────────┘   └──────────┘   └──────────┘   └────────┘
-    ↓             ↓              ↓               ↓              ↓             ↓
-  Load         Parse        Apply            Check         Create         Write
-  files      frontmatter   adapters         schemas       version.json   atomically
-```
+**Critical pitfalls to avoid (from PITFALLS.md):**
+- ⚠️ Regex-based field removal (use AST)
+- ⚠️ Mass corruption from bugs (dry-run mode mandatory)
+- ⚠️ Premature code deletion (archive, don't delete)
+- ⚠️ Incomplete validation (3-tier: static, semantic, runtime)
 
-### Module Organization
+**Duration:** 3-5 days  
+**Status:** After completion, code ARCHIVED (not deleted entirely)
 
-**Use domain-oriented structure** (not MVC or file-type):
+---
 
-```
-/bin/lib/
-├── pipeline/          # Orchestrator
-│   ├── index.js      # Main pipeline: compose stages
-│   └── context.js    # PipelineContext (shared state)
-├── readers/          # Stage 1: Load files
-│   └── template-reader.js
-├── parsers/          # Stage 2: Extract frontmatter
-│   └── frontmatter-parser.js
-├── transformers/     # Stage 3: Platform-specific transformation
-│   ├── skill-transformer.js
-│   └── agent-transformer.js
-├── validators/       # Stage 4: Schema validation
-│   ├── schema-validator.js
-│   └── joi-schemas.js
-├── generators/       # Stage 5: Generate metadata files
-│   └── version-generator.js
-└── writers/          # Stage 6: Atomic file writes
-    └── atomic-writer.js
-```
+#### Phase 2: Installation Pipeline (PERMANENT CODE)
 
-### Adapter Pattern for Platforms
+**Goal:** Build installer that deploys templates to user directories.
 
-**Each platform gets its own adapter:**
+**Deliverables:**
+- CLI tool: `bin/install.js` (npx-compatible)
+- Platform detection & adapters
+- Interactive prompts with `@clack/prompts`
+- Template rendering (simple string replacement)
+- Atomic file operations with rollback
+- Installation manifest & version tracking
+- Cross-platform testing (macOS, Linux, Windows)
+
+**Technologies:** commander, fs-extra, chalk, @clack/prompts (permanent)
+
+**Key features from FEATURES.md:**
+- ✅ Platform detection (Claude, GitHub, Codex)
+- ✅ Interactive mode (no flags = prompts)
+- ✅ Non-interactive mode (CI/CD support)
+- ✅ Template rendering (`{{VARIABLES}}` replacement)
+- ✅ Atomic writes with rollback
+- ✅ Progress indicators & spinners
+- ✅ Version detection & upgrade path
+
+**Critical pitfalls to avoid (from PITFALLS.md):**
+- ⚠️ Partial installation (transaction pattern)
+- ⚠️ Path traversal (strict validation)
+- ⚠️ Directory conflicts (pre-flight checks)
+- ⚠️ Overwriting user customizations (backup first)
+
+**Duration:** 5-7 days  
+**Status:** Permanent codebase, maintained forever
+
+---
+
+#### Phase 3: Multi-Platform Support (PERMANENT ENHANCEMENT)
+
+**Goal:** Extend to all platforms (Claude, GitHub, Codex, future).
+
+**Deliverables:**
+- Platform adapters for Claude, GitHub, Codex
+- Platform-specific validation
+- Cross-platform testing suite
+- Documentation per platform
+
+**Technologies:** Extends Phase 2 stack (no new dependencies)
+
+**Key features from FEATURES.md:**
+- ✅ All three platforms supported
+- ✅ Platform-specific frontmatter transformations
+- ✅ Tool name mapping per platform
+- ✅ File extension handling
+- ✅ Path reference corrections
+
+**Duration:** 3-4 days  
+**Status:** Permanent enhancement
+
+---
+
+### Phase Dependencies
+
+**Sequential (must follow order):**
+1. Phase 1 MUST complete before Phase 2 (templates required)
+2. Phase 2 MUST work on one platform before Phase 3 (validate core)
+
+**Parallel opportunities:**
+- None — phases are strictly sequential
+
+**Migration notes:**
+- Phase 1 code is ARCHIVED after completion, not deleted entirely
+- Emergency re-migration procedure documented
+- Keep `.github/` as source of truth for 6 months
+- Eventually delete `.github/`, use `/templates/` as source
+
+### Research Flags
+
+**Phase 1: No additional research needed** ✅
+- All frontmatter corrections documented (PLATFORMS.md)
+- Tool mappings verified (PLATFORMS.md)
+- YAML manipulation patterns established (ECOSYSTEM.md)
+- Validation strategy defined (RISKS.md)
+
+**Phase 2: No additional research needed** ✅
+- Template rendering approach decided (simple string replacement)
+- Interactive CLI library selected (@clack/prompts)
+- Transaction pattern documented (RISKS.md)
+- Path validation strategy defined (RISKS.md)
+
+**Phase 3: Minor research needed** ⚠️
+- Codex-specific frontmatter specs (if different from GitHub)
+- Platform detection methods for all three CLIs
+- Cross-platform path handling edge cases (Windows)
+
+**Later phases: Plugin system research needed** 📋
+- Plugin discovery mechanisms (Phase 4+)
+- ESLint vs Babel plugin patterns (Phase 4+)
+
+### Confidence Levels by Phase
+
+| Phase | Technology | Architecture | Risks | Overall |
+|-------|------------|--------------|-------|---------|
+| **Phase 1** | HIGH | HIGH | HIGH | **HIGH** ✅ |
+| **Phase 2** | HIGH | HIGH | HIGH | **HIGH** ✅ |
+| **Phase 3** | MEDIUM-HIGH | HIGH | MEDIUM | **MEDIUM-HIGH** ⚠️ |
+
+**Ready to start:** Phase 1 (all research complete)  
+**Blocked:** None
+
+## Validation Strategy (Before Archiving Migration Code)
+
+**CRITICAL:** Phase 1 migration code cannot be archived until ALL validation passes.
+
+### Three-Tier Validation
+
+#### Tier 1: Static Validation (Structure)
+
+**Run after:** Each file transformation  
+**Checks:**
+- [ ] YAML parses without syntax errors
+- [ ] Required fields present (`name`, `description`)
+- [ ] No unsupported fields in frontmatter
+- [ ] Field types correct (string vs array vs object)
+- [ ] Template variables inserted correctly
+
+**Tools:** js-yaml parser, ajv schema validation
 
 ```javascript
-// platforms/base-adapter.js
-class BaseAdapter {
-  transformFrontmatter(frontmatter) { throw new Error('Not implemented') }
-  transformTools(tools) { throw new Error('Not implemented') }
-  getTargetDir() { throw new Error('Not implemented') }
-  getFileExtension(type) { throw new Error('Not implemented') }
+// Example validation
+const schema = {
+  type: 'object',
+  required: ['name', 'description'],
+  properties: {
+    name: { type: 'string' },
+    description: { type: 'string' },
+    'allowed-tools': { type: 'string' },  // Claude skills
+    tools: { type: ['array', 'string'] }  // GitHub
+  },
+  additionalProperties: false  // No unsupported fields
 }
 
-// platforms/claude-adapter.js
-class ClaudeAdapter extends BaseAdapter {
-  transformFrontmatter(fm) {
-    return {
-      name: fm.name,
-      description: fm.description,
-      'argument-hint': this.generateHint(fm.arguments),
-      'allowed-tools': this.transformTools(fm.tools)  // String, not array
-    }
-  }
-  
-  transformTools(tools) {
-    const claudeMap = { execute: 'Bash', read: 'Read', edit: 'Edit' }
-    return tools.map(t => claudeMap[t] || t).join(', ')  // Comma-separated
-  }
-  
-  getTargetDir() { return '.claude' }
-  getFileExtension(type) { return type === 'agent' ? '.md' : '.md' }
-}
-
-// platforms/github-adapter.js
-class GitHubAdapter extends BaseAdapter {
-  transformFrontmatter(fm) {
-    return {
-      name: fm.name,
-      description: fm.description,
-      'argument-hint': this.generateHint(fm.arguments),
-      tools: this.transformTools(fm.tools)  // Array format
-    }
-  }
-  
-  transformTools(tools) {
-    return tools.map(t => t.toLowerCase())  // Lowercase array
-  }
-  
-  getTargetDir() { return '.github' }
-  getFileExtension(type) { return type === 'agent' ? '.agent.md' : '.md' }
-}
+const valid = ajv.validate(schema, frontmatter)
 ```
 
-### Transaction Pattern for Rollback
+#### Tier 2: Semantic Validation (Content)
 
-**Track all operations, rollback on failure:**
+**Run after:** All files transformed  
+**Checks:**
+- [ ] Tool names match platform specifications
+- [ ] Agent → skill references valid (skills exist)
+- [ ] Path variables use correct format (`{{VAR}}`)
+- [ ] File extensions match platform conventions
+- [ ] Version files created for each template
+- [ ] No duplicate names across templates
+
+**Tools:** Custom validators with platform specs
 
 ```javascript
-class InstallTransaction {
-  constructor() {
-    this.operations = []
-    this.completed = []
-    this.manifest = { files: [], timestamp: Date.now() }
+// Example semantic validation
+function validateToolNames(tools, platform) {
+  const allowedTools = {
+    claude: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'Task'],
+    github: ['read', 'edit', 'execute', 'search', 'agent']
   }
   
-  addOperation(operation) {
-    this.operations.push(operation)
-  }
+  const toolList = Array.isArray(tools) 
+    ? tools 
+    : tools.split(',').map(t => t.trim())
   
-  async commit() {
-    try {
-      for (const op of this.operations) {
-        await op.execute()
-        this.completed.push(op)
-        this.manifest.files.push(op.targetPath)
-      }
-      await this.writeManifest()
-    } catch (error) {
-      console.error('❌ Installation failed, rolling back...')
-      await this.rollback()
-      throw error
+  for (const tool of toolList) {
+    if (!allowedTools[platform].includes(tool)) {
+      throw new Error(`Invalid tool: ${tool} for ${platform}`)
     }
-  }
-  
-  async rollback() {
-    for (const op of this.completed.reverse()) {
-      await op.undo()
-    }
-  }
-  
-  async writeManifest() {
-    await fs.writeJson('.gsd-install-manifest.json', this.manifest)
   }
 }
 ```
 
-### Key Architectural Decisions
+#### Tier 3: Runtime Validation (Actual Installation)
 
-1. **Pure transformers** — No side effects, testable in isolation
-2. **I/O at edges** — Only readers/writers touch filesystem
-3. **Adapters for platforms** — Keep platform logic separate from core
-4. **Transactions for safety** — Rollback on failure
-5. **Manifest for tracking** — Know what was installed
-6. **Schema validation** — Catch errors before writing
-## Open Questions
+**Run after:** Semantic validation passes  
+**Checks:**
+- [ ] Test installation succeeds for both platforms
+- [ ] Skills load without errors in Claude CLI
+- [ ] Agents load without errors in GitHub CLI
+- [ ] Slash commands appear in menus
+- [ ] Agent invocation works
+- [ ] No path resolution errors
 
-### Phase 1 Research Needed (Before Implementation)
+**Tools:** Integration tests with real CLIs
 
-1. **What YAML formatting variations exist in current 42 template files?**
-   - Array syntax: all flow `[a, b]` or some block style?
-   - Multiline strings: literal `|` or folded `>`?
-   - Comment usage and placement?
-   - Indentation consistency?
-   - **Action:** Analyze all 42 files before implementing parser
+```bash
+# Test installation script
+#!/bin/bash
 
-2. **What is the complete tool mapping for Copilot → Claude?**
-   - Known: `execute` → `Bash`, `search` → `Grep`, `agent` → `Task`
-   - Unknown: Platform-specific tools like `mcp__*`?
-   - Unknown: Are there other tool aliases?
-   - **Action:** Document complete mapping from official docs
+# Install to test directory
+INSTALL_DIR="/tmp/gsd-test-install"
+rm -rf "$INSTALL_DIR"
 
-3. **What fields need removal vs transformation vs preservation?**
-   - Remove: `metadata.platform`, `skill_version`, etc.
-   - Transform: `tools` array, `arguments` → `argument-hint`
-   - Preserve: Which fields stay unchanged?
-   - **Action:** Create transformation spec for each platform
+# Run installer
+node bin/install.js --platform=claude --target="$INSTALL_DIR/.claude"
 
-4. **How do Claude/Copilot handle skill updates?**
-   - Do they hot-reload or require restart?
-   - Is there a cache to clear?
-   - **Action:** Test update behavior on both platforms
+# Validate Claude skills load
+claude --list-skills | grep "gsd-new-project" || exit 1
 
-5. **What are the exact frontmatter specs for each platform TODAY?**
-   - Need current snapshot of specs
-   - Track changes over time
-   - **Action:** Document current state as baseline
+# Validate agents load
+claude --list-agents | grep "gsd-executor" || exit 1
 
-### Questions for Later Phases
+echo "✓ All runtime validation passed"
+```
 
-6. **How to detect CLI platform versions?** (Phase 2)
-   - Command-line flags?
-   - Config files to read?
-   - **Action:** Research version detection methods
+### Validation Checklist (Before Archiving)
 
-7. **What file permissions do skills need?** (Phase 2)
-   - Executable bits required?
-   - Platform differences?
-   - **Action:** Test permission requirements
+**All must pass before archiving migration code:**
 
-8. **How to design plugin system?** (Phase 3)
-   - ESLint pattern? Babel pattern?
-   - Plugin discovery mechanism?
-   - **Action:** Research Node.js CLI plugin patterns
+**Static (Structure):**
+- [ ] All 42 template files parse without YAML errors
+- [ ] All required fields present
+- [ ] No unsupported fields remain
+- [ ] Field types match platform specifications
+
+**Semantic (Content):**
+- [ ] All tool names valid for each platform
+- [ ] All agent → skill references valid
+- [ ] All path variables use correct syntax
+- [ ] All version files created correctly (42 total)
+- [ ] No duplicate template names
+
+**Runtime (Installation):**
+- [ ] Test installation succeeds (Claude)
+- [ ] Test installation succeeds (GitHub)
+- [ ] Skills load in Claude CLI without errors
+- [ ] Agents load in GitHub CLI without errors
+- [ ] Slash commands visible and functional
+- [ ] Agent delegation works correctly
+
+**Documentation:**
+- [ ] Emergency recovery procedure documented
+- [ ] Archive location documented in README
+- [ ] Validation results saved to report file
+- [ ] Manual review completed by at least one developer
+
+### Emergency Recovery Procedure
+
+**When to use:** Template bugs discovered after archiving.
+
+**Prerequisites:**
+- Migration code archived in `.archive/phase-1-migration/`
+- Original `.github/` files unchanged in git history
+- Emergency script: `scripts/emergency-remigrate.sh`
+
+**Procedure:**
+
+```bash
+#!/bin/bash
+# scripts/emergency-remigrate.sh
+
+set -e
+
+echo "⚠️  EMERGENCY RE-MIGRATION"
+echo ""
+echo "This will:"
+echo "  1. Backup current /templates/"
+echo "  2. Restore migration script from archive"
+echo "  3. Re-run migration with latest fixes"
+echo ""
+read -p "Continue? [y/N] " -n 1 -r
+echo
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  exit 1
+fi
+
+# 1. Backup current templates
+BACKUP_DIR="templates.backup.$(date +%Y%m%d-%H%M%S)"
+mv templates "$BACKUP_DIR"
+echo "✓ Backed up to $BACKUP_DIR"
+
+# 2. Restore migration script
+cp .archive/phase-1-migration/migrate-to-templates.js scripts/
+echo "✓ Restored migration script"
+
+# 3. Re-run migration
+node scripts/migrate-to-templates.js --dry-run
+echo ""
+read -p "Dry-run looks good? Apply migration? [y/N] " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  node scripts/migrate-to-templates.js --apply
+  echo "✓ Re-migration complete"
+else
+  echo "❌ Aborted. Restoring backup..."
+  rm -rf templates
+  mv "$BACKUP_DIR" templates
+fi
+```
+
+**Recovery checklist:**
+- [ ] Backup current `/templates/` before re-migration
+- [ ] Restore migration script from `.archive/`
+- [ ] Apply fixes to migration script
+- [ ] Run dry-run mode first
+- [ ] Manually review diff output
+- [ ] Run full 3-tier validation
+- [ ] Test installations on both platforms
+- [ ] Commit corrected templates
+- [ ] Update archive with fixed migration code
 
 ## Ready for Phase 1
 
-### What We Know (High Confidence)
+### What We Know (High Confidence) ✅
 
-✅ **Technology stack** — All versions verified, bundle size acceptable  
-✅ **Official frontmatter specs** — Verified against Claude & GitHub docs  
-✅ **Unsupported fields** — Documented which fields to remove  
+✅ **Phase separation architecture** — Two distinct concerns, two distinct stacks  
+✅ **Technology stack** — Phase 1 temporary (gray-matter, js-yaml, ajv), Phase 2+ permanent (commander, prompts)  
+✅ **Official frontmatter specs** — Verified against Claude & GitHub docs, unsupported fields identified  
 ✅ **Tool name mappings** — Complete mapping table from official docs  
-✅ **Critical risks** — Identified with concrete mitigations  
-✅ **Architecture pattern** — Functional pipeline with adapters  
-✅ **Path rewriting strategy** — Simple string replacement, no template engine  
+✅ **Critical risks** — Identified with concrete mitigations for both phases  
+✅ **Migration risks** — Mass corruption, premature deletion, incomplete validation  
+✅ **Installation risks** — Partial installation, path traversal, directory conflicts  
+✅ **Validation strategy** — 3-tier validation (static, semantic, runtime)  
+✅ **Emergency recovery** — Documented procedure, archived migration code
 
 ### What to Build First (Phase 1 MVP)
 
-**Goal:** Validate core transformation pipeline with one platform.
+**Goal:** Validate core migration pipeline with comprehensive safeguards.
 
 **Scope:**
-1. Read template files from disk
+1. Read 42 template files from `.github/`
 2. Parse YAML frontmatter with `gray-matter`
-3. Transform frontmatter using adapter
-4. Remove unsupported fields (AST-based, not regex)
-5. Generate `version.json` for extracted metadata
-6. Write transformed files to target directory
-7. Validate with single platform (Claude recommended)
-
-**Technologies:**
-- `commander` for CLI parsing
-- `gray-matter` for frontmatter extraction
-- `yaml` for AST-based manipulation
-- `fs-extra` for file operations
-- `vitest` for testing
+3. Remove unsupported fields (AST-based, NOT regex)
+4. Fix field naming (`tools` → `allowed-tools` for Claude)
+5. Convert tool arrays to platform-specific formats
+6. Replace `arguments` with `argument-hint`
+7. Generate `version.json` for extracted metadata
+8. Insert template variables (`{{INSTALL_DIR}}`, etc.)
+9. Write transformed files to `/templates/`
+10. Run 3-tier validation
+11. Generate validation report
+12. Archive migration code to `.archive/phase-1-migration/`
 
 **Success Criteria:**
-- [ ] Read all 42 template files
-- [ ] Parse frontmatter without errors
-- [ ] Remove unsupported fields cleanly
-- [ ] Transform tools correctly (Copilot → Claude)
-- [ ] Generate version.json for each file
-- [ ] Write to `.claude/` directory
-- [ ] No YAML structure corruption
-- [ ] All tests pass
+- [ ] All 42 templates migrate without errors
+- [ ] Dry-run mode shows accurate diffs
+- [ ] All 3-tier validation checks pass
+- [ ] Test installation succeeds on both platforms
+- [ ] Skills load without errors in real CLIs
+- [ ] Emergency recovery procedure tested
+- [ ] Migration code archived (not deleted)
+- [ ] Validation report committed to git
 
 **What to Defer:**
 - ❌ Interactive prompts (Phase 2)
-- ❌ Multi-platform support (Phase 2)
-- ❌ Transaction rollback (Phase 2)
-- ❌ Path traversal protection (basic validation only)
-- ❌ Windows testing (Phase 3)
+- ❌ Multi-platform support beyond Claude/GitHub (Phase 3)
+- ❌ Plugin system (Phase 4+)
+- ❌ CI/CD integration (Phase 2)
+
+**Estimated Duration:** 3-5 days for Phase 1 (migration + validation + archiving)
 
 ### Next Steps
 
-1. **Analyze existing templates** — Run script to extract YAML variations from 42 files
-2. **Create transformation spec** — Document exact field mappings per platform
-3. **Implement reader → parser → transform pipeline** — Start with simplest path
-4. **Test with real files** — Validate against actual templates, not synthetic examples
-5. **Add basic validation** — Ensure output matches official specs
-6. **Write integration tests** — End-to-end tests with real template files
+1. **Implement migration script** — `scripts/migrate-to-templates.js` with dry-run mode
+2. **Add 3-tier validation** — Static (ajv), semantic (custom), runtime (integration tests)
+3. **Test emergency recovery** — Verify archive and re-migration procedure works
+4. **Run full migration** — Convert all 42 files with validation
+5. **Test installations** — Verify on both Claude and GitHub platforms
+6. **Archive migration code** — Move to `.archive/phase-1-migration/`
+7. **Document recovery procedure** — Add to README and script comments
+8. **Commit everything** — Templates, version files, validation report, archive
 
-**Estimated effort:** 3-5 days for Phase 1 MVP (single platform, basic transformation)
+**Blocked by:** Nothing — all research complete, ready to start Phase 1 ✅
 
 ---
 
@@ -802,21 +956,22 @@ class InstallTransaction {
 
 | Area | Confidence | Source Quality | Notes |
 |------|------------|----------------|-------|
-| **Technology Stack** | **HIGH** | npm registry, official docs | All versions verified Jan 2026 |
-| **Platform Specs** | **HIGH** | Official Claude & GitHub docs | Comprehensive field tables |
-| **Tool Mappings** | **HIGH** | Official tool alias docs | Complete mapping verified |
-| **Architecture** | **MEDIUM-HIGH** | Established patterns | Proven patterns, but untested in this context |
-| **YAML Transformation** | **HIGH** | YAML spec, `yaml` package | AST manipulation is standard approach |
-| **Risks & Mitigation** | **HIGH** | Real-world installer failures | Concrete examples from npm ecosystem |
-| **Windows Support** | **MEDIUM** | Logical inference | Not tested on Windows yet |
-| **Template Security** | **MEDIUM** | OWASP guidelines | Needs deeper research in later phase |
+| **Phase separation** | **HIGH** | Migration patterns, ETL pipelines | Clear architectural boundary |
+| **Technology stack (Phase 1)** | **HIGH** | npm registry, package docs | All versions verified |
+| **Technology stack (Phase 2)** | **HIGH** | npm registry, package docs | All versions verified |
+| **Platform specs** | **HIGH** | Official Claude & GitHub docs | Comprehensive field tables |
+| **Tool mappings** | **HIGH** | Official tool alias docs | Complete mapping verified |
+| **Migration risks** | **HIGH** | Real-world migration failures | Concrete examples, proven mitigations |
+| **Installation risks** | **HIGH** | Real-world installer failures | Transaction pattern established |
+| **Validation strategy** | **HIGH** | Testing best practices | 3-tier approach proven in industry |
+| **Emergency recovery** | **MEDIUM-HIGH** | Git workflows, backup patterns | Procedure documented but untested |
 
-**Overall Confidence: HIGH** — Sufficient to start Phase 1 implementation.
+**Overall Confidence: HIGH** — Sufficient to start Phase 1 implementation immediately.
 
 **Gaps:**
-- Windows testing (needs real environment)
-- Plugin system design (Phase 3, not urgent)
-- Template variations (analyze 42 files before implementing)
+- Emergency recovery untested (test during Phase 1)
+- Windows-specific edge cases (test during Phase 2)
+- Codex platform specs (research during Phase 3)
 
 ---
 
@@ -832,7 +987,8 @@ class InstallTransaction {
 
 **Package Documentation:**
 - gray-matter: https://github.com/jonschlinkert/gray-matter
-- yaml: https://eemeli.org/yaml/
+- js-yaml: https://github.com/nodeca/js-yaml
+- ajv: https://ajv.js.org/
 - commander: https://github.com/tj/commander.js
 - fs-extra: https://github.com/jprichardson/node-fs-extra
 - @clack/prompts: https://github.com/bombshell-dev/clack
@@ -844,29 +1000,34 @@ class InstallTransaction {
 
 ### Secondary Sources (MEDIUM Confidence)
 
-**Reference Implementations:**
-- create-vite: https://github.com/vitejs/vite/tree/main/packages/create-vite
-- create-react-app patterns (archive)
-- ESLint plugin system: https://eslint.org/docs/latest/extend/plugins
-
 **Design Patterns:**
+- Database migration patterns (Flyway, Liquibase)
+- ETL pipeline architecture
 - Domain-driven design principles
 - Functional pipeline architecture
 - Adapter pattern (Gang of Four)
 - Transaction pattern (database systems)
 
+**Reference Implementations:**
+- create-vite: https://github.com/vitejs/vite/tree/main/packages/create-vite
+- ESLint plugin system: https://eslint.org/docs/latest/extend/plugins
+- Babel plugin system: https://babeljs.io/docs/en/plugins
+
 **Security:**
-- OWASP Path Traversal Prevention: https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Cheat_Sheet.html
-- npm security advisories
+- OWASP Path Traversal: https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Cheat_Sheet.html
+- npm security best practices
 
 ### Tertiary Sources (Needs Validation)
 
-- Windows path handling (not tested on real Windows)
-- Template security sandboxing (needs deeper research)
-- Platform spec evolution (can't predict vendor changes)
+- Codex platform specifications (not yet researched)
+- Windows path handling edge cases (not tested on real Windows)
+- Plugin system for Phase 4+ (not researched yet)
 
 ---
 
 **Research Date:** 2025-01-26  
+**Re-researched Date:** 2025-01-26 (with migration architecture)  
 **Synthesized By:** gsd-research-synthesizer  
 **Status:** ✅ READY FOR PHASE 1 PLANNING
+
+**Key Insight:** This project has TWO DISTINCT PHASES with different technology needs. Phase 1 (migration) is temporary code that will be archived. Phase 2+ (installation) is permanent code with no YAML parsing. Do NOT mix these concerns.
