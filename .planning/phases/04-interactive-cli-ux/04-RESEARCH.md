@@ -1,6 +1,6 @@
 # Phase 4: Interactive CLI with Beautiful UX - Research
 
-**Researched:** 2025-01-26 (Updated: 2025-01-26 with global detection check pattern)
+**Researched:** 2025-01-26 (Updated: 2025-01-26 with global detection check pattern; 2025-01-27 with adapter architecture)
 **Domain:** Interactive CLI / Terminal UI
 **Confidence:** HIGH
 
@@ -10,11 +10,11 @@ Interactive CLI development requires three core libraries working together: **@c
 
 @clack/prompts provides opinionated, pre-styled components (text, confirm, select, multiselect) with built-in support for disabled options, hints, and graceful cancellation. The confirm() component is ideal for warning prompts with yes/no choices. cli-progress MultiBar instances are fully reusable across different phases of the application, allowing consistent progress display between CLI and interactive modes. Cross-platform binary detection requires platform-specific commands (which/where) with timeout protection.
 
-The architecture follows a "detect → warn → prompt → execute → display" pattern: detect environment (TTY, binaries), warn if no platforms detected with confirmation, prompt user with context-aware options, execute installation with shared progress renderer, display results with consistent formatting. Critical: Global detection check (zero platforms) happens BEFORE platform selection to prevent deadlock with all-disabled menu.
+The architecture follows an **Adapter → Core pattern**: CLI mode and Interactive mode are ADAPTERS that gather parameters differently, then call the SAME installation core. This eliminates code duplication and ensures consistent behavior. The installation flow is: "detect → warn → prompt → execute → display" (detect environment (TTY, binaries), warn if no platforms detected with confirmation, prompt user with context-aware options, execute installation with shared progress renderer, display results with consistent formatting). Critical: Global detection check (zero platforms) happens BEFORE platform selection to prevent deadlock with all-disabled menu.
 
 Exit code conventions matter: exit code 0 for success AND user cancellation/declining (intentional choice), exit code 1 for actual errors (installation failure), exit code 2 for misuse (invalid flags).
 
-**Primary recommendation:** Use @clack/prompts for all interactive prompts including warning confirmations, reuse existing cli-progress MultiBar from Phase 2/3, leverage built-in Node.js TTY detection (process.stdin.isTTY) for automatic fallback to non-interactive mode, and implement global detection check before platform selection.
+**Primary recommendation:** Use @clack/prompts for all interactive prompts including warning confirmations, reuse existing cli-progress MultiBar from Phase 2/3, leverage built-in Node.js TTY detection (process.stdin.isTTY) for automatic fallback to non-interactive mode, implement global detection check before platform selection, and use Adapter → Core pattern to eliminate duplicate code between modes.
 
 ## Standard Stack
 
@@ -50,21 +50,85 @@ npm install @clack/prompts@^0.11.0
 
 ## Architecture Patterns
 
-### Recommended Project Structure
+### Recommended Project Structure (Updated)
 ```
 bin/
-├── install.js              # Entry point, detects interactive vs CLI mode
+├── install.js                   # Entry point - CLI mode adapter
 ├── lib/
 │   ├── cli/
-│   │   ├── logger.js       # Existing colored output (reuse)
-│   │   ├── progress.js     # Existing MultiBar factory (reuse)
-│   │   └── interactive.js  # NEW: Interactive prompt orchestrator
+│   │   ├── installation-core.js # SHARED: Core installation function
+│   │   ├── next-steps.js        # SHARED: Next steps with command prefix handling
+│   │   ├── interactive.js       # Interactive mode adapter
+│   │   ├── logger.js            # SHARED: Colored output (reuse)
+│   │   ├── progress.js          # SHARED: MultiBar factory (reuse)
+│   │   └── README.md            # Architecture documentation
 │   ├── platforms/
-│   │   ├── binary-detector.js  # Existing: CLI detection (enhance)
-│   │   └── detector.js     # Existing: Version detection
+│   │   ├── binary-detector.js   # Existing: CLI detection (enhance)
+│   │   └── detector.js          # Existing: Version detection
 │   └── installer/
-│       └── orchestrator.js # Existing: Installation logic (reuse)
+│       └── orchestrator.js      # SHARED: Per-platform installation logic
 ```
+
+### Pattern 0: Adapter → Core Architecture (CRITICAL)
+**What:** CLI and Interactive modes are adapters that gather parameters, then call shared installation core
+**When to use:** Always - this is the foundational pattern for the entire CLI architecture
+**Why:** Eliminates duplicate code, ensures consistent behavior, single source of truth
+**Example:**
+```javascript
+// Source: Design pattern - Adapter pattern for mode independence
+
+// bin/install.js (CLI Mode Adapter)
+import { installPlatforms } from './lib/cli/installation-core.js';
+
+async function main() {
+  // Parse command-line flags
+  const platforms = [];
+  if (options.claude) platforms.push('claude');
+  if (options.copilot) platforms.push('copilot');
+  if (options.codex) platforms.push('codex');
+  
+  const scope = options.global ? 'global' : 'local';
+  
+  // Call shared core
+  await installPlatforms(platforms, scope, {
+    scriptDir: __dirname,
+    showBanner: true,
+    verbose: options.verbose
+  });
+}
+
+// bin/lib/cli/interactive.js (Interactive Mode Adapter)
+import { installPlatforms } from './installation-core.js';
+
+export async function runInteractive() {
+  // Show prompts
+  const { platforms, scope } = await promptSelections();
+  
+  // Call same shared core
+  await installPlatforms(platforms, scope, {
+    scriptDir: getScriptDir(import.meta.url),
+    showBanner: false // Already showed banner
+  });
+}
+
+// bin/lib/cli/installation-core.js (Shared Core)
+export async function installPlatforms(platforms, scope, options) {
+  // Single implementation used by both modes
+  for (const platform of platforms) {
+    await install({ platform, isGlobal: scope === 'global', ... });
+  }
+  showNextSteps(platforms);
+}
+```
+
+**Key principles:**
+- Adapters: CLI mode (parse flags) and Interactive mode (show prompts)
+- Core: Single installPlatforms() function with all installation logic
+- Both modes call the same core function with the same parameters
+- No mode-specific code in the core
+- No installation logic in the adapters
+
+See `bin/lib/cli/README.md` for complete architecture documentation.
 
 ### Pattern 1: TTY Detection and Mode Selection
 **What:** Detect if running in interactive terminal and fallback gracefully
