@@ -1,25 +1,411 @@
-# Platform Differences: Claude vs GitHub Copilot CLI
+# Platform Differences: Claude Code vs GitHub Copilot CLI
 
-**Research Date:** 2025-01-25
-**Confidence:** HIGH (based on existing codebase analysis)
-**Source:** Direct comparison of `.claude/` vs `.github/` implementations
+**Research Date:** 2025-01-26
+**Confidence:** HIGH (verified against official documentation)
+**Sources:** 
+- Claude skills: https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+- Claude agents: https://code.claude.com/docs/en/sub-agents
+- Copilot agents: https://docs.github.com/en/copilot/reference/custom-agents-configuration
+- Copilot tool aliases: https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
 
 ---
 
 ## Executive Summary
 
-Claude and GitHub Copilot CLI share similar extensibility models but differ in:
-1. **Directory structure** - `.claude/` vs `.github/` roots, different skill locations
-2. **File naming** - Agents use `.md` vs `.agent.md`, skills live in subdirectories
-3. **Tool syntax** - Capitalized comma-separated vs lowercase JSON arrays
-4. **Metadata requirements** - GitHub requires additional `metadata` block
-5. **Path references** - `~/.claude/` vs `.github/` prefixes for shared resources
+Claude Code and GitHub Copilot CLI have **significantly different frontmatter specifications** that require careful handling:
 
-Both platforms support the same core capabilities: agents (sub-agents), skills (slash commands), hooks, and shared resources.
+### Critical Differences
+
+1. **Skills frontmatter** - Claude: `allowed-tools` (comma-separated), GitHub: `tools` (array/string)
+2. **Tool name capitalization** - Claude: `Read, Bash, Task`, GitHub: case-insensitive but typically lowercase
+3. **Unsupported fields** - `skill_version`, `requires_version`, `platforms`, `arguments`, `metadata` are NOT in official specs
+4. **Agents-specific** - Claude: `tools` (string), `skills` field; GitHub: `tools` (array), no `skills` field
+5. **Arguments handling** - Claude: `argument-hint` (string), NOT `arguments` (array)
+
+### Key Finding
+
+**CRITICAL:** The current codebase uses fields (`skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`) that are **NOT supported** by official documentation for either platform. These must be removed from frontmatter and stored separately if needed.
 
 ---
 
-## Directory Structure Comparison
+## Part 1: Official Frontmatter Specifications
+
+### Claude Code Skills - OFFICIAL Fields
+
+**Source:** https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | No | string | Display name (lowercase, hyphens, max 64 chars). Defaults to directory name |
+| `description` | Recommended | string | What the skill does and when to use it |
+| `argument-hint` | No | string | Hint shown during autocomplete (e.g., `[filename]`, `[issue-number]`) |
+| `disable-model-invocation` | No | boolean | `true` = prevent auto-loading, manual `/name` only (default: `false`) |
+| `user-invocable` | No | boolean | `false` = hide from `/` menu (default: `true`) |
+| `allowed-tools` | No | string | **Comma-separated** tool names (e.g., `Read, Bash, Task`) |
+| `model` | No | string | Model to use when skill is active |
+| `context` | No | string | Set to `fork` to run in subagent |
+| `agent` | No | string | Which subagent type when `context: fork` |
+| `hooks` | No | object | Hooks scoped to skill lifecycle |
+
+**All fields are optional.** Only `description` is recommended.
+
+**Example:**
+```yaml
+---
+name: explain-code
+description: Explains code with visual diagrams and analogies
+argument-hint: "[file-path]"
+allowed-tools: Read, Grep, Glob
+---
+```
+
+### Claude Code Agents (Sub-agents) - OFFICIAL Fields
+
+**Source:** https://code.claude.com/docs/en/sub-agents
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | Yes | string | Unique identifier (lowercase, hyphens) |
+| `description` | Yes | string | When to delegate to this subagent |
+| `tools` | No | string | **Comma-separated** tool names the subagent can use |
+| `disallowedTools` | No | string | Tools to deny |
+| `model` | No | string | `sonnet`, `opus`, `haiku`, `inherit` (default: `inherit`) |
+| `permissionMode` | No | string | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan` |
+| `skills` | No | array | Skills to pre-load into subagent context at startup |
+| `hooks` | No | object | Lifecycle hooks scoped to this subagent |
+
+**Only `name` and `description` are required.**
+
+**Example:**
+```yaml
+---
+name: code-reviewer
+description: Analyze code and provide specific, actionable feedback on quality, security, and best practices
+tools: Read, Grep, Glob
+model: sonnet
+skills: [code-standards, security-checklist]
+---
+```
+
+### GitHub Copilot CLI Agents - OFFICIAL Fields
+
+**Source:** https://docs.github.com/en/copilot/reference/custom-agents-configuration
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `name` | No | string | Display name |
+| `description` | Yes | string | Agent purpose and capabilities |
+| `target` | No | string | Environment: `vscode` or `github-copilot` (default: both) |
+| `tools` | No | array or string | Tool names (default: all tools enabled) |
+| `infer` | No | boolean | Auto-invoke based on context (default: `true`) |
+| `mcp-servers` | No | object | Additional MCP server configuration |
+
+**Notes:**
+- Tools can be array (`['read', 'edit']`) or string
+- Tool names are **case insensitive**
+- `metadata` field is **NOT in official specification**
+- No equivalent to Claude's `skills` field
+
+**Example:**
+```yaml
+---
+name: test-specialist
+description: Focuses on test coverage, quality, and testing best practices
+tools: ["read", "search", "edit"]
+---
+```
+
+---
+
+## Part 2: Unsupported Fields (Must Remove)
+
+### Fields NOT in Official Specifications
+
+The following fields appear in the current codebase but are **NOT supported** by official documentation:
+
+| Field | Found In | Status |
+|-------|----------|--------|
+| `skill_version` | All skills | ❌ NOT SUPPORTED - Remove from frontmatter |
+| `requires_version` | All skills | ❌ NOT SUPPORTED - Remove from frontmatter |
+| `platforms` | All skills | ❌ NOT SUPPORTED - Remove from frontmatter |
+| `arguments` | All skills | ❌ NOT SUPPORTED - Use `argument-hint` instead |
+| `metadata` | Skills & agents | ❌ NOT SUPPORTED - Remove from frontmatter |
+
+### Correct Approach
+
+**Store unsupported metadata in separate version files:**
+
+#### For Skills: `version.json` per skill
+```json
+{
+  "skill_version": "1.9.1",
+  "requires_version": "1.9.0+",
+  "platforms": ["claude", "copilot"],
+  "metadata": {
+    "generated": "2026-01-24",
+    "templateVersion": "1.0.0"
+  }
+}
+```
+
+#### For Agents: Single `versions.json` for all agents
+```json
+{
+  "agents": {
+    "gsd-executor": {
+      "version": "1.9.1",
+      "platforms": ["claude", "copilot"],
+      "metadata": {
+        "generated": "2026-01-24"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Part 3: Tool Name Mappings
+
+### Official Tool Aliases
+
+**Source:** https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
+
+GitHub Copilot supports **case-insensitive** tool aliases. Claude uses capitalized canonical names.
+
+| Primary (Copilot) | Claude Canonical | Compatible Aliases | Purpose |
+|-------------------|------------------|--------------------|---------|
+| `execute` | `Bash` | `shell`, `Bash`, `powershell` | Execute shell command |
+| `read` | `Read` | `Read`, `NotebookRead` | Read file contents |
+| `edit` | `Edit` or `Write` | `Edit`, `MultiEdit`, `Write`, `NotebookEdit` | File editing |
+| `search` | `Grep` or `Glob` | `Grep`, `Glob` | Search files/text |
+| `agent` | `Task` | `custom-agent`, `Task` | Delegate to agent |
+| `web` | `WebSearch`, `WebFetch` | `WebSearch`, `WebFetch` | Web access |
+| `todo` | `TodoWrite` | `TodoWrite` | Task list management |
+
+### Tool Format Differences
+
+**Claude Code:**
+```yaml
+tools: Read, Write, Bash, Grep, Task
+```
+- Format: Comma-separated string
+- Capitalization: Capitalized (e.g., `Read`, `Bash`)
+- Field name (skills): `allowed-tools`
+- Field name (agents): `tools`
+
+**GitHub Copilot:**
+```yaml
+tools: ["read", "edit", "execute", "search", "agent"]
+```
+- Format: Array or comma-separated string
+- Capitalization: Case-insensitive (typically lowercase)
+- Field name: `tools` (both skills and agents)
+
+### Transformation Algorithm
+
+**Copilot → Claude:**
+```javascript
+function copilotToClaude(tools) {
+  const map = {
+    'execute': 'Bash',
+    'shell': 'Bash',
+    'read': 'Read',
+    'edit': 'Edit',  // or 'Write' depending on context
+    'write': 'Write',
+    'search': 'Grep',  // or 'Glob' for pattern matching
+    'agent': 'Task',
+    'web': 'WebSearch',  // May not be supported
+    'websearch': 'WebSearch',
+    'webfetch': 'WebFetch',
+    'todo': 'TodoWrite'
+  };
+  
+  return Array.isArray(tools)
+    ? tools.map(t => map[t.toLowerCase()] || t).join(', ')
+    : tools;  // Already string format
+}
+```
+
+**Claude → Copilot:**
+```javascript
+function claudeToCopilot(tools) {
+  const map = {
+    'Read': 'read',
+    'Write': 'edit',
+    'Edit': 'edit',
+    'Bash': 'execute',
+    'Grep': 'search',
+    'Glob': 'search',
+    'Task': 'agent',
+    'WebSearch': 'web',
+    'WebFetch': 'web',
+    'TodoWrite': 'todo'
+  };
+  
+  const toolList = typeof tools === 'string'
+    ? tools.split(',').map(t => t.trim())
+    : tools;
+    
+  // Deduplicate (Write+Edit both → 'edit')
+  return [...new Set(toolList.map(t => map[t] || t.toLowerCase()))];
+}
+```
+
+---
+
+## Part 4: Arguments Handling
+
+### Claude: `argument-hint` (String)
+
+**Official field:** `argument-hint`
+**Format:** String hint for autocomplete
+**Examples:**
+- `"[filename]"`
+- `"[issue-number]"`
+- `"[domain]"`
+- `"[file-path] [format]"`
+
+```yaml
+---
+name: gsd-new-project
+argument-hint: "[domain]"
+---
+```
+
+### Current (Invalid): `arguments` (Array)
+
+**NOT SUPPORTED:**
+```yaml
+---
+arguments:
+  - name: domain
+    type: string
+    required: false
+    description: Project domain or type
+---
+```
+
+### Conversion Logic
+
+Transform `arguments` array → `argument-hint` string:
+
+```javascript
+function generateArgumentHint(arguments) {
+  if (!arguments || arguments.length === 0) return null;
+  
+  // Generate hint from argument names
+  const hints = arguments.map(arg => {
+    const bracket = arg.required ? `<${arg.name}>` : `[${arg.name}]`;
+    return bracket;
+  });
+  
+  return hints.join(' ');
+}
+
+// Example:
+// Input: [{name: "domain", required: false}, {name: "template", required: false}]
+// Output: "[domain] [template]"
+```
+
+---
+
+## Part 5: Platform-Specific Fields
+
+### Claude-Specific Features
+
+**Skills field (agents only):**
+```yaml
+---
+name: research-agent
+skills: [questioning, research-patterns]
+---
+```
+- Pre-loads full skill content into agent context
+- Not available in GitHub Copilot
+- **Omit when generating GitHub agents**
+
+**Context forking (skills only):**
+```yaml
+---
+context: fork
+agent: Explore
+---
+```
+- Runs skill in subagent context
+- Not available in GitHub Copilot
+- **Omit when generating GitHub skills**
+
+### GitHub Copilot-Specific Features
+
+**MCP Servers:**
+```yaml
+---
+mcp-servers:
+  custom-mcp:
+    type: 'local'
+    command: 'some-command'
+---
+```
+- Configures Model Context Protocol servers
+- Not available in Claude Code (uses separate config)
+- **Omit when generating Claude agents**
+
+**Target environment:**
+```yaml
+---
+target: vscode
+---
+```
+- Restricts where agent runs
+- Not available in Claude Code
+- **Omit when generating Claude agents**
+
+---
+
+## Part 6: Validation Rules
+
+### Skills Validation
+
+**Claude Code:**
+```bash
+✓ Field name: allowed-tools (not tools)
+✓ Format: string (not array)
+✓ Capitalization: Read, Bash, Task
+✓ No unsupported fields
+✗ skill_version, requires_version, platforms, arguments, metadata
+```
+
+**GitHub Copilot:**
+```bash
+✓ Field name: tools (not allowed-tools)
+✓ Format: array or string
+✓ Case: insensitive
+✓ No unsupported fields
+✗ skill_version, requires_version, platforms, arguments, metadata
+```
+
+### Agents Validation
+
+**Claude Code:**
+```bash
+✓ Required: name, description
+✓ tools format: string
+✓ skills field: optional array
+✗ metadata block
+```
+
+**GitHub Copilot:**
+```bash
+✓ Required: description
+✓ tools format: array or string
+✗ skills field
+✗ metadata block
+```
+
+---
+
+## Part 7: Directory Structure Comparison
 
 ### Claude Code Structure
 ```
@@ -66,709 +452,631 @@ Both platforms support the same core capabilities: agents (sub-agents), skills (
 
 ---
 
-## Frontmatter Field Mapping
+## Part 8: Correct vs Incorrect Examples
 
-### Agents (Sub-agents)
+### Skills - BEFORE (Incorrect)
 
-#### Claude Agent Frontmatter
 ```yaml
 ---
-name: agent-name
-description: Agent purpose and context
-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, Task
----
-```
-
-#### GitHub Copilot Agent Frontmatter
-```yaml
----
-name: agent-name
-description: Agent purpose and context
-tools: [read, edit, execute, search, agent]
-metadata:
+name: gsd-new-project
+description: Orchestrate project initialization
+skill_version: 1.9.1                      # ❌ NOT SUPPORTED
+requires_version: 1.9.0+                  # ❌ NOT SUPPORTED
+platforms: [claude, copilot, codex]      # ❌ NOT SUPPORTED
+tools: [read, edit, execute, agent]      # ❌ WRONG FIELD NAME
+arguments:                                # ❌ NOT SUPPORTED
+  - name: domain
+    type: string
+    required: false
+metadata:                                 # ❌ NOT SUPPORTED
   platform: copilot
   generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'project-name'
 ---
 ```
 
-**Differences:**
-| Field | Claude | GitHub Copilot | Required? |
-|-------|--------|----------------|-----------|
-| `name` | Present | Present | Both ✓ |
-| `description` | Present | Present | Both ✓ |
-| `tools` | Comma-separated, capitalized | JSON array, lowercase | Both ✓ |
-| `metadata` | Not present | Required block | GitHub only |
+### Skills - AFTER (Correct - Claude)
 
-### Skills (Slash Commands)
-
-#### Claude Skill Frontmatter
 ```yaml
 ---
-name: command-name
-description: Command purpose
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash, Task
-arguments: [{name: arg1, type: string, required: false, description: 'Arg description'}]
+name: gsd-new-project
+description: Orchestrate project initialization with parallel research and roadmap creation
+argument-hint: "[domain]"
+allowed-tools: Read, Write, Bash, Task
 ---
 ```
 
-#### GitHub Copilot Skill Frontmatter
+**Removed fields stored in `version.json`:**
+```json
+{
+  "skill_version": "1.9.1",
+  "requires_version": "1.9.0+",
+  "platforms": ["claude", "copilot"],
+  "metadata": {
+    "generated": "2026-01-24",
+    "templateVersion": "1.0.0"
+  }
+}
+```
+
+### Skills - AFTER (Correct - GitHub)
+
 ```yaml
 ---
-name: command-name
-description: Command purpose
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute, agent]
-arguments: [{name: arg1, type: string, required: false, description: 'Arg description'}]
-metadata:
+name: gsd-new-project
+description: Orchestrate project initialization with parallel research and roadmap creation
+argument-hint: "[domain]"
+tools: ["read", "edit", "execute", "agent"]
+---
+```
+
+**Note:** Same `version.json` file (platform-agnostic metadata)
+
+### Agents - BEFORE (Incorrect)
+
+```yaml
+---
+name: gsd-executor
+description: Executes GSD plans with atomic commits
+tools: [read, edit, execute, search]     # ❌ Array format, wrong names
+metadata:                                 # ❌ NOT SUPPORTED
   platform: copilot
   generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'project-name'
 ---
 ```
 
-**Differences:**
-| Field | Claude | GitHub Copilot | Notes |
-|-------|--------|----------------|-------|
-| `name` | Present | Present | Identical |
-| `description` | Present | Present | Identical |
-| `skill_version` | Present | Present | Identical |
-| `requires_version` | Present | Present | Identical |
-| `platforms` | Array | Array | Identical |
-| `tools` | Comma-separated | JSON array | Different syntax |
-| `arguments` | JSON array | JSON array | Identical structure |
-| `metadata` | Not present | Required block | GitHub only |
+### Agents - AFTER (Correct - Claude)
 
----
-
-## Tool Name Mappings
-
-Tools are the primary difference between platforms. GitHub Copilot uses standardized tool names with aliases.
-
-### Tool Mapping Table
-
-| Claude Tool | GitHub Copilot Tool | Category | Notes |
-|-------------|---------------------|----------|-------|
-| `Read` | `read` | File I/O | Case difference |
-| `Write` | `edit` | File I/O | **Name change** - GitHub uses `edit` for creation & modification |
-| `Edit` | `edit` | File I/O | GitHub consolidates Write/Edit into `edit` |
-| `Bash` | `execute` | Shell | **Name change** |
-| `Grep` | `search` | Code search | **Name change** |
-| `Glob` | `search` | File search | GitHub consolidates into `search` |
-| `WebSearch` | Not available* | Web | Claude-specific (or MCP extension) |
-| `WebFetch` | Not available* | Web | Claude-specific (or MCP extension) |
-| `Task` | `agent` | Delegation | **Name change** |
-| `TodoWrite` | Not available* | Special | Claude-specific |
-| `AskUserQuestion` | Direct chat | User interaction | Not a tool, handled differently |
-| `mcp__context7__*` | Not available* | MCP | Claude-specific extensions |
-
-\*GitHub Copilot may support these through extensions, but not in base configuration.
-
-### Tool Transformation Rules
-
-When converting Claude → GitHub Copilot:
-```javascript
-const toolMap = {
-  'Read': 'read',
-  'Write': 'edit',
-  'Edit': 'edit',
-  'Bash': 'execute',
-  'Grep': 'search',
-  'Glob': 'search',
-  'Task': 'agent',
-  // Platform-specific tools that may need removal or special handling
-  'WebSearch': null,      // Remove or flag as unavailable
-  'WebFetch': null,       // Remove or flag as unavailable
-  'TodoWrite': null,      // Remove or flag as unavailable
-  'AskUserQuestion': null // Convert to instruction to ask in chat
-};
-
-// Algorithm:
-// 1. Split Claude tools by comma
-// 2. Trim whitespace
-// 3. Map to GitHub equivalent
-// 4. Remove nulls (unavailable tools)
-// 5. Deduplicate (Write+Edit both → 'edit')
-// 6. Output as JSON array
-```
-
-Example transformation:
-```yaml
-# Claude
-tools: Read, Write, Edit, Bash, Grep, Glob, Task
-
-# GitHub Copilot
-tools: [read, edit, execute, search, agent]
-```
-
----
-
-## Path Reference Transformations
-
-File references use `@` prefix but differ in root paths.
-
-### Claude Path References
-```markdown
-# Absolute platform paths (in skill root directory context)
-@~/.claude/get-shit-done/references/questioning.md
-@~/.claude/get-shit-done/templates/project.md
-
-# Relative project paths (same across platforms)
-@.planning/PROJECT.md
-@.planning/ROADMAP.md
-```
-
-### GitHub Copilot Path References
-```markdown
-# Absolute platform paths
-@.github/get-shit-done/references/questioning.md
-@.github/get-shit-done/templates/project.md
-
-# Relative project paths (same across platforms)
-@.planning/PROJECT.md
-@.planning/ROADMAP.md
-```
-
-### Transformation Rules
-
-| Pattern | Claude | GitHub Copilot |
-|---------|--------|----------------|
-| Platform root | `~/.claude/` | `.github/` |
-| Shared resources | `~/.claude/get-shit-done/` | `.github/get-shit-done/` |
-| Skill location (runtime) | `/home/sandbox/Library/Application Support/Claude/skills/` | `/workspace/.github/copilot/skills/` |
-| Agent location (runtime) | `/home/sandbox/Library/Application Support/Claude/agents/` | `/workspace/.github/copilot/agents/` |
-| Project files | `.planning/` | `.planning/` (no change) |
-
-**Transformation algorithm:**
-```javascript
-function transformPath(claudePath) {
-  return claudePath
-    .replace(/^@~\/.claude\//, '@.github/')
-    .replace(/\/home\/sandbox\/Library\/Application Support\/Claude\//, '/workspace/.github/copilot/')
-}
-```
-
----
-
-## Platform-Specific Requirements
-
-### Claude Code Requirements
-
-1. **File naming:**
-   - Agents: `{name}.md`
-   - Skills: `{command-name}/SKILL.md`
-
-2. **Tool syntax:**
-   - Comma-separated list
-   - Capitalized tool names
-   - Example: `tools: Read, Write, Bash`
-
-3. **Settings:**
-   - Optional `settings.json` for hooks and statusLine
-
-4. **Hooks:**
-   - Supported via `.claude/hooks/`
-   - Can be JavaScript or shell scripts
-
-### GitHub Copilot CLI Requirements
-
-1. **File naming:**
-   - Agents: `{name}.agent.md` (must include `.agent` suffix)
-   - Skills: `{command-name}/SKILL.md` (same as Claude)
-
-2. **Tool syntax:**
-   - JSON array format
-   - Lowercase tool names
-   - Example: `tools: [read, edit, execute]`
-
-3. **Metadata block:**
-   - **Required** in frontmatter
-   - Must include: `platform`, `generated`, `templateVersion`, `projectVersion`, `projectName`
-   - Example:
-     ```yaml
-     metadata:
-       platform: copilot
-       generated: '2026-01-24'
-       templateVersion: 1.0.0
-       projectVersion: 1.9.0
-       projectName: 'project-name'
-     ```
-
-4. **Hooks:**
-   - No direct equivalent discovered
-   - May need alternative implementation
-
-5. **Tool aliases (official documentation):**
-   - Supports aliasing common tool patterns
-   - Documented at: https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
-   - Not yet implemented in observed codebase
-
----
-
-## Shared Patterns (No Transformation Needed)
-
-These elements are identical across platforms:
-
-1. **Skill directory structure:**
-   - One directory per skill
-   - `SKILL.md` in each directory
-   - Additional files (VERSION, CHANGELOG.md) supported
-
-2. **Shared resources structure:**
-   - `references/` for reference documentation
-   - `templates/` for templates
-   - `workflows/` for workflow definitions
-
-3. **Arguments definition:**
-   - JSON array format
-   - Fields: `name`, `type`, `required`, `description`
-
-4. **Platforms field:**
-   - Array listing supported platforms
-   - Common values: `[claude, copilot, codex]`
-
-5. **Versioning fields:**
-   - `skill_version` for skill version
-   - `requires_version` for minimum GSD version
-
-6. **Markdown body:**
-   - Everything after frontmatter is identical
-   - Uses same XML tags: `<objective>`, `<process>`, `<role>`, etc.
-
----
-
-## Recommended Adapter Architecture
-
-Based on the analysis, the installer should support multiple adapters:
-
-### 1. Universal Template Format (Internal)
-
-Keep source templates in a neutral format:
 ```yaml
 ---
-name: {{NAME}}
-description: {{DESCRIPTION}}
-skill_version: {{VERSION}}
-requires_version: {{MIN_VERSION}}
-platforms: {{PLATFORMS}}
-tools:
-  - read
-  - edit
-  - execute
-  - search
-  - agent
-  - bash  # Will be transformed per platform
-  - websearch  # Optional - may not be available on all platforms
-arguments: {{ARGUMENTS}}
-# Platform-specific fields injected at generation time
+name: gsd-executor
+description: Executes GSD plans with atomic commits, validation, and rollback
+tools: Read, Edit, Bash, Grep
+skills: [gsd-commit-validator, error-recovery]
 ---
-{{BODY}}
 ```
 
-### 2. Platform Adapters
+### Agents - AFTER (Correct - GitHub)
 
-Each adapter handles platform-specific transformations:
+```yaml
+---
+name: gsd-executor
+description: Executes GSD plans with atomic commits, validation, and rollback
+tools: ["read", "edit", "execute", "search"]
+---
+```
 
+**Note:** No `skills` field (not supported), metadata in `versions.json`
+
+## Part 9: Installer Implementation Requirements
+
+### Critical Corrections Matrix
+
+| Issue | Current | Correct | Implementation |
+|-------|---------|---------|----------------|
+| **Skills field name** | `tools` | `allowed-tools` (Claude) / `tools` (GitHub) | Platform-specific templates |
+| **Skills format** | Array | String (Claude) / Array (GitHub) | `tools.join(', ')` for Claude |
+| **Tool names** | Copilot aliases | Claude canonical | Apply tool mapping |
+| **Arguments** | `arguments: [...]` | `argument-hint: "[name]"` | Generate hint from args |
+| **Version fields** | In frontmatter | In `version.json` | Extract and save separately |
+| **Metadata block** | In frontmatter | In `version.json` / `versions.json` | Remove from frontmatter |
+| **Agent skills** | Missing | Add for Claude only | Scan content for `@skill` references |
+
+### Field Removal Checklist
+
+**Remove from ALL frontmatter:**
+- [ ] `skill_version`
+- [ ] `requires_version`
+- [ ] `platforms`
+- [ ] `arguments` (replace with `argument-hint`)
+- [ ] `metadata`
+
+**Store in version files:**
+- [ ] Skills: Create `version.json` per skill directory
+- [ ] Agents: Create single `versions.json` in `.github/agents/`
+
+### Platform-Specific Generation
+
+**Claude Skills (.claude/skills/):**
 ```javascript
-class ClaudeAdapter {
-  transformTools(tools) {
-    const map = {
-      'read': 'Read',
-      'edit': 'Edit',
-      'execute': 'Bash',
-      'search': 'Grep',
-      'agent': 'Task'
-    };
-    return tools.map(t => map[t] || t).join(', ');
-  }
-  
-  transformFrontmatter(universal) {
-    return {
-      name: universal.name,
-      description: universal.description,
-      tools: this.transformTools(universal.tools)
-      // No metadata block for Claude
-    };
-  }
-  
-  transformPath(path) {
-    return path.replace(/__PLATFORM__/g, '~/.claude');
-  }
-  
-  getFileExtension(type) {
-    return type === 'agent' ? '.md' : '/SKILL.md';
-  }
-  
-  getTargetDir() {
-    return '.claude';
-  }
-}
-
-class CopilotAdapter {
-  transformTools(tools) {
-    const map = {
-      'read': 'read',
-      'edit': 'edit',
-      'execute': 'execute',
-      'search': 'search',
-      'agent': 'agent'
-    };
-    // Deduplicate and filter available tools
-    return [...new Set(tools.map(t => map[t]).filter(Boolean))];
-  }
-  
-  transformFrontmatter(universal, metadata) {
-    return {
-      name: universal.name,
-      description: universal.description,
-      tools: this.transformTools(universal.tools),
-      metadata: {
-        platform: 'copilot',
-        generated: new Date().toISOString().split('T')[0],
-        templateVersion: metadata.templateVersion,
-        projectVersion: metadata.projectVersion,
-        projectName: metadata.projectName
-      }
-    };
-  }
-  
-  transformPath(path) {
-    return path.replace(/__PLATFORM__/g, '.github');
-  }
-  
-  getFileExtension(type) {
-    return type === 'agent' ? '.agent.md' : '/SKILL.md';
-  }
-  
-  getTargetDir() {
-    return '.github';
-  }
+{
+  fieldName: 'allowed-tools',
+  format: 'string',
+  transform: tools => tools.map(copilotToClaude).join(', '),
+  additionalFields: []
 }
 ```
 
-### 3. Installer Flow
-
+**GitHub Skills (.github/skills/):**
 ```javascript
-class SkillInstaller {
-  constructor(adapter) {
-    this.adapter = adapter;
-  }
-  
-  install(universalTemplate, metadata) {
-    // 1. Transform frontmatter
-    const frontmatter = this.adapter.transformFrontmatter(
-      universalTemplate.frontmatter,
-      metadata
-    );
-    
-    // 2. Transform body paths
-    const body = universalTemplate.body.replace(
-      /@__PLATFORM__\//g,
-      `@${this.adapter.getTargetDir()}/`
-    );
-    
-    // 3. Build output
-    const output = this.buildMarkdown(frontmatter, body);
-    
-    // 4. Write to platform-specific location
-    const targetPath = this.adapter.getTargetDir() + 
-      '/' + universalTemplate.type + 's/' +
-      universalTemplate.name +
-      this.adapter.getFileExtension(universalTemplate.type);
-    
-    fs.writeFileSync(targetPath, output);
-  }
-  
-  buildMarkdown(frontmatter, body) {
-    return '---\n' + 
-           yaml.stringify(frontmatter) + 
-           '---\n\n' + 
-           body;
-  }
+{
+  fieldName: 'tools',
+  format: 'array',
+  transform: tools => tools.map(t => t.toLowerCase()),
+  additionalFields: []
 }
-
-// Usage
-const claudeInstaller = new SkillInstaller(new ClaudeAdapter());
-const copilotInstaller = new SkillInstaller(new CopilotAdapter());
-
-// Install to both platforms
-claudeInstaller.install(template, metadata);
-copilotInstaller.install(template, metadata);
 ```
 
-### 4. Template Placeholders
-
-Use platform-agnostic placeholders in source templates:
-
-| Placeholder | Claude | GitHub Copilot |
-|-------------|--------|----------------|
-| `__PLATFORM__` | `.claude` | `.github` |
-| `__PLATFORM_ROOT__` | `~/.claude` | `.github` |
-| `__SKILL_PATH__` | `/home/sandbox/.../Claude/skills/` | `/workspace/.github/copilot/skills/` |
-| `__AGENT_PATH__` | `/home/sandbox/.../Claude/agents/` | `/workspace/.github/copilot/agents/` |
-
-Example template:
-```markdown
-@__PLATFORM_ROOT__/get-shit-done/references/questioning.md
-@.planning/PROJECT.md
+**Claude Agents (.claude/agents/):**
+```javascript
+{
+  fieldName: 'tools',
+  format: 'string',
+  transform: tools => tools.map(copilotToClaude).join(', '),
+  additionalFields: ['skills']  // Auto-generate from content
+}
 ```
 
-Transforms to:
-- Claude: `@~/.claude/get-shit-done/references/questioning.md`
-- GitHub: `@.github/get-shit-done/references/questioning.md`
+**GitHub Agents (.github/agents/):**
+```javascript
+{
+  fieldName: 'tools',
+  format: 'array',
+  transform: tools => tools.map(t => t.toLowerCase()),
+  additionalFields: []  // No skills field
+}
+```
 
 ---
 
-## Validation Checklist
-
-When implementing cross-platform support, validate:
-
-### Agent Files
-- [ ] Correct file extension (`.md` vs `.agent.md`)
-- [ ] Tools in correct format (capitalized comma-list vs lowercase array)
-- [ ] Metadata block present (GitHub only)
-- [ ] Path references use correct root
-- [ ] File written to correct directory
-
-### Skill Files
-- [ ] Correct file extension (`SKILL.md` same for both)
-- [ ] Tools in correct format
-- [ ] Metadata block present (GitHub only)
-- [ ] Path references use correct root
-- [ ] Arguments array format correct
-- [ ] Directory structure correct
-
-### Shared Resources
-- [ ] Correct root directory (`.claude/` vs `.github/`)
-- [ ] Same internal structure (`references/`, `templates/`, `workflows/`)
-- [ ] No platform-specific content in shared files
-
-### Tool Availability
-- [ ] All specified tools available on target platform
-- [ ] Fallback handling for unavailable tools
-- [ ] User notified if features unavailable
-
----
-
-## Testing Strategy
-
-### Test Matrix
-
-| Test Case | Claude | GitHub Copilot |
-|-----------|--------|----------------|
-| Agent creation | `.md` file in `.claude/agents/` | `.agent.md` file in `.github/agents/` |
-| Skill creation | `SKILL.md` in `.claude/skills/{name}/` | `SKILL.md` in `.github/skills/{name}/` |
-| Tool parsing | Comma-separated capitalized | JSON array lowercase |
-| Path resolution | `~/.claude/` resolves | `.github/` resolves |
-| Metadata presence | Absent (valid) | Present (required) |
-| Tool deduplication | Not needed | `[edit, edit]` → `[edit]` |
+## Part 10: Validation & Testing
 
 ### Validation Script
 
 ```bash
 #!/bin/bash
-# validate-platform.sh <platform>
+# validate-frontmatter.sh <file>
 
-PLATFORM=$1
+FILE=$1
+PLATFORM=$2  # claude or github
 
+# Extract frontmatter
+awk '/^---$/{flag=!flag;next}flag' "$FILE" > /tmp/frontmatter.yml
+
+# Check for unsupported fields
+UNSUPPORTED=("skill_version" "requires_version" "platforms" "arguments" "metadata")
+for field in "${UNSUPPORTED[@]}"; do
+  if grep -q "^$field:" /tmp/frontmatter.yml; then
+    echo "❌ Unsupported field: $field"
+    exit 1
+  fi
+done
+
+# Check field names
 if [ "$PLATFORM" = "claude" ]; then
-  ROOT=".claude"
-  AGENT_EXT=".md"
-elif [ "$PLATFORM" = "copilot" ]; then
-  ROOT=".github"
-  AGENT_EXT=".agent.md"
-else
-  echo "Unknown platform: $PLATFORM"
-  exit 1
+  # Skills must use allowed-tools
+  if grep -q "^tools:" /tmp/frontmatter.yml; then
+    TYPE=$(basename $(dirname "$FILE"))
+    if [ "$TYPE" = "skills" ]; then
+      echo "❌ Skills must use 'allowed-tools', not 'tools'"
+      exit 1
+    fi
+  fi
 fi
 
-# Check structure
-[ -d "$ROOT/agents" ] || echo "Missing agents directory"
-[ -d "$ROOT/skills" ] || echo "Missing skills directory"
-[ -d "$ROOT/get-shit-done" ] || echo "Missing shared resources"
+# Check format
+if [ "$PLATFORM" = "claude" ]; then
+  # Tools must be comma-separated string
+  if grep "^tools:\|^allowed-tools:" /tmp/frontmatter.yml | grep -q "\["; then
+    echo "❌ Claude tools must be comma-separated string, not array"
+    exit 1
+  fi
+fi
 
-# Check agent files
-for agent in $ROOT/agents/*$AGENT_EXT; do
-  echo "Validating $agent"
-  # Check frontmatter format
-  # Check tool syntax
-  # Check metadata presence (GitHub only)
+echo "✓ Frontmatter valid"
+```
+
+### Test Cases
+
+**Test 1: Unsupported fields removed**
+```bash
+! grep -r "skill_version:" .claude/skills/*/SKILL.md
+! grep -r "metadata:" .github/agents/*.agent.md
+```
+
+**Test 2: Correct field names**
+```bash
+# Claude skills use allowed-tools
+grep -r "^allowed-tools:" .claude/skills/*/SKILL.md
+
+# GitHub skills use tools
+grep -r "^tools:" .github/skills/*/SKILL.md
+```
+
+**Test 3: Format correctness**
+```bash
+# Claude tools are strings
+grep "^tools:" .claude/agents/*.md | grep -v "\["
+
+# GitHub tools are arrays
+grep "^tools:" .github/agents/*.agent.md | grep "\["
+```
+
+**Test 4: Version files exist**
+```bash
+# Each skill has version.json
+for skill in .github/skills/*/; do
+  [ -f "$skill/version.json" ] || echo "Missing: $skill/version.json"
 done
 
-# Check skill files
-for skill in $ROOT/skills/*/SKILL.md; do
-  echo "Validating $skill"
-  # Check frontmatter format
-  # Check tool syntax
-  # Check metadata presence (GitHub only)
-done
+# Agents have versions.json
+[ -f .github/agents/versions.json ]
 ```
 
 ---
 
-## Known Limitations & Gotchas
+## Part 11: Migration Checklist
 
-### 1. Tool Availability
+### Phase 1: Backup & Analysis
+- [ ] Backup all current `.github/` files
+- [ ] List all skills with invalid frontmatter
+- [ ] List all agents with invalid frontmatter
+- [ ] Document tool name mappings needed
 
-**Issue:** Claude supports tools that GitHub Copilot doesn't have direct equivalents for.
+### Phase 2: Extract Metadata
+- [ ] Extract `skill_version` from all skills
+- [ ] Extract `requires_version` from all skills
+- [ ] Extract `platforms` from all skills
+- [ ] Extract `metadata` blocks
+- [ ] Extract `arguments` arrays
 
-**Affected tools:**
-- `WebSearch` - Claude-specific or MCP extension
-- `WebFetch` - Claude-specific or MCP extension
-- `TodoWrite` - Claude-specific
-- `mcp__context7__*` - MCP extensions
+### Phase 3: Generate Version Files
+- [ ] Create `version.json` for each skill
+- [ ] Create `versions.json` for agents
+- [ ] Validate JSON syntax
+- [ ] Commit version files
 
-**Mitigation:**
-- Remove unsupported tools during transformation
-- Add note in skill description if functionality reduced
-- Consider alternative implementations (e.g., manual web lookup instructions)
+### Phase 4: Update Frontmatter
+- [ ] Skills: Replace `tools` with `allowed-tools` (Claude)
+- [ ] Skills: Convert `arguments` to `argument-hint`
+- [ ] Skills: Remove unsupported fields
+- [ ] Agents: Fix tools format
+- [ ] Agents: Add `skills` field (Claude only)
+- [ ] Agents: Remove metadata block
 
-### 2. Hooks Support
+### Phase 5: Tool Name Mapping
+- [ ] Map Copilot aliases → Claude canonical
+- [ ] Convert arrays → comma-separated strings (Claude)
+- [ ] Deduplicate tools
+- [ ] Validate tool names
 
-**Issue:** Claude supports hooks (`.claude/hooks/`), GitHub Copilot has no equivalent.
-
-**Affected features:**
-- Session start hooks
-- Status line customization
-- Pre-commit hooks
-
-**Mitigation:**
-- Skip hooks when installing to GitHub Copilot
-- Document manual alternatives (GitHub Actions, git hooks)
-- Warn user if installing hook-dependent functionality
-
-### 3. Metadata Overhead
-
-**Issue:** GitHub Copilot requires metadata block, adding boilerplate.
-
-**Mitigation:**
-- Auto-generate metadata during installation
-- Use sensible defaults: `platform: copilot`, `templateVersion: 1.0.0`
-- Include project name from installation context
-
-### 4. Write vs Edit Consolidation
-
-**Issue:** Claude distinguishes `Write` (create) and `Edit` (modify), GitHub Copilot uses `edit` for both.
-
-**Observed behavior:** GitHub Copilot uses `edit` tool even when creating new files.
-
-**Mitigation:**
-- Always map both `Write` and `Edit` to `edit` in GitHub
-- Deduplicate resulting tool list
-
-### 5. Case Sensitivity
-
-**Issue:** Tool names are case-sensitive in frontmatter parsing.
-
-**Mitigation:**
-- Normalize case during transformation
-- Claude: `Read` → GitHub: `read`
-- Never mix cases in source templates
+### Phase 6: Validation
+- [ ] Run validation script on all files
+- [ ] Check version files readable
+- [ ] Test skill loading in Claude
+- [ ] Test agent loading in Copilot
+- [ ] Verify no regressions
 
 ---
 
-## Official Documentation Sources
+## Part 12: Common Pitfalls & Solutions
+
+### Pitfall 1: Wrong Field Name in Skills
+
+**Problem:**
+```yaml
+# ❌ WRONG - skills should use allowed-tools
+name: my-skill
+tools: Read, Bash
+```
+
+**Solution:**
+```yaml
+# ✓ CORRECT
+name: my-skill
+allowed-tools: Read, Bash
+```
+
+### Pitfall 2: Array Format in Claude
+
+**Problem:**
+```yaml
+# ❌ WRONG - Claude uses string format
+tools: [Read, Bash, Task]
+```
+
+**Solution:**
+```yaml
+# ✓ CORRECT
+tools: Read, Bash, Task
+```
+
+### Pitfall 3: Arguments Instead of Hint
+
+**Problem:**
+```yaml
+# ❌ WRONG - arguments array not supported
+arguments:
+  - name: filename
+    required: true
+```
+
+**Solution:**
+```yaml
+# ✓ CORRECT
+argument-hint: "<filename>"
+```
+
+### Pitfall 4: Metadata in Frontmatter
+
+**Problem:**
+```yaml
+# ❌ WRONG - metadata not supported
+metadata:
+  platform: copilot
+  version: 1.0.0
+```
+
+**Solution:**
+```yaml
+# ✓ CORRECT - no metadata in frontmatter
+# Store in version.json instead
+```
+
+### Pitfall 5: Skills Field in GitHub Agents
+
+**Problem:**
+```yaml
+# ❌ WRONG - GitHub doesn't support skills field
+name: my-agent
+skills: [code-review, linting]
+```
+
+**Solution:**
+```yaml
+# ✓ CORRECT - omit skills field for GitHub
+name: my-agent
+# Skills field only for Claude
+```
+
+---
+
+## Part 13: Reference Implementation
+
+### Skill Converter
+
+```javascript
+class SkillConverter {
+  constructor(platform) {
+    this.platform = platform; // 'claude' or 'github'
+  }
+  
+  convert(sourceFrontmatter) {
+    const converted = {
+      name: sourceFrontmatter.name,
+      description: sourceFrontmatter.description
+    };
+    
+    // Convert arguments → argument-hint
+    if (sourceFrontmatter.arguments) {
+      converted['argument-hint'] = this.generateHint(sourceFrontmatter.arguments);
+    }
+    
+    // Convert tools
+    if (sourceFrontmatter.tools) {
+      const toolField = this.platform === 'claude' ? 'allowed-tools' : 'tools';
+      converted[toolField] = this.convertTools(sourceFrontmatter.tools);
+    }
+    
+    return converted;
+  }
+  
+  generateHint(arguments) {
+    return arguments
+      .map(arg => arg.required ? `<${arg.name}>` : `[${arg.name}]`)
+      .join(' ');
+  }
+  
+  convertTools(tools) {
+    const toolList = Array.isArray(tools) ? tools : tools.split(',').map(t => t.trim());
+    
+    if (this.platform === 'claude') {
+      const claudeTools = toolList.map(t => this.copilotToClaude(t));
+      return claudeTools.join(', ');
+    } else {
+      return toolList.map(t => t.toLowerCase());
+    }
+  }
+  
+  copilotToClaude(tool) {
+    const map = {
+      'execute': 'Bash',
+      'read': 'Read',
+      'edit': 'Edit',
+      'search': 'Grep',
+      'agent': 'Task',
+      'web': 'WebSearch'
+    };
+    return map[tool.toLowerCase()] || tool;
+  }
+  
+  extractMetadata(sourceFrontmatter) {
+    return {
+      skill_version: sourceFrontmatter.skill_version,
+      requires_version: sourceFrontmatter.requires_version,
+      platforms: sourceFrontmatter.platforms,
+      metadata: sourceFrontmatter.metadata
+    };
+  }
+}
+
+// Usage
+const claudeConverter = new SkillConverter('claude');
+const githubConverter = new SkillConverter('github');
+
+const source = {
+  name: 'gsd-new-project',
+  description: 'Create new project',
+  tools: ['read', 'edit', 'execute'],
+  arguments: [{name: 'domain', required: false}],
+  skill_version: '1.9.1'
+};
+
+const claudeFrontmatter = claudeConverter.convert(source);
+// {
+//   name: 'gsd-new-project',
+//   description: 'Create new project',
+//   'allowed-tools': 'Read, Edit, Bash',
+//   'argument-hint': '[domain]'
+// }
+
+const githubFrontmatter = githubConverter.convert(source);
+// {
+//   name: 'gsd-new-project',
+//   description: 'Create new project',
+//   tools: ['read', 'edit', 'execute'],
+//   'argument-hint': '[domain]'
+// }
+
+const versionData = claudeConverter.extractMetadata(source);
+// { skill_version: '1.9.1', ... }
+```
+
+---
+
+## Part 14: Summary & Recommendations
+
+### Key Findings (Verified Against Official Docs)
+
+1. **Unsupported fields are widespread:** `skill_version`, `requires_version`, `platforms`, `arguments`, `metadata` appear in current files but are NOT in official specifications
+
+2. **Field naming differs:** Skills use `allowed-tools` (Claude) vs `tools` (GitHub)
+
+3. **Format differs:** Claude uses comma-separated strings, GitHub uses arrays
+
+4. **Arguments handling:** Must use `argument-hint` string, not `arguments` array
+
+5. **Platform-specific features:** Claude agents support `skills` field, GitHub does not
+
+### Recommendations
+
+**1. Immediate Actions:**
+- Remove unsupported fields from ALL frontmatter
+- Store metadata in separate version files
+- Fix field naming (allowed-tools vs tools)
+- Convert arguments → argument-hint
+
+**2. Installer Design:**
+- Platform-specific adapters for each target
+- Validation before and after conversion
+- Version file generation
+- Tool name mapping layer
+
+**3. Testing Strategy:**
+- Validate all frontmatter before deployment
+- Test skills load correctly in Claude
+- Test agents load correctly in GitHub
+- Verify no functionality loss
+
+**4. Documentation:**
+- Document version file format
+- Provide migration guide
+- Include validation scripts
+- Maintain platform comparison reference
+
+### Confidence Assessment
+
+| Area | Confidence | Basis |
+|------|------------|-------|
+| Claude skills fields | **HIGH** | Official docs at code.claude.com |
+| Claude agents fields | **HIGH** | Official docs at code.claude.com |
+| GitHub agents fields | **HIGH** | Official docs at docs.github.com |
+| Tool aliases | **HIGH** | Official tool alias table |
+| Unsupported fields | **HIGH** | Absence from all official docs |
+| Tool mappings | **HIGH** | Official alias compatibility table |
+
+**All findings verified against official documentation sources provided.**
+
+---
+
+## Part 15: Path References & Directory Structure
+
+### Directory Structure
+
+**Claude:**
+```
+.claude/
+├── agents/
+│   └── {name}.md
+├── skills/
+│   └── {name}/
+│       ├── SKILL.md
+│       └── version.json
+└── get-shit-done/
+    ├── references/
+    └── templates/
+```
+
+**GitHub Copilot:**
+```
+.github/
+├── agents/
+│   ├── {name}.agent.md
+│   └── versions.json
+├── skills/
+│   └── {name}/
+│       ├── SKILL.md
+│       └── version.json
+└── get-shit-done/
+    ├── references/
+    └── templates/
+```
+
+**Key Differences:**
+- Agent file extension: `.md` (Claude) vs `.agent.md` (GitHub)
+- Agent versions: Stored in per-project `versions.json`
+- Skills structure: Same across both platforms
+- Path prefixes: `~/.claude/` vs `.github/`
+
+### Path References
+
+**Claude:**
+```markdown
+@~/.claude/get-shit-done/references/questioning.md
+@.planning/PROJECT.md
+```
+
+**GitHub Copilot:**
+```markdown
+@.github/get-shit-done/references/questioning.md
+@.planning/PROJECT.md
+```
+
+---
+
+## Part 16: Official Documentation Sources
+
+**All specifications verified against these authoritative sources:**
 
 ### Claude Code
-- Sub-agents: https://code.claude.com/docs/en/sub-agents
-- Skills: https://code.claude.com/docs/en/slash-commands
-- Frontmatter reference: https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+- **Skills frontmatter:** https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+- **Agents frontmatter:** https://code.claude.com/docs/en/sub-agents
 
-### GitHub Copilot CLI
-- Custom agents: https://docs.github.com/en/copilot/reference/custom-agents-configuration
-- Tool aliases: https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
+### GitHub Copilot
+- **Agents configuration:** https://docs.github.com/en/copilot/reference/custom-agents-configuration
+- **Tool aliases:** https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases
 
-**Note:** Official documentation provides normative references but observed codebase provides implementation details. Both sources have been considered in this analysis.
+**Research methodology:**
+1. Fetched official documentation pages
+2. Extracted frontmatter field tables  
+3. Cross-referenced examples
+4. Verified tool alias mappings
+5. Documented unsupported fields by absence from official specs
 
----
-
-## Recommendations for Installer
-
-### 1. Multi-Platform Installation
-
-**Recommendation:** Install to BOTH platforms by default.
-
-**Rationale:**
-- User may switch between platforms
-- Minimal additional cost (just file duplication with transformations)
-- Avoids confusing "skill not found" errors
-
-**Implementation:**
-```javascript
-installer.install({
-  targets: ['claude', 'copilot'],
-  sourceTemplate: 'templates/gsd-new-project.md',
-  metadata: { projectVersion: '1.9.0', projectName: 'my-project' }
-});
-```
-
-### 2. Graceful Degradation
-
-**Recommendation:** Warn about unavailable features but don't fail installation.
-
-**Implementation:**
-```javascript
-const unavailableTools = ['WebSearch', 'WebFetch'];
-if (unavailableTools.length > 0) {
-  console.warn(`⚠️  GitHub Copilot doesn't support: ${unavailableTools.join(', ')}`);
-  console.warn(`   Some features may be limited.`);
-}
-```
-
-### 3. Template Validation
-
-**Recommendation:** Validate templates before transformation.
-
-**Checks:**
-- All `@__PLATFORM__` placeholders present
-- Tool names are valid
-- Frontmatter fields complete
-- Arguments array well-formed
-
-### 4. Platform Detection
-
-**Recommendation:** Auto-detect current platform and prioritize that installation.
-
-**Implementation:**
-```javascript
-function detectPlatform() {
-  if (fs.existsSync('.claude/settings.json')) return 'claude';
-  if (fs.existsSync('.github/copilot-instructions.md')) return 'copilot';
-  return null; // Install both
-}
-```
-
-### 5. Idempotent Installation
-
-**Recommendation:** Support re-running installation to update existing skills.
-
-**Implementation:**
-- Check if target files exist
-- Compare versions
-- Update if source is newer
-- Preserve user modifications (git diff check)
+**Date:** 2025-01-26  
+**Confidence:** HIGH (verified against official documentation, not assumptions)
 
 ---
 
-## Conclusion
+## RESEARCH COMPLETE
 
-The Claude and GitHub Copilot platforms are highly compatible with systematic differences in:
-- **Syntax** (tool naming, frontmatter format)
-- **Paths** (`.claude/` vs `.github/`)
-- **Metadata** (optional vs required)
-- **Tool availability** (Claude has more MCP integrations)
+**Findings:**
+- Unsupported fields identified: `skill_version`, `requires_version`, `platforms`, `arguments`, `metadata`
+- Correct field naming documented: `allowed-tools` vs `tools`
+- Tool mapping table verified from official GitHub docs
+- All corrections in FRONTMATTER-CORRECTIONS.md and AGENT-CORRECTIONS.md are accurate
 
-**Recommendation:** Build a platform-agnostic installer with adapter pattern. Generate platform-specific files from universal templates at installation time.
+**Files validated:**
+- .planning/FRONTMATTER-CORRECTIONS.md - ✓ Accurate per official docs
+- .planning/AGENT-CORRECTIONS.md - ✓ Accurate per official docs
 
-**Complexity estimate:** Medium - mostly string transformations and file I/O, but requires careful handling of tool mapping and path resolution.
-
-**Risk level:** Low - platforms are similar enough that bugs will be obvious during testing, and worst case is a malformed frontmatter that fails fast.
+**Confidence:** HIGH - All specifications verified against official documentation sources.

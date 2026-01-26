@@ -483,6 +483,647 @@ async function verifyInstallation(platform, targetPath) {
 
 ---
 
+### 🔴 CRITICAL: YAML Frontmatter Transformation Errors
+
+**What goes wrong:**
+When transforming 42 template files with frontmatter modifications, systematic errors affect ALL files:
+- Field removal matches partial names (removing `platform` also removes `platformVersion`)
+- YAML structure corruption (breaking multiline strings, comments, or indentation)
+- Array syntax changes (converting `[read, edit]` to block style unintentionally)
+- Tool name mapping with case mismatches (`execute` vs `Execute` vs `Bash`)
+- Incomplete transformations leaving files in invalid state
+
+**Why it happens:**
+- Regex-based field removal instead of AST manipulation
+- Not preserving original YAML formatting style
+- Naive string matching without understanding YAML structure
+- No validation after transformation
+- Batch operations without per-file verification
+
+**Consequences:**
+- All 29 skills broken by systematic error
+- Invalid YAML that fails to parse
+- Claude/Copilot cannot load skills
+- User must manually fix 42 files
+- Rollback required but may be incomplete
+
+**Critical edge cases:**
+
+1. **Flow sequence syntax:**
+```yaml
+# Original
+tools: [read, edit, execute]
+
+# MUST preserve flow style, not convert to:
+tools:
+  - read
+  - edit
+  - execute
+```
+
+2. **Partial field name matches:**
+```yaml
+metadata:
+  platform: copilot        # Want to remove this
+  platformVersion: 1.0     # MUST NOT remove this
+  generated: '2024-01-01'
+```
+
+3. **Multiline string fields:**
+```yaml
+description: |
+  This is a multiline
+  description that spans
+  multiple lines
+# Regex match on 'description:' must handle ALL lines
+```
+
+4. **YAML comments:**
+```yaml
+tools: [read, edit]  # Required tools
+# Inline comments must be preserved or removed consistently
+```
+
+5. **Indentation preservation:**
+```yaml
+metadata:
+  platform: copilot  # Remove this line
+  version: 1.0       # MUST preserve indentation exactly
+  project: gsd       # Otherwise YAML structure breaks
+```
+
+6. **Empty objects after removal:**
+```yaml
+metadata:
+  platform: copilot  # Only field
+# After removal, should 'metadata:' line be removed too?
+```
+
+**Mitigation strategy:**
+
+```javascript
+// Use proper YAML parsing, not regex
+const yaml = require('yaml')
+
+function transformFrontmatter(content, transformations) {
+  // 1. Extract frontmatter safely
+  const fenceRegex = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/
+  const match = content.match(fenceRegex)
+  
+  if (!match) {
+    throw new Error('No frontmatter found')
+  }
+  
+  const [, yamlContent, body] = match
+  
+  // 2. Parse to AST (preserves formatting metadata)
+  const doc = yaml.parseDocument(yamlContent)
+  
+  // 3. Apply transformations at AST level
+  for (const { action, path, value } of transformations) {
+    switch (action) {
+      case 'remove':
+        doc.deleteIn(path.split('.'))
+        break
+      case 'set':
+        doc.setIn(path.split('.'), value)
+        break
+      case 'map':
+        const current = doc.getIn(path.split('.'))
+        doc.setIn(path.split('.'), value(current))
+        break
+    }
+  }
+  
+  // 4. Stringify preserving flow style for arrays
+  const options = {
+    // Preserve original array style
+    flowCollectionPadding: false,
+    // Don't force block style
+    defaultStringType: 'PLAIN'
+  }
+  const newYaml = doc.toString(options)
+  
+  // 5. Reconstruct file
+  return `---\n${newYaml}---\n${body}`
+}
+
+// Example: Remove metadata.platform safely
+const transformed = transformFrontmatter(content, [
+  { 
+    action: 'remove', 
+    path: 'metadata.platform'  // Exact path, not regex
+  }
+])
+
+// Example: Map tool names
+const transformed = transformFrontmatter(content, [
+  {
+    action: 'map',
+    path: 'tools',
+    value: (tools) => tools.map(t => TOOL_MAPPING[t.toLowerCase()] || t)
+  }
+])
+```
+
+**Field removal safety checklist:**
+- [ ] Use exact field paths, not substring matching
+- [ ] Remove `metadata.platform` not all lines containing "platform"
+- [ ] Validate YAML parses after each transformation
+- [ ] Preserve array syntax (flow vs block style)
+- [ ] Preserve indentation exactly
+- [ ] Handle empty parent objects (remove or keep?)
+- [ ] Detect and handle YAML comments appropriately
+
+**Tool mapping safety checklist:**
+- [ ] Normalize to lowercase before lookup: `tool.toLowerCase()`
+- [ ] Define explicit mapping: `{ execute: 'Bash', search: 'Grep' }`
+- [ ] Handle unknown tools: error or warn, don't silently pass through
+- [ ] Validate mapped names exist in target platform
+- [ ] Test with case variations: `Execute`, `EXECUTE`, `execute`
+- [ ] Handle platform-specific tools: `mcp__context7__query`
+
+**Batch operation safety:**
+```javascript
+// Transform 42 files with validation
+async function transformAllFiles(files, transformations) {
+  const results = []
+  
+  for (const file of files) {
+    try {
+      // 1. Read original
+      const original = fs.readFileSync(file, 'utf-8')
+      
+      // 2. Transform
+      const transformed = transformFrontmatter(original, transformations)
+      
+      // 3. Validate YAML parses
+      const fenceMatch = transformed.match(/^---\r?\n([\s\S]*?)\r?\n---/)
+      yaml.parse(fenceMatch[1])  // Throws if invalid
+      
+      // 4. Write to temp file
+      const tmpFile = file + '.tmp'
+      fs.writeFileSync(tmpFile, transformed, 'utf-8')
+      
+      // 5. Track for atomic rename
+      results.push({ file, tmpFile, original })
+      
+    } catch (error) {
+      // Rollback all temp files
+      for (const { tmpFile } of results) {
+        fs.unlinkSync(tmpFile)
+      }
+      throw new Error(`Transformation failed on ${file}: ${error.message}`)
+    }
+  }
+  
+  // 6. Atomic rename all at once
+  for (const { file, tmpFile } of results) {
+    fs.renameSync(tmpFile, file)
+  }
+  
+  return results
+}
+```
+
+**Detection and early validation:**
+- Pre-transformation: Validate all 42 files parse correctly
+- During transformation: Validate each transformed file before writing
+- Post-transformation: Run full validation suite
+- Syntax errors: Fail immediately with filename and line number
+- Semantic errors: Warn but allow (e.g., unknown tool name)
+
+**Warning signs of problems:**
+- Transformation takes >1 second per file (regex catastrophic backtracking?)
+- Different array styles in output (flow style became block style)
+- Different indentation than original (2 spaces became 4 spaces)
+- File size changed significantly (content lost or duplicated?)
+- YAML parser warnings about deprecated syntax
+
+**Test cases that MUST pass:**
+```javascript
+describe('Frontmatter transformation', () => {
+  test('preserves flow array syntax', () => {
+    const input = 'tools: [read, edit]'
+    const output = transform(input, [{ action: 'remove', path: 'other' }])
+    expect(output).toContain('tools: [read, edit]')  // NOT block style
+  })
+  
+  test('removes exact field only', () => {
+    const input = `
+metadata:
+  platform: copilot
+  platformVersion: 1.0
+`
+    const output = transform(input, [{ action: 'remove', path: 'metadata.platform' }])
+    expect(output).not.toContain('platform: copilot')
+    expect(output).toContain('platformVersion: 1.0')  // MUST remain
+  })
+  
+  test('handles multiline strings', () => {
+    const input = `
+description: |
+  Line 1
+  Line 2
+  Line 3
+`
+    const output = transform(input, [{ action: 'remove', path: 'other' }])
+    expect(output).toContain('Line 1\n  Line 2\n  Line 3')
+  })
+  
+  test('preserves inline comments', () => {
+    const input = 'tools: [read, edit]  # Required'
+    const output = transform(input, [{ action: 'remove', path: 'other' }])
+    expect(output).toContain('# Required')
+  })
+  
+  test('case-insensitive tool mapping', () => {
+    const input = 'tools: [Execute, SEARCH, read]'
+    const output = transform(input, [
+      { action: 'map', path: 'tools', value: mapTools }
+    ])
+    expect(output).toContain('Bash')  // Execute mapped
+    expect(output).toContain('Grep')  // SEARCH mapped
+  })
+})
+```
+
+**Implementation checklist:**
+- [ ] Use `yaml` package with AST support (not regex)
+- [ ] Test all edge cases above with real template files
+- [ ] Validate YAML after every transformation
+- [ ] Atomic file operations (write to .tmp, then rename)
+- [ ] Rollback on first error (don't leave 25/42 files changed)
+- [ ] Clear error messages with filename and line number
+- [ ] Dry-run mode to preview changes without writing
+
+---
+
+### 🔴 CRITICAL: Skill Reference Extraction Regex Failures
+
+**What goes wrong:**
+When scanning markdown for `/gsd-*` skill references, regex matches false positives:
+- Matching `/gsd-` in code blocks or comments
+- Matching URLs like `https://github.com/gsd-docs/gsd-guide`
+- Matching file paths in error messages
+- Missing references due to line break variations
+- Extracting partial names (stopping at hyphen or whitespace)
+
+**Why it happens:**
+- Simple regex without context awareness
+- Not excluding code blocks (` ```...``` `)
+- Not handling markdown link syntax `[text](/gsd-skill)`
+- Greedy matching stops at wrong boundary
+
+**Consequences:**
+- False skill dependencies added to version.json
+- Build breaks looking for non-existent skills
+- Version validation fails
+- Manual editing required to fix JSON
+
+**Edge cases:**
+
+1. **Code blocks should be IGNORED:**
+````markdown
+```bash
+# Don't match this: /gsd-test-skill
+./get-shit-done /gsd-execute-plan
+```
+````
+
+2. **Inline code should be IGNORED:**
+```markdown
+Run the `/gsd-plan-phase` command (not: use `/gsd-old-name`)
+```
+
+3. **URLs should be IGNORED:**
+```markdown
+See docs at https://example.com/gsd-docs/gsd-troubleshooting
+```
+
+4. **Valid references to EXTRACT:**
+```markdown
+Spawns `/gsd-planner` agent
+This skill depends on: /gsd-map-codebase
+```
+
+**Mitigation strategy:**
+
+```javascript
+function extractSkillReferences(markdownContent) {
+  // 1. Remove code blocks first
+  const withoutCodeBlocks = markdownContent.replace(/```[\s\S]*?```/g, '')
+  
+  // 2. Remove inline code
+  const withoutInlineCode = withoutCodeBlocks.replace(/`[^`]+`/g, '')
+  
+  // 3. Extract valid skill references
+  const skillPattern = /\/gsd-[a-z0-9-]+/g
+  const matches = withoutInlineCode.match(skillPattern) || []
+  
+  // 4. Deduplicate
+  return [...new Set(matches)]
+}
+
+// Test cases
+const markdown = `
+# Test Document
+
+Spawns \`/gsd-planner\` agent.
+
+\`\`\`bash
+# Don't match: /gsd-fake
+\`\`\`
+
+Depends on /gsd-map-codebase and /gsd-execute-phase.
+
+See https://example.com/gsd-docs for more.
+`
+
+const refs = extractSkillReferences(markdown)
+// Should return: ['/gsd-planner', '/gsd-map-codebase', '/gsd-execute-phase']
+// Should NOT include: '/gsd-fake', '/gsd-docs'
+```
+
+**Implementation checklist:**
+- [ ] Strip code blocks before matching
+- [ ] Strip inline code before matching
+- [ ] Use word boundary or punctuation to end match
+- [ ] Validate extracted names exist in skill list
+- [ ] Report references to non-existent skills as warnings
+- [ ] Handle skill name case variations consistently
+
+---
+
+### 🟡 MODERATE: Cross-Platform File Operation Issues
+
+**What goes wrong:**
+File operations behave differently on Windows vs Unix:
+- Path separators (`\` vs `/`)
+- Line endings (`\r\n` vs `\n`)
+- Case sensitivity (Windows ignores case, Unix doesn't)
+- Executable permissions (Unix has, Windows doesn't)
+- Symlink support (varies)
+
+**Why it happens:**
+- Hard-coded path separators
+- Not normalizing line endings
+- Assuming case-sensitive filesystem
+- Setting execute bits on Windows (silently fails)
+
+**Consequences:**
+- Windows users see `\` in paths where `/` expected
+- Git shows entire file changed due to line ending conversion
+- Files conflict on case-insensitive systems (Skill.md vs skill.md)
+- Permissions lost when copying from Unix to Windows
+
+**Mitigation strategy:**
+
+```javascript
+const path = require('path')
+const os = require('os')
+
+// Use path.join() and path.resolve(), never string concat
+const skillPath = path.join(targetDir, 'skills', 'gsd-skill', 'SKILL.md')
+// NOT: const skillPath = targetDir + '/skills/gsd-skill/SKILL.md'
+
+// Normalize line endings on read
+function readTemplateFile(filepath) {
+  let content = fs.readFileSync(filepath, 'utf-8')
+  // Normalize to LF
+  content = content.replace(/\r\n/g, '\n')
+  return content
+}
+
+// Preserve line endings on write
+function writeFileWithCorrectEndings(filepath, content) {
+  // On Windows, optionally convert to CRLF
+  if (os.platform() === 'win32' && shouldUseCRLF()) {
+    content = content.replace(/\n/g, '\r\n')
+  }
+  fs.writeFileSync(filepath, content, 'utf-8')
+}
+
+// Handle executable permissions safely
+function makeExecutable(filepath) {
+  if (os.platform() !== 'win32') {
+    const stats = fs.statSync(filepath)
+    fs.chmodSync(filepath, stats.mode | 0o111)  // Add execute bit
+  }
+  // On Windows, do nothing (no execute bit concept)
+}
+
+// Case-insensitive file checks on Windows
+function fileExistsCaseInsensitive(filepath) {
+  if (!fs.existsSync(filepath)) return false
+  
+  // On case-insensitive systems, verify exact case
+  if (os.platform() === 'win32' || os.platform() === 'darwin') {
+    const dir = path.dirname(filepath)
+    const base = path.basename(filepath)
+    const files = fs.readdirSync(dir)
+    return files.includes(base)  // Exact match
+  }
+  
+  return true
+}
+```
+
+**Implementation checklist:**
+- [ ] Use `path.join()` for all path construction
+- [ ] Normalize line endings on read
+- [ ] Preserve or standardize line endings on write
+- [ ] Skip chmod on Windows
+- [ ] Test on Windows, Mac, and Linux
+- [ ] Use `.gitattributes` to control line endings in repo
+
+---
+
+### 🟡 MODERATE: Atomic File Write Without Rollback
+
+**What goes wrong:**
+Writing transformed files directly without atomic operations:
+```javascript
+// DANGER: If this fails mid-write, file is corrupted
+fs.writeFileSync(skillPath, transformedContent)
+```
+
+Power loss, disk full, or process kill during write → corrupted file.
+
+**Why it happens:**
+- Using `writeFileSync()` directly instead of write-then-rename pattern
+- Not using temp files
+- No verification of write success
+
+**Consequences:**
+- Partial file written (ends mid-line)
+- Invalid YAML that can't be parsed
+- Original content lost
+- Manual recovery required
+
+**Mitigation strategy:**
+
+```javascript
+function atomicWriteFile(filepath, content) {
+  const tmpPath = filepath + '.tmp.' + Date.now()
+  
+  try {
+    // 1. Write to temp file
+    fs.writeFileSync(tmpPath, content, 'utf-8')
+    
+    // 2. Verify write
+    const written = fs.readFileSync(tmpPath, 'utf-8')
+    if (written !== content) {
+      throw new Error('Write verification failed')
+    }
+    
+    // 3. Atomic rename (POSIX guarantees atomicity)
+    fs.renameSync(tmpPath, filepath)
+    
+  } catch (error) {
+    // Clean up temp file
+    if (fs.existsSync(tmpPath)) {
+      fs.unlinkSync(tmpPath)
+    }
+    throw error
+  }
+}
+
+// For batch operations, prepare all temp files first
+function atomicBatchWrite(operations) {
+  const tempFiles = []
+  
+  try {
+    // Write all temp files
+    for (const { filepath, content } of operations) {
+      const tmpPath = filepath + '.tmp'
+      fs.writeFileSync(tmpPath, content, 'utf-8')
+      tempFiles.push({ tmp: tmpPath, dest: filepath })
+    }
+    
+    // Verify all temp files
+    for (const { tmp, dest } of tempFiles) {
+      const content = fs.readFileSync(tmp, 'utf-8')
+      const expected = operations.find(op => op.filepath === dest).content
+      if (content !== expected) {
+        throw new Error(`Verification failed: ${dest}`)
+      }
+    }
+    
+    // Atomic rename all at once
+    for (const { tmp, dest } of tempFiles) {
+      fs.renameSync(tmp, dest)
+    }
+    
+  } catch (error) {
+    // Rollback: delete all temp files
+    for (const { tmp } of tempFiles) {
+      if (fs.existsSync(tmp)) {
+        fs.unlinkSync(tmp)
+      }
+    }
+    throw error
+  }
+}
+```
+
+**Implementation checklist:**
+- [ ] Never write directly to destination file
+- [ ] Always write to temp file first
+- [ ] Verify temp file contents match expected
+- [ ] Use atomic rename (rename syscall is atomic)
+- [ ] Clean up temp files on error
+- [ ] Handle disk full gracefully
+- [ ] Test interruption scenarios (SIGINT during write)
+
+---
+
+### 🟡 MODERATE: JSON Generation Validation Gaps
+
+**What goes wrong:**
+Generating 29 `version.json` + 1 `versions.json` with invalid JSON:
+- Trailing commas: `{ "skills": ["a", "b",] }`
+- Unquoted keys: `{ name: "test" }`
+- Single quotes: `{ 'name': 'test' }`
+- Undefined values: `{ "key": undefined }`
+- NaN or Infinity: `{ "value": NaN }`
+
+**Why it happens:**
+- String concatenation instead of `JSON.stringify()`
+- Template literals with JS values
+- Not validating JSON after generation
+
+**Consequences:**
+- Files fail to parse in Node.js or CLI tools
+- Silent failures when reading versions
+- Version detection breaks
+- User must manually fix JSON syntax
+
+**Mitigation strategy:**
+
+```javascript
+// NEVER use string templates for JSON
+// BAD:
+const json = `{
+  "name": "${name}",
+  "version": "${version}"
+}`
+
+// GOOD: Use JSON.stringify
+const obj = {
+  name: name,
+  version: version,
+  skills: skillNames
+}
+const json = JSON.stringify(obj, null, 2)  // Pretty print with 2 spaces
+
+// Validate JSON after generation
+function generateAndValidateJSON(data, filepath) {
+  // 1. Stringify
+  const json = JSON.stringify(data, null, 2)
+  
+  // 2. Parse back to verify
+  try {
+    const parsed = JSON.parse(json)
+    
+    // 3. Deep equality check
+    if (JSON.stringify(parsed) !== JSON.stringify(data)) {
+      throw new Error('JSON roundtrip failed')
+    }
+  } catch (error) {
+    throw new Error(`Invalid JSON generated: ${error.message}`)
+  }
+  
+  // 4. Write atomically
+  atomicWriteFile(filepath, json + '\n')  // Add trailing newline
+}
+
+// For versions.json with all skills
+function generateVersionsManifest(skills) {
+  const manifest = {
+    version: '1.9.0',
+    generated: new Date().toISOString(),
+    skills: skills.map(skill => ({
+      name: skill.name,
+      version: skill.version,
+      path: skill.path
+    }))
+  }
+  
+  generateAndValidateJSON(manifest, 'versions.json')
+}
+```
+
+**Validation checklist:**
+- [ ] Use `JSON.stringify()`, never string templates
+- [ ] Parse generated JSON to verify validity
+- [ ] Check for common errors (trailing commas, quotes)
+- [ ] Add trailing newline to files (POSIX compliance)
+- [ ] Validate schema after generation
+- [ ] Test with special characters in values
+
+---
+
 ## 2. Breaking Changes & Versioning Risks
 
 ### 🔴 CRITICAL: CLI Platform Spec Changes
@@ -1934,6 +2575,13 @@ jobs:
 
 | Risk | Severity | Likelihood | Impact | Mitigation Priority |
 |------|----------|-----------|--------|---------------------|
+| **Frontmatter Transformation Risks** | | | | |
+| YAML frontmatter transformation errors | 🔴 Critical | High | Critical | **P0** |
+| Skill reference extraction regex failures | 🔴 Critical | Medium | High | **P0** |
+| Atomic file write without rollback | 🟡 Moderate | High | High | **P0** |
+| JSON generation validation gaps | 🟡 Moderate | Medium | Medium | **P1** |
+| Cross-platform file operation issues | 🟡 Moderate | High | Medium | **P1** |
+| **General Installer Risks** | | | | |
 | Partial installation without rollback | 🔴 Critical | High | High | **P0** |
 | Path traversal vulnerability | 🔴 Critical | Medium | Critical | **P0** |
 | Malicious template content | 🔴 Critical | Low | Critical | **P0** |
@@ -1951,20 +2599,478 @@ jobs:
 
 ---
 
+## Testing Strategy for Frontmatter Transformation
+
+### Critical Test Scenarios
+
+**These tests MUST pass before shipping transformation code:**
+
+#### 1. YAML Edge Cases
+
+```javascript
+describe('YAML parsing edge cases', () => {
+  test('preserves flow array syntax', () => {
+    const input = `---
+tools: [read, edit, execute]
+---`
+    const output = transform(input, removeField('other'))
+    expect(output).toMatch(/tools: \[read, edit, execute\]/)
+  })
+  
+  test('handles trailing commas in flow arrays', () => {
+    const input = `tools: [read, edit,]`
+    // Should parse correctly despite trailing comma
+    expect(() => transform(input, [])).not.toThrow()
+  })
+  
+  test('preserves multiline literal strings', () => {
+    const input = `---
+description: |
+  Line 1
+  Line 2
+  Line 3
+---`
+    const output = transform(input, removeField('other'))
+    expect(output).toContain('Line 1\n  Line 2\n  Line 3')
+  })
+  
+  test('preserves inline comments', () => {
+    const input = `tools: [read, edit]  # Required tools`
+    const output = transform(input, removeField('other'))
+    expect(output).toContain('# Required tools')
+  })
+  
+  test('handles special characters in values', () => {
+    const input = `name: "User's Guide: Getting Started"`
+    const output = transform(input, [])
+    expect(output).toContain(`"User's Guide: Getting Started"`)
+  })
+  
+  test('handles colons in unquoted values', () => {
+    const input = `name: Error: invalid`
+    // Should require quotes or fail gracefully
+    expect(() => yaml.parse(input)).toThrow()
+  })
+})
+```
+
+#### 2. Field Removal Precision
+
+```javascript
+describe('Field removal precision', () => {
+  test('removes exact field only', () => {
+    const input = `---
+metadata:
+  platform: copilot
+  platformVersion: 1.0
+  generated: '2024-01-01'
+---`
+    const output = transform(input, removeField('metadata.platform'))
+    expect(output).not.toContain('platform: copilot')
+    expect(output).toContain('platformVersion: 1.0')
+    expect(output).toContain('generated:')
+  })
+  
+  test('removes nested field without affecting siblings', () => {
+    const input = `---
+tools: [read, edit]
+tools_optional: [agent]
+---`
+    const output = transform(input, removeField('tools_optional'))
+    expect(output).toContain('tools: [read, edit]')
+    expect(output).not.toContain('tools_optional')
+  })
+  
+  test('handles empty parent after removal', () => {
+    const input = `---
+metadata:
+  platform: copilot
+---`
+    const output = transform(input, removeField('metadata.platform'))
+    // Should remove empty 'metadata:' or leave it - must be consistent
+    const hasEmptyMetadata = output.match(/metadata:\s*\n---/)
+    expect(hasEmptyMetadata).toBe(null)  // Should remove empty parent
+  })
+  
+  test('preserves indentation after removal', () => {
+    const input = `---
+agent:
+  name: test
+  metadata:
+    platform: copilot
+    version: 1.0
+---`
+    const output = transform(input, removeField('agent.metadata.platform'))
+    expect(output).toMatch(/version: 1\.0/)
+    // Indentation should remain consistent
+    expect(output).toMatch(/\n    version: 1\.0/)
+  })
+})
+```
+
+#### 3. Tool Mapping
+
+```javascript
+describe('Tool name mapping', () => {
+  test('maps case-insensitive tool names', () => {
+    const cases = [
+      { input: 'execute', expected: 'Bash' },
+      { input: 'Execute', expected: 'Bash' },
+      { input: 'EXECUTE', expected: 'Bash' },
+      { input: 'search', expected: 'Grep' },
+      { input: 'SEARCH', expected: 'Grep' }
+    ]
+    
+    for (const { input, expected } of cases) {
+      const yaml = `tools: [${input}]`
+      const output = transform(yaml, mapTools)
+      expect(output).toContain(expected)
+    }
+  })
+  
+  test('handles unknown tool names', () => {
+    const input = `tools: [read, unknown_tool, edit]`
+    // Should either error or warn, not silently pass through
+    expect(() => transform(input, mapTools)).toThrow(/unknown_tool/)
+  })
+  
+  test('preserves platform-specific tools', () => {
+    const input = `tools: [read, mcp__context7__query]`
+    const output = transform(input, mapTools)
+    expect(output).toContain('mcp__context7__query')
+  })
+  
+  test('maps multiple tools in array', () => {
+    const input = `tools: [execute, search, read, edit]`
+    const output = transform(input, mapTools)
+    expect(output).toContain('Bash')
+    expect(output).toContain('Grep')
+  })
+})
+```
+
+#### 4. Skill Reference Extraction
+
+```javascript
+describe('Skill reference extraction', () => {
+  test('extracts valid skill references', () => {
+    const markdown = `
+Spawns /gsd-planner agent.
+Depends on /gsd-map-codebase.
+`
+    const refs = extractSkillRefs(markdown)
+    expect(refs).toEqual(['/gsd-planner', '/gsd-map-codebase'])
+  })
+  
+  test('ignores code blocks', () => {
+    const markdown = `
+Valid: /gsd-real
+
+\`\`\`bash
+# Fake: /gsd-fake
+\`\`\`
+`
+    const refs = extractSkillRefs(markdown)
+    expect(refs).toEqual(['/gsd-real'])
+    expect(refs).not.toContain('/gsd-fake')
+  })
+  
+  test('ignores inline code', () => {
+    const markdown = `Use \`/gsd-old\` or /gsd-new`
+    const refs = extractSkillRefs(markdown)
+    expect(refs).toEqual(['/gsd-new'])
+    expect(refs).not.toContain('/gsd-old')
+  })
+  
+  test('ignores URLs', () => {
+    const markdown = `
+See https://example.com/gsd-docs/gsd-guide
+Use /gsd-real-skill
+`
+    const refs = extractSkillRefs(markdown)
+    expect(refs).toEqual(['/gsd-real-skill'])
+  })
+  
+  test('handles skill names with numbers', () => {
+    const markdown = `/gsd-add-phase-v2`
+    const refs = extractSkillRefs(markdown)
+    expect(refs).toContain('/gsd-add-phase-v2')
+  })
+})
+```
+
+#### 5. Batch Transformation with Rollback
+
+```javascript
+describe('Batch transformation', () => {
+  test('transforms all files atomically', async () => {
+    const files = ['file1.md', 'file2.md', 'file3.md']
+    
+    // Setup: Create test files
+    for (const file of files) {
+      fs.writeFileSync(file, `---\nname: ${file}\n---\nContent`)
+    }
+    
+    // Transform
+    await transformAllFiles(files, removeField('other'))
+    
+    // Verify all transformed
+    for (const file of files) {
+      const content = fs.readFileSync(file, 'utf-8')
+      expect(content).toMatch(/^---/)
+    }
+  })
+  
+  test('rolls back on error', async () => {
+    const files = ['good1.md', 'good2.md', 'bad.md', 'good3.md']
+    
+    // Setup files
+    for (const file of files) {
+      if (file === 'bad.md') {
+        fs.writeFileSync(file, 'invalid yaml')
+      } else {
+        fs.writeFileSync(file, `---\nname: ${file}\n---`)
+      }
+    }
+    
+    // Attempt transform
+    await expect(transformAllFiles(files, [])).rejects.toThrow()
+    
+    // Verify NO files changed (atomic rollback)
+    for (const file of files) {
+      if (file !== 'bad.md') {
+        const content = fs.readFileSync(file, 'utf-8')
+        expect(content).toBe(`---\nname: ${file}\n---`)
+      }
+    }
+  })
+  
+  test('handles disk full during write', async () => {
+    // Mock fs.writeFileSync to fail after 2 files
+    let writeCount = 0
+    const originalWrite = fs.writeFileSync
+    fs.writeFileSync = (...args) => {
+      if (++writeCount > 2) throw new Error('ENOSPC: disk full')
+      return originalWrite(...args)
+    }
+    
+    try {
+      const files = ['f1.md', 'f2.md', 'f3.md', 'f4.md']
+      await expect(transformAllFiles(files, [])).rejects.toThrow('disk full')
+      
+      // Verify cleanup of temp files
+      for (const file of files) {
+        expect(fs.existsSync(file + '.tmp')).toBe(false)
+      }
+    } finally {
+      fs.writeFileSync = originalWrite
+    }
+  })
+})
+```
+
+#### 6. Cross-Platform File Operations
+
+```javascript
+describe('Cross-platform compatibility', () => {
+  test('handles Windows path separators', () => {
+    const winPath = 'templates\\agents\\skill.md'
+    const normalized = normalizePath(winPath)
+    expect(normalized).toBe('templates/agents/skill.md')
+  })
+  
+  test('handles Windows line endings', () => {
+    const content = "line1\r\nline2\r\nline3"
+    const normalized = normalizeLineEndings(content)
+    expect(normalized).toBe("line1\nline2\nline3")
+  })
+  
+  test('preserves mixed line endings warning', () => {
+    const content = "line1\nline2\r\nline3\n"
+    expect(() => validateLineEndings(content)).toThrow(/mixed/)
+  })
+  
+  test('skips chmod on Windows', () => {
+    if (process.platform === 'win32') {
+      expect(() => makeExecutable('file.sh')).not.toThrow()
+    }
+  })
+})
+```
+
+#### 7. JSON Generation Validation
+
+```javascript
+describe('JSON generation', () => {
+  test('generates valid JSON', () => {
+    const data = {
+      name: 'test',
+      version: '1.0.0',
+      skills: ['skill1', 'skill2']
+    }
+    const json = generateJSON(data)
+    expect(() => JSON.parse(json)).not.toThrow()
+  })
+  
+  test('rejects invalid data', () => {
+    const data = {
+      name: 'test',
+      value: undefined  // Invalid in JSON
+    }
+    expect(() => generateJSON(data)).toThrow()
+  })
+  
+  test('adds trailing newline', () => {
+    const json = generateJSON({ name: 'test' })
+    expect(json.endsWith('\n')).toBe(true)
+  })
+  
+  test('pretty prints with 2 spaces', () => {
+    const json = generateJSON({ a: { b: 'c' } })
+    expect(json).toContain('  "a"')
+    expect(json).toContain('    "b"')
+  })
+})
+```
+
+### Systematic Error Detection
+
+**Before batch transformation, run pre-flight checks:**
+
+```javascript
+async function preflight(files) {
+  const issues = []
+  
+  for (const file of files) {
+    // 1. File exists and readable
+    if (!fs.existsSync(file)) {
+      issues.push({ file, error: 'File not found' })
+      continue
+    }
+    
+    // 2. Valid UTF-8
+    try {
+      fs.readFileSync(file, 'utf-8')
+    } catch (e) {
+      issues.push({ file, error: 'Invalid UTF-8 encoding' })
+      continue
+    }
+    
+    // 3. Has frontmatter
+    const content = fs.readFileSync(file, 'utf-8')
+    if (!content.match(/^---\r?\n[\s\S]*?\n---/)) {
+      issues.push({ file, error: 'No frontmatter found' })
+      continue
+    }
+    
+    // 4. Frontmatter parses
+    try {
+      const fenceMatch = content.match(/^---\r?\n([\s\S]*?)\n---/)
+      yaml.parse(fenceMatch[1])
+    } catch (e) {
+      issues.push({ file, error: `YAML parse error: ${e.message}` })
+      continue
+    }
+    
+    // 5. Check line endings
+    if (content.includes('\r\n') && content.includes('\n') && 
+        !content.match(/\n/g).every((_, i, arr) => 
+          i === arr.length - 1 || content[content.indexOf('\n', i) - 1] === '\r'
+        )) {
+      issues.push({ file, warning: 'Mixed line endings detected' })
+    }
+  }
+  
+  if (issues.some(i => i.error)) {
+    throw new Error(`Preflight failed:\n${formatIssues(issues)}`)
+  }
+  
+  if (issues.some(i => i.warning)) {
+    console.warn(`Preflight warnings:\n${formatIssues(issues)}`)
+  }
+}
+```
+
+### Regression Test Suite
+
+**Must run before every commit:**
+
+```bash
+# Test with real template files
+npm run test:templates
+
+# Test edge cases
+npm run test:edge-cases
+
+# Test cross-platform (in CI)
+npm run test:windows
+npm run test:linux
+npm run test:macos
+
+# Test with 42 files simultaneously
+npm run test:batch
+
+# Test rollback scenarios
+npm run test:rollback
+```
+
+### Warning Signs During Development
+
+**If you see these, STOP and investigate:**
+
+1. **Transformation takes >100ms per file** → Regex catastrophic backtracking
+2. **Output file size differs by >10% from input** → Content lost or duplicated
+3. **Array syntax changes** (flow → block or vice versa) → Not preserving style
+4. **Indentation changes** (2 spaces → 4 spaces) → YAML structure may break
+5. **Test passes locally but fails in CI** → Platform-specific issue
+6. **Git shows entire file changed** when only frontmatter touched → Line ending issue
+7. **One file fails but others succeed** → Not atomic, rollback missing
+8. **Error message doesn't include filename** → Hard to debug, add context
+
+---
+
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (P0)
-**Goal:** Safe, atomic installation
+**Goal:** Safe, atomic installation with frontmatter transformation
 
+**Frontmatter Transformation (Critical):**
+- [ ] Use `yaml` package with AST support (not regex)
+- [ ] Atomic file writes (write to .tmp, then rename)
+- [ ] Batch transformation with rollback on first error
+- [ ] Preserve YAML formatting (flow arrays, indentation, comments)
+- [ ] Field removal by exact path (`metadata.platform`, not substring match)
+- [ ] Tool name mapping with case normalization
+- [ ] Skill reference extraction (excluding code blocks)
+- [ ] JSON generation with validation
+
+**Transaction Safety:**
 - [ ] Transaction-based installation
 - [ ] Rollback on failure
 - [ ] Path validation (block traversal)
 - [ ] Pre-flight directory checks
 - [ ] Installation markers (`.gsd-meta.json`)
 
+**Testing (Critical - run on every commit):**
+- [ ] YAML edge case tests (flow arrays, multiline, comments)
+- [ ] Field removal precision tests
+- [ ] Tool mapping tests (case insensitive)
+- [ ] Skill reference extraction tests
+- [ ] Batch transformation with rollback tests
+- [ ] Cross-platform tests (Windows, Mac, Linux)
+
 ### Phase 2: Validation (P1)
 **Goal:** Fail fast with clear errors
 
+**Frontmatter Validation:**
+- [ ] Pre-flight: Validate all 42 files parse correctly
+- [ ] During transformation: Validate after each file
+- [ ] Post-transformation: Full validation suite
+- [ ] Error messages with filename and line number
+- [ ] Warning for mixed line endings
+- [ ] JSON schema validation for version.json files
+
+**Template Validation:**
 - [ ] Template validation (JSON Schema)
 - [ ] Frontmatter parsing
 - [ ] Content security analysis
@@ -1988,6 +3094,8 @@ jobs:
 - [ ] Graceful permission degradation
 - [ ] Test isolation
 - [ ] Comprehensive error messages
+- [ ] Dry-run mode for transformations
+- [ ] Progress reporting for 42-file batch
 
 ---
 
@@ -1995,6 +3103,14 @@ jobs:
 
 | Area | Confidence | Rationale |
 |------|------------|-----------|
+| **Frontmatter Transformation** | | |
+| YAML parsing with AST | **HIGH** | `yaml` package is mature, battle-tested |
+| Field removal precision | **HIGH** | AST manipulation is predictable |
+| Tool name mapping | **HIGH** | Simple dictionary lookup with normalization |
+| Skill reference extraction | **MEDIUM** | Regex-based, tested but needs edge case validation |
+| Batch atomic operations | **HIGH** | Standard write-tmp-rename pattern |
+| Cross-platform file ops | **MEDIUM** | Windows/Unix differences require careful testing |
+| **General Installer** | | |
 | Validation patterns | **HIGH** | Standard JSON Schema + YAML parsing (established tools) |
 | Transaction/rollback | **HIGH** | Well-known pattern (databases, package managers) |
 | Path security | **HIGH** | Standard path traversal prevention techniques |
@@ -2003,27 +3119,51 @@ jobs:
 | Platform spec changes | **MEDIUM** | Can't predict vendor changes, must react |
 | Testing isolation | **HIGH** | Standard temp directory + env var patterns |
 
+**Critical confidence gaps:**
+1. **Skill reference extraction** - Markdown parsing with regex has edge cases; needs comprehensive test suite
+2. **Cross-platform file operations** - Windows line endings, path separators, permissions need testing on actual Windows systems
+3. **Edge case coverage** - Unknown unknowns in 42 diverse template files; need to test with REAL files early
+
 ---
 
 ## Open Questions for Phase-Specific Research
 
-1. **What is the exact frontmatter spec for each platform today?**
+1. **What YAML formatting variations exist in current 42 template files?**
+   - Array syntax: all flow `[a, b]` or some block style?
+   - Multiline strings: literal `|` or folded `>`?
+   - Comment usage: inline vs block?
+   - Indentation: consistently 2 spaces?
+   - Flag for Phase 1 research - MUST examine real files before implementing
+
+2. **What is the complete tool mapping for Copilot → Claude?**
+   - Currently known: `execute` → `Bash`, `search` → `Grep`
+   - What other tool aliases exist?
+   - Are there platform-specific tools (like `mcp__*`)?
+   - Flag for Phase 1 research
+
+3. **What fields need to be removed vs transformed in frontmatter?**
+   - Remove: `metadata.platform`, `metadata.generated`, etc.
+   - Transform: `tools` array with mapping
+   - Preserve: which fields stay unchanged?
+   - Flag for Phase 1 research
+
+4. **What is the exact frontmatter spec for each platform today?**
    - Need to document current state for each CLI
    - Identify what varies between platforms
    - Flag for Phase 1 research
 
-2. **How do Claude/Copilot/Codex handle skill updates?**
+5. **How do Claude/Copilot/Codex handle skill updates?**
    - Do they hot-reload?
    - Require restart?
    - Cache skill definitions?
    - Flag for Phase 1 research
 
-3. **What file permissions do skills need?**
+6. **What file permissions do skills need?**
    - Executable bits required?
    - Platform differences?
    - Flag for Phase 1 research
 
-4. **How can we detect CLI platform versions?**
+7. **How can we detect CLI platform versions?**
    - Command-line flags?
    - Config files?
    - API endpoints?
@@ -2034,21 +3174,36 @@ jobs:
 ## Sources
 
 **HIGH confidence (established patterns):**
+- YAML parsing: `yaml` npm package documentation (v2.x), YAML 1.2 specification
 - Transaction pattern: Database systems (PostgreSQL docs), package managers (npm, apt)
 - Path validation: OWASP Path Traversal Prevention Cheat Sheet
 - JSON Schema: Official JSON Schema specification
 - Adapter pattern: Gang of Four Design Patterns
+- Atomic file operations: POSIX rename(2) semantics, Node.js fs.renameSync documentation
 
-**MEDIUM confidence (inferred from project):**
+**MEDIUM confidence (domain knowledge):**
+- Frontmatter edge cases: Common issues from Jekyll, Hugo, and other static site generators
+- YAML pitfalls: Known from js-yaml, yaml-js parser issues
+- Regex catastrophic backtracking: Standard regex performance issues
+- Cross-platform file operations: Node.js platform differences (documented)
+
+**LOW confidence (inferred from project):**
 - CLI frontmatter structure: Based on existing `.claude/skills/` and `.github/skills/` files
 - Platform differences: Observed from current multi-platform support
 - File structure: Current project layout
 
-**Areas needing validation:**
-- Specific platform version detection methods
-- Exact frontmatter specifications
+**Areas needing validation with real data:**
+- Exact YAML formatting in all 42 template files (MUST examine before implementing)
+- Complete tool mapping dictionary (may have more than execute→Bash, search→Grep)
+- Full list of fields to remove vs transform
+- Skill reference patterns in markdown (may have edge cases not covered)
 - Platform-specific installation requirements
 - Skill hot-reloading behavior
+
+**Critical: Test with REAL template files EARLY**
+- Don't implement transformation logic without examining actual file variations
+- One systematic error affects all 42 files
+- Early validation with real data prevents rewrite
 
 ---
 

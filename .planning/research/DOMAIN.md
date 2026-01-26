@@ -1276,6 +1276,938 @@ p.outro('✨ Installation complete! Run `gh gsd` to get started.')
 
 ---
 
+## 4. Transformation Pipeline Architecture
+
+**Confidence: HIGH** (Based on established ETL patterns, functional programming principles, and Node.js ecosystem best practices)
+
+### Problem Statement
+
+Building an installer that transforms 42 files (29 skills + 13 agents) with complex frontmatter transformations requires:
+- Clear pipeline stages (read → parse → transform → validate → write)
+- Strong module boundaries
+- Robust error handling
+- Atomic operations (all-or-nothing)
+- Idempotent operations (safe to re-run)
+- Comprehensive testing
+
+### Core Architecture Pattern: Functional Pipeline
+
+**RECOMMENDED:** Use functional composition where each stage is a pure function that takes context, transforms it, returns context.
+
+```javascript
+// pipeline/index.js
+async function runPipeline(config) {
+  const context = new PipelineContext(config);
+  
+  try {
+    await readStage(context);
+    await parseStage(context);
+    await transformStage(context);
+    await validateStage(context);
+    await generateStage(context);
+    await writeStage(context);
+    
+    return context;
+  } catch (err) {
+    await rollbackStage(context);
+    throw err;
+  }
+}
+```
+
+**Why this pattern:**
+- ✅ **Composable:** Easy to add/remove stages
+- ✅ **Testable:** Each stage tested independently
+- ✅ **Debuggable:** Inspect context between stages
+- ✅ **Predictable:** No hidden side effects
+
+**Alternative patterns considered:**
+- ❌ **Streams:** Overkill for 42 files, harder to debug
+- ❌ **Middleware:** More complex than needed, express-style unnecessary
+
+### Module Structure for Transformation Pipeline
+
+**Principle:** Organize by pipeline stage, with clear separation between I/O and pure transformations.
+
+```
+/bin/lib/
+├── pipeline/
+│   ├── index.js              # Main orchestrator
+│   ├── context.js            # Pipeline context object
+│   └── stages.js             # Stage definitions
+│
+├── readers/                  # Stage 1: Read
+│   ├── index.js              # Public API
+│   ├── file-reader.js        # Read source files
+│   └── frontmatter-parser.js # Parse YAML frontmatter
+│
+├── transformers/             # Stage 2: Transform
+│   ├── index.js              # Public API
+│   ├── skill-transformer.js  # Transform skill frontmatter
+│   ├── agent-transformer.js  # Transform agent frontmatter
+│   ├── tool-mapper.js        # Map tool names (Copilot→Claude)
+│   └── skill-extractor.js    # Extract /gsd-* references
+│
+├── validators/               # Stage 3: Validate
+│   ├── index.js              # Public API
+│   ├── schema-validator.js   # Validate against Joi schemas
+│   ├── reference-validator.js # Validate cross-references
+│   └── schemas/
+│       ├── skill-schema.js
+│       └── agent-schema.js
+│
+├── generators/               # Stage 4: Generate
+│   ├── index.js              # Public API
+│   ├── metadata-generator.js # Generate version.json per skill
+│   └── versions-generator.js # Generate consolidated versions.json
+│
+├── writers/                  # Stage 5: Write
+│   ├── index.js              # Public API
+│   ├── atomic-writer.js      # Atomic file operations
+│   └── directory-copier.js   # Directory operations
+│
+└── errors/
+    ├── index.js              # Public API
+    ├── pipeline-error.js     # Base error class
+    └── validation-error.js   # Validation-specific errors
+```
+
+**Key principles:**
+1. **I/O at edges only:** Only `readers/` and `writers/` touch filesystem
+2. **Pure transformers:** All transformation logic is pure (no side effects)
+3. **Single responsibility:** Each module does ONE thing
+4. **Public APIs:** `index.js` exports only public functions, hides internals
+5. **Error types:** Custom errors with stage/file context
+
+### Pipeline Context Pattern
+
+**Problem:** Each stage needs access to configuration, paths, files, and accumulated state.
+
+**Solution:** Context object passed through entire pipeline.
+
+```javascript
+// pipeline/context.js
+class PipelineContext {
+  constructor(config) {
+    this.config = config;
+    this.sourcePath = config.sourcePath;
+    this.targetPath = config.targetPath;
+    this.tempPath = null;
+    
+    // Accumulated data
+    this.files = [];        // All files being processed
+    this.skills = [];       // Parsed skill files
+    this.agents = [];       // Parsed agent files
+    this.metadata = {};     // Generated metadata
+    
+    // Error tracking
+    this.errors = [];
+    this.warnings = [];
+  }
+  
+  addFile(file) {
+    this.files.push(file);
+  }
+  
+  addError(error) {
+    this.errors.push(error);
+  }
+  
+  hasErrors() {
+    return this.errors.length > 0;
+  }
+  
+  getFileCount() {
+    return this.files.length;
+  }
+}
+
+module.exports = { PipelineContext };
+```
+
+**Usage in stages:**
+```javascript
+// Each stage takes context, modifies it, returns it
+async function transformStage(context) {
+  for (const file of context.files) {
+    try {
+      if (file.type === 'skill') {
+        file.frontmatter = transformSkillFrontmatter(file.frontmatter);
+      } else if (file.type === 'agent') {
+        file.frontmatter = transformAgentFrontmatter(file.frontmatter);
+      }
+    } catch (err) {
+      context.addError(new TransformError(file.path, err));
+    }
+  }
+  return context;
+}
+```
+
+### Frontmatter Parsing with gray-matter
+
+**RECOMMENDED LIBRARY:** `gray-matter` v4.0.3
+
+**Why gray-matter:**
+- ✅ Industry standard (2.3M+ weekly downloads)
+- ✅ Used by Jekyll, Hugo, 11ty, VuePress, Gatsby, Astro
+- ✅ Handles YAML, JSON, TOML, Coffee
+- ✅ Can stringify (write back modified frontmatter)
+- ✅ Excerpt support
+- ✅ Excellent error messages
+
+**Installation:**
+```bash
+npm install gray-matter
+```
+
+**Usage:**
+```javascript
+const matter = require('gray-matter');
+
+// readers/frontmatter-parser.js
+function parseFrontmatter(filePath, content) {
+  try {
+    const parsed = matter(content);
+    return {
+      frontmatter: parsed.data,    // YAML as JS object
+      markdown: parsed.content,     // Markdown content
+      original: parsed.orig         // Original string
+    };
+  } catch (err) {
+    if (err.name === 'YAMLException') {
+      throw new ParseError(filePath, 'Invalid YAML syntax', err);
+    }
+    throw err;
+  }
+}
+
+// writers/frontmatter-writer.js
+function stringifyFrontmatter(frontmatter, markdown) {
+  return matter.stringify(markdown, frontmatter);
+}
+```
+
+**Alternative considered:**
+- ❌ `front-matter`: YAML only, no stringify support, less maintained
+
+### Error Handling Strategy
+
+**Two-tier approach:**
+1. **Fail-fast for critical errors** (invalid config, missing source directory)
+2. **Collect-and-report for validation errors** (invalid frontmatter in one file)
+
+**Error types:**
+```javascript
+// errors/pipeline-error.js
+class PipelineError extends Error {
+  constructor(stage, message, file = null, cause = null) {
+    super(message);
+    this.name = 'PipelineError';
+    this.stage = stage;       // Which stage failed
+    this.file = file;          // Which file (if applicable)
+    this.cause = cause;        // Underlying error
+  }
+  
+  toString() {
+    let msg = `[${this.stage}] ${this.message}`;
+    if (this.file) msg += ` (file: ${this.file})`;
+    return msg;
+  }
+}
+
+class ValidationError extends PipelineError {
+  constructor(file, field, message) {
+    super('validation', message, file);
+    this.field = field;
+  }
+}
+
+class TransformError extends PipelineError {
+  constructor(file, message, cause) {
+    super('transform', message, file, cause);
+  }
+}
+```
+
+**Error handling in pipeline:**
+```javascript
+async function runPipeline(config) {
+  const context = new PipelineContext(config);
+  
+  try {
+    // Fail-fast stages
+    await readStage(context);
+    if (context.hasErrors()) {
+      throw new PipelineError('read', 'Failed to read source files');
+    }
+    
+    // Collect-errors stages
+    await transformStage(context);  // Continues even if some files fail
+    await validateStage(context);   // Accumulates all validation errors
+    
+    // Report all errors
+    if (context.hasErrors()) {
+      console.error(`Found ${context.errors.length} errors:`);
+      context.errors.forEach(err => console.error(`  ${err}`));
+      throw new PipelineError('validation', 'Validation failed');
+    }
+    
+    // Fail-fast for writes
+    await writeStage(context);
+    
+  } catch (err) {
+    await rollbackStage(context);
+    throw err;
+  }
+}
+```
+
+### Atomic Operations & Rollback
+
+**Problem:** If transformation fails halfway through writing, you're left with corrupted state.
+
+**RECOMMENDED SOLUTION:** Write to temporary directory, then atomic move.
+
+```javascript
+// writers/atomic-writer.js
+const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
+
+async function atomicWrite(context) {
+  // Create temp directory
+  const tempDir = await fs.mkdtemp(
+    path.join(os.tmpdir(), 'gsd-installer-')
+  );
+  context.tempPath = tempDir;
+  
+  try {
+    // Write all files to temp directory
+    for (const file of context.files) {
+      const targetPath = path.join(tempDir, file.relativePath);
+      await fs.mkdir(path.dirname(targetPath), { recursive: true });
+      await fs.writeFile(targetPath, file.content);
+    }
+    
+    // Validate temp directory
+    await validateOutput(tempDir);
+    
+    // Atomic move (or copy+delete if cross-filesystem)
+    await moveDirectory(tempDir, context.targetPath);
+    
+    console.log(`✓ Successfully installed to ${context.targetPath}`);
+    
+  } catch (err) {
+    // Cleanup temp directory
+    await fs.rm(tempDir, { recursive: true, force: true });
+    throw new PipelineError('write', 'Failed to write files', null, err);
+  }
+}
+
+async function moveDirectory(source, target) {
+  try {
+    // Try atomic rename (works if same filesystem)
+    await fs.rename(source, target);
+  } catch (err) {
+    // Fall back to copy + delete (cross-filesystem)
+    await fs.cp(source, target, { recursive: true });
+    await fs.rm(source, { recursive: true, force: true });
+  }
+}
+```
+
+**Why this approach:**
+- ✅ Clean rollback (just delete temp directory)
+- ✅ Target directory never in corrupted state
+- ✅ Can validate before committing
+- ✅ Atomic on same filesystem
+
+**Alternative: Dry-run mode**
+```javascript
+async function runPipeline(config, { dryRun = false }) {
+  const context = new PipelineContext(config);
+  
+  await readStage(context);
+  await transformStage(context);
+  await validateStage(context);
+  
+  if (dryRun) {
+    console.log('Dry run - would write:', context.files.length, 'files');
+    context.files.forEach(f => console.log(`  - ${f.relativePath}`));
+  } else {
+    await writeStage(context);
+  }
+}
+```
+
+**Use dry-run for:**
+- User preview before actual install
+- Testing without side effects
+- Debugging transformations
+
+### Validation Strategy
+
+**Two levels:**
+1. **Schema validation** (structure, types, required fields)
+2. **Cross-reference validation** (skill references exist)
+
+**RECOMMENDED LIBRARY:** `joi` v17.x for schema validation
+
+**Installation:**
+```bash
+npm install joi
+```
+
+**Schema validation:**
+```javascript
+// validators/schemas/skill-schema.js
+const Joi = require('joi');
+
+const skillSchema = Joi.object({
+  version: Joi.string()
+    .required()
+    .pattern(/^\d+\.\d+\.\d+$/)
+    .messages({
+      'string.pattern.base': 'version must be semver format (e.g., 1.0.0)'
+    }),
+  
+  name: Joi.string().required(),
+  
+  description: Joi.string().required(),
+  
+  tags: Joi.array()
+    .items(Joi.string())
+    .default([]),
+  
+  arguments: Joi.array().items(Joi.object({
+    name: Joi.string().required(),
+    required: Joi.boolean().default(false),
+    type: Joi.string()
+      .valid('string', 'number', 'boolean', 'array', 'object')
+      .default('string'),
+    description: Joi.string()
+  })).default([]),
+  
+  capabilities: Joi.array()
+    .items(Joi.string().valid('read', 'write', 'execute'))
+    .default([])
+    
+}).unknown(false); // Fail on unknown fields
+
+module.exports = { skillSchema };
+```
+
+**Validator usage:**
+```javascript
+// validators/schema-validator.js
+const { skillSchema } = require('./schemas/skill-schema');
+
+function validateSkill(data, filePath) {
+  const { error, value } = skillSchema.validate(data, {
+    abortEarly: false // Get all errors, not just first
+  });
+  
+  if (error) {
+    const errors = error.details.map(detail => ({
+      field: detail.path.join('.'),
+      message: detail.message,
+      file: filePath
+    }));
+    
+    throw new ValidationError(
+      filePath,
+      errors.map(e => e.field).join(', '),
+      errors.map(e => e.message).join('; ')
+    );
+  }
+  
+  return value; // Returns validated & coerced value
+}
+```
+
+**Cross-reference validation:**
+```javascript
+// validators/reference-validator.js
+function validateSkillReferences(agents, skills) {
+  const skillNames = new Set(skills.map(s => s.frontmatter.name));
+  const errors = [];
+  
+  agents.forEach(agent => {
+    agent.skillReferences.forEach(ref => {
+      if (!skillNames.has(ref)) {
+        errors.push({
+          file: agent.path,
+          message: `Unknown skill reference: ${ref}`
+        });
+      }
+    });
+  });
+  
+  return errors;
+}
+
+// Usage in validateStage
+async function validateStage(context) {
+  // Schema validation
+  for (const file of context.files) {
+    try {
+      if (file.type === 'skill') {
+        validateSkill(file.frontmatter, file.path);
+      }
+    } catch (err) {
+      context.addError(err);
+    }
+  }
+  
+  // Cross-reference validation
+  const refErrors = validateSkillReferences(context.agents, context.skills);
+  refErrors.forEach(err => context.addError(new ValidationError(
+    err.file, 'skill_reference', err.message
+  )));
+  
+  return context;
+}
+```
+
+### Idempotency Guarantees
+
+**Requirement:** Running installer twice must produce identical results.
+
+**Strategies:**
+
+**1. Pure transformations (no incremental changes):**
+```javascript
+// ❌ BAD: Non-idempotent
+function transform(data) {
+  data.count = (data.count || 0) + 1; // Increments each time!
+  return data;
+}
+
+// ✅ GOOD: Idempotent
+function transform(data) {
+  return {
+    ...data,
+    count: 1 // Always set to 1
+  };
+}
+```
+
+**2. Replace, don't append:**
+```javascript
+// ❌ BAD: Appends each time
+function addTag(data) {
+  data.tags.push('installer');
+  return data;
+}
+
+// ✅ GOOD: Set-based approach
+function ensureTag(data) {
+  const tags = new Set(data.tags || []);
+  tags.add('installer');
+  return { ...data, tags: Array.from(tags) };
+}
+```
+
+**3. Deterministic metadata (no timestamps):**
+```javascript
+// ❌ BAD: Changes each run
+const metadata = {
+  generated_at: new Date().toISOString()
+};
+
+// ✅ GOOD: Use source version or omit
+const metadata = {
+  source_version: getSourceVersion(), // From git hash or package.json
+  installer_version: require('../package.json').version
+};
+```
+
+**4. Checksum-based skip:**
+```javascript
+const crypto = require('crypto');
+
+function needsUpdate(sourcePath, targetPath) {
+  if (!fs.existsSync(targetPath)) return true;
+  
+  const sourceHash = hashFile(sourcePath);
+  const targetHash = hashFile(targetPath);
+  
+  return sourceHash !== targetHash;
+}
+
+function hashFile(filePath) {
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash('sha256').update(content).digest('hex');
+}
+
+// Usage in writeStage
+async function writeStage(context) {
+  for (const file of context.files) {
+    if (needsUpdate(file.sourcePath, file.targetPath)) {
+      await fs.writeFile(file.targetPath, file.content);
+      console.log(`  Updated: ${file.relativePath}`);
+    } else {
+      console.log(`  Skipped: ${file.relativePath} (unchanged)`);
+    }
+  }
+}
+```
+
+### Testing Strategy
+
+**Four testing levels:**
+
+**1. Unit tests: Pure transformations**
+```javascript
+// transformers/skill-transformer.test.js
+const { transformSkillFrontmatter } = require('./skill-transformer');
+
+describe('transformSkillFrontmatter', () => {
+  it('should rename gsd_version to version', () => {
+    const input = { gsd_version: '1.0.0', name: 'test' };
+    const output = transformSkillFrontmatter(input);
+    
+    expect(output).toEqual({ version: '1.0.0', name: 'test' });
+    expect(output).not.toHaveProperty('gsd_version');
+  });
+  
+  it('should convert string tags to array', () => {
+    const input = { tags: 'tag1, tag2' };
+    const output = transformSkillFrontmatter(input);
+    
+    expect(output.tags).toEqual(['tag1', 'tag2']);
+  });
+  
+  it('should be idempotent', () => {
+    const input = { gsd_version: '1.0.0' };
+    const once = transformSkillFrontmatter(input);
+    const twice = transformSkillFrontmatter(once);
+    
+    expect(once).toEqual(twice);
+  });
+});
+```
+
+**2. Integration tests: Pipeline stages**
+```javascript
+// pipeline/pipeline.test.js
+const { runPipeline } = require('./index');
+const { PipelineContext } = require('./context');
+
+describe('pipeline', () => {
+  it('should process skill files end-to-end', async () => {
+    const context = new PipelineContext({
+      sourcePath: './test/fixtures/skills',
+      targetPath: './test/output'
+    });
+    
+    await runPipeline(context);
+    
+    expect(context.files).toHaveLength(2);
+    expect(context.errors).toHaveLength(0);
+    
+    // Verify output
+    const output = await fs.readFile(
+      './test/output/skill1.md',
+      'utf8'
+    );
+    expect(output).toContain('version: 1.0.0');
+  });
+});
+```
+
+**3. Snapshot tests: Complex transformations**
+```javascript
+// transformers/agent-transformer.test.js
+it('should transform agent frontmatter correctly', () => {
+  const input = {
+    name: 'Test Agent',
+    gsd_version: '1.0.0',
+    tools: 'read_file, write_file',
+    context7: 'yes'
+  };
+  
+  const output = transformAgentFrontmatter(input);
+  
+  // Captures entire output structure
+  expect(output).toMatchSnapshot();
+});
+```
+
+**4. Golden files: End-to-end verification**
+```
+/test/
+├── fixtures/          # Input files
+│   ├── skills/
+│   │   └── test-skill.md
+│   └── agents/
+│       └── test-agent.md
+└── golden/            # Expected output
+    ├── skills/
+    │   └── test-skill.md
+    └── agents/
+        └── test-agent.md
+```
+
+```javascript
+it('should match golden file', async () => {
+  await runPipeline(context);
+  
+  const actual = await fs.readFile(
+    './test/output/skills/test-skill.md',
+    'utf8'
+  );
+  const expected = await fs.readFile(
+    './test/golden/skills/test-skill.md',
+    'utf8'
+  );
+  
+  expect(actual).toBe(expected);
+});
+```
+
+**Test coverage targets:**
+- ✅ Unit tests: 100% of transformer functions
+- ✅ Integration tests: All pipeline stages
+- ✅ Snapshot tests: Complex transformations
+- ✅ Golden files: End-to-end installer run
+
+### Performance Optimization
+
+**For 42 files, performance is not critical, but these patterns scale:**
+
+**1. Parallel processing:**
+```javascript
+// Process independent transformations in parallel
+async function transformStage(context) {
+  const transformed = await Promise.all(
+    context.files.map(async file => {
+      file.frontmatter = transformFrontmatter(file);
+      return file;
+    })
+  );
+  
+  context.files = transformed;
+  return context;
+}
+```
+
+**When to use:**
+- ✅ Independent transformations
+- ✅ I/O-bound operations
+- ❌ NOT for this project (42 files = fast enough serially)
+
+**2. Skip unchanged files:**
+```javascript
+// Already covered in "Idempotency" section
+if (needsUpdate(sourcePath, targetPath)) {
+  await writeFile(targetPath, content);
+}
+```
+
+**When to use:**
+- ✅ Re-running installer on existing installation
+- ✅ Incremental updates
+- ✅ Large file counts
+
+### Recommended Pipeline Flow
+
+**Full pipeline for this project:**
+
+```javascript
+// bin/lib/pipeline/index.js
+const { PipelineContext } = require('./context');
+const { readStage } = require('./stages/read-stage');
+const { parseStage } = require('./stages/parse-stage');
+const { transformStage } = require('./stages/transform-stage');
+const { validateStage } = require('./stages/validate-stage');
+const { generateStage } = require('./stages/generate-stage');
+const { writeStage } = require('./stages/write-stage');
+const { rollbackStage } = require('./stages/rollback-stage');
+
+async function runPipeline(config, options = {}) {
+  const context = new PipelineContext(config);
+  
+  try {
+    // Stage 1: Read source files
+    await readStage(context);
+    console.log(`✓ Read ${context.getFileCount()} files`);
+    
+    // Stage 2: Parse YAML frontmatter
+    await parseStage(context);
+    console.log(`✓ Parsed frontmatter`);
+    
+    // Stage 3: Transform frontmatter
+    await transformStage(context);
+    console.log(`✓ Transformed frontmatter`);
+    
+    // Stage 4: Validate
+    await validateStage(context);
+    if (context.hasErrors()) {
+      console.error(`✗ Validation failed with ${context.errors.length} errors`);
+      context.errors.forEach(err => console.error(`  ${err}`));
+      throw new PipelineError('validation', 'Validation failed');
+    }
+    console.log(`✓ Validated`);
+    
+    // Stage 5: Generate metadata files
+    await generateStage(context);
+    console.log(`✓ Generated metadata`);
+    
+    // Stage 6: Write to target (atomic)
+    if (options.dryRun) {
+      console.log(`Dry run - would write ${context.files.length} files`);
+    } else {
+      await writeStage(context);
+      console.log(`✓ Installed to ${context.targetPath}`);
+    }
+    
+    return context;
+    
+  } catch (err) {
+    console.error(`✗ Pipeline failed at stage: ${err.stage || 'unknown'}`);
+    await rollbackStage(context);
+    throw err;
+  }
+}
+
+module.exports = { runPipeline, PipelineContext };
+```
+
+**Stage implementations:**
+
+```javascript
+// bin/lib/pipeline/stages/read-stage.js
+const fs = require('fs').promises;
+const path = require('path');
+
+async function readStage(context) {
+  const { sourcePath } = context;
+  
+  // Read skills
+  const skillsPath = path.join(sourcePath, '.github/skills');
+  const skillFiles = await fs.readdir(skillsPath);
+  
+  for (const file of skillFiles) {
+    if (!file.endsWith('.md')) continue;
+    
+    const filePath = path.join(skillsPath, file);
+    const content = await fs.readFile(filePath, 'utf8');
+    
+    context.addFile({
+      type: 'skill',
+      path: filePath,
+      relativePath: `skills/${file}`,
+      content,
+      frontmatter: null // Parsed in next stage
+    });
+  }
+  
+  // Read agents
+  const agentsPath = path.join(sourcePath, '.github/agents');
+  const agentFiles = await fs.readdir(agentsPath);
+  
+  for (const file of agentFiles) {
+    if (!file.endsWith('.md')) continue;
+    
+    const filePath = path.join(agentsPath, file);
+    const content = await fs.readFile(filePath, 'utf8');
+    
+    context.addFile({
+      type: 'agent',
+      path: filePath,
+      relativePath: `agents/${file}`,
+      content,
+      frontmatter: null
+    });
+  }
+  
+  return context;
+}
+
+module.exports = { readStage };
+```
+
+```javascript
+// bin/lib/pipeline/stages/parse-stage.js
+const matter = require('gray-matter');
+const { ParseError } = require('../../errors');
+
+async function parseStage(context) {
+  for (const file of context.files) {
+    try {
+      const parsed = matter(file.content);
+      file.frontmatter = parsed.data;
+      file.markdown = parsed.content;
+    } catch (err) {
+      context.addError(new ParseError(
+        file.path,
+        'Failed to parse YAML frontmatter',
+        err
+      ));
+    }
+  }
+  
+  // Fail-fast if any parse errors
+  if (context.hasErrors()) {
+    throw new PipelineError('parse', 'Failed to parse frontmatter');
+  }
+  
+  return context;
+}
+
+module.exports = { parseStage };
+```
+
+```javascript
+// bin/lib/pipeline/stages/transform-stage.js
+const { transformSkillFrontmatter } = require('../../transformers/skill-transformer');
+const { transformAgentFrontmatter } = require('../../transformers/agent-transformer');
+
+async function transformStage(context) {
+  for (const file of context.files) {
+    try {
+      if (file.type === 'skill') {
+        file.frontmatter = transformSkillFrontmatter(file.frontmatter);
+      } else if (file.type === 'agent') {
+        file.frontmatter = transformAgentFrontmatter(file.frontmatter);
+      }
+    } catch (err) {
+      context.addError(new TransformError(file.path, err.message, err));
+    }
+  }
+  
+  return context;
+}
+
+module.exports = { transformStage };
+```
+
+### Sources & References
+
+**Pipeline Architecture:**
+- Functional programming patterns: https://mostly-adequate.gitbook.io/mostly-adequate-guide/
+- ETL patterns: https://martinfowler.com/articles/data-monolith-to-mesh.html
+
+**Frontmatter Parsing:**
+- **gray-matter:** https://github.com/jonschlinkert/gray-matter (RECOMMENDED)
+- NPM stats: https://npmtrends.com/gray-matter
+
+**Validation:**
+- **joi:** https://joi.dev/api/ (Schema validation)
+- NPM: https://www.npmjs.com/package/joi
+
+**Testing:**
+- Jest snapshots: https://jestjs.io/docs/snapshot-testing
+- Golden files pattern: https://ro-che.info/articles/2017-12-04-golden-tests
+
+**Atomic Operations:**
+- Node.js fs.rename: https://nodejs.org/api/fs.html#fs_fs_rename_oldpath_newpath_callback
+- Atomic file operations: https://rcoh.me/posts/atomic-rsync/
+
+---
+
 ## Summary & Recommendations
 
 ### Domain-Oriented Module Structure
@@ -1302,9 +2234,43 @@ p.outro('✨ Installation complete! Run `gh gsd` to get started.')
 ✅ **Progress:** Sequential spinners for multi-step installations  
 ✅ **UX:** Show "coming soon" options with `disabled: true`, handle Ctrl+C gracefully
 
-**Install:**
-```bash
-npm install @clack/prompts mustache
+### Transformation Pipeline Architecture
+
+✅ **Use functional pipeline pattern:** `read → parse → transform → validate → generate → write`  
+✅ **Context object:** Pass `PipelineContext` through all stages  
+✅ **I/O at edges only:** Only `readers/` and `writers/` touch filesystem  
+✅ **Pure transformers:** All transformation logic is pure (no side effects)  
+
+✅ **Module structure:**
+```
+pipeline/          # Orchestrator
+readers/           # Read & parse frontmatter
+transformers/      # Pure transformation functions
+validators/        # Schema & reference validation
+generators/        # Metadata generation
+writers/           # Atomic file operations
+errors/            # Custom error types
 ```
 
-This research provides comprehensive guidance for building a professional, maintainable template-based installer with excellent UX.
+✅ **Frontmatter parsing:** Use `gray-matter` (v4.2.3) - industry standard  
+✅ **Schema validation:** Use `joi` (v17.x) for comprehensive validation  
+✅ **Error handling:** Fail-fast for critical, collect-and-report for validation  
+✅ **Atomic operations:** Write to temp directory, atomic move to target  
+✅ **Idempotency:** Pure transformations, deterministic output, checksum-based skips  
+✅ **Testing:** Unit (transformers), integration (stages), snapshot (complex), golden (E2E)
+
+**Install:**
+```bash
+npm install @clack/prompts mustache gray-matter joi
+```
+
+**Test:**
+```bash
+npm install -D jest
+```
+
+This research provides comprehensive guidance for building a professional, maintainable template-based installer with:
+- **Excellent UX** (interactive prompts, progress indicators)
+- **Robust architecture** (functional pipeline, clear boundaries)
+- **Safe operations** (atomic writes, idempotency, rollback)
+- **High confidence** (comprehensive testing, schema validation)
