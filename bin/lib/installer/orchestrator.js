@@ -1,13 +1,15 @@
 // bin/lib/installer/orchestrator.js
 
 import { join } from 'path';
+import { homedir } from 'os';
 import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
 import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
-import { renderTemplate, getClaudeVariables, findUnknownVariables } from '../rendering/template-renderer.js';
+import { renderTemplate, findUnknownVariables } from '../rendering/template-renderer.js';
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
+import { adapterRegistry } from '../platforms/registry.js';
 import { readdir, readFile } from 'fs/promises';
 
 /**
@@ -23,12 +25,31 @@ import { readdir, readFile } from 'fs/promises';
 export async function install(options) {
   const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride } = options;
   
-  // Resolve paths (allow override for testing)
-  const targetDir = targetDirOverride || resolveTargetDirectory(isGlobal, platform);
+  // Get platform adapter
+  const adapter = adapterRegistry.get(platform);
+  
+  // Determine target directory
+  const targetBase = adapter.getTargetDir(isGlobal);
+  const targetDir = targetDirOverride || (isGlobal 
+    ? join(homedir(), targetBase.replace('~/', ''))
+    : targetBase);
+  
   const templatesDir = getTemplatesDirectory(scriptDir);
+  
+  // Get command prefix and path reference for variable replacement
+  const commandPrefix = adapter.getCommandPrefix();
+  const pathReference = adapter.getPathReference();
+  
+  const templateVars = {
+    PLATFORM_ROOT: pathReference,
+    COMMAND_PREFIX: commandPrefix,
+    VERSION: '2.0.0',
+    PLATFORM_NAME: platform
+  };
   
   logger.info(`Target directory: ${targetDir}`, 1);
   logger.info(`Templates source: ${templatesDir}`, 1);
+  logger.info(`Command prefix: ${commandPrefix}`, 1);
   
   // Validate templates exist
   await validateTemplates(templatesDir);
@@ -45,9 +66,6 @@ export async function install(options) {
     // For now, proceed with overwrite
   }
   
-  // Get template variables
-  const variables = getClaudeVariables(isGlobal);
-  
   // Create target directory
   await ensureDirectory(targetDir);
   
@@ -63,13 +81,13 @@ export async function install(options) {
     
     try {
       // Phase 1: Install skills
-      stats.skills = await installSkills(templatesDir, targetDir, variables, multiBar, isVerbose, platform);
+      stats.skills = await installSkills(templatesDir, targetDir, templateVars, multiBar, isVerbose, platform);
       
       // Phase 2: Install agents
-      stats.agents = await installAgents(templatesDir, targetDir, variables, multiBar, isVerbose);
+      stats.agents = await installAgents(templatesDir, targetDir, templateVars, multiBar, isVerbose);
       
       // Phase 3: Install shared directory
-      stats.shared = await installShared(templatesDir, targetDir, variables, multiBar, isVerbose);
+      stats.shared = await installShared(templatesDir, targetDir, templateVars, multiBar, isVerbose);
       
       stopAllProgress(multiBar);
     } catch (error) {
@@ -79,17 +97,17 @@ export async function install(options) {
   } else {
     // Verbose mode: no progress bars, show files
     logger.header('Installing Skills');
-    stats.skills = await installSkills(templatesDir, targetDir, variables, null, isVerbose, platform);
+    stats.skills = await installSkills(templatesDir, targetDir, templateVars, null, isVerbose, platform);
     
     logger.header('Installing Agents');
-    stats.agents = await installAgents(templatesDir, targetDir, variables, null, isVerbose);
+    stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
     
     logger.header('Installing Shared Directory');
-    stats.shared = await installShared(templatesDir, targetDir, variables, null, isVerbose);
+    stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
   }
   
   // Generate installation manifest
-  await generateManifest(targetDir, stats, isGlobal);
+  await generateManifest(targetDir, stats, isGlobal, platform);
   
   return stats;
 }
@@ -269,12 +287,12 @@ async function processTemplateFile(filePath, variables, isVerbose) {
 /**
  * Generate installation manifest
  */
-async function generateManifest(targetDir, stats, isGlobal) {
+async function generateManifest(targetDir, stats, isGlobal, platform) {
   const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
   
   const manifest = {
     version: '2.0.0',
-    platform: 'claude',
+    platform: platform,
     scope: isGlobal ? 'global' : 'local',
     installedAt: new Date().toISOString(),
     stats: {
