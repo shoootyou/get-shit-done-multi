@@ -95,6 +95,12 @@ async function main() {
   logger.banner();
   
   // Install to each platform
+  const platformNames = {
+    claude: 'Claude Code',
+    copilot: 'GitHub Copilot CLI',
+    codex: 'Codex CLI'
+  };
+  
   for (const platform of platforms) {
     logger.info(`Installing to ${platform} (${isGlobal ? 'global' : 'local'})...`, 1);
     
@@ -105,18 +111,29 @@ async function main() {
       scriptDir: __dirname
     });
     
-    logger.success(`✓ ${platform} installation complete`, 1);
+    logger.success(`${platform} installation complete`, 1);
   }
   
-  console.log(); // Add spacing after installations
-  logger.success('All installations complete!');
+  // Show installation complete message with platform names
+  console.log(); // One jump line before
+  if (platforms.length > 1) {
+    const names = platforms.join(', ');
+    logger.success(`${names} installation complete`);
+  } else {
+    logger.success(`${platforms[0]} installation complete`);
+  }
   
-  // Add next actions
-  console.log();
-  logger.info('Next steps:', 1);
-  logger.info('  • Open your AI CLI and run /gsd-help to see available commands', 1);
-  logger.info('  • Try /gsd-diagnose to validate your setup', 1);
-  logger.info('  • Explore skills with /gsd-list-skills', 1);
+  // Add next steps section with header
+  logger.header('Next Steps');
+  
+  // Dynamic AI CLI name based on number of platforms
+  const cliName = platforms.length > 1 
+    ? 'your AI CLI' 
+    : platformNames[platforms[0]] || 'your AI CLI';
+  
+  logger.info(`Open ${cliName} and run /gsd-help to see available commands`);
+  logger.info('Try /gsd-diagnose to validate your setup');
+  logger.info('Explore skills with /gsd-list-skills');
 }
 
 // Execute with proper error handling

@@ -39,9 +39,6 @@ export async function runInteractive(options = {}) {
   
   // Run installation (Pattern 3 from research)
   await runInstallation(platforms, scope);
-  
-  // Show completion with outro
-  p.outro('Installation complete!');
 }
 
 /**
@@ -168,6 +165,7 @@ async function runInstallation(platforms, scope) {
         silent: true // Don't show command prefix logging
       });
       
+      logger.success(`${platform} installation complete`, 1);
       successes.push({ platform, platformLabel, stats });
     } catch (error) {
       failures.push({ platform: platformNames[platform] || platform, error });
@@ -175,17 +173,6 @@ async function runInstallation(platforms, scope) {
   }
   
   multiBar.stop();
-  
-  console.log(); // Add spacing after progress bars
-  
-  // Show summary using CLI logger format
-  if (successes.length > 0) {
-    console.log();
-    logger.success(`Successfully installed to ${successes.length} platform(s):`);
-    successes.forEach(({ platformLabel, stats }) => {
-      logger.info(`  ${platformLabel}: ${stats.skills} skills, ${stats.agents} agents`, 2);
-    });
-  }
   
   if (failures.length > 0) {
     console.log();
@@ -198,13 +185,26 @@ async function runInstallation(platforms, scope) {
     }
   }
   
-  // Add the next actions message using CLI logger format
-  if (successes.length > 0) {
-    console.log();
-    logger.info('Next steps:');
-    logger.info('  • Open your AI CLI and run /gsd-help to see available commands', 2);
-    logger.info('  • Try /gsd-diagnose to validate your setup', 2);
-    logger.info('  • Explore skills with /gsd-list-skills', 2);
-    console.log();
+  // Show installation complete message with platform names
+  console.log(); // One jump line before
+  if (successes.length > 1) {
+    const names = successes.map(s => s.platform).join(', ');
+    logger.success(`${names} installation complete`);
+  } else if (successes.length === 1) {
+    logger.success(`${successes[0].platform} installation complete`);
   }
+  
+  // Add next steps section with header
+  logger.header('Next Steps');
+  
+  // Dynamic AI CLI name based on number of platforms
+  const cliName = platforms.length > 1 
+    ? 'your AI CLI' 
+    : platformNames[platforms[0]] || 'your AI CLI';
+  
+  logger.info(`Open ${cliName} and run /gsd-help to see available commands`);
+  logger.info('Try /gsd-diagnose to validate your setup');
+  logger.info('Explore skills with /gsd-list-skills');
+  
+  console.log(); // Add spacing at end
 }
