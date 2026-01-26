@@ -33,6 +33,7 @@ export async function install(options) {
   const hasExisting = await pathExists(manifestPath);
   
   if (hasExisting) {
+    logger.sectionTitle('Warnings');
     logger.warn('Existing installation detected', 1);
     logger.warn('Installation will overwrite existing files', 1);
     // In Phase 4, we'll add interactive confirmation here
