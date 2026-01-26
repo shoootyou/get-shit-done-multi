@@ -192,6 +192,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 2 (core installer must work)
 
+**Plans:** 3 plans
+
 **Requirements Mapped:**
 - PLATFORM-01: Platform detection (GSD-specific paths)
 - PLATFORM-01B: Binary detection for recommendations
@@ -228,10 +230,16 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - `/bin/lib/platforms/registry.js` (adapter lookup)
 - Updated rendering to use adapters for transformations
 
+**Plans:**
+- [ ] 03-01-PLAN.md — Platform Foundation (Wave 1)
+- [ ] 03-02-PLAN.md — Concrete Adapters (Wave 2)
+- [ ] 03-03-PLAN.md — Orchestrator Integration and CLI (Wave 3)
+
 **Notes:**
 - This validates the adapter pattern with all three platforms
 - Platform detection checks for existing GSD installations, not CLI presence
 - Binary detection (`copilot`, `claude`, `codex`) recommends which platforms to install
+- ARCHITECTURAL RULE: Each adapter extends ONLY PlatformAdapter (no cross-inheritance)
 
 ---
 
