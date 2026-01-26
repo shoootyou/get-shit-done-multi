@@ -4,6 +4,7 @@ import { join } from 'path';
 import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
 import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
 import { renderTemplate, getClaudeVariables, findUnknownVariables } from '../rendering/template-renderer.js';
+import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
@@ -22,7 +23,7 @@ export async function install(options) {
   const templatesDir = getTemplatesDirectory(scriptDir);
   
   logger.info(`Target directory: ${targetDir}`);
-  logger.verbose(`Templates directory: ${templatesDir}`, isVerbose);
+  logger.info(`Templates source: ${templatesDir}`);
   
   // Validate templates exist
   await validateTemplates(templatesDir);
@@ -53,7 +54,7 @@ export async function install(options) {
     
     try {
       // Phase 1: Install skills
-      stats.skills = await installSkills(templatesDir, targetDir, variables, multiBar, isVerbose);
+      stats.skills = await installSkills(templatesDir, targetDir, variables, multiBar, isVerbose, platform);
       
       // Phase 2: Install agents
       stats.agents = await installAgents(templatesDir, targetDir, variables, multiBar, isVerbose);
@@ -69,7 +70,7 @@ export async function install(options) {
   } else {
     // Verbose mode: no progress bars, show files
     logger.header('Installing Skills');
-    stats.skills = await installSkills(templatesDir, targetDir, variables, null, isVerbose);
+    stats.skills = await installSkills(templatesDir, targetDir, variables, null, isVerbose, platform);
     
     logger.header('Installing Agents');
     stats.agents = await installAgents(templatesDir, targetDir, variables, null, isVerbose);
@@ -107,19 +108,27 @@ async function validateTemplates(templatesDir) {
 /**
  * Install skills from templates
  */
-async function installSkills(templatesDir, targetDir, variables, multiBar, isVerbose) {
+async function installSkills(templatesDir, targetDir, variables, multiBar, isVerbose, platform) {
   const skillsTemplateDir = join(templatesDir, 'skills');
   const skillsTargetDir = join(targetDir, 'skills');
   
-  // Get skill directories
+  // Get skill directories (exclude get-shit-done which has platform subdirectories)
   const skillDirs = await readdir(skillsTemplateDir, { withFileTypes: true });
-  const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-'));
+  const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-') && d.name !== 'get-shit-done');
   
-  const total = skills.length;
+  // Add platform-specific get-shit-done skill
+  const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
+  const hasGetShitDone = await pathExists(getShitDoneTemplateDir);
+  
+  const total = skills.length + (hasGetShitDone ? 1 : 0);
   const bar = multiBar ? createProgressBar(multiBar, 'Skills', total) : null;
   
   let count = 0;
+  
+  // Install regular skills
   for (const skill of skills) {
+    logger.verboseInProgress(skill.name, isVerbose);
+    
     const srcDir = join(skillsTemplateDir, skill.name);
     const destDir = join(skillsTargetDir, skill.name);
     
@@ -132,7 +141,22 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
     
     count++;
     if (bar) updateProgress(bar, count);
-    logger.verbose(`  → ${skill.name}`, isVerbose);
+    logger.verboseComplete(isVerbose);
+  }
+  
+  // Install platform-specific get-shit-done skill
+  if (hasGetShitDone) {
+    logger.verboseInProgress('get-shit-done', isVerbose);
+    
+    const destDir = join(skillsTargetDir, 'get-shit-done');
+    await copyDirectory(getShitDoneTemplateDir, destDir);
+    
+    const skillFile = join(destDir, 'SKILL.md');
+    await processTemplateFile(skillFile, variables, isVerbose);
+    
+    count++;
+    if (bar) updateProgress(bar, count);
+    logger.verboseComplete(isVerbose);
   }
   
   return count;
@@ -156,6 +180,8 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
   
   let count = 0;
   for (const agent of agents) {
+    logger.verboseInProgress(agent, isVerbose);
+    
     const srcFile = join(agentsTemplateDir, agent);
     const destFile = join(agentsTargetDir, agent);
     
@@ -166,18 +192,20 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     
     count++;
     if (bar) updateProgress(bar, count);
-    logger.verbose(`  → ${agent}`, isVerbose);
+    logger.verboseComplete(isVerbose);
   }
   
   // Copy versions.json
   const versionsFile = join(agentsTemplateDir, 'versions.json');
   if (await pathExists(versionsFile)) {
+    logger.verboseInProgress('versions.json', isVerbose);
+    
     const content = await readFile(versionsFile, 'utf8');
     const processed = renderTemplate(content, variables);
     await writeFile(join(agentsTargetDir, 'versions.json'), processed);
     count++;
     if (bar) updateProgress(bar, count);
-    logger.verbose('  → versions.json', isVerbose);
+    logger.verboseComplete(isVerbose);
   }
   
   return agents.length;
@@ -192,6 +220,8 @@ async function installShared(templatesDir, targetDir, variables, multiBar, isVer
   
   const bar = multiBar ? createProgressBar(multiBar, 'Shared', 1) : null;
   
+  logger.verboseInProgress('get-shit-done/', isVerbose);
+  
   // Copy entire directory
   await copyDirectory(sharedTemplateDir, sharedTargetDir);
   
@@ -202,7 +232,7 @@ async function installShared(templatesDir, targetDir, variables, multiBar, isVer
   }
   
   if (bar) updateProgress(bar, 1);
-  logger.verbose('  → get-shit-done/', isVerbose);
+  logger.verboseComplete(isVerbose);
   
   return 1;
 }
@@ -219,8 +249,13 @@ async function processTemplateFile(filePath, variables, isVerbose) {
     logger.warn(`Unknown variables in ${filePath}: ${unknown.join(', ')}`);
   }
   
+  // Replace template variables
   const processed = renderTemplate(content, variables);
-  await writeFile(filePath, processed);
+  
+  // Clean frontmatter (remove empty fields)
+  const cleaned = cleanFrontmatter(processed);
+  
+  await writeFile(filePath, cleaned);
 }
 
 /**
