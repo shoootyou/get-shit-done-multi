@@ -392,14 +392,25 @@ Problems that look simple but have existing solutions:
 **What goes wrong:** Migration creates version.json but omits fields that were undefined in source.
 **Why it happens:** Conditional logic or undefined field skipping.
 **How to avoid:**
-- Extract ALL expected fields, even if undefined
-- Preserve structure: `{skill_version: undefined}` is valid JSON
-- Or use defaults: `skill_version: data.skill_version || "unknown"`
-- Document which fields are optional vs required
+- **DECISION:** Include ALL expected fields. If value is null, use default values
+- Defaults: `version` → "2.0.0", `skill_version` → "1.0.0", `requires_version` → "1.0.0+"
+- Preserve explicit structure for all version.json files
+- Document which fields have defaults vs remain null
 **Warning signs:**
 - version.json files have inconsistent structure
 - Some files missing expected keys
 - JSON schema validation fails
+
+**Example implementation:**
+```javascript
+const version = {
+  version: parsed.data.metadata?.projectVersion || "2.0.0",
+  skill_version: parsed.data.skill_version || "1.0.0",
+  requires_version: parsed.data.requires_version || "1.0.0+",
+  platforms: parsed.data.platforms || ["claude", "copilot", "codex"],
+  metadata: parsed.data.metadata || {}
+};
+```
 
 ## Code Examples
 
@@ -559,13 +570,14 @@ async function requireManualApproval(summary) {
 ### External Diff Viewer with Fallbacks
 ```javascript
 // Source: https://github.com/sindresorhus/open + platform conventions
+// DECISION: Use fallback chain (VS Code → platform-specific → terminal)
 import open from 'open';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 async function openDiff(beforePath, afterPath) {
-  // Try VS Code (cross-platform)
+  // 1. Try VS Code (cross-platform, most common)
   try {
     await execAsync('which code');
     await open('', {
@@ -578,7 +590,7 @@ async function openDiff(beforePath, afterPath) {
     // VS Code not available
   }
   
-  // Platform-specific tools
+  // 2. Platform-specific tools
   try {
     if (process.platform === 'darwin') {
       await execAsync(`opendiff "${beforePath}" "${afterPath}"`);
@@ -594,7 +606,7 @@ async function openDiff(beforePath, afterPath) {
     // Platform tool not available
   }
   
-  // Terminal fallback
+  // 3. Terminal fallback (always works)
   console.log('\n--- Before ---');
   console.log(await fs.readFile(beforePath, 'utf-8'));
   console.log('\n--- After ---');
@@ -683,20 +695,78 @@ frontmatter['allowed-tools'] = normalizeToolNames(frontmatter.tools);
 // Output: "Read, Edit, Bash"
 ```
 
+### Argument Hint Extraction
+```javascript
+// Source: Resolved decision - use [argname] format
+// DECISION: Extract first argument name from arguments array, wrap in brackets
+
+function extractArgumentHint(argumentsArray) {
+  // Handle missing or empty arguments
+  if (!argumentsArray || !Array.isArray(argumentsArray) || argumentsArray.length === 0) {
+    return undefined; // No arguments = no hint
+  }
+  
+  // Get first argument's name
+  const firstArg = argumentsArray[0];
+  if (!firstArg || !firstArg.name) {
+    console.warn('First argument missing name field');
+    return undefined;
+  }
+  
+  // Format: [argname]
+  return `[${firstArg.name}]`;
+}
+
+// Usage in skill frontmatter correction
+const correctedFrontmatter = {
+  name: parsed.data.name,
+  description: parsed.data.description,
+  'allowed-tools': normalizeToolNames(parsed.data.tools),
+  'argument-hint': extractArgumentHint(parsed.data.arguments)
+};
+
+// Example transformation:
+// Before: arguments: [{name: "phase", type: "string", required: true}]
+// After:  argument-hint: "[phase]"
+```
+
 ### Skill Reference Extraction (for Agent Skills Field)
 ```javascript
 // Source: .planning/AGENT-CORRECTIONS.md requirement
+// DECISION: Include /gsd-* mentions BUT validate if it's a skill (include) vs agent (exclude)
+
+// Known skill names (from .github/skills/)
+const KNOWN_SKILLS = [
+  'gsd-new-project', 'gsd-plan-phase', 'gsd-execute-phase', 'gsd-verify-work',
+  'gsd-progress', 'gsd-help', 'gsd-debug', 'gsd-resume-work', 'gsd-pause-work',
+  // ... all 29 skill names
+];
+
+// Known agent names (from .github/agents/)
+const KNOWN_AGENTS = [
+  'gsd-planner', 'gsd-executor', 'gsd-verifier', 'gsd-debugger',
+  'gsd-phase-researcher', 'gsd-project-researcher', 'gsd-roadmapper',
+  // ... all 13 agent names
+];
+
 function extractSkillReferences(agentContent) {
   // Scan content for /gsd-* references
-  const skillPattern = /\/gsd-[a-z-]+/g;
-  const matches = agentContent.match(skillPattern) || [];
+  const gsdPattern = /\/gsd-[a-z-]+/g;
+  const matches = agentContent.match(gsdPattern) || [];
   
-  // Deduplicate and sort
-  const skills = [...new Set(matches)]
-    .map(s => s.substring(1)) // Remove leading /
-    .sort();
+  // Deduplicate
+  const uniqueRefs = [...new Set(matches)].map(s => s.substring(1)); // Remove leading /
   
-  return skills;
+  // Filter: include only skills, exclude agents
+  const skills = uniqueRefs.filter(ref => {
+    if (KNOWN_SKILLS.includes(ref)) return true;
+    if (KNOWN_AGENTS.includes(ref)) return false;
+    // Unknown reference - include for manual validation to catch
+    console.warn(`Unknown reference: ${ref} - including for manual review`);
+    return true;
+  });
+  
+  return skills.sort();
 }
 
 // Usage
@@ -794,27 +864,29 @@ async function processSkillFile(filePath) {
 
 ## Open Questions
 
-Things that couldn't be fully resolved:
+~~All questions resolved. Answers integrated into Standard Stack and Architecture Patterns sections.~~
 
-1. **Argument-hint extraction from arguments array**
-   - What we know: Old frontmatter has `arguments: [{name, type, required, description}]` array. New format needs `argument-hint: string`.
-   - What's unclear: Exact format for argument-hint. Should it be `"[name]"`, `"<name>"`, `"name"`, or full description?
-   - Recommendation: Check existing skills in Claude Desktop for convention. Likely `"[argname]"` format based on typical CLI convention. Validate with actual Claude parsing if possible.
+**RESOLVED:**
 
-2. **Skills field auto-generation accuracy**
-   - What we know: Agent skills field should list pre-loaded skills. Content scanning with `/gsd-[a-z-]+` pattern finds references.
-   - What's unclear: Does every `/gsd-*` mention mean pre-load, or only certain contexts? Could false positives occur in examples/comments?
-   - Recommendation: Include all mentions (comprehensive), then manual validation catches false positives. User reviews and can manually edit if needed.
+1. **Argument-hint format** ✓
+   - **Decision:** Use `[argname]` format
+   - **Example:** `argument-hint: "[phase]"` or `argument-hint: "[milestone]"`
+   - Extract from first argument in arguments array, wrap in brackets
 
-3. **Version.json field nullability**
-   - What we know: Some skills may have undefined metadata fields.
-   - What's unclear: Should version.json include fields with `null` values, or omit them entirely?
-   - Recommendation: Include all expected fields even if null (explicit structure). Makes parsing more predictable. User can clean up manually if desired.
+2. **Skills field auto-generation** ✓
+   - **Decision:** Include all `/gsd-*` mentions BUT validate: if it's a skill name, include; if it's an agent name, exclude
+   - **Implementation:** Scan content for `/gsd-[a-z-]+` pattern, cross-reference against known skill names (exclude agent names)
+   - Manual validation catches any false positives during review
 
-4. **Platform-specific diff viewer preferences**
-   - What we know: VS Code works cross-platform if installed. Each platform has native tools (opendiff, meld).
-   - What's unclear: User preference for diff viewer. Should script ask, or use fallback chain?
-   - Recommendation: Use fallback chain (VS Code → platform → terminal). Most users have VS Code, others get native tools. Fast and automatic.
+3. **Version.json field structure** ✓
+   - **Decision:** Include ALL expected fields. If value is null, use default values
+   - **Defaults:** version → "2.0.0", description → extracted from frontmatter, other fields use documented defaults
+   - Explicit structure ensures predictable parsing
+
+4. **Diff viewer preference** ✓
+   - **Decision:** Use fallback chain (VS Code → platform-specific → terminal)
+   - **Implementation:** Try `code --diff` first, then platform tools (opendiff/meld), finally terminal-based diff
+   - Fast and automatic, no user prompts needed
 
 ## Sources
 
