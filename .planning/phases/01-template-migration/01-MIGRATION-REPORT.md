@@ -1,29 +1,29 @@
 # Phase 1 Migration Report
 
-**Generated:** 2026-01-26T10:51:40.136Z
+**Generated:** 2026-01-26T11:05:56.770Z
 **Status:** Success
 
-
-📊 Migration Summary
-
-Skills:
+[34m[1m[22m[39m
+[34m[1m📊 Migration Summary[22m[39m
+[34m[1m[22m[39m
+[36mSkills:[39m
   Total: 28
-  ✓ Successful: 28
-
-Agents:
+  [32m✓ Successful:[39m 28
+[36m[39m
+[36mAgents:[39m
   Total: 13
-  ✓ Successful: 13
-
-Files Created:
+  [32m✓ Successful:[39m 13
+[36m[39m
+[36mFiles Created:[39m
   Skills: 28 × 2 files (SKILL.md + version.json)
   Agents: 13 × 1 file (.agent.md) + versions.json
   Shared: templates/get-shit-done/ directory
-
-  Total files: 70
+[32m[39m
+[32m  Total files: 70[39m
 
 ## Validation Results
 
-✓ All validations passed
+[32m✓ All validations passed[39m
 
 ## Files Created
 
@@ -74,6 +74,24 @@ Files Created:
 
 ### Shared Directory
 - templates/get-shit-done/
+
+## Important Notes for Phase 2 Installation
+
+### Tools Field Translation
+
+**Agent `tools` field behavior:**
+- **Templates use Claude format:** `tools: "Read, Write, Bash"` (comma-separated string with capitalized names)
+- **Phase 2 installers must translate for Copilot:** Convert Claude names to Copilot format: `["read", "edit", "execute"]`
+  - `Read` → `read`
+  - `Write` → `edit` (Copilot alias)
+  - `Bash` → `execute` (Copilot alias)
+  - See full mapping table in AGENT-CORRECTIONS.md
+- **Codex uses same format as Claude:** No translation needed for Codex installs
+
+**Implementation:**
+- Phase 2 installers will handle platform-specific translation during agent file installation
+- Templates remain in Claude format (source of truth)
+- Translation logic will be in platform-specific installer modules
 
 ## Next Steps
 
