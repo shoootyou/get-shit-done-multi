@@ -21,7 +21,7 @@ decisions_count: 12
 - **Disable undetected platforms** with "Install CLI first" message
 - **Display existing GSD versions** next to platform name (e.g., "Claude (v2.0.0)")
 - **Allow multi-platform selection** in single run (same as CLI --claude --copilot)
-- **Warn but allow** installation to undetected platforms with confirmation prompt
+- **Global detection check:** If NO CLIs are detected at all, show warning asking for confirmation before proceeding to platform selection
 
 ### Skill Selection
 - **Install everything by default** - All 29 skills + 13 agents automatically
@@ -97,10 +97,11 @@ decisions_count: 12
 - **Research:** cli-progress API, shared progress renderer architecture
 - **Why:** Want consistent progress display across modes
 
-### Warning Prompts for Undetected Platforms
-- **Q:** Best UX pattern for "CLI not detected but proceeding anyway" warning?
-- **Research:** @clack/prompts confirm() with custom messages, warning styling
-- **Why:** Need user confirmation before installing to undetected platform
+### Global Detection Warning Pattern
+- **Q:** Best UX pattern for "No CLIs detected at all" warning before platform selection?
+- **Research:** @clack/prompts confirm() with warning messages, early-exit patterns
+- **Why:** Need user confirmation when zero platforms detected before showing selection menu
+- **Decision:** Show warning, ask confirmation, if declined exit gracefully
 
 ---
 
@@ -108,11 +109,12 @@ decisions_count: 12
 
 ### Interactive Flow
 1. **Welcome screen** (optional intro message)
-2. **Platform selection** (multi-select menu, show all three, disable undetected)
-3. **Scope selection** (global vs local, one choice per platform if multi-selected)
-4. **Immediate installation** (no skill selection, no confirmation)
-5. **Progress display** (same as CLI - multi-bar per platform)
-6. **Completion** (success message with next steps)
+2. **Global detection check** (if zero CLIs detected, show warning and confirm to proceed)
+3. **Platform selection** (multi-select menu, show all three, disable undetected)
+4. **Scope selection** (global vs local, one choice per platform if multi-selected)
+5. **Immediate installation** (no skill selection, no confirmation)
+6. **Progress display** (same as CLI - multi-bar per platform)
+7. **Completion** (success message with next steps)
 
 ### Error Handling Flow
 1. **Error occurs** during installation
@@ -131,6 +133,7 @@ decisions_count: 12
 
 ### Must Demonstrate
 - ✅ Interactive mode triggers when no CLI flags present
+- ✅ Global detection check: If zero CLIs detected, show warning and confirm
 - ✅ Platform menu shows all three platforms with detection status
 - ✅ Multi-platform selection works (can select Claude + Copilot)
 - ✅ Scope selection works (global/local per platform)
