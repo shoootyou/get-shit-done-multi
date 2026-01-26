@@ -87,15 +87,18 @@ export function header(title) {
  */
 export function banner() {
   console.log();
-  console.log(chalk.cyan('   ██████╗ ███████╗██████╗ '));
-  console.log(chalk.cyan('  ██╔════╝ ██╔════╝██╔══██╗'));
-  console.log(chalk.cyan('  ██║  ███╗███████╗██║  ██║'));
-  console.log(chalk.cyan('  ██║   ██║╚════██║██║  ██║'));
-  console.log(chalk.cyan('  ╚██████╔╝███████║██████╔╝'));
-  console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝'));
-  console.log(chalk.bold.white('  Get Shit Done v2.0.0'));
-  console.log(chalk.gray('  A meta-prompting, context engineering and spec-driven development system.'));
-  console.log(chalk.gray('   * Forked from TÂCHES/get-shit-done'));
+  console.log(chalk.cyan('   ██████╗ ███████╗██████╗     ███╗   ███╗██╗   ██╗██╗  ████████╗██╗'));
+  console.log(chalk.cyan('  ██╔════╝ ██╔════╝██╔══██╗    ████╗ ████║██║   ██║██║  ╚══██╔══╝██║'));
+  console.log(chalk.cyan('  ██║  ███╗███████╗██║  ██║    ██╔████╔██║██║   ██║██║     ██║   ██║'));
+  console.log(chalk.cyan('  ██║   ██║╚════██║██║  ██║    ██║╚██╔╝██║██║   ██║██║     ██║   ██║'));
+  console.log(chalk.cyan('  ╚██████╔╝███████║██████╔╝    ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║'));
+  console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝'));
+  console.log();
+  console.log(chalk.bold.white('  Get Shit Done MULTI v2.0.0'));
+  console.log(chalk.gray('  Multi-platform meta-prompting, context engineering and spec-driven development system.'));
+  console.log();
+  console.log(chalk.gray('   * Forked from TÂCHES/get-shit-done (Claude Code only)'));
+  console.log(chalk.gray('   * Extended for Claude Code, GitHub Copilot CLI, and Codex CLI'));
   console.log(chalk.gray('   * Maintained by shoootyou/get-shit-done-multi'));
   console.log();
 }
@@ -103,11 +106,19 @@ export function banner() {
 /**
  * Print final summary
  * @param {Object} stats - Installation statistics
+ * @param {string} platform - Platform name (claude, copilot, codex)
  */
-export function summary(stats) {
+export function summary(stats, platform) {
+  const platformNames = {
+    claude: 'Claude Code',
+    copilot: 'GitHub Copilot CLI',
+    codex: 'Codex CLI'
+  };
+  const cliName = platformNames[platform] || 'your AI CLI';
+
   console.log();
   success(`${stats.skills} skills, ${stats.agents} agents installed to ${stats.target}`, 1);
-  info(`Open your AI CLI and run '/gsd-help' to get started`, 1);
+  info(`Open ${cliName} and run '/gsd-help' to get started`, 1);
 }
 
 /**
@@ -117,4 +128,5 @@ export function summary(stats) {
 export function sectionTitle(title) {
   console.log();
   console.log(' ' + chalk.bold.cyan(title));
+  console.log(' ' + chalk.cyan('─'.repeat(title.length)));
 }
