@@ -61,7 +61,10 @@
     "fs-extra": "^11.3.3"
   },
   "devDependencies": {
+    "@inquirer/prompts": "^8.2.0",
     "@vitest/ui": "^4.0.18",
+    "gray-matter": "^4.0.3",
+    "open": "^11.0.0",
     "vitest": "^4.0.18"
   }
 }
