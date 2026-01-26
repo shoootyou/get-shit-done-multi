@@ -213,39 +213,51 @@
 
 ### Category: Template Structure (TEMPLATE)
 
-**TEMPLATE-01: Skill and Agent Templates**
-- **Source:** Use existing files from `.github/skills/` and `.github/agents/` as source of truth
-- **Process:** Copy to `/templates/` and convert to templates by adding `{{VARIABLES}}`
+**TEMPLATE-01: Migration to Template Structure (PHASE 1 ONE-TIME)**
+- **Purpose:** ONE-TIME migration from `.github/` to `/templates/` with frontmatter corrections
+- **Source:** Read from `.github/skills/` and `.github/agents/` (READ-ONLY, never modify)
+- **Target:** Write corrected templates to `/templates/skills/` and `/templates/agents/`
+- **Process:** 
+  1. Copy skill/agent content
+  2. Apply frontmatter corrections (see TEMPLATE-01C and TEMPLATE-01D)
+  3. Add template variables (`{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`, etc.)
+  4. Generate version.json files
+  5. Validate output against official specs
+- **After Phase 1:** Delete migration code, `/templates/` becomes permanent source
+- **install.js:** Always reads from `/templates/`, never from `.github/`
 - **Do NOT:** Modify original source files in `.github/`, `.claude/`, or `.codex/` directories
+- **Do NOT:** Create ongoing conversion pipeline (migration is one-time only)
 - **Do NOT:** Generate new skills or agents from scratch
 - **Skills structure:** `/templates/skills/gsd-<skill-name>/SKILL.md` (directory-based)
 - **Agents structure:** `/templates/agents/gsd-<agent-name>.agent.md` (flat files)
 - **Agent versions:** `/templates/agents/versions.json` (consolidated metadata for all agents)
-- **Rationale:** Reuse existing tested skills/agents, ensure consistency, preserve originals
+- **Rationale:** One-time migration establishes clean template foundation, avoid maintaining dual sources
 
-**TEMPLATE-01B: Template Conversion Process**
-- Replace hardcoded values with template variables:
+**TEMPLATE-01B: Template Variable Injection (PHASE 1 ONE-TIME)**
+- **During migration:** Replace hardcoded values with template variables:
   - Platform roots: `.github/` → `{{PLATFORM_ROOT}}`
   - Command prefixes: `/gsd-` → `{{COMMAND_PREFIX}}`
   - Version numbers: `1.9.1` → `{{VERSION}}`
   - Platform names: `copilot` → `{{PLATFORM_NAME}}`
 - Preserve all other content exactly as-is
 - Maintain directory structure for skills
-- **Rationale:** Systematic conversion ensures no content loss
+- **After Phase 1:** No further conversion needed, templates are ready
+- **Rationale:** One-time systematic conversion ensures no content loss, templates work for all platforms
 
-**TEMPLATE-01C: Frontmatter Format Correction (SKILLS ONLY)**
-- **APPLIES TO SKILLS ONLY** - Agents have independent structure and are NOT affected
-- **Fix invalid frontmatter fields** during template conversion (NOT on source files):
+**TEMPLATE-01C: Frontmatter Format Correction for Skills (PHASE 1 ONE-TIME)**
+- **APPLIES TO SKILLS ONLY** - Agents have independent structure (see TEMPLATE-01D)
+- **During Phase 1 migration only:** Fix invalid frontmatter fields when creating templates (NOT on source files):
   - **Remove unsupported fields:** `skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`
   - **Rename field:** `tools` → `allowed-tools`
   - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
   - **Normalize tool names:** Apply proper capitalization (read→Read, bash→Bash, execute→Bash, etc.)
   - **Convert arguments to argument-hint:** Use `arguments` array from source as reference to generate appropriate `argument-hint` string (e.g., `[domain]`, `[filename] [format]`)
-- **Create version.json** in each template skill directory (NOT in agents):
+- **Create version.json** in each template skill directory during migration:
   - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata` ONLY
   - **DO NOT** store `arguments` field - use as reference only during conversion
   - Used for version tracking and platform compatibility checks
   - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}}`
+- **After Phase 1:** Templates have correct frontmatter, version.json files exist, migration code deleted
 - **Official supported frontmatter fields for SKILLS** (per https://code.claude.com/docs/en/slash-commands#frontmatter-reference):
   - `name` (optional): Display name
   - `description` (recommended): What the skill does
@@ -257,24 +269,22 @@
   - `context` (optional): Set to `fork` for subagent
   - `agent` (optional): Subagent type when context is fork
   - `hooks` (optional): Lifecycle hooks
-- **Agent frontmatter** (separate structure - to be documented separately):
-  - Agents have simpler structure and different validation rules
-  - Agent corrections (if any) will be defined separately
-- **Rationale:** Current skill frontmatter has unsupported fields per official Claude docs, corrections must apply during template generation. Agents follow different spec.
+- **Rationale:** One-time correction during migration establishes clean foundation, no ongoing conversion needed
 
-**TEMPLATE-01D: Agent Frontmatter Correction**
+**TEMPLATE-01D: Agent Frontmatter Correction (PHASE 1 ONE-TIME)**
 - **APPLIES TO AGENTS ONLY** (13 files) - Separate from Skills
-- **Fix agent frontmatter fields** during template conversion (NOT on source files):
+- **During Phase 1 migration only:** Fix agent frontmatter fields when creating templates (NOT on source files):
   - **Remove unsupported field:** `metadata` block
   - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
   - **Map tool names:** Copilot aliases → Claude official (execute→Bash, search→Grep, agent→Task)
   - **Add skills field (Claude only):** Scan agent content for `/gsd-` references, add all found skills
   - **Keep supported fields:** name, description, tools, disallowedTools, model, permissionMode, skills, hooks (Claude) | name, description, target, tools, infer, mcp-servers (Copilot)
-- **Create versions.json** in templates/agents/ (NOT per-agent):
+- **Create versions.json** in templates/agents/ during migration (NOT per-agent):
   - Consolidated file with all agents: `{"agent-name": {version, platforms, metadata}, ...}`
   - Template with {{VARIABLES}} for platform-specific values
   - Copied to `.xxx/agents/versions.json` during installation (one per platform)
   - Format: `{"gsd-executor": {"version": "1.9.1", "requires_version": "1.9.0+", "platforms": [...], "metadata": {...}}}`
+- **After Phase 1:** Templates have correct frontmatter, versions.json exists, migration code deleted
 - **Official supported frontmatter fields for AGENTS:**
   - **Claude** (per https://code.claude.com/docs/en/sub-agents):
     - `name` (required): Unique identifier
@@ -294,7 +304,7 @@
     - `mcp-servers` (optional): Additional MCP servers
     - `metadata` (optional but remove): Use versions.json instead
 - **Skill reference extraction:** Scan agent content for `/gsd-*`, `$gsd-*`, `gsd-*` patterns, cross-reference with skills directory, add to `skills` field (Claude only)
-- **Rationale:** Agents have platform-specific requirements, metadata should be centralized in versions.json, skills must be pre-loaded for Claude agents to reference them
+- **Rationale:** One-time correction during migration establishes clean foundation, agents have platform-specific requirements, metadata centralized in versions.json
 
 **TEMPLATE-02: Platform-Specific Transformations**
 - Handle platform differences via adapters (not template duplication)

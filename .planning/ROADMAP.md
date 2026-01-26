@@ -11,11 +11,13 @@
 
 This roadmap delivers a **complete template-based installer** that deploys AI CLI skills and agents to Claude Code, GitHub Copilot CLI, and Codex CLI. Users run `npx get-shit-done-multi`, answer interactive prompts, and get working skills installed atomically with rollback on failure.
 
-**Approach:** Build foundation with single platform first (validate architecture), add multi-platform support with all three platforms (Claude, Copilot, Codex), enhance UX (interactive prompts), add reliability (transactions + versioning), then harden for production (security + cross-platform), and document everything.
+**Approach:** Establish clean foundation with ONE-TIME migration (Phase 1 converts `.github/` → `/templates/` with frontmatter corrections, then deleted), build core installer using templates (Phase 2), add multi-platform support (Phase 3), enhance UX with interactive prompts (Phase 4), add reliability with transactions (Phase 5) and versioning (Phase 6), harden with security (Phase 7), and document everything (Phase 8).
+
+**Architecture Strategy:** Phase 1 is a ONE-TIME migration that establishes `/templates/` as permanent source of truth. After Phase 1, `.github/` becomes historical reference only, and all future work uses `/templates/`. Conversion logic is temporary and deleted after Phase 1 completes.
 
 **Version Strategy:** Initial release is v2.0 (complete product). Future versions follow SemVer: new commands = MINOR, breaking changes = MAJOR.
 
-**Coverage:** 37 v2.0 requirements mapped across 7 phases
+**Coverage:** 37 v2.0 requirements mapped across 8 phases
 
 ---
 
@@ -43,82 +45,135 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ## Phases
 
-### Phase 1: Core Installer Foundation
+### Phase 1: Template Migration (ONE-TIME)
 
-**Goal:** User can install get-shit-done skills to Claude Code via `npx get-shit-done-multi --claude`
+**Goal:** Migrate `.github/` skills and agents to `/templates/` with frontmatter corrections, establishing permanent source of truth
+
+**Type:** ONE-TIME MIGRATION (conversion logic deleted after completion)
 
 **Dependencies:** None (foundation)
 
 **Plans:** 4 plans
 
 **Requirements Mapped:**
-- INSTALL-01: NPX entry point (version 2.0.0)
-- INSTALL-02: File system operations
-- INSTALL-03: Template rendering (copy from `.github/` and convert)
-- CLI-02: Platform selection flags (`--claude`)
-- CLI-05: Help and version flags
-- SAFETY-02: Path normalization
-- TEMPLATE-01: Use `.github/skills/` and `.github/agents/` as source
-- TEMPLATE-01B: Convert to templates with {{VARIABLES}}
-- TEMPLATE-01C: Frontmatter format correction (skills only)
-- TEMPLATE-01D: Agent frontmatter correction
+- TEMPLATE-01: Migration to template structure (Phase 1 one-time)
+- TEMPLATE-01B: Template variable injection (Phase 1 one-time)
+- TEMPLATE-01C: Frontmatter format correction for skills (Phase 1 one-time)
+- TEMPLATE-01D: Agent frontmatter correction (Phase 1 one-time)
+- TEMPLATE-02B: Tool name reference table
 - TEMPLATE-03: Template variables
 - TEST-01: Testing isolation
 - TEST-02: Test cleanup
 
 **Success Criteria:**
-1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd-*/`
-2. All 29 skills from `.github/skills/` converted to templates with corrected frontmatter
-3. All 13 agents from `.github/agents/` converted to templates with corrected frontmatter
-4. Shared directory (`get-shit-done/`) copies to `.claude/get-shit-done/` with manifest template
-5. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
-6. Skill structure: `.claude/skills/gsd-<name>/SKILL.md` (directory-based)
-7. Skill frontmatter corrections applied: `allowed-tools`, `argument-hint`, removed unsupported fields
-8. Agent frontmatter corrections applied: `tools` string, `skills` auto-generated, removed metadata
-9. version.json created per skill (29 files)
-10. versions.json created for all agents (1 file)
-11. Tool names mapped correctly (Copilot aliases → Claude official)
-12. Installation completes in <30 seconds for typical setup
-13. `--help` and `--version` flags show correct information
-14. Version displays as 2.0.0
+1. All 29 skills migrated from `.github/skills/` → `/templates/skills/` with corrected frontmatter
+2. All 13 agents migrated from `.github/agents/` → `/templates/agents/` with corrected frontmatter
+3. Skill frontmatter corrections applied: `allowed-tools` (comma-separated string), `argument-hint`, removed unsupported fields
+4. Agent frontmatter corrections applied: `tools` string, `skills` auto-generated from content scan, removed metadata block
+5. version.json created per skill (29 files in `/templates/skills/gsd-*/version.json`)
+6. versions.json created for all agents (1 file in `/templates/agents/versions.json`)
+7. Template variables injected: `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`, `{{VERSION}}`, `{{PLATFORM_NAME}}`
+8. Tool names mapped correctly (Copilot aliases → Claude official names)
+9. Shared directory template (`/templates/get-shit-done/`) with manifest template
+10. Skills field auto-generated for agents (scans for `/gsd-*` references in content)
+11. All templates validate against official Claude/Copilot specs
+12. Migration script validates 100% success before completion
+13. Migration creates cleanup checklist (delete conversion code after verification)
+14. `.github/` remains untouched (READ-ONLY historical reference)
 
 **Key Deliverables:**
-- `/bin/install.js` (entry point with shebang)
-- `/bin/lib/io/file-operations.js` (copy, create directories)
-- `/bin/lib/rendering/template-renderer.js` (string replacement)
-- `/bin/lib/paths/path-resolver.js` (normalization, validation)
+- `/scripts/migrate-to-templates.js` (ONE-TIME migration script, deleted after Phase 1)
 - `/templates/skills/gsd-*/SKILL.md` (29 skills with corrected frontmatter)
 - `/templates/skills/gsd-*/version.json` (29 version files)
 - `/templates/agents/gsd-*.agent.md` (13 agents with corrected frontmatter)
 - `/templates/agents/versions.json` (1 consolidated versions file)
-- `/get-shit-done/.gsd-install-manifest.json` (template)
-- Skill reference extraction script (scan agent content for /gsd-* patterns)
+- `/templates/get-shit-done/.gsd-install-manifest.json` (template)
+- Frontmatter parser (gray-matter for YAML parsing)
 - Tool name mapping utilities
-- Basic error handling and logging
+- Skill reference extractor (scans agent content for skill references)
+- Validation suite (checks output against official specs)
+- Migration report (shows before/after comparison, validation results)
+
+**Post-Phase 1 Actions:**
+- Verify all templates against specs (manual spot-check)
+- Delete `/scripts/migrate-to-templates.js` (no longer needed)
+- Update documentation to reference `/templates/` as source
+- Commit templates to git as permanent source
 
 **References:**
 - See `.planning/FRONTMATTER-CORRECTIONS.md` for skill corrections spec
 - See `.planning/AGENT-CORRECTIONS.md` for agent corrections spec
 
 **Plans:**
-- [ ] 01-01-PLAN.md — Foundation & Core Modules (Wave 1)
-- [ ] 01-02-PLAN.md — Template System & CLI Output (Wave 2)
-- [ ] 01-03-PLAN.md — Test Infrastructure (Wave 3)
-- [ ] 01-04-PLAN.md — Integration Test Suites & Verification (Wave 4)
+- [ ] 01-01-PLAN.md — Migration Script & Frontmatter Parsing (Wave 1)
+- [ ] 01-02-PLAN.md — Skills Migration & Correction (Wave 2)
+- [ ] 01-03-PLAN.md — Agents Migration & Correction (Wave 3)
+- [ ] 01-04-PLAN.md — Validation & Migration Report (Wave 4)
 
 **Notes:**
-- Keep it simple: no adapter abstraction yet (validate mechanics first)
-- No rollback yet (comes in Phase 4)
-- No interactive prompts yet (comes in Phase 3)
-- Initial version is 2.0.0
+- This is a ONE-TIME migration, not an ongoing transformation pipeline
+- After Phase 1, `/templates/` becomes permanent source of truth
+- `.github/` preserved as historical reference only
+- Conversion logic is temporary and will be deleted
+- Phase 2+ work with `/templates/` only, never touch `.github/` again
 
 ---
 
-### Phase 2: Multi-Platform Support with All Three Platforms
+### Phase 2: Core Installer Foundation
+
+**Goal:** User can install get-shit-done skills to Claude Code via `npx get-shit-done-multi --claude` using templates from `/templates/`
+
+**Dependencies:** Phase 1 (templates must exist)
+
+**Plans:** 4 plans
+
+**Requirements Mapped:**
+- INSTALL-01: NPX entry point (version 2.0.0)
+- INSTALL-02: File system operations
+- INSTALL-03: Template rendering (uses `/templates/` as source, never `.github/`)
+- CLI-02: Platform selection flags (`--claude`)
+- CLI-05: Help and version flags
+- SAFETY-02: Path normalization
+
+**Success Criteria:**
+1. User runs `npx get-shit-done-multi --claude` and skills install to `~/.claude/skills/gsd-*/`
+2. Installation reads from `/templates/` directory (never `.github/`)
+3. Template variables (e.g., `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`) replaced correctly in output files
+4. Skill structure: `.claude/skills/gsd-<name>/SKILL.md` (directory-based)
+5. Agent structure: `.claude/agents/gsd-<name>.md` (flat files)
+6. Shared directory copies to `.claude/get-shit-done/` with manifest
+7. Installation completes in <30 seconds for typical setup
+8. `--help` and `--version` flags show correct information
+9. Version displays as 2.0.0
+
+**Key Deliverables:**
+- `/bin/install.js` (entry point with shebang)
+- `/bin/lib/io/file-operations.js` (copy, create directories)
+- `/bin/lib/rendering/template-renderer.js` (string replacement, uses `/templates/`)
+- `/bin/lib/paths/path-resolver.js` (normalization, validation)
+- `/get-shit-done/.gsd-install-manifest.json` (generated from template)
+- Basic error handling and logging
+
+**Plans:**
+- [ ] 02-01-PLAN.md — Foundation & Core Modules (Wave 1)
+- [ ] 02-02-PLAN.md — Template System & CLI Output (Wave 2)
+- [ ] 02-03-PLAN.md — Test Infrastructure (Wave 3)
+- [ ] 02-04-PLAN.md — Integration Test Suites & Verification (Wave 4)
+
+**Notes:**
+- Keep it simple: no adapter abstraction yet (validate mechanics first)
+- No rollback yet (comes in Phase 5)
+- No interactive prompts yet (comes in Phase 4)
+- Initial version is 2.0.0
+- `/templates/` is source of truth (migration completed in Phase 1)
+
+---
+
+### Phase 3: Multi-Platform Support with All Three Platforms
 
 **Goal:** User can install to Claude, Copilot, OR Codex via `--claude`, `--copilot`, or `--codex` flags, with correct platform-specific transformations
 
-**Dependencies:** Phase 1 (core installer must work)
+**Dependencies:** Phase 2 (core installer must work)
 
 **Requirements Mapped:**
 - PLATFORM-01: Platform detection (GSD-specific paths)
@@ -163,11 +218,11 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 3: Interactive CLI with Beautiful UX
+### Phase 4: Interactive CLI with Beautiful UX
 
 **Goal:** User runs `npx get-shit-done-multi` (no flags), sees beautiful interactive prompts, selects platform and skills, confirms installation
 
-**Dependencies:** Phase 2 (multi-platform support needed for selection)
+**Dependencies:** Phase 3 (multi-platform support needed for selection)
 
 **Requirements Mapped:**
 - CLI-01: Interactive mode (default)
@@ -201,11 +256,11 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 4: Atomic Transactions and Rollback
+### Phase 5: Atomic Transactions and Rollback
 
 **Goal:** Installation fails mid-process → all completed operations rollback, leaving no partial state
 
-**Dependencies:** Phase 1-2 (needs file operations and adapters)
+**Dependencies:** Phase 2-3 (needs file operations and adapters)
 
 **Requirements Mapped:**
 - INSTALL-04: Atomic operations with rollback
@@ -233,11 +288,11 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 5: Update Detection and Versioning
+### Phase 6: Update Detection and Versioning
 
 **Goal:** User re-runs installer → sees installed version, gets prompted if update available, can upgrade
 
-**Dependencies:** Phase 4 (needs installation manifest)
+**Dependencies:** Phase 5 (needs installation manifest)
 
 **Requirements Mapped:**
 - VERSION-02: Update detection
@@ -271,11 +326,11 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 6: Path Security and Validation
+### Phase 7: Path Security and Validation
 
 **Goal:** Malicious or malformed paths are rejected before any file writes, preventing traversal attacks
 
-**Dependencies:** Phase 1-4 (needs file operations and transactions)
+**Dependencies:** Phase 2-5 (needs file operations and transactions)
 
 **Requirements Mapped:**
 - SAFETY-01: Path traversal prevention
@@ -299,11 +354,11 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 7: Documentation and Polish
+### Phase 8: Documentation and Polish
 
 **Goal:** Complete documentation exists for installation, architecture, and platform differences
 
-**Dependencies:** Phase 1-6 (document complete system)
+**Dependencies:** Phase 1-7 (document complete system)
 
 **Requirements Mapped:**
 - DOCS-01: Installation instructions

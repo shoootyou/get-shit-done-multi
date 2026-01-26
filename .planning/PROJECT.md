@@ -26,6 +26,12 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 4. Installs skills/agents atomically with rollback on failure
 5. Tracks versions for update detection
 
+**Architecture:** Two-phase approach
+- **Phase 1 (Migration):** ONE-TIME conversion from `.github/` → `/templates/` with frontmatter corrections
+- **Phase 2+ (Steady State):** `/templates/` becomes permanent source of truth for all future work
+- **Conversion logic:** Temporary, deleted after Phase 1 completes
+- **install.js:** Always uses `/templates/` as source (never `.github/`)
+
 ## Core Constraints
 
 ### Technical
@@ -49,11 +55,15 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 - **Applies to:** ALL phases, ALL testing activities throughout the project
 
 ### Template Conversion Constraints (CRITICAL)
+- **Phase 1 is ONE-TIME MIGRATION:** Convert `.github/` → `/templates/` once, then delete conversion code
 - **Source files are READ-ONLY:** Never modify `.github/`, `.claude/`, or `.codex/` directories
 - **Work in templates/:** All conversions and corrections happen in `/templates/` directory
-- **Frontmatter corrections:** Applied during template generation, NOT on source files
-- **Preserve originals:** Keep source files as reference and backup
-- **Applies to:** ALL phases, ALL template operations throughout the project
+- **Frontmatter corrections:** Applied during Phase 1 migration, NOT on source files
+- **After Phase 1:** `/templates/` becomes permanent source of truth
+- **install.js always uses templates/:** Installation reads from `/templates/`, not `.github/`
+- **Conversion logic is temporary:** Delete migration scripts after Phase 1 completes
+- **Preserve originals:** Keep `.github/` as historical reference only
+- **Applies to:** Phase 1 migration strategy, affects all subsequent phases
 
 ### Extensibility
 - **Adapter pattern** for platform differences
@@ -76,9 +86,11 @@ Project succeeds when:
 
 ## Out of Scope (v2.0)
 
-- Custom template repositories (only bundled templates from `.github/`)
-- Generating new skills/agents (use existing `.github/skills/` and `.github/agents/` as source)
-- **Modifying source files** (`.github/`, `.claude/`, `.codex/` are READ-ONLY)
+- Custom template repositories (only bundled templates from `/templates/`)
+- Generating new skills/agents (Phase 1 migrates existing, then `/templates/` is source)
+- **Modifying source files** (`.github/`, `.claude/`, `.codex/` are READ-ONLY historical reference)
+- **Ongoing conversion logic** (Phase 1 migration is ONE-TIME, then deleted)
+- **Maintaining .github/ as source** (Phase 1 migrates to `/templates/`, which becomes truth)
 - Plugin system for external adapters (future work)
 - Web-based configuration UI
 - Telemetry or usage analytics
