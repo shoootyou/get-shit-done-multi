@@ -110,8 +110,6 @@ async function main() {
       isVerbose: options.verbose || false,
       scriptDir: __dirname
     });
-    
-    logger.success(`${platform} installation complete`, 1);
   }
   
   // Show installation complete message with platform names

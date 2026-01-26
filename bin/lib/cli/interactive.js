@@ -165,7 +165,6 @@ async function runInstallation(platforms, scope) {
         silent: true // Don't show command prefix logging
       });
       
-      logger.success(`${platform} installation complete`, 1);
       successes.push({ platform, platformLabel, stats });
     } catch (error) {
       failures.push({ platform: platformNames[platform] || platform, error });
