@@ -172,10 +172,10 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Basic error handling and logging
 
 **Plans:**
-- [ ] 02-01-PLAN.md — Foundation & Core Modules (Wave 1)
-- [ ] 02-02-PLAN.md — Template System & CLI Output (Wave 2)
-- [ ] 02-03-PLAN.md — Test Infrastructure (Wave 3)
-- [ ] 02-04-PLAN.md — Integration Test Suites & Verification (Wave 4)
+- [ ] 02-01-PLAN.md — Foundation & Project Structure (Wave 1)
+- [ ] 02-02-PLAN.md — Core Modules (Wave 2)
+- [ ] 02-03-PLAN.md — CLI Integration & Installation Orchestration (Wave 3)
+- [ ] 02-04-PLAN.md — Test Infrastructure & Integration Tests (Wave 4)
 
 **Notes:**
 - Keep it simple: no adapter abstraction yet (validate mechanics first)
