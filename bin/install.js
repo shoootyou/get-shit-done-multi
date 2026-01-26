@@ -13,7 +13,10 @@ import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
 import { runInteractive } from './lib/cli/interactive.js';
-import { installPlatforms, getScriptDir } from './lib/cli/installation-core.js';
+import { installPlatforms } from './lib/cli/installation-core.js';
+import { showUsageError } from './lib/cli/usage.js';
+import { parsePlatformFlags, parseScope } from './lib/cli/flag-parser.js';
+import { shouldUseInteractiveMode, isValidTTY } from './lib/cli/mode-detector.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -51,49 +54,25 @@ async function main() {
   program.parse(process.argv);
   const options = program.opts();
   
-  // Determine platforms to install
-  const platforms = [];
-  if (options.claude) platforms.push('claude');
-  if (options.copilot) platforms.push('copilot');
-  if (options.codex) platforms.push('codex');
+  // Parse platforms
+  const platforms = parsePlatformFlags(options, adapterRegistry);
   
-  // Check for interactive mode eligibility
-  const hasFlags = platforms.length > 0;
-  const isInteractive = !hasFlags && process.stdin.isTTY;
-  
-  if (isInteractive) {
-    // Phase 4: Interactive mode
+  // Check for interactive mode
+  if (shouldUseInteractiveMode(platforms, isValidTTY())) {
     await runInteractive(options);
     process.exit(0);
-  } else if (!hasFlags && !process.stdin.isTTY) {
-    // No flags and no TTY - show usage
-    logger.error('No platform specified and not running in interactive mode.');
-    logger.info('Usage: npx get-shit-done-multi --claude --global');
-    logger.info('   or: npx get-shit-done-multi (interactive mode in terminal)');
+  }
+  
+  // Non-interactive without flags - show usage
+  if (platforms.length === 0 && !isValidTTY()) {
+    showUsageError();
     process.exit(EXIT_CODES.INVALID_ARGS);
   }
   
-  // Validate platforms
-  const supported = adapterRegistry.getSupportedPlatforms();
-  for (const platform of platforms) {
-    if (!supported.includes(platform)) {
-      logger.error(`Unknown platform: ${platform}. Supported: ${supported.join(', ')}`);
-      process.exit(EXIT_CODES.INVALID_ARGS);
-    }
-  }
+  // Parse scope
+  const scope = parseScope(options);
   
-  // Determine scope (default: local)
-  const isGlobal = options.global === true;
-  const isLocal = options.local === true;
-  
-  if (isGlobal && isLocal) {
-    logger.error('Cannot specify both --global and --local');
-    process.exit(EXIT_CODES.INVALID_ARGS);
-  }
-  
-  const scope = isGlobal ? 'global' : 'local';
-  
-  // Use shared installation core (same path as interactive mode)
+  // Install platforms
   await installPlatforms(platforms, scope, {
     scriptDir: __dirname,
     verbose: options.verbose || false,
