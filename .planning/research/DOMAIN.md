@@ -8,16 +8,22 @@
 
 ## Executive Summary
 
-This research covers three critical architectural areas for the template-based installer:
+This research covers five critical architectural areas for the template-based installer:
 
 1. **Domain-Oriented Module Structure** - Organizing `/bin/lib` by responsibility (platforms/, templates/, rendering/) instead of file type
 2. **Path Rewriting & Resolution** - Strategies for rewriting template paths like `@.github/...` to target directories
 3. **Interactive CLI UX** - Libraries and patterns for "no flags = interactive mode" with progress indicators
+4. **Transformation Pipeline Architecture** - Functional pipeline pattern with composable stages
+5. **Phase 1 Migration Architecture (Temporary)** - One-time migration from `.github/` to `/templates/` (code deleted after)
+6. **Phase 2+ Installation Architecture (Permanent)** - Template-based installation pipeline (reuses stages from Phase 1)
 
 **Key Recommendations:**
 - Use domain-driven directory structure with explicit public APIs via `index.js`
 - Use hybrid path rewriting: template variables (`{{VAR}}`) + path aliases (`@install`)
 - Use `@clack/prompts` for interactive CLI with built-in spinners and disabled menu options
+- **Use Stage-Based Composition (ETL Pattern):** Shared stages, separate pipelines for migration and installation
+- **Clear separation:** Migration pipeline is temporary (deleted after Phase 1), installation is permanent
+- **Reuse validated components:** Installation reuses battle-tested stages from migration
 
 ---
 
@@ -2208,6 +2214,921 @@ module.exports = { transformStage };
 
 ---
 
+## 5. Phase 1 Migration Architecture (Temporary)
+
+**Confidence: HIGH** (Based on database migration patterns, codemod tools, and ETL best practices)
+
+### Problem Statement
+
+Phase 1 is a **ONE-TIME MIGRATION** that:
+1. Reads from `.github/skills/` and `.github/agents/`
+2. Parses YAML frontmatter
+3. Applies corrections (remove fields, rename `tools` → `allowed-tools`, etc.)
+4. Generates `version.json` files
+5. Writes to `/templates/` with `{{VARIABLES}}`
+6. Validates output
+7. Reports results
+8. **CRITICAL:** This code is DELETED after successful migration
+
+**Key architectural challenge:** Should migration code reuse permanent installation components, or be completely separate?
+
+### Research: Architectural Patterns
+
+#### Pattern 1: Complete Separation (Database Migration Pattern)
+
+**How database migrations work:**
+- Migration files are SEPARATE from application code
+- Each migration is self-contained, versioned, immutable
+- Application uses ORM (permanent), migrations use raw SQL (temporary)
+- Migrations NEVER reuse application code
+
+**Rationale:**
+1. Application code changes over time
+2. Migrations must be idempotent and reproducible forever
+3. Different concerns (one-time transformation vs ongoing operations)
+4. No coupling risk
+
+**Applied to our project:**
+```
+/bin/migrate/              # Temporary, entire directory deleted after success
+├── index.js               # Migration orchestrator
+├── readers/               # Read .github/ YAML
+├── transformers/          # Apply corrections
+├── writers/               # Write to /templates/
+└── validators/            # Validate migration output
+
+/bin/lib/                  # Permanent installation code
+├── templates/             # Template loading
+├── rendering/             # Variable rendering
+├── install/               # Installation orchestrator
+└── ...                    # Other permanent modules
+```
+
+**Pros:**
+- ✅ Complete isolation (zero coupling risk)
+- ✅ Easy to delete (entire `/bin/migrate/` directory)
+- ✅ No chance migration concerns leak into permanent code
+- ✅ Clear "this is temporary" signal
+
+**Cons:**
+- ❌ Code duplication (file operations, validation logic)
+- ❌ More code to write and test
+- ❌ Can't reuse validated components
+
+#### Pattern 2: Shared Utilities (Package Manager Pattern)
+
+**How package managers work:**
+- `npm install` vs `npm publish` share SAME core utilities
+- Different command handlers for different workflows
+- Shared low-level operations (registry client, file operations, JSON parsing)
+
+**Rationale:**
+1. File operations are file operations (shared)
+2. Install vs publish have different workflows (separate)
+3. Core abstractions are stable enough to share
+
+**Applied to our project:**
+```
+/bin/lib/
+├── core/                  # SHARED utilities (permanent)
+│   ├── file-ops.js        # Read, write, copy files
+│   ├── yaml-parser.js     # Parse YAML frontmatter
+│   └── validator.js       # Validation utilities
+│
+├── pipelines/
+│   ├── migrate.js         # TEMPORARY migration pipeline (deleted after)
+│   └── install.js         # PERMANENT installation pipeline
+│
+└── [other permanent modules]
+```
+
+**Pros:**
+- ✅ Reuse low-level utilities (less duplication)
+- ✅ Utilities are stable, safe to share
+- ✅ Less code to write overall
+
+**Cons:**
+- ❌ Harder to delete (need to identify what's temporary)
+- ❌ Risk of migration concerns leaking into utilities
+- ❌ Utilities might evolve, breaking migration
+
+#### Pattern 3: Stage-Based Composition (ETL Pattern) ⭐ **RECOMMENDED**
+
+**How ETL pipelines work:**
+- Extract, Transform, Load are separate, composable stages
+- Each stage is pure function with clear input/output contract
+- Orchestrator connects stages into pipelines
+- Different pipelines compose same stages differently
+
+**Rationale:**
+1. Stages are pure, reusable primitives
+2. Pipelines are compositions (migration vs installation)
+3. Maximum reuse with clear separation
+4. Stages can be tested independently
+
+**Applied to our project:**
+
+```
+/bin/lib/
+├── stages/                         # PERMANENT, reusable stages
+│   ├── read/
+│   │   ├── from-yaml.js           # Read .github/ YAML files
+│   │   └── from-template.js       # Read /templates/ files
+│   │
+│   ├── parse/
+│   │   ├── yaml-frontmatter.js    # Parse YAML frontmatter
+│   │   └── detect-variables.js    # Find {{VARIABLES}} in templates
+│   │
+│   ├── transform/
+│   │   ├── remove-fields.js       # Remove unwanted fields
+│   │   ├── rename-fields.js       # Rename fields (tools → allowed-tools)
+│   │   ├── add-variables.js       # Add {{VARIABLES}} to content
+│   │   └── render-variables.js    # Render {{VARIABLES}} to values
+│   │
+│   ├── validate/
+│   │   ├── check-frontmatter.js   # Validate frontmatter schema
+│   │   └── check-files.js         # Validate file structure
+│   │
+│   ├── write/
+│   │   ├── to-directory.js        # Write files to directory
+│   │   └── with-backup.js         # Write with backup/rollback
+│   │
+│   └── report/
+│       ├── migration-report.js    # Generate migration report
+│       └── install-report.js      # Generate installation report
+│
+├── pipelines/
+│   └── migrate.js                 # TEMPORARY migration pipeline (deleted after)
+│
+└── install/
+    └── index.js                   # PERMANENT installation orchestrator
+```
+
+**Migration Pipeline (Temporary):**
+```javascript
+// /bin/pipelines/migrate.js - DELETED AFTER MIGRATION
+import { readFromYaml } from '../lib/stages/read/from-yaml.js'
+import { parseFrontmatter } from '../lib/stages/parse/yaml-frontmatter.js'
+import { removeFields, renameFields, addVariables } from '../lib/stages/transform/index.js'
+import { checkFrontmatter } from '../lib/stages/validate/check-frontmatter.js'
+import { toDirectory } from '../lib/stages/write/to-directory.js'
+import { migrationReport } from '../lib/stages/report/migration-report.js'
+
+export async function migrate() {
+  // Pipeline: .github/ → /templates/
+  
+  // 1. Read source files
+  const skills = await readFromYaml('.github/skills/')
+  const agents = await readFromYaml('.github/agents/')
+  
+  // 2. Parse frontmatter
+  const parsed = [...skills, ...agents].map(parseFrontmatter)
+  
+  // 3. Apply transformations
+  const transformed = parsed
+    .map(removeFields(['unwantedField', 'anotherOldField']))
+    .map(renameFields({ tools: 'allowed-tools' }))
+    .map(addVariables())  // Add {{PLATFORM_ROOT}}, etc.
+  
+  // 4. Validate
+  const validated = transformed.map(checkFrontmatter)
+  
+  // 5. Write to /templates/
+  await toDirectory('/templates/', validated)
+  
+  // 6. Report
+  return migrationReport(validated)
+}
+```
+
+**Installation Pipeline (Permanent):**
+```javascript
+// /bin/lib/install/index.js - PERMANENT
+import { readFromTemplate } from '../stages/read/from-template.js'
+import { detectVariables } from '../stages/parse/detect-variables.js'
+import { renderVariables } from '../stages/transform/render-variables.js'
+import { checkFiles } from '../stages/validate/check-files.js'
+import { toDirectory } from '../stages/write/to-directory.js'
+import { installReport } from '../stages/report/install-report.js'
+
+export async function install(templateId, targetDir, variables) {
+  // Pipeline: /templates/ → target directory
+  
+  // 1. Read template
+  const template = await readFromTemplate(templateId)
+  
+  // 2. Detect variables
+  const vars = detectVariables(template)
+  
+  // 3. Render variables
+  const rendered = renderVariables(template, variables)
+  
+  // 4. Validate
+  const validated = checkFiles(rendered)
+  
+  // 5. Write to target
+  await toDirectory(targetDir, validated)
+  
+  // 6. Report
+  return installReport(validated)
+}
+```
+
+**What Gets Deleted:**
+```bash
+# After migration succeeds, delete:
+rm /bin/pipelines/migrate.js
+
+# What stays (PERMANENT):
+/bin/lib/stages/          # All stages - reused by installation
+/bin/lib/install/         # Installation orchestrator
+```
+
+**Pros:**
+- ✅ Maximum reuse of validated components
+- ✅ Clear separation (pipeline vs stages)
+- ✅ Easy to test (stages are pure functions)
+- ✅ Installation reuses battle-tested stages
+- ✅ Only delete pipeline file (stages stay)
+- ✅ Stages have no migration-specific logic
+
+**Cons:**
+- ❌ Requires designing good stage contracts upfront
+- ❌ More upfront architecture work
+
+### Recommendation: Stage-Based Composition (Pattern 3)
+
+**Why this is best for our project:**
+
+1. **Reuse with safety:** Migration validates stages that installation will use
+2. **Easy deletion:** Only `/bin/pipelines/migrate.js` needs deletion
+3. **Pure stages:** No side effects, no coupling, fully testable
+4. **Battle-tested:** Migration validates stages before installation uses them
+5. **Clear contracts:** Each stage has clear input/output
+
+**Stage Contract Pattern:**
+
+```javascript
+// All stages follow this contract:
+
+/**
+ * Stage function contract
+ * @param {StageInput} input - Data from previous stage
+ * @param {Object} config - Configuration options
+ * @returns {StageOutput | Promise<StageOutput>} - Data for next stage
+ * @throws {StageError} - If stage fails
+ */
+
+// Example: read stage
+export async function readFromYaml(path, config = {}) {
+  // Input: file path
+  // Output: array of file objects
+  return [{ path: '...', content: '...' }]
+}
+
+// Example: transform stage
+export function renameFields(data, mapping, config = {}) {
+  // Input: data object, field mapping
+  // Output: transformed data object
+  return { ...data, newField: data.oldField }
+}
+
+// Example: validate stage
+export function checkFrontmatter(data, schema, config = {}) {
+  // Input: data object, schema
+  // Output: data object (unchanged) or throws
+  // Side effect: throws ValidationError if invalid
+  if (!isValid(data, schema)) {
+    throw new ValidationError('Invalid frontmatter')
+  }
+  return data
+}
+```
+
+### Validation Strategy
+
+**Critical:** Must validate migration success before deleting code.
+
+**Validation Checklist:**
+
+```javascript
+// /bin/validate-migration.js
+async function validateMigration() {
+  const checks = [
+    // 1. All source files migrated
+    checkAllFilesMigrated('.github/', '/templates/'),
+    
+    // 2. Frontmatter corrections applied
+    checkFrontmatterCorrect('/templates/'),
+    
+    // 3. Variables added correctly
+    checkVariablesPresent('/templates/'),
+    
+    // 4. File structure correct
+    checkDirectoryStructure('/templates/'),
+    
+    // 5. Installation pipeline works on migrated templates
+    testInstallationPipeline('/templates/skills/test-skill'),
+    
+    // 6. Manual spot-checks
+    generateSpotCheckReport('/templates/')
+  ]
+  
+  const results = await Promise.all(checks)
+  
+  if (results.every(r => r.passed)) {
+    console.log('✅ Migration validated. Safe to delete /bin/pipelines/migrate.js')
+    return true
+  } else {
+    console.error('❌ Migration validation failed')
+    console.error(results.filter(r => !r.passed))
+    return false
+  }
+}
+```
+
+**Validation steps:**
+
+1. **Automated checks:**
+   - File count matches (29 skills + 13 agents = 42 files)
+   - All frontmatter fields renamed correctly
+   - All `{{VARIABLES}}` present where expected
+   - No `tools` field (should be `allowed-tools`)
+   - All `version.json` files generated
+
+2. **Test installation:**
+   - Run installation pipeline on migrated templates
+   - Verify installation completes without errors
+   - Validate installed files match expected structure
+
+3. **Manual review:**
+   - Spot-check 3-5 templates for correctness
+   - Verify complex cases handled correctly
+   - Generate diff report for review
+
+4. **Generate migration report:**
+   - Summary of changes
+   - List of transformed files
+   - Any warnings or edge cases
+
+**Only after ALL validations pass:** Delete `/bin/pipelines/migrate.js`
+
+### Rollback Strategy
+
+**If migration fails partway:**
+
+1. **Git protection:**
+   - Migration writes to NEW directory `/templates/`
+   - Original `.github/` unchanged
+   - If failure → `git clean -fd` removes `/templates/`
+
+2. **Atomic migration:**
+   - Write to `/templates-temp/` first
+   - Validate output
+   - Atomic rename: `/templates-temp/` → `/templates/`
+   - If validation fails → delete `/templates-temp/`, no harm
+
+3. **Idempotent migration:**
+   - Safe to re-run migration
+   - Same input → same output
+   - Deterministic transformations
+
+**Rollback procedure:**
+```bash
+# If migration fails or output is wrong:
+rm -rf /templates/        # Remove bad output
+git status                # Confirm .github/ unchanged
+npm run migrate           # Re-run migration
+```
+
+### Migration Execution Plan
+
+**Phase 1 execution:**
+
+```bash
+# 1. Run migration
+npm run migrate
+
+# 2. Validate output
+npm run validate-migration
+
+# 3. Review migration report
+cat .planning/migration-report.md
+
+# 4. Spot-check templates
+code /templates/skills/gsd-research.md
+
+# 5. Test installation on migrated template
+npm run install -- --template=gsd-research --platform=claude-desktop
+
+# 6. If all checks pass, delete migration pipeline
+git rm /bin/pipelines/migrate.js
+git commit -m "Phase 1 complete: Delete migration pipeline"
+```
+
+---
+
+## 6. Phase 2+ Installation Architecture (Permanent)
+
+**Confidence: HIGH** (Based on package manager patterns, template systems, and installation tool best practices)
+
+### Problem Statement
+
+Phase 2+ is the **PERMANENT INSTALLATION PIPELINE** that:
+1. Reads from `/templates/` (NOT `.github/`)
+2. Renders `{{VARIABLES}}` to actual values
+3. Copies to target directory
+4. **NO conversion logic** (templates already correct)
+5. Runs forever as the main installer
+
+**Key architectural principles:**
+- Clean, maintainable architecture
+- No migration concerns
+- Platform adapters for cross-platform support
+- Clear component boundaries
+
+### Component Architecture
+
+**Recommended structure:**
+
+```
+/bin/lib/
+├── stages/                      # Pure, reusable stages (from migration)
+│   ├── read/
+│   ├── parse/
+│   ├── transform/
+│   ├── validate/
+│   ├── write/
+│   └── report/
+│
+├── install/                     # Installation orchestrator
+│   ├── index.js                 # Main entry point
+│   ├── pipeline.js              # Pipeline composition
+│   └── config.js                # Installation configuration
+│
+├── platforms/                   # Platform adapters
+│   ├── index.js                 # Platform detection
+│   ├── claude-desktop.js        # Claude Desktop platform
+│   ├── claude-cli.js            # Claude CLI platform (future)
+│   ├── github-cli.js            # GitHub CLI platform (future)
+│   └── base.js                  # Base platform interface
+│
+├── templates/                   # Template management
+│   ├── index.js                 # Public API
+│   ├── loader.js                # Load templates from /templates/
+│   ├── registry.js              # Template registry (catalog)
+│   └── validator.js             # Template validation
+│
+├── rendering/                   # Variable rendering
+│   ├── index.js                 # Public API
+│   ├── engine.js                # Template engine (mustache)
+│   ├── variables.js             # Variable resolution
+│   └── filters.js               # Custom filters (optional)
+│
+├── prompts/                     # Interactive CLI
+│   ├── index.js                 # Public API
+│   ├── platform-select.js       # Platform selection
+│   ├── template-select.js       # Template selection
+│   └── confirm.js               # Confirmation prompts
+│
+└── errors/                      # Error handling
+    ├── index.js                 # Public API
+    ├── install-error.js         # Installation errors
+    └── validation-error.js      # Validation errors
+```
+
+### Component Boundaries
+
+**1. Installation Orchestrator (`/bin/lib/install/`)**
+
+**Responsibility:** Coordinate installation pipeline
+
+**Public API:**
+```javascript
+// /bin/lib/install/index.js
+export async function install(options) {
+  // options: { template, platform, variables, targetDir }
+  const pipeline = createPipeline(options)
+  return await pipeline.run()
+}
+```
+
+**Does NOT:**
+- ❌ Know about .github/ (migration concern)
+- ❌ Do field transformations (conversion concern)
+- ❌ Have migration-specific logic
+
+**Does:**
+- ✅ Compose stages into installation pipeline
+- ✅ Handle installation configuration
+- ✅ Coordinate platform adapters
+
+---
+
+**2. Platform Adapters (`/bin/lib/platforms/`)**
+
+**Responsibility:** Provide platform-specific configuration
+
+**Interface:**
+```javascript
+// /bin/lib/platforms/base.js
+class Platform {
+  get name() { return 'platform-name' }
+  get installDir() { return '/path/to/install' }
+  get configFile() { return '/path/to/config' }
+  
+  async detect() {
+    // Return true if this platform is present
+  }
+  
+  getVariables() {
+    // Return platform-specific variables
+    return {
+      PLATFORM_ROOT: this.installDir,
+      PLATFORM_NAME: this.name
+    }
+  }
+}
+```
+
+**Example:**
+```javascript
+// /bin/lib/platforms/claude-desktop.js
+export class ClaudeDesktopPlatform extends Platform {
+  get name() { return 'claude-desktop' }
+  
+  get installDir() {
+    // Platform-specific logic
+    if (process.platform === 'darwin') {
+      return path.join(os.homedir(), 'Library/Application Support/Claude')
+    } else if (process.platform === 'win32') {
+      return path.join(os.homedir(), 'AppData/Roaming/Claude')
+    } else {
+      return path.join(os.homedir(), '.config/claude')
+    }
+  }
+  
+  async detect() {
+    return fs.existsSync(this.installDir)
+  }
+  
+  getVariables() {
+    return {
+      PLATFORM_ROOT: path.join(this.installDir, '.claude'),
+      PLATFORM_NAME: 'claude-desktop',
+      SKILLS_DIR: path.join(this.installDir, '.claude/skills'),
+      AGENTS_DIR: path.join(this.installDir, '.claude/agents')
+    }
+  }
+}
+```
+
+**When to introduce platform adapters:**
+
+- ✅ **Phase 2:** Basic platform detection (hardcode Claude Desktop paths)
+- ✅ **Phase 3:** Full platform adapter pattern (prepare for multiple platforms)
+- ✅ **Phase 4+:** Add new platforms (claude-cli, github-cli)
+
+**Don't over-engineer in Phase 2:** Start simple, refactor when adding second platform.
+
+---
+
+**3. Template Management (`/bin/lib/templates/`)**
+
+**Responsibility:** Load, validate, catalog templates
+
+**Public API:**
+```javascript
+// /bin/lib/templates/index.js
+export async function loadTemplate(templateId) {
+  // Load template from /templates/skills/ or /templates/agents/
+  return {
+    id: 'template-id',
+    type: 'skill' | 'agent',
+    files: [{ path: '...', content: '...' }],
+    metadata: { version: '...', dependencies: [...] }
+  }
+}
+
+export async function listTemplates() {
+  // Return catalog of available templates
+  return [
+    { id: 'skill-1', name: 'Research Skill', type: 'skill' },
+    { id: 'agent-1', name: 'Orchestrator', type: 'agent' }
+  ]
+}
+
+export async function validateTemplate(template) {
+  // Validate template structure and frontmatter
+}
+```
+
+**Internal:**
+```javascript
+// /bin/lib/templates/loader.js - Template loading logic
+// /bin/lib/templates/registry.js - Template catalog/index
+// /bin/lib/templates/validator.js - Template validation
+```
+
+---
+
+**4. Variable Rendering (`/bin/lib/rendering/`)**
+
+**Responsibility:** Render `{{VARIABLES}}` in templates
+
+**Public API:**
+```javascript
+// /bin/lib/rendering/index.js
+export async function render(template, variables) {
+  // Render all {{VARIABLES}} in template files
+  return {
+    ...template,
+    files: template.files.map(file => ({
+      ...file,
+      content: renderContent(file.content, variables)
+    }))
+  }
+}
+```
+
+**Internal:**
+```javascript
+// /bin/lib/rendering/engine.js - Mustache wrapper
+// /bin/lib/rendering/variables.js - Variable resolution
+// /bin/lib/rendering/filters.js - Custom filters (optional)
+```
+
+**Example:**
+```javascript
+// Input template:
+import { workflow } from '{{PLATFORM_ROOT}}/core/workflow.js'
+
+// Variables:
+{ PLATFORM_ROOT: '.claude/get-shit-done' }
+
+// Output:
+import { workflow } from '.claude/get-shit-done/core/workflow.js'
+```
+
+---
+
+**5. Interactive CLI (`/bin/lib/prompts/`)**
+
+**Responsibility:** Interactive prompts for installation
+
+**Public API:**
+```javascript
+// /bin/lib/prompts/index.js
+export async function promptForInstallation() {
+  const platform = await selectPlatform()
+  const template = await selectTemplate()
+  const confirm = await confirmInstallation({ platform, template })
+  
+  return { platform, template, confirmed: confirm }
+}
+```
+
+**Internal:**
+```javascript
+// /bin/lib/prompts/platform-select.js
+import * as clack from '@clack/prompts'
+
+export async function selectPlatform() {
+  return await clack.select({
+    message: 'Select installation platform:',
+    options: [
+      { value: 'claude-desktop', label: 'Claude Desktop' },
+      { value: 'claude-cli', label: 'Claude CLI (coming soon)', disabled: true },
+      { value: 'github-cli', label: 'GitHub CLI (coming soon)', disabled: true }
+    ]
+  })
+}
+```
+
+---
+
+### Installation Pipeline Flow
+
+**Complete installation flow:**
+
+```javascript
+// /bin/lib/install/pipeline.js
+import { detectPlatform } from '../platforms/index.js'
+import { loadTemplate } from '../templates/index.js'
+import { render } from '../rendering/index.js'
+import { writeFiles } from '../stages/write/to-directory.js'
+import { validateInstallation } from '../stages/validate/check-files.js'
+
+export async function runInstallation(options) {
+  // 1. Detect or select platform
+  const platform = options.platform || await detectPlatform()
+  const platformAdapter = getPlatformAdapter(platform)
+  
+  // 2. Load template
+  const template = await loadTemplate(options.template)
+  
+  // 3. Get platform variables
+  const variables = {
+    ...platformAdapter.getVariables(),
+    ...options.variables
+  }
+  
+  // 4. Render template
+  const rendered = await render(template, variables)
+  
+  // 5. Validate
+  await validateInstallation(rendered)
+  
+  // 6. Write to target directory
+  const targetDir = options.targetDir || platformAdapter.installDir
+  await writeFiles(targetDir, rendered.files)
+  
+  // 7. Report success
+  return {
+    success: true,
+    template: template.id,
+    platform: platform,
+    installedTo: targetDir
+  }
+}
+```
+
+**Key differences from migration:**
+- ✅ Reads from `/templates/` (not `.github/`)
+- ✅ Renders variables (no field transformations)
+- ✅ Platform-aware (uses platform adapters)
+- ✅ Interactive mode (prompts for user input)
+- ✅ NO conversion logic (templates already correct)
+
+### Separation of Concerns
+
+**What installation DOES:**
+- Load templates from `/templates/`
+- Render `{{VARIABLES}}` to values
+- Detect/select platform
+- Copy files to target directory
+- Validate installation
+
+**What installation DOES NOT:**
+- ❌ Read from `.github/` (migration concern)
+- ❌ Transform frontmatter fields (conversion concern)
+- ❌ Know about migration-specific corrections
+- ❌ Handle legacy formats
+
+**Clean boundary:** Installation assumes templates are already correct.
+
+### When to Introduce Complexity
+
+**Phase 2 (MVP):**
+- ✅ Simple platform detection (hardcode Claude Desktop)
+- ✅ Basic template loading (no registry)
+- ✅ Simple variable rendering (mustache)
+- ✅ Direct file copying (no fancy features)
+
+**Phase 3 (Platform Support):**
+- ✅ Platform adapter pattern
+- ✅ Multiple platform support
+- ✅ Platform-specific configuration
+
+**Phase 4+ (Advanced Features):**
+- ✅ Template registry/catalog
+- ✅ Dependency management
+- ✅ Version management
+- ✅ Update mechanism
+
+**Don't over-engineer Phase 2.** Start simple, refactor when adding complexity.
+
+### Testing Strategy
+
+**Unit tests (stages):**
+```javascript
+// test/stages/render.test.js
+test('renders {{PLATFORM_ROOT}} variable', () => {
+  const content = 'import x from "{{PLATFORM_ROOT}}/core.js"'
+  const variables = { PLATFORM_ROOT: '.claude' }
+  const result = renderVariables(content, variables)
+  expect(result).toBe('import x from ".claude/core.js"')
+})
+```
+
+**Integration tests (pipeline):**
+```javascript
+// test/install/pipeline.test.js
+test('installs template to target directory', async () => {
+  const result = await runInstallation({
+    template: 'test-skill',
+    platform: 'claude-desktop',
+    targetDir: '/tmp/test-install'
+  })
+  
+  expect(result.success).toBe(true)
+  expect(fs.existsSync('/tmp/test-install/skill.md')).toBe(true)
+})
+```
+
+**E2E tests (full installation):**
+```javascript
+// test/e2e/install.test.js
+test('full installation flow', async () => {
+  // 1. Load template
+  // 2. Render variables
+  // 3. Install to temp directory
+  // 4. Validate installed files
+  // 5. Cleanup
+})
+```
+
+---
+
+## 7. Migration vs Installation: Architecture Decision
+
+### Final Recommendation: Stage-Based with Clear Boundaries
+
+**Structure:**
+
+```
+/bin/
+├── lib/
+│   ├── stages/              # PERMANENT: Pure, reusable stages
+│   │   ├── read/
+│   │   ├── parse/
+│   │   ├── transform/
+│   │   ├── validate/
+│   │   ├── write/
+│   │   └── report/
+│   │
+│   ├── install/             # PERMANENT: Installation orchestrator
+│   ├── platforms/           # PERMANENT: Platform adapters
+│   ├── templates/           # PERMANENT: Template management
+│   ├── rendering/           # PERMANENT: Variable rendering
+│   ├── prompts/             # PERMANENT: Interactive CLI
+│   └── errors/              # PERMANENT: Error handling
+│
+└── pipelines/
+    └── migrate.js           # TEMPORARY: Migration pipeline (deleted after Phase 1)
+```
+
+**Key decisions:**
+
+1. **Shared stages, separate pipelines:** Migration and installation share pure stages, but have different orchestration
+2. **Easy deletion:** Only `/bin/pipelines/migrate.js` deleted after Phase 1
+3. **No coupling:** Installation has no migration-specific logic
+4. **Battle-tested stages:** Migration validates stages that installation will use
+5. **Clean boundaries:** Clear separation between temporary and permanent code
+
+**Phase 1 (Migration):**
+- Compose stages: `readFromYaml → parse → transform → validate → write → report`
+- Orchestrator: `/bin/pipelines/migrate.js` (temporary)
+- After success: Delete `/bin/pipelines/migrate.js`
+
+**Phase 2+ (Installation):**
+- Compose stages: `readFromTemplate → parse → render → validate → write → report`
+- Orchestrator: `/bin/lib/install/` (permanent)
+- Uses same stages (already validated by migration)
+
+### Validation Before Deletion
+
+**Checklist before deleting migration code:**
+
+- [ ] All 42 files migrated (29 skills + 13 agents)
+- [ ] Frontmatter corrections applied correctly
+- [ ] `{{VARIABLES}}` present in all templates
+- [ ] No `tools` field (renamed to `allowed-tools`)
+- [ ] All `version.json` files generated
+- [ ] Installation pipeline works on migrated templates
+- [ ] Manual spot-check of 3-5 templates
+- [ ] Migration report generated and reviewed
+- [ ] Test installation completes successfully
+
+**Only after ALL checks pass:** `git rm /bin/pipelines/migrate.js`
+
+### Build Order Implications
+
+**Phase 1 (Migration):**
+1. Build stages (read, parse, transform, validate, write)
+2. Build migration pipeline (compose stages)
+3. Run migration
+4. Validate output
+5. Delete migration pipeline
+
+**Phase 2 (Installation):**
+1. Reuse stages from Phase 1 (already built and tested)
+2. Build installation orchestrator
+3. Build platform detection (simple, hardcoded)
+4. Build template loading
+5. Build variable rendering
+6. Compose installation pipeline
+
+**Phase 3+ (Advanced):**
+1. Add platform adapters
+2. Add template registry
+3. Add interactive CLI
+4. Add advanced features
+
+**Key insight:** Phase 2 reuses battle-tested stages from Phase 1, reducing risk and effort.
+
+---
+
 ## Summary & Recommendations
 
 ### Domain-Oriented Module Structure
@@ -2259,6 +3180,67 @@ errors/            # Custom error types
 ✅ **Idempotency:** Pure transformations, deterministic output, checksum-based skips  
 ✅ **Testing:** Unit (transformers), integration (stages), snapshot (complex), golden (E2E)
 
+### Phase 1 Migration Architecture (Temporary)
+
+✅ **Use Stage-Based Composition (ETL Pattern):** Shared stages, separate pipelines  
+✅ **Structure:**
+```
+/bin/lib/stages/       # PERMANENT: Pure, reusable stages
+/bin/pipelines/        # TEMPORARY: Migration pipeline (deleted after Phase 1)
+  └── migrate.js       # Delete this file after successful migration
+```
+
+✅ **Migration pipeline composes stages:** `readFromYaml → parse → transform → validate → write → report`  
+✅ **Validation checklist before deletion:**
+- All 42 files migrated (29 skills + 13 agents)
+- Frontmatter corrections applied
+- `{{VARIABLES}}` present
+- Test installation on migrated templates
+- Manual spot-check
+
+✅ **Rollback strategy:**
+- Migration writes to NEW `/templates/` directory
+- Original `.github/` unchanged (git protection)
+- If failure → delete `/templates/`, re-run
+
+✅ **What gets deleted:** Only `/bin/pipelines/migrate.js` (stages stay, reused by installation)
+
+### Phase 2+ Installation Architecture (Permanent)
+
+✅ **Reuse validated stages from Phase 1:** Same stages, different composition  
+✅ **Installation pipeline composes stages:** `readFromTemplate → parse → render → validate → write → report`  
+✅ **Component boundaries:**
+```
+install/          # Installation orchestrator
+platforms/        # Platform adapters (claude-desktop, claude-cli, github-cli)
+templates/        # Template loading and registry
+rendering/        # Variable rendering ({{VARIABLES}} → values)
+prompts/          # Interactive CLI
+```
+
+✅ **No migration logic:** Installation assumes templates are already correct  
+✅ **Platform adapters:** Provide platform-specific configuration and variables  
+✅ **When to introduce:**
+- Phase 2: Simple platform detection (hardcode paths)
+- Phase 3: Full platform adapter pattern
+- Phase 4+: Multiple platforms
+
+✅ **Clean separation:** Installation reads from `/templates/` only (never `.github/`)
+
+### Architecture Decision: Stage-Based with Clear Boundaries
+
+**Key decisions:**
+1. ✅ **Shared stages, separate pipelines:** Maximum reuse with clear separation
+2. ✅ **Easy deletion:** Only pipeline file deleted, stages stay
+3. ✅ **No coupling:** Installation has zero migration-specific logic
+4. ✅ **Battle-tested:** Migration validates stages that installation reuses
+5. ✅ **Pure stages:** No side effects, fully testable, reusable
+
+**Build order implications:**
+- **Phase 1:** Build stages → migration pipeline → validate → delete pipeline
+- **Phase 2:** Reuse stages → installation orchestrator → platform detection → template loading
+- **Phase 3+:** Add platform adapters, template registry, advanced features
+
 **Install:**
 ```bash
 npm install @clack/prompts mustache gray-matter joi
@@ -2274,3 +3256,4 @@ This research provides comprehensive guidance for building a professional, maint
 - **Robust architecture** (functional pipeline, clear boundaries)
 - **Safe operations** (atomic writes, idempotency, rollback)
 - **High confidence** (comprehensive testing, schema validation)
+- **Clean migration strategy** (temporary vs permanent code clearly separated)

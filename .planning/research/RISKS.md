@@ -1,7 +1,7 @@
 # Risk Analysis: Template-Based Multi-CLI Installer
 
 **Project:** get-shit-done-multi  
-**Researched:** 2025-01-25  
+**Researched:** 2025-01-25 (Updated: 2025-01-26 with migration risks)  
 **Domain:** Template-based installer for AI CLI skills and agents  
 **Confidence:** HIGH (based on established installer patterns, Node.js ecosystem practices, and security best practices)
 
@@ -9,15 +9,1342 @@
 
 ## Executive Summary
 
-Building a template-based installer that supports multiple AI CLI platforms (Claude, Copilot, Codex, and future platforms) introduces risks across **validation**, **versioning**, **extensibility**, and **security**. This analysis identifies critical and moderate risks with concrete mitigation strategies.
+Building a template-based installer that supports multiple AI CLI platforms (Claude, Copilot, Codex, and future platforms) introduces risks across **validation**, **versioning**, **extensibility**, **security**, and **one-time migration architecture**.
 
-**Key findings:**
-- **Critical risk:** Partial installations without rollback can corrupt user environments
-- **Critical risk:** Path traversal vulnerabilities can overwrite system files
-- **High risk:** Breaking changes in CLI frontmatter specs can break existing templates
-- **Moderate risk:** Adding new platforms requires careful abstraction to avoid template pollution
+**CRITICAL MIGRATION RISKS (Phase 1):**
+- **🔴 CRITICAL:** Migration errors corrupt all 42 template files with no recovery path
+- **🔴 CRITICAL:** Premature deletion of migration code prevents bug fixes
+- **🔴 CRITICAL:** Incomplete validation allows broken templates into production
+- **🟡 HIGH:** Manual edits to `/templates/` diverge from `.github/` source
+- **🟡 HIGH:** Future `.github/` updates have no re-migration path
 
-**Architecture recommendation:** Plugin-based adapter pattern with atomic installation transactions.
+**POST-MIGRATION RISKS (Phase 2+):**
+- **🔴 CRITICAL:** Template bugs discovered after migration deletion require manual fixes
+- **🟡 HIGH:** No conversion pipeline means template errors propagate to installations
+- **🟡 MODERATE:** Version drift between platforms if templates manually edited
+
+**INSTALLATION RISKS (All Phases):**
+- **🔴 CRITICAL:** Partial installations without rollback can corrupt user environments
+- **🔴 CRITICAL:** Path traversal vulnerabilities can overwrite system files
+- **🟡 HIGH:** Breaking changes in CLI frontmatter specs can break existing templates
+- **🟡 MODERATE:** Adding new platforms requires careful abstraction to avoid template pollution
+
+**Architecture recommendation:** 
+1. Phase 1: Comprehensive validation before deletion, keep migration code in git history
+2. All Phases: Plugin-based adapter pattern with atomic installation transactions
+
+---
+
+## ⚠️ MIGRATION-SPECIFIC RISKS (Phase 1 Only)
+
+These risks are unique to the **one-time migration architecture** where Phase 1 converts `.github/` → `/templates/` with frontmatter corrections, then deletes migration code.
+
+---
+
+### 🔴 CRITICAL: Mass Template Corruption from Migration Bugs
+
+**What goes wrong:**
+Migration script has a bug (incorrect regex, wrong tool mapping, malformed YAML). It runs successfully but corrupts frontmatter across **all 42 files**:
+- 29 skills with broken `allowed-tools` fields
+- 13 agents with invalid `skills` references
+- Template variables incorrectly replaced
+- Missing or malformed version files
+
+**Why it happens:**
+- Migration is ONE-TIME and processes all files in batch
+- No incremental validation (all-or-nothing execution)
+- Complex transformations (tool mappings, frontmatter parsing, reference extraction)
+- Easy to test on one file, miss edge cases across 42 files
+
+**Consequences:**
+- All templates broken = installer completely non-functional
+- If migration code deleted, must recreate transformations manually
+- Lost work: hours debugging and manually fixing 42 files
+- Can't re-run migration (code deleted, `.github/` unchanged)
+
+**Example failure scenario:**
+```javascript
+// Migration bug: Regex matches too broadly
+content = content.replace(/tools:\s*\[.*\]/g, 'tools: Read, Write, Bash')
+
+// Corrupts agent content that mentions tools array in documentation:
+// "The following tools: [read, edit] are available"
+// → "The following tools: Read, Write, Bash are available" (WRONG)
+```
+
+**Prevention strategy:**
+
+**1. Dry-run mode (mandatory first):**
+```javascript
+// scripts/migrate-to-templates.js --dry-run
+async function migrate(options = {}) {
+  const { dryRun = false } = options
+  
+  if (dryRun) {
+    console.log('🔍 DRY RUN MODE - No files will be modified')
+  }
+  
+  for (const file of filesToMigrate) {
+    const result = await processFile(file)
+    
+    if (dryRun) {
+      console.log(`Would write: ${result.outputPath}`)
+      console.log('Diff:', result.changes)
+    } else {
+      await fs.writeFile(result.outputPath, result.content)
+    }
+  }
+  
+  if (dryRun) {
+    console.log('\n✓ Dry run complete. Review changes above.')
+    console.log('To apply: npm run migrate:apply')
+  }
+}
+```
+
+**2. Incremental validation (file-by-file):**
+```javascript
+async function processFile(file) {
+  const original = await fs.readFile(file, 'utf-8')
+  const transformed = await applyTransformations(original)
+  
+  // Validate IMMEDIATELY after transformation
+  const validation = validateFrontmatter(transformed)
+  
+  if (!validation.valid) {
+    throw new Error(`Validation failed for ${file}: ${validation.errors}`)
+  }
+  
+  return { content: transformed, validation }
+}
+```
+
+**3. Checkpoint system (rollback on first failure):**
+```javascript
+class MigrationTransaction {
+  constructor() {
+    this.checkpoints = []
+    this.completed = []
+  }
+  
+  async processFile(file) {
+    // Create checkpoint before transformation
+    this.checkpoints.push({
+      file,
+      original: await fs.readFile(file, 'utf-8')
+    })
+    
+    const result = await transformFile(file)
+    
+    // Validate BEFORE marking complete
+    if (!result.valid) {
+      await this.rollback()
+      throw new Error(`Migration failed at ${file}`)
+    }
+    
+    this.completed.push(result)
+  }
+  
+  async rollback() {
+    // Restore all original files
+    for (const checkpoint of this.checkpoints) {
+      await fs.writeFile(checkpoint.file, checkpoint.original)
+    }
+  }
+}
+```
+
+**4. Reference integrity checks:**
+```javascript
+// After migration, verify cross-references work
+async function validateReferences() {
+  const errors = []
+  
+  // Check agent skill references
+  for (const agent of agents) {
+    const skillRefs = extractSkillReferences(agent.content)
+    for (const ref of skillRefs) {
+      const skillExists = await fs.pathExists(`templates/skills/${ref}/SKILL.md`)
+      if (!skillExists) {
+        errors.push(`Agent ${agent.name} references missing skill: ${ref}`)
+      }
+    }
+  }
+  
+  // Check tool name consistency
+  const allTools = extractAllTools()
+  const invalidTools = allTools.filter(t => !VALID_TOOLS.includes(t))
+  if (invalidTools.length > 0) {
+    errors.push(`Invalid tools found: ${invalidTools.join(', ')}`)
+  }
+  
+  return errors
+}
+```
+
+**5. Official spec validation:**
+```javascript
+// Validate against Claude/Copilot official specs
+async function validateAgainstSpecs(file) {
+  const { frontmatter, content } = parseFile(file)
+  
+  // Check against Claude spec
+  if (file.includes('claude')) {
+    const allowedFields = ['name', 'description', 'allowed-tools', 'argument-hint', ...]
+    const unknownFields = Object.keys(frontmatter).filter(k => !allowedFields.includes(k))
+    
+    if (unknownFields.length > 0) {
+      return { valid: false, error: `Unknown fields: ${unknownFields}` }
+    }
+  }
+  
+  return { valid: true }
+}
+```
+
+**Detection:**
+- **Pre-migration:** Run dry-run and review ALL diffs manually
+- **During migration:** Validate each file immediately after transformation
+- **Post-migration:** Run comprehensive test suite against templates
+- **Before deletion:** Manual spot-check 5-10 files for correctness
+
+**Implementation checklist:**
+- [ ] Migration has `--dry-run` mode (default: dry-run, must use `--apply` to execute)
+- [ ] File-by-file validation with immediate failure on error
+- [ ] Transaction system with rollback on first failure
+- [ ] Reference integrity checker (agents → skills, tool names)
+- [ ] Official spec validator (checks against Claude/Copilot docs)
+- [ ] Manual review step in migration workflow (documented in README)
+- [ ] Migration report shows before/after for ALL fields changed
+- [ ] Keep `.github/` untouched as reference for comparison
+
+**When safe to delete migration code:**
+- ✅ Dry-run reviewed and approved
+- ✅ Migration applied successfully with zero validation errors
+- ✅ Manual spot-check confirms correctness (10+ files)
+- ✅ Reference integrity verified (all skill references valid)
+- ✅ Test suite passes against templates
+- ✅ At least one successful installation test using templates
+- ✅ Committed to git (can recover if needed)
+
+**Phase mapping:** Phase 1 (migration script execution)
+
+---
+
+### 🔴 CRITICAL: Premature Deletion of Migration Code
+
+**What goes wrong:**
+Migration code deleted immediately after Phase 1 completes. Later discovery:
+- Template has subtle bug (wrong tool mapping, malformed version.json)
+- `.github/` updated with new skill (need to migrate one more file)
+- Frontmatter spec changes (need to re-apply corrections)
+- Must recreate migration logic manually or fix 42 files by hand
+
+**Why it happens:**
+- Excitement to "clean up" after Phase 1
+- Assumption migration is perfect
+- No buffer period for validation
+- "Delete temporary code" interpreted too literally
+
+**Consequences:**
+- Can't re-run migration if bugs found
+- Must manually fix template errors (hours of work)
+- Lost institutional knowledge (migration logic only in deleted code)
+- Risk of inconsistent manual fixes across templates
+
+**Example failure scenario:**
+```
+Day 1: Phase 1 completes, migration code deleted
+Day 3: Discover agent skill references are case-sensitive, migration used wrong case
+Day 3: Must manually fix 13 agent files (no migration script to re-run)
+Day 5: Another bug found in tool mappings
+Day 5: Must manually audit all 42 files again
+```
+
+**Prevention strategy:**
+
+**1. Keep migration code in git history (never truly delete):**
+```bash
+# After Phase 1 completes
+git add scripts/migrate-to-templates.js
+git commit -m "Phase 1: Migration script (preserved in history)"
+
+# Move to archive directory instead of deleting
+mkdir -p .archive/phase-1-migration
+git mv scripts/migrate-to-templates.js .archive/phase-1-migration/
+git commit -m "Phase 1: Archive migration script (can restore if needed)"
+
+# Keep README explaining how to recover
+cat > .archive/phase-1-migration/README.md << EOF
+# Phase 1 Migration Script (Archived)
+
+This migration script converted .github/ to /templates/ with frontmatter corrections.
+
+## Recovery
+
+If you need to re-run migration:
+1. Restore this script: git checkout HEAD~1 -- scripts/migrate-to-templates.js
+2. Delete /templates/ directory
+3. Run: node scripts/migrate-to-templates.js --dry-run
+4. Review changes, then: node scripts/migrate-to-templates.js --apply
+
+## When to recover
+
+- Template bugs discovered that affect multiple files
+- Need to migrate new files added to .github/
+- Frontmatter spec changes require re-applying corrections
+
+EOF
+```
+
+**2. Validation period (don't delete immediately):**
+```markdown
+## Migration Completion Checklist
+
+Phase 1 is NOT complete until:
+
+- [ ] Migration executed successfully (zero errors)
+- [ ] Manual spot-check completed (10+ files reviewed)
+- [ ] Reference integrity validated
+- [ ] Test suite passes (100% pass rate)
+- [ ] Installation test completed (npx install using templates)
+- [ ] **WAIT 7 DAYS for validation period**
+- [ ] No bugs discovered during validation period
+- [ ] Migration code archived (not deleted) to .archive/
+
+**DO NOT delete migration code until validation period complete.**
+```
+
+**3. Emergency recovery procedure:**
+```bash
+#!/bin/bash
+# scripts/emergency-remigrate.sh
+
+set -e
+
+echo "⚠️  EMERGENCY RE-MIGRATION"
+echo ""
+echo "This will:"
+echo "  1. Delete current /templates/"
+echo "  2. Restore migration script from git history"
+echo "  3. Re-run migration with latest fixes"
+echo ""
+read -p "Continue? [y/N] " -n 1 -r
+echo
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  exit 1
+fi
+
+# Backup current templates
+mv templates templates.backup.$(date +%Y%m%d-%H%M%S)
+
+# Restore migration script
+git show HEAD:scripts/migrate-to-templates.js > scripts/migrate-to-templates.js.recovered
+
+# Re-run migration
+node scripts/migrate-to-templates.js.recovered --apply
+
+echo ""
+echo "✓ Re-migration complete"
+echo "  Review templates/, then:"
+echo "    - If good: rm -rf templates.backup.*"
+echo "    - If bad: mv templates.backup.* templates"
+```
+
+**4. Document migration decisions:**
+```javascript
+// scripts/migrate-to-templates.js
+
+/**
+ * MIGRATION DECISIONS LOG
+ * 
+ * Why this script exists:
+ *   Phase 1 is ONE-TIME conversion from .github/ to /templates/ with frontmatter fixes.
+ * 
+ * Key transformations:
+ *   - Tool names: Copilot aliases → Claude official (read → Read, execute → Bash)
+ *   - Frontmatter: Remove unsupported fields (metadata, skill_version, etc.)
+ *   - Template variables: Inject {{PLATFORM_ROOT}}, {{COMMAND_PREFIX}}
+ *   - Version files: Extract metadata to version.json per skill
+ * 
+ * Validation:
+ *   - Dry-run mode shows all changes before applying
+ *   - File-by-file validation against official specs
+ *   - Reference integrity checks (agents → skills)
+ * 
+ * Recovery:
+ *   - Script preserved in .archive/phase-1-migration/
+ *   - Can restore and re-run if bugs discovered
+ *   - Emergency procedure: scripts/emergency-remigrate.sh
+ * 
+ * When to re-run:
+ *   - Template bugs affecting multiple files
+ *   - New files added to .github/ need migration
+ *   - Frontmatter spec changes
+ */
+```
+
+**Detection:**
+- Don't rely on detection — **prevent deletion**
+- Keep migration code in archive (not deleted)
+- Document recovery procedure before Phase 1 completes
+
+**When safe to archive (not delete):**
+- ✅ 7+ days validation period completed
+- ✅ Zero bugs discovered in templates
+- ✅ At least 3 successful installations using templates
+- ✅ Archived to `.archive/` with recovery instructions
+- ✅ Emergency recovery procedure tested
+
+**Phase mapping:** Phase 1 completion (archive decision)
+
+---
+
+### 🔴 CRITICAL: Incomplete Validation Allows Broken Templates
+
+**What goes wrong:**
+Migration completes with "success" message. Validation only checked:
+- YAML parses (syntax check only)
+- Files exist (presence check only)
+- Missed deeper issues:
+  - Tool names valid but wrong platform (used Copilot names in Claude templates)
+  - Agent skill references point to non-existent skills
+  - Template variables malformed (`{{PLATFORMROOT}}` instead of `{{PLATFORM_ROOT}}`)
+  - version.json has correct schema but wrong values
+
+**Why it happens:**
+- Validation focuses on "can parse" not "is correct"
+- No cross-reference checks (agents → skills)
+- No platform-specific validation (Claude vs Copilot rules)
+- No test installation attempt
+
+**Consequences:**
+- Templates appear valid but fail at installation time
+- Users get cryptic errors ("skill not found", "invalid tool name")
+- Debugging requires deep knowledge of platform specs
+- Multiple iterations to fix (each iteration touches 42 files)
+
+**Example failure scenario:**
+```yaml
+# Migration output (looks valid)
+---
+name: gsd-executor
+tools: read, write, execute  # ❌ Wrong: Copilot names, should be Read, Write, Bash
+skills: gsd-new-project      # ❌ Wrong: Missing path prefix /gsd-new-project
+---
+
+# YAML parses ✅
+# File exists ✅
+# But fails at runtime:
+#   - Claude: "Unknown tool: read"
+#   - Agent: "Skill not found: gsd-new-project"
+```
+
+**Prevention strategy:**
+
+**1. Multi-layer validation:**
+```javascript
+// Validation layers (each must pass)
+async function validateMigration() {
+  const results = {
+    syntax: await validateSyntax(),           // Layer 1: Parseable
+    schema: await validateSchema(),           // Layer 2: Correct structure
+    semantics: await validateSemantics(),     // Layer 3: Valid values
+    references: await validateReferences(),   // Layer 4: Cross-references
+    integration: await validateIntegration()  // Layer 5: Test install
+  }
+  
+  const failures = Object.entries(results)
+    .filter(([_, result]) => !result.valid)
+  
+  if (failures.length > 0) {
+    throw new Error(`Validation failed: ${failures.map(f => f[0]).join(', ')}`)
+  }
+  
+  return results
+}
+```
+
+**2. Platform-specific validation:**
+```javascript
+// Validate Claude templates
+async function validateClaudeTemplate(file) {
+  const { frontmatter } = parseFile(file)
+  const errors = []
+  
+  // Check tool names (must be capitalized official names)
+  if (frontmatter['allowed-tools']) {
+    const tools = frontmatter['allowed-tools'].split(',').map(t => t.trim())
+    const validTools = ['Read', 'Write', 'Bash', 'Edit', 'Grep', 'Task']
+    
+    const invalidTools = tools.filter(t => !validTools.includes(t))
+    if (invalidTools.length > 0) {
+      errors.push(`Invalid Claude tools: ${invalidTools} (must be: ${validTools})`)
+    }
+  }
+  
+  // Check for Copilot-style aliases (common migration bug)
+  if (frontmatter['allowed-tools']?.includes('execute')) {
+    errors.push(`Found Copilot alias 'execute', should be 'Bash'`)
+  }
+  
+  // Check frontmatter fields (no unsupported fields)
+  const supportedFields = ['name', 'description', 'allowed-tools', 'argument-hint']
+  const unsupportedFields = Object.keys(frontmatter).filter(k => !supportedFields.includes(k))
+  
+  if (unsupportedFields.length > 0) {
+    errors.push(`Unsupported Claude fields: ${unsupportedFields}`)
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
+```
+
+**3. Reference integrity validation:**
+```javascript
+// Check all cross-references resolve
+async function validateReferences() {
+  const errors = []
+  
+  // Build skill index
+  const skills = await listSkills('templates/skills')
+  const skillNames = skills.map(s => s.name)
+  
+  // Check agent skill references
+  for (const agent of await listAgents('templates/agents')) {
+    const { frontmatter, content } = parseFile(agent.path)
+    
+    // Check frontmatter skills field
+    if (frontmatter.skills) {
+      const refs = frontmatter.skills.split(',').map(s => s.trim())
+      const missing = refs.filter(ref => !skillNames.includes(ref))
+      
+      if (missing.length > 0) {
+        errors.push(`Agent ${agent.name} references missing skills: ${missing}`)
+      }
+    }
+    
+    // Check inline skill references in content
+    const contentRefs = content.match(/{{COMMAND_PREFIX}}([a-z-]+)/g) || []
+    for (const ref of contentRefs) {
+      const skillName = ref.replace('{{COMMAND_PREFIX}}', '')
+      if (!skillNames.includes(skillName)) {
+        errors.push(`Agent ${agent.name} content references missing skill: ${skillName}`)
+      }
+    }
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
+```
+
+**4. Test installation validation:**
+```javascript
+// Attempt actual installation in test environment
+async function validateIntegration() {
+  const testDir = path.join(os.tmpdir(), `gsd-test-${Date.now()}`)
+  
+  try {
+    // Run installer using migrated templates
+    await runInstaller({
+      platform: 'claude',
+      scope: 'local',
+      targetDir: testDir,
+      templatesDir: 'templates'
+    })
+    
+    // Verify installation structure
+    const errors = []
+    
+    // Check skill files exist and parse
+    for (const skill of await listSkills('templates/skills')) {
+      const installedPath = path.join(testDir, '.claude/skills', skill.name, 'SKILL.md')
+      
+      if (!await fs.pathExists(installedPath)) {
+        errors.push(`Skill not installed: ${skill.name}`)
+        continue
+      }
+      
+      // Verify template variables replaced
+      const content = await fs.readFile(installedPath, 'utf-8')
+      if (content.includes('{{PLATFORM_ROOT}}')) {
+        errors.push(`Skill ${skill.name} has unreplaced variables`)
+      }
+    }
+    
+    return { valid: errors.length === 0, errors }
+    
+  } finally {
+    await fs.remove(testDir)
+  }
+}
+```
+
+**5. Comprehensive validation report:**
+```javascript
+// Generate detailed validation report
+async function generateValidationReport() {
+  const results = await validateMigration()
+  
+  console.log('📋 MIGRATION VALIDATION REPORT')
+  console.log('=' .repeat(50))
+  console.log()
+  
+  for (const [layer, result] of Object.entries(results)) {
+    const icon = result.valid ? '✅' : '❌'
+    console.log(`${icon} ${layer.toUpperCase()}`)
+    
+    if (!result.valid) {
+      for (const error of result.errors) {
+        console.log(`   ❌ ${error}`)
+      }
+    } else {
+      console.log(`   ✅ ${result.summary}`)
+    }
+    console.log()
+  }
+  
+  if (Object.values(results).every(r => r.valid)) {
+    console.log('✅ MIGRATION VALIDATED - Safe to proceed')
+  } else {
+    console.log('❌ MIGRATION FAILED - Fix errors above')
+    process.exit(1)
+  }
+}
+```
+
+**Detection:**
+- Run comprehensive validation after migration
+- Check all 5 layers (syntax, schema, semantics, references, integration)
+- Review validation report manually
+
+**Implementation checklist:**
+- [ ] Syntax validation (YAML parses)
+- [ ] Schema validation (correct field types)
+- [ ] Semantic validation (tool names, platform-specific rules)
+- [ ] Reference validation (agents → skills, template variables)
+- [ ] Integration validation (test installation in temp directory)
+- [ ] Validation report generated and reviewed
+- [ ] Zero validation errors required before Phase 1 complete
+
+**Phase mapping:** Phase 1 (validation after migration)
+
+---
+
+### 🟡 HIGH: Manual Template Edits Diverge from Source
+
+**What goes wrong:**
+After Phase 1, developer needs to:
+- Fix a typo in skill description
+- Add new argument to skill
+- Update agent tool list
+
+Developer edits `/templates/skills/gsd-new-project/SKILL.md` directly. Change works, but:
+- `.github/skills/gsd-new-project/SKILL.md` unchanged (divergence)
+- Next time migration runs (if ever), overwrites manual fix
+- No record of why change was made
+- Can't distinguish "template bug" from "intentional customization"
+
+**Why it happens:**
+- Templates are now source of truth, feels natural to edit them
+- `.github/` is "old source", why keep it in sync?
+- No clear workflow for "template updates"
+- Tempting to make quick fixes directly
+
+**Consequences:**
+- Source and templates diverge (confusion about "real" source)
+- Lost changes if migration ever re-run
+- Difficult to track what's been customized vs migrated
+- Can't easily regenerate templates from source
+
+**Example failure scenario:**
+```
+Day 10: Fix typo in /templates/skills/gsd-debug/SKILL.md
+Day 30: Add new skill to .github/skills/gsd-test/
+Day 30: Run migration again to get gsd-test template
+Day 30: Migration overwrites gsd-debug fix (typo back)
+```
+
+**Prevention strategy:**
+
+**1. Clear "source of truth" documentation:**
+```markdown
+# TEMPLATES.md
+
+## Source of Truth
+
+After Phase 1 migration, `/templates/` is the PERMANENT source of truth.
+
+### ⛔ DO NOT edit .github/
+
+`.github/` directories are HISTORICAL REFERENCE ONLY:
+- `.github/skills/` — Original source before migration
+- `.github/agents/` — Original source before migration
+
+DO NOT edit these files. Changes will not be reflected in templates.
+
+### ✅ DO edit /templates/
+
+To update skills or agents:
+1. Edit files in `/templates/`
+2. Commit with clear message explaining change
+3. Tag as manual customization if not migrating from .github/
+
+### Migration is ONE-TIME
+
+Phase 1 migration ran once and is complete. Migration code archived.
+
+If you need to add new files from .github/:
+1. Manually copy to /templates/
+2. Apply same transformations migration did
+3. See .archive/phase-1-migration/README.md for reference
+```
+
+**2. Protect .github/ from edits:**
+```json
+// .github/.readonly-marker
+{
+  "note": "This directory is HISTORICAL REFERENCE ONLY",
+  "do_not_edit": "Changes here will NOT affect templates",
+  "source_of_truth": "/templates/",
+  "migration_complete": "2025-01-26"
+}
+```
+
+```bash
+# Add git attributes to warn on edits
+cat >> .gitattributes << EOF
+# .github/ is historical reference only
+.github/**/*.md linguist-generated=true
+EOF
+```
+
+**3. Template change workflow:**
+```markdown
+## Template Update Workflow
+
+### For bug fixes:
+1. Edit file in `/templates/skills/` or `/templates/agents/`
+2. Run validation: `npm run validate:templates`
+3. Test installation: `npm run test:install`
+4. Commit: `fix(templates): correct tool name in gsd-debug`
+
+### For new features:
+1. Add to `/templates/` directly (NOT .github/)
+2. Create version.json if needed
+3. Update CHANGELOG.md
+4. Commit: `feat(templates): add argument-hint to gsd-new-project`
+
+### For new skills (rare):
+1. Create in `/templates/skills/gsd-new-skill/`
+2. Apply same structure as existing skills
+3. Create version.json
+4. Reference .archive/phase-1-migration for format examples
+```
+
+**4. Divergence detection:**
+```javascript
+// scripts/check-divergence.js
+// Compare .github/ vs /templates/ to detect manual edits
+
+async function checkDivergence() {
+  const divergences = []
+  
+  for (const skill of await listSkills('.github/skills')) {
+    const sourcePath = `.github/skills/${skill.name}/SKILL.md`
+    const templatePath = `templates/skills/${skill.name}/SKILL.md`
+    
+    if (!await fs.pathExists(templatePath)) {
+      continue // Template deleted intentionally
+    }
+    
+    // Reverse template transformations to compare
+    const sourceContent = await fs.readFile(sourcePath, 'utf-8')
+    const templateContent = await fs.readFile(templatePath, 'utf-8')
+    const denormalizedTemplate = reverseTransformations(templateContent)
+    
+    if (sourceContent !== denormalizedTemplate) {
+      divergences.push({
+        file: skill.name,
+        reason: 'Template has manual customizations not in source'
+      })
+    }
+  }
+  
+  if (divergences.length > 0) {
+    console.log('⚠️  Divergence detected (manual edits in templates):')
+    for (const d of divergences) {
+      console.log(`  - ${d.file}: ${d.reason}`)
+    }
+  } else {
+    console.log('✅ No divergence (templates match source)')
+  }
+}
+```
+
+**Detection:**
+- Periodic divergence check (weekly?)
+- Code review catches direct .github/ edits
+- CI warning if .github/ modified after Phase 1
+
+**Implementation checklist:**
+- [ ] TEMPLATES.md documents source of truth
+- [ ] .github/ marked as historical reference
+- [ ] Template change workflow documented
+- [ ] Divergence checker script available
+- [ ] Code review guidelines enforce template-first edits
+
+**Phase mapping:** Phase 2+ (ongoing template maintenance)
+
+---
+
+### 🟡 HIGH: No Re-Migration Path for Future Updates
+
+**What goes wrong:**
+Six months after Phase 1:
+- `.github/` repository releases new skill (`gsd-monitor`)
+- Frontmatter spec changes (new `hooks` field supported)
+- Need to add new skill and update all existing templates
+- But: Migration code deleted, transformations lost
+
+Must either:
+- Manually recreate migration logic (hours of work)
+- Manually copy and transform new skill (error-prone)
+- Skip update entirely (miss new features)
+
+**Why it happens:**
+- Assumed migration is truly "one-time" (never need again)
+- No plan for incorporating upstream updates
+- `.github/` continues evolving while templates static
+
+**Consequences:**
+- Templates drift from latest `.github/` source
+- New skills not available to template users
+- Spec improvements not adopted
+- Manual work for each update (high friction)
+
+**Example failure scenario:**
+```
+Phase 1: Migrate 29 skills from .github/
+Phase 1: Delete migration code
+6 months later: .github/ has 35 skills (6 new)
+6 months later: Need to manually port 6 skills to /templates/
+6 months later: Each skill takes 20 minutes (formatting, tool mapping, validation)
+6 months later: 2 hours of manual work per update
+```
+
+**Prevention strategy:**
+
+**1. Keep migration code accessible (already covered above):**
+- Archive migration script to `.archive/phase-1-migration/`
+- Document recovery procedure
+- Keep git history intact
+
+**2. Template update procedure:**
+```markdown
+## Adding New Skills from .github/
+
+If new skills added to .github/ repository:
+
+### Option A: Use archived migration script
+
+1. Restore migration script:
+   ```bash
+   git show HEAD:.archive/phase-1-migration/migrate-to-templates.js > scripts/migrate.js
+   ```
+
+2. Modify to process only new files:
+   ```javascript
+   const newSkills = ['gsd-monitor', 'gsd-benchmark']
+   for (const skill of newSkills) {
+     await migrateSkill(skill)
+   }
+   ```
+
+3. Run and validate:
+   ```bash
+   node scripts/migrate.js --dry-run
+   node scripts/migrate.js --apply
+   npm run validate:templates
+   ```
+
+### Option B: Manual migration
+
+1. Copy new skill to templates:
+   ```bash
+   cp -r .github/skills/gsd-monitor templates/skills/
+   ```
+
+2. Apply transformations manually:
+   - Fix frontmatter (remove unsupported fields)
+   - Map tool names (execute → Bash, etc.)
+   - Inject template variables
+   - Create version.json
+
+3. Validate:
+   ```bash
+   npm run validate:templates -- --file templates/skills/gsd-monitor
+   ```
+
+### Reference
+
+See `.archive/phase-1-migration/` for transformation examples.
+```
+
+**3. Upstream sync strategy:**
+```javascript
+// scripts/sync-from-upstream.js
+// Semi-automated sync of new files from .github/
+
+async function syncFromUpstream() {
+  console.log('🔄 Checking for new files in .github/...')
+  
+  const sourceSkills = await listSkills('.github/skills')
+  const templateSkills = await listSkills('templates/skills')
+  
+  const newSkills = sourceSkills.filter(s => 
+    !templateSkills.find(t => t.name === s.name)
+  )
+  
+  if (newSkills.length === 0) {
+    console.log('✅ No new skills to sync')
+    return
+  }
+  
+  console.log(`📦 Found ${newSkills.length} new skills:`)
+  for (const skill of newSkills) {
+    console.log(`  - ${skill.name}`)
+  }
+  
+  console.log()
+  console.log('To migrate these skills:')
+  console.log('  1. Restore migration script: npm run restore:migration')
+  console.log('  2. Modify to process new skills only')
+  console.log('  3. Run migration: npm run migrate:apply')
+  console.log()
+  console.log('Or migrate manually:')
+  console.log('  1. Copy to templates/')
+  console.log('  2. Apply transformations (see .archive/phase-1-migration/)')
+  console.log('  3. Validate: npm run validate:templates')
+}
+```
+
+**4. Template versioning:**
+```json
+// templates/VERSION
+{
+  "template_version": "1.0.0",
+  "source_commit": "abc123def",  // .github/ commit used for migration
+  "migrated_at": "2025-01-26",
+  "skills_count": 29,
+  "agents_count": 13,
+  "last_sync": "2025-01-26"
+}
+```
+
+**Detection:**
+- Regular checks for new skills in .github/
+- Automated upstream sync checker (CI job?)
+- Template version tracking
+
+**Implementation checklist:**
+- [ ] Migration script archived (not deleted)
+- [ ] Template update procedure documented
+- [ ] Upstream sync checker available
+- [ ] Template VERSION file tracks source commit
+- [ ] Clear workflow for adding new skills
+
+**Phase mapping:** Phase 2+ (ongoing maintenance)
+
+---
+
+## 🔴 POST-MIGRATION RISKS (Phase 2+)
+
+These risks emerge after Phase 1 migration completes and migration code is deleted/archived.
+
+---
+
+### 🔴 CRITICAL: Template Bugs Discovered After Migration Deletion
+
+**What goes wrong:**
+Phase 1 complete, migration archived. Phase 3 development starts (multi-platform support). Discover bug:
+- Agent skill references missing leading slash (should be `/gsd-new-project`, not `gsd-new-project`)
+- Affects all 13 agents
+- Migration script could fix in seconds, but it's archived
+- Must manually edit 13 files
+
+Worse: Bug found in production after installation:
+- Tool mapping was wrong (used Copilot names instead of Claude)
+- Installer fails for all users
+- Emergency hotfix needed, but templates already shipped
+
+**Why it happens:**
+- Validation missed edge cases
+- Bugs only surface during integration (Phase 2-3 development)
+- Real-world usage reveals issues testing didn't catch
+
+**Consequences:**
+- Manual fixes across multiple files (error-prone)
+- Inconsistent fixes if done in batches
+- Emergency hotfix pressure leads to mistakes
+- Users experience broken installations
+
+**Example failure scenario:**
+```
+Phase 1: Migration complete, validated, archived
+Phase 2: Build installer using templates
+Phase 3: Test installation — works!
+v2.0 Release: Users install, report errors:
+  "Skill not found: gsd-new-project"
+  "Invalid tool name: execute"
+Root cause: Migration bug in skill references, tool mappings
+Fix requires: Edit all 42 template files manually
+Time to fix: 2-4 hours
+Risk: Manual edits introduce new bugs
+```
+
+**Prevention strategy:**
+
+**1. Extended validation period (covered above):**
+- Don't archive migration immediately
+- Wait 7+ days for bug discovery
+- Run comprehensive test suite
+- Attempt real installations
+
+**2. Quick recovery procedure:**
+```bash
+#!/bin/bash
+# scripts/emergency-fix-templates.sh
+
+echo "🚨 EMERGENCY TEMPLATE FIX"
+echo ""
+echo "This restores migration script for emergency fixes."
+echo "Use only for bugs affecting multiple templates."
+echo ""
+
+# Restore migration from archive
+cp .archive/phase-1-migration/migrate-to-templates.js scripts/
+
+# Backup current templates
+cp -r templates templates.backup.$(date +%Y%m%d-%H%M%S)
+
+# Run migration with fix
+node scripts/migrate-to-templates.js --apply
+
+echo ""
+echo "✓ Templates regenerated"
+echo "  1. Test installation"
+echo "  2. If good: rm -rf templates.backup.*"
+echo "  3. If bad: restore from templates.backup.*"
+```
+
+**3. Template test suite (catches bugs before production):**
+```javascript
+// tests/templates.test.js
+
+describe('Template Validation', () => {
+  it('all agent skill references are valid', async () => {
+    const agents = await loadAllAgents('templates/agents')
+    const skills = await loadAllSkills('templates/skills')
+    const skillNames = skills.map(s => s.name)
+    
+    for (const agent of agents) {
+      const refs = extractSkillReferences(agent)
+      for (const ref of refs) {
+        expect(skillNames).toContain(ref)
+      }
+    }
+  })
+  
+  it('all tool names are valid for Claude', async () => {
+    const validTools = ['Read', 'Write', 'Bash', 'Edit', 'Grep', 'Task']
+    const skills = await loadAllSkills('templates/skills')
+    
+    for (const skill of skills) {
+      if (skill.frontmatter['allowed-tools']) {
+        const tools = skill.frontmatter['allowed-tools'].split(',').map(t => t.trim())
+        for (const tool of tools) {
+          expect(validTools).toContain(tool)
+        }
+      }
+    }
+  })
+  
+  it('no unreplaced template variables in content', async () => {
+    const allFiles = await glob('templates/**/*.md')
+    for (const file of allFiles) {
+      const content = await fs.readFile(file, 'utf-8')
+      // Template variables should exist in templates (replaced during install)
+      // But check for malformed variables
+      expect(content).not.toMatch(/\{\{[^}]*\}\}/g) // No partial variables
+    }
+  })
+})
+```
+
+**4. Phased rollout (catch bugs before full release):**
+```markdown
+## Release Strategy
+
+### Alpha (Internal Testing)
+- Install templates on dev machines
+- Use for real work (dogfooding)
+- Duration: 1 week
+- Goal: Catch integration bugs
+
+### Beta (Limited Release)
+- Release to npm with `beta` tag
+- Invite 5-10 early adopters
+- Duration: 1 week
+- Goal: Catch real-world usage bugs
+
+### Production Release
+- Only after alpha + beta validation
+- Full npm release
+- Documented known issues
+
+**If bugs found:** Restore migration, fix templates, re-release
+```
+
+**5. Template hot-fix procedure:**
+```markdown
+## Emergency Template Hot-Fix
+
+If critical bug found in released templates:
+
+### Step 1: Assess impact
+- How many templates affected?
+- Can users work around it?
+- Is migration restore needed?
+
+### Step 2: Quick fix (1-2 templates)
+- Edit templates directly
+- Run validation: `npm run validate:templates`
+- Test install: `npm run test:install`
+- Release patch: `npm version patch && npm publish`
+
+### Step 3: Migration restore (3+ templates)
+- Run: `scripts/emergency-fix-templates.sh`
+- Fix migration script bug
+- Regenerate all templates
+- Validate and test
+- Release patch
+
+### Step 4: Post-mortem
+- Why did validation miss this?
+- Add test case to prevent recurrence
+- Update validation checklist
+```
+
+**Detection:**
+- Comprehensive test suite (run before archive)
+- Alpha/beta testing phase
+- Monitor production errors
+- Quick recovery procedure ready
+
+**Implementation checklist:**
+- [ ] Extended validation period (7+ days)
+- [ ] Emergency fix script ready
+- [ ] Template test suite comprehensive
+- [ ] Phased rollout strategy
+- [ ] Hot-fix procedure documented
+- [ ] Migration can be restored quickly
+
+**Phase mapping:** Phase 2+ (after migration archived)
+
+---
+
+### 🟡 HIGH: No Conversion Pipeline for Template Bug Fixes
+
+**What goes wrong:**
+After Phase 1, discover that:
+- All agent tool names need updating (new spec released)
+- All skills need new `hooks` field added
+- Template variable format changes (`{{VAR}}` → `${{VAR}}`)
+
+No conversion pipeline exists (migration deleted). Must either:
+- Manually edit 42 files (hours, error-prone)
+- Write new script from scratch (recreate migration work)
+
+**Why it happens:**
+- Migration was "one-time" architecture
+- No plan for bulk template updates
+- Assumed templates are static after Phase 1
+
+**Consequences:**
+- High friction for template maintenance
+- Bulk changes avoided due to manual work
+- Templates become stale/outdated
+- Quality degrades over time
+
+**Prevention strategy:**
+
+**1. Keep migration as "template maintenance tool":**
+```markdown
+## Migration Script Purpose (Revised)
+
+The migration script is not just for ONE-TIME migration.
+
+### Primary uses:
+1. ✅ Phase 1: Initial migration (.github/ → /templates/)
+2. ✅ Ongoing: Bulk template updates
+3. ✅ Emergency: Fix bugs across multiple templates
+4. ✅ Maintenance: Apply spec changes to all templates
+
+### Do NOT delete migration permanently
+
+Archive to `.archive/`, but keep accessible for bulk operations.
+```
+
+**2. Generalized transformation system:**
+```javascript
+// scripts/transform-templates.js
+// Generic tool for bulk template updates
+
+import { globby } from 'globby';
+import fs from 'fs-extra';
+
+async function applyTransformation(files, transformer) {
+  for (const file of files) {
+    const content = await fs.readFile(file, 'utf-8')
+    const transformed = await transformer(content, file)
+    await fs.writeFile(file, transformed)
+    console.log(`✓ ${file}`)
+  }
+}
+
+// Example transformations
+const transformers = {
+  // Update tool names
+  updateToolNames: (content) => {
+    return content
+      .replace(/tools:\s*execute/g, 'tools: Bash')
+      .replace(/tools:\s*read/g, 'tools: Read')
+  },
+  
+  // Add new frontmatter field
+  addHooksField: (content) => {
+    const { frontmatter, body } = parseFrontmatter(content)
+    frontmatter.hooks = { onLoad: 'initialize' }
+    return serializeFrontmatter(frontmatter, body)
+  },
+  
+  // Update template variable format
+  updateVariableFormat: (content) => {
+    return content.replace(/\{\{(\w+)\}\}/g, '$$\{\{$1\}\}')
+  }
+}
+
+// Usage:
+// node scripts/transform-templates.js --transformer=updateToolNames --files="templates/**/*.md"
+```
+
+**3. Template maintenance playbook:**
+```markdown
+## Template Maintenance Playbook
+
+### Scenario: Update tool names across all templates
+
+**Before:**
+```yaml
+tools: read, execute
+```
+
+**After:**
+```yaml
+tools: Read, Bash
+```
+
+**Procedure:**
+1. Write transformation function:
+   ```javascript
+   function updateTools(content) {
+     return content
+       .replace(/tools:\s*read/gi, 'tools: Read')
+       .replace(/tools:\s*execute/gi, 'tools: Bash')
+   }
+   ```
+
+2. Test on single file:
+   ```bash
+   node scripts/transform-templates.js \
+     --transformer=updateTools \
+     --files="templates/skills/gsd-debug/SKILL.md" \
+     --dry-run
+   ```
+
+3. Review changes, then apply to all:
+   ```bash
+   node scripts/transform-templates.js \
+     --transformer=updateTools \
+     --files="templates/**/*.md"
+   ```
+
+4. Validate:
+   ```bash
+   npm run validate:templates
+   npm run test:install
+   ```
+
+5. Commit:
+   ```bash
+   git add templates/
+   git commit -m "chore(templates): update tool names to official format"
+   ```
+```
+
+**4. Version migration strategy:**
+```javascript
+// templates/migrations/
+// Keep template migrations like database migrations
+
+export const migrations = [
+  {
+    version: '1.0.0',
+    description: 'Initial migration from .github/',
+    up: async () => { /* original migration */ },
+    down: async () => { /* rollback */ }
+  },
+  {
+    version: '1.1.0',
+    description: 'Update tool names to official format',
+    up: async () => {
+      await applyTransformation('templates/**/*.md', updateToolNames)
+    },
+    down: async () => {
+      await applyTransformation('templates/**/*.md', revertToolNames)
+    }
+  },
+  {
+    version: '1.2.0',
+    description: 'Add hooks field to all skills',
+    up: async () => {
+      await applyTransformation('templates/skills/**/*.md', addHooksField)
+    },
+    down: async () => {
+      await applyTransformation('templates/skills/**/*.md', removeHooksField)
+    }
+  }
+]
+
+// Run migrations
+// node scripts/migrate-templates.js up   # Apply pending migrations
+// node scripts/migrate-templates.js down # Rollback last migration
+```
+
+**Detection:**
+- Need for bulk changes identified
+- Transformation tool available
+
+**Implementation checklist:**
+- [ ] Keep migration script as maintenance tool
+- [ ] Generic transformation system available
+- [ ] Template maintenance playbook documented
+- [ ] Migration versioning system (like DB migrations)
+- [ ] Each bulk change logged and reversible
+
+**Phase mapping:** Phase 2+ (ongoing maintenance)
 
 ---
 

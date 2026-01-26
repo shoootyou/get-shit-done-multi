@@ -22,27 +22,27 @@ CLAUDE.md
 # Tests folders
 test-output
 
-# Clean GSD Github installation
-.github/skills/gsd-*
-.github/agents/gsd-*
-.github/get-shit-done
-.github/ISSUE_TEMPLATE/gsd-*
-.github/skills/get-shit-done/SKILL.md
+# # Clean GSD Github installation
+# .github/skills/gsd-*
+# .github/agents/gsd-*
+# .github/get-shit-done
+# .github/ISSUE_TEMPLATE/gsd-*
+# .github/skills/get-shit-done/SKILL.md
 
-# Clean GSD Claude Installation
-.claude/skills/gsd-*
-.claude/agents/gsd-*
-.claude/get-shit-done
-.claude/ISSUE_TEMPLATE/gsd-*
-.claude/skills/get-shit-done/SKILL.md
+# # Clean GSD Claude Installation
+# .claude/skills/gsd-*
+# .claude/agents/gsd-*
+# .claude/get-shit-done
+# .claude/ISSUE_TEMPLATE/gsd-*
+# .claude/skills/get-shit-done/SKILL.md
 
-# Clean GSD Codex Installation
-.codex/skills/gsd-*
-.codex/agents/gsd-*
-.codex/get-shit-done
-.codex/ISSUE_TEMPLATE/gsd-*
-.codex/skills/get-shit-done/agents/gsd-*
-.codex/skills/get-shit-done/SKILL.md
+# # Clean GSD Codex Installation
+# .codex/skills/gsd-*
+# .codex/agents/gsd-*
+# .codex/get-shit-done
+# .codex/ISSUE_TEMPLATE/gsd-*
+# .codex/skills/get-shit-done/agents/gsd-*
+# .codex/skills/get-shit-done/SKILL.md
 
 # GSD migration backup (created during upgrade from old structure)
 .old-gsd-system/

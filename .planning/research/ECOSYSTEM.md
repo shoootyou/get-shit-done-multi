@@ -20,6 +20,493 @@ The GSD multi-CLI installer needs to solve three core problems:
 
 ---
 
+## 0. CRITICAL: Phase 1 vs Phase 2+ Stack Separation
+
+**ARCHITECTURE INSIGHT:** This project has TWO distinct concerns with different technology needs:
+
+### Phase 1: ONE-TIME Migration (Temporary)
+**Purpose:** Convert `.github/` → `/templates/` with frontmatter corrections  
+**Lifespan:** Used once, then **DELETED**  
+**Focus:** YAML parsing, modification, validation, reporting
+
+### Phase 2+: Installation (Permanent)  
+**Purpose:** Install templates to user directories  
+**Lifespan:** Remains in codebase forever  
+**Focus:** Template rendering, CLI UX, file operations
+
+**DO NOT MIX THESE CONCERNS.** Phase 1 tools are temporary dependencies that will be removed.
+
+---
+
+## 0.1. Phase 1 Migration Stack (TEMPORARY)
+
+**Status:** Tools for one-time migration, **WILL BE DELETED** after Phase 1 completes  
+**Confidence:** HIGH
+
+### Core Migration Tools
+
+| Library | Version | Purpose | Why | Status |
+|---------|---------|---------|-----|--------|
+| `gray-matter` | ^4.0.3 | Parse and modify frontmatter | Industry standard for frontmatter manipulation, preserves formatting | **TEMPORARY** |
+| `js-yaml` | ^4.1.1 | YAML validation | gray-matter uses this internally, explicit for validation | **TEMPORARY** |
+| `ajv` | ^8.17.1 | JSON Schema validation | Validate against official Claude/Copilot specs | **TEMPORARY** |
+| `chalk` | ^5.6.2 | Console output | Report migration results (already in package.json) | **PERMANENT** |
+
+**Installation (Phase 1 only):**
+```bash
+npm install --save-dev gray-matter@^4.0.3 js-yaml@^4.1.1 ajv@^8.17.1
+```
+
+### gray-matter for Frontmatter Migration
+
+**Why gray-matter over plain YAML?**
+- Preserves original formatting and comments
+- Separates frontmatter from content cleanly
+- Allows modification and re-serialization
+- Battle-tested (4M+ weekly downloads)
+
+**Usage Pattern:**
+```javascript
+import matter from 'gray-matter';
+import fs from 'fs-extra';
+
+async function migrateSkill(sourcePath, targetPath) {
+  // Read source file
+  const content = await fs.readFile(sourcePath, 'utf8');
+  const parsed = matter(content);
+  
+  // Extract metadata for version.json
+  const metadata = {
+    skill_version: parsed.data.skill_version,
+    requires_version: parsed.data.requires_version,
+    platforms: parsed.data.platforms,
+    metadata: parsed.data.metadata
+  };
+  
+  // Convert arguments to argument-hint
+  const argumentHint = convertArgumentsToHint(parsed.data.arguments);
+  
+  // Convert tools to allowed-tools (comma-separated string)
+  const allowedTools = parsed.data.tools
+    ?.map(t => t.charAt(0).toUpperCase() + t.slice(1))
+    .join(', ');
+  
+  // Create corrected frontmatter
+  const correctedFrontmatter = {
+    name: parsed.data.name,
+    description: parsed.data.description,
+    'argument-hint': argumentHint,
+    'allowed-tools': allowedTools
+  };
+  
+  // Write corrected template
+  const correctedContent = matter.stringify(parsed.content, correctedFrontmatter);
+  await fs.writeFile(targetPath, correctedContent, 'utf8');
+  
+  // Write version.json
+  const versionPath = targetPath.replace(/\.md$/, '.version.json');
+  await fs.writeJSON(versionPath, metadata, { spaces: 2 });
+}
+```
+
+### ajv for Validation
+
+**Why ajv?**
+- Supports JSON Schema Draft-07 and Draft-2020-12
+- Fast validation with schema compilation
+- Excellent error reporting
+- Industry standard (25M+ weekly downloads)
+
+**Usage Pattern:**
+```javascript
+import Ajv from 'ajv';
+
+// Define Claude skill frontmatter schema
+const skillSchema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    description: { type: 'string' },
+    'argument-hint': { type: 'string' },
+    'allowed-tools': { type: 'string' }, // Comma-separated
+    'disable-model-invocation': { type: 'boolean' },
+    'user-invocable': { type: 'boolean' },
+    model: { type: 'string' },
+    context: { enum: ['fork'] },
+    agent: { type: 'string' },
+    hooks: { type: 'object' }
+  },
+  required: ['name', 'description'],
+  additionalProperties: false // Catch unsupported fields
+};
+
+const ajv = new Ajv({ allErrors: true });
+const validate = ajv.compile(skillSchema);
+
+function validateFrontmatter(frontmatter, skillName) {
+  const valid = validate(frontmatter);
+  if (!valid) {
+    console.error(`❌ ${skillName}: Validation failed`);
+    validate.errors.forEach(err => {
+      console.error(`  - ${err.instancePath}: ${err.message}`);
+    });
+    return false;
+  }
+  return true;
+}
+```
+
+### Migration Script Structure
+
+**Recommended structure for Phase 1 migration:**
+
+```
+scripts/
+  migrate/
+    index.js          # Main migration orchestrator
+    skills.js         # Skill-specific migration
+    agents.js         # Agent-specific migration (simpler, different rules)
+    validate.js       # Validation against schemas
+    report.js         # Generate migration report
+```
+
+**After Phase 1 completes:**
+1. Run migration: `node scripts/migrate/index.js`
+2. Verify `/templates/` correctness
+3. Delete `scripts/migrate/` directory
+4. Remove temporary dependencies from package.json:
+   ```bash
+   npm uninstall gray-matter js-yaml ajv
+   ```
+
+### Phase 1 Confidence Assessment
+
+| Area | Confidence | Notes |
+|------|------------|-------|
+| gray-matter | HIGH | Current stable version (4.0.3), widely used |
+| js-yaml | HIGH | Current stable version (4.1.1), gray-matter dependency |
+| ajv | HIGH | Current stable version (8.17.1), JSON Schema standard |
+| Migration pattern | HIGH | Well-established pattern for one-time conversions |
+
+---
+
+## 0.2. Phase 2+ Installation Stack (PERMANENT)
+
+**Status:** Tools that remain in codebase forever  
+**Confidence:** HIGH
+
+### Core Installation Tools
+
+| Library | Version | Purpose | Why | Status |
+|---------|---------|---------|-----|--------|
+| `commander` | ^14.0.2 | CLI framework | Industry standard, simple API, already in package.json | **PERMANENT** |
+| `fs-extra` | ^11.3.3 | File operations | Adds async/await, copy, ensureDir to fs, already in package.json | **PERMANENT** |
+| `chalk` | ^5.6.2 | Terminal colors | Beautiful output, ESM support, already in package.json | **PERMANENT** |
+| `ora` | ^9.1.0 | Progress spinners | Best-in-class spinner library | **ADD** |
+| `inquirer` | ^13.2.1 | Interactive prompts | Rich prompt library (confirm, select, checkbox, etc.) | **ADD** |
+| `ejs` | ^4.0.1 | Template rendering | For JS/JSON templates with {{VARIABLES}} | **ADD** |
+
+**Already installed (Phase 2 ready):**
+- commander@14.0.2
+- fs-extra@11.3.3
+- chalk@5.6.2
+
+**Need to add:**
+```bash
+npm install ora@^9.1.0 inquirer@^13.2.1 ejs@^4.0.1
+```
+
+### Template Rendering Strategy
+
+**CRITICAL:** Templates are in `/templates/`, already corrected by Phase 1. NO conversion logic.
+
+#### For Markdown Files (Skills, Agents)
+**Use string replacement** (no library needed):
+```javascript
+async function renderMarkdownTemplate(templatePath, variables) {
+  let content = await fs.readFile(templatePath, 'utf8');
+  
+  // Replace {{VAR}} with values
+  Object.entries(variables).forEach(([key, value]) => {
+    const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    content = content.replace(placeholder, value);
+  });
+  
+  return content;
+}
+```
+
+**Why not use a template engine?**
+- Markdown files are simple text
+- Only need variable substitution
+- No logic (if/for) needed
+- Preserves exact formatting
+- No additional dependencies
+
+#### For JS/JSON Files (Hooks, Config)
+**Use EJS** for structured files:
+```javascript
+import ejs from 'ejs';
+
+async function renderJSTemplate(templatePath, variables) {
+  const content = await fs.readFile(templatePath, 'utf8');
+  return ejs.render(content, variables);
+}
+```
+
+**Example template (pre-commit.ejs):**
+```javascript
+#!/usr/bin/env node
+// Generated by get-shit-done-multi v<%= version %>
+// Platform: <%= platform %>
+
+import { execSync } from 'child_process';
+
+const hooks = {
+  'pre-commit': () => {
+    // Run linting
+    execSync('<%= lintCommand %>', { stdio: 'inherit' });
+  }
+};
+
+hooks['<%= hookName %>']();
+```
+
+**Why EJS?**
+- Simple syntax (`<%= variable %>`)
+- Supports logic if needed (`<% if (condition) { %>`)
+- No complex configuration
+- Works with any text format
+- Small footprint (1MB installed)
+
+### CLI Framework: commander
+
+**Already in package.json at ^14.0.2** ✅
+
+**Usage Pattern:**
+```javascript
+#!/usr/bin/env node
+import { Command } from 'commander';
+import { install } from '../lib/install.js';
+
+const program = new Command();
+
+program
+  .name('get-shit-done-multi')
+  .description('Install GSD skills and agents to AI CLI platforms')
+  .version('2.0.0')
+  .option('-p, --platform <type>', 'target platform (claude, copilot, codex)')
+  .option('--skills <names...>', 'specific skills to install')
+  .option('--agents <names...>', 'specific agents to install')
+  .option('--global', 'install globally (default: local)')
+  .option('-y, --yes', 'skip prompts, use defaults')
+  .action(async (options) => {
+    await install(options);
+  });
+
+program.parse();
+```
+
+### Interactive Prompts: inquirer
+
+**Need to add** (current version: 13.2.1)
+
+**Why inquirer over alternatives?**
+- Rich prompt types (input, confirm, list, checkbox, password)
+- Built-in validation
+- ESM support in v13+
+- 3M+ weekly downloads
+- Best UX for CLI prompts
+
+**Usage Pattern:**
+```javascript
+import inquirer from 'inquirer';
+
+async function promptUser() {
+  const answers = await inquirer.prompt([
+    {
+      type: 'checkbox',
+      name: 'platforms',
+      message: 'Select platforms to install:',
+      choices: [
+        { name: 'Claude Code', value: 'claude', checked: true },
+        { name: 'GitHub Copilot CLI', value: 'copilot' },
+        { name: 'Codex CLI', value: 'codex' }
+      ]
+    },
+    {
+      type: 'list',
+      name: 'scope',
+      message: 'Installation scope:',
+      choices: ['local', 'global'],
+      default: 'local'
+    },
+    {
+      type: 'checkbox',
+      name: 'skills',
+      message: 'Select skills to install:',
+      choices: await getAvailableSkills()
+    },
+    {
+      type: 'confirm',
+      name: 'confirmed',
+      message: 'Proceed with installation?',
+      default: true
+    }
+  ]);
+  
+  return answers;
+}
+```
+
+### Progress Feedback: ora
+
+**Need to add** (current version: 9.1.0)
+
+**Why ora?**
+- Beautiful spinners
+- Success/fail/warn states
+- Multiple concurrent spinners
+- ESM support
+- 2M+ weekly downloads
+
+**Usage Pattern:**
+```javascript
+import ora from 'ora';
+
+async function installSkill(skill, platform) {
+  const spinner = ora(`Installing ${skill.name} to ${platform}`).start();
+  
+  try {
+    await copyTemplate(skill, platform);
+    spinner.succeed(`Installed ${skill.name}`);
+  } catch (error) {
+    spinner.fail(`Failed to install ${skill.name}: ${error.message}`);
+    throw error;
+  }
+}
+```
+
+### File Operations: fs-extra
+
+**Already in package.json at ^11.3.3** ✅
+
+**Why fs-extra over native fs?**
+- Promise-based API (async/await)
+- Additional utilities: `copy`, `ensureDir`, `emptyDir`, `readJSON`, `writeJSON`
+- Graceful error handling
+- Drop-in replacement for `fs`
+
+**Usage Pattern:**
+```javascript
+import fs from 'fs-extra';
+
+async function installTemplate(source, target) {
+  // Ensure target directory exists
+  await fs.ensureDir(target);
+  
+  // Copy with overwrite protection
+  const exists = await fs.pathExists(target);
+  if (exists) {
+    throw new Error(`Target already exists: ${target}`);
+  }
+  
+  // Copy directory recursively
+  await fs.copy(source, target, {
+    overwrite: false,
+    errorOnExist: true
+  });
+}
+```
+
+### Phase 2+ Confidence Assessment
+
+| Area | Confidence | Notes |
+|------|------------|-------|
+| commander | HIGH | Current version (14.0.2), already installed |
+| fs-extra | HIGH | Current version (11.3.3), already installed |
+| chalk | HIGH | Current version (5.6.2), already installed |
+| ora | HIGH | Current version (9.1.0), ESM-ready |
+| inquirer | HIGH | Current version (13.2.1), ESM-ready |
+| ejs | HIGH | Current version (4.0.1), widely used |
+| String replacement | HIGH | No library needed, simple pattern |
+
+---
+
+## 0.3. Stack Summary and Dependencies
+
+### Current package.json Status
+
+**Already installed (ready for Phase 2):**
+```json
+{
+  "dependencies": {
+    "chalk": "^5.6.2",         // ✅ Permanent
+    "commander": "^14.0.2",    // ✅ Permanent
+    "fs-extra": "^11.3.3"      // ✅ Permanent
+  }
+}
+```
+
+### Required Changes
+
+**Phase 1 only (devDependencies, will be removed):**
+```bash
+npm install --save-dev gray-matter@^4.0.3 js-yaml@^4.1.1 ajv@^8.17.1
+```
+
+**Phase 2+ (permanent dependencies):**
+```bash
+npm install ora@^9.1.0 inquirer@^13.2.1 ejs@^4.0.1
+```
+
+### Final package.json After Phase 1
+
+**After migration completes and temporary tools are removed:**
+```json
+{
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "ejs": "^4.0.1",
+    "fs-extra": "^11.3.3",
+    "inquirer": "^13.2.1",
+    "ora": "^9.1.0"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.0.18",
+    "vitest": "^4.0.18"
+    // gray-matter, js-yaml, ajv REMOVED after Phase 1
+  }
+}
+```
+
+### Dependency Timeline
+
+```
+Phase 1 (Migration):
+  - Add: gray-matter, js-yaml, ajv (devDependencies)
+  - Use: chalk (reporting)
+  - Complete migration
+  - Remove: gray-matter, js-yaml, ajv
+  - Delete: scripts/migrate/ directory
+
+Phase 2+ (Installation):
+  - Add: ora, inquirer, ejs (dependencies)
+  - Use: commander, fs-extra, chalk (already installed)
+  - These remain permanently
+```
+
+### Why This Separation Matters
+
+1. **Clean codebase:** No dead migration code in production
+2. **Smaller bundle:** Temporary tools don't bloat the package
+3. **Clear intent:** Dependencies signal what the tool does
+4. **Maintainability:** Future developers see only installation logic
+5. **npm audit:** Fewer dependencies = smaller attack surface
+
+---
+
 ## 1. CLI Installer Patterns
 
 ### Current Industry Approaches
@@ -692,12 +1179,30 @@ async function processTemplates(sourceDir, targetDir, context) {
 
 ### YAML Parsing
 
-#### ❌ js-yaml (4.1.1)
-**Why rejected:** 
-- Only parses YAML, doesn't handle frontmatter delimiters (`---`)
-- You'd need to manually extract frontmatter blocks with regex
-- Extra code: split on `---`, parse YAML, reconstruct
-- **Verdict:** Wrong abstraction level
+#### ✅ gray-matter (4.0.3) - RECOMMENDED for Phase 1
+**Why chosen:**
+- Handles frontmatter delimiters (`---`) automatically
+- Preserves original formatting and comments
+- Allows modification and re-serialization
+- Uses js-yaml internally for parsing
+- **Verdict:** Correct abstraction for frontmatter manipulation
+
+**Usage:**
+```javascript
+import matter from 'gray-matter';
+const parsed = matter(content);
+// Modify: parsed.data.field = value
+const output = matter.stringify(parsed.content, parsed.data);
+```
+
+#### ✅ js-yaml (4.1.1) - Used WITH gray-matter
+**Why include explicitly:**
+- gray-matter uses this internally
+- Needed for validation beyond parsing
+- Can validate YAML structure independently
+- **Verdict:** Include as explicit dependency for validation in Phase 1
+
+**Note:** js-yaml alone doesn't handle frontmatter delimiters, which is why gray-matter wraps it.
 
 #### ❌ front-matter (4.0.2)
 **Why rejected:**
@@ -708,13 +1213,23 @@ async function processTemplates(sourceDir, targetDir, context) {
 
 ### Template Engines
 
-#### ❌ EJS (4.0.1)
-**Why rejected for XML:**
-- Syntax conflict: EJS uses `<% %>`, XML uses `< >`
-- Workaround: Custom delimiters `<?= ?>` is confusing
-- **Verdict:** Overkill for simple variable substitution, conflicts with XML
+#### ✅ EJS (4.0.1) - For JS/JSON Only
+**When to use:**
+- JS/JSON configuration files that need structure
+- Hook files with variable substitution
+- Any non-XML structured files
 
-**When to reconsider:** If you need conditionals/loops in templates
+**When NOT to use:**
+- Markdown files (use string replacement)
+- XML files (syntax conflict: EJS uses `<% %>`, XML uses `< >`)
+
+**Usage:**
+```javascript
+import ejs from 'ejs';
+const rendered = ejs.render(template, { version: '2.0.0' });
+```
+
+**Verdict:** Use for structured files (JS/JSON), skip for markdown/XML
 
 #### ❌ Handlebars (4.7.8)
 **Why rejected:**
@@ -734,21 +1249,25 @@ async function processTemplates(sourceDir, targetDir, context) {
 
 **When to use:** Complex CLIs with nested commands, positional arguments
 
-#### ❌ inquirer (13.2.1)
-**Why rejected:**
-- Heavy (14 dependencies)
-- CJS-only (no native ESM)
-- Slow first run in npx context
-- **Verdict:** Too heavy for npx installer
+#### ✅ inquirer (13.2.1) - For Interactive Mode
+**When to use:**
+- Interactive prompts when no flags provided
+- Platform selection, skill selection
+- Confirmation dialogs
 
-**When to use:** Rich interactive CLIs (wizards, multi-step prompts)
+**Why use (updated for v13+):**
+- Rich prompt types (checkbox, list, confirm, input)
+- ESM support in v13+ (no longer CJS-only)
+- Beautiful UX for interactive mode
 
-#### ✅ prompts (2.4.2) - Optional Enhancement
+**Verdict:** Add for Phase 2+ interactive mode
+
+#### ⚠️ prompts (2.4.2) - Alternative to inquirer
 **Why consider:**
-- Lightweight (minimal dependencies)
+- Lighter alternative to inquirer
+- Minimal dependencies
 - ESM support
-- Beautiful prompts
-- **Verdict:** Add if you want interactive mode (no flags provided)
+- **Verdict:** Either works, inquirer has richer features
 
 ### File Operations
 
@@ -1969,75 +2488,131 @@ else {
 ## Sources
 
 **Package Versions (verified via npm Jan 2026):**
-- commander: 14.0.2 (Oct 2025) - https://www.npmjs.com/package/commander
+
+**Phase 1 (Temporary):**
 - gray-matter: 4.0.3 (Apr 2021, stable) - https://www.npmjs.com/package/gray-matter
+- js-yaml: 4.1.1 (Dec 2022, stable) - https://www.npmjs.com/package/js-yaml
+- ajv: 8.17.1 (Jun 2024) - https://www.npmjs.com/package/ajv
+
+**Phase 2+ (Permanent):**
+- commander: 14.0.2 (Oct 2025) - https://www.npmjs.com/package/commander
 - fs-extra: 11.3.3 (Dec 2025) - https://www.npmjs.com/package/fs-extra
 - chalk: 5.6.2 (Sep 2025) - https://www.npmjs.com/package/chalk
+- ora: 9.1.0 (Nov 2024) - https://www.npmjs.com/package/ora
+- inquirer: 13.2.1 (Oct 2024) - https://www.npmjs.com/package/inquirer
+- ejs: 4.0.1 (Dec 2024) - https://www.npmjs.com/package/ejs
+
+**Testing:**
 - vitest: 4.0.18 (Jan 2026) - https://www.npmjs.com/package/vitest
+- @vitest/ui: 4.0.18 (Jan 2026) - https://www.npmjs.com/package/@vitest/ui
 
 **Alternatives evaluated:**
-- yargs: 18.0.0 - https://www.npmjs.com/package/yargs
-- inquirer: 13.2.1 - https://www.npmjs.com/package/inquirer
-- prompts: 2.4.2 - https://www.npmjs.com/package/prompts
-- js-yaml: 4.1.1 - https://www.npmjs.com/package/js-yaml
-- front-matter: 4.0.2 - https://www.npmjs.com/package/front-matter
-- ejs: 4.0.1 - https://www.npmjs.com/package/ejs
-- handlebars: 4.7.8 - https://www.npmjs.com/package/handlebars
+- yargs: 18.0.0 (alternative to commander) - https://www.npmjs.com/package/yargs
+- prompts: 2.4.2 (alternative to inquirer) - https://www.npmjs.com/package/prompts
+- front-matter: 4.0.2 (alternative to gray-matter) - https://www.npmjs.com/package/front-matter
+- handlebars: 4.7.8 (alternative to ejs) - https://www.npmjs.com/package/handlebars
 
 **Official Documentation:**
 - Node.js path module: https://nodejs.org/api/path.html
 - Node.js os module: https://nodejs.org/api/os.html
 - Node.js fs/promises: https://nodejs.org/api/fs.html
 
-**Confidence:** HIGH (all package versions verified via npm registry, official Node.js docs)
+**Confidence:** HIGH (all package versions verified via npm registry Jan 2026, official Node.js docs)
 
 ---
 
 ## Next Steps for Roadmap Creation
 
-Based on this research, the stack is well-chosen and current:
+Based on this research, stack decisions are clear and separated by phase:
 
-### ✅ Already Using (Keep)
-- **commander 14.0.2** - Latest, perfect for flag-based CLI
-- **fs-extra 11.3.3** - Latest, essential for template copying
-- **chalk 5.6.2** - Latest, good for UX
-- **vitest 4.0.18** - Latest, ESM-native testing
+### Phase 1: Migration Stack (TEMPORARY)
 
-### ➕ Add These
-- **gray-matter 4.0.3** - Critical for YAML frontmatter parsing/modification
-  ```bash
-  npm install gray-matter@^4.0.3
-  ```
+**Add as devDependencies (will be removed after Phase 1):**
+```bash
+npm install --save-dev gray-matter@^4.0.3 js-yaml@^4.1.1 ajv@^8.17.1
+```
 
-### ⚠️ Optional (Consider Later)
-- **prompts 2.4.2** - If you want interactive mode (no flags)
-- **ora 9.1.0** - If you want loading spinners
-- **semver 7.7.3** - If you implement update checking
+**Implementation priorities:**
+1. Create `scripts/migrate/` directory structure
+2. Implement skill migration with gray-matter
+3. Implement agent migration (simpler, different rules)
+4. Add ajv validation against Claude/Copilot specs
+5. Generate migration report
+6. **After completion:** Delete `scripts/migrate/` and remove temp dependencies
 
-### 🎯 Implementation Priorities
+### Phase 2+: Installation Stack (PERMANENT)
 
-**Phase 1: Frontmatter Processing (Immediate)**
-- Install gray-matter
-- Implement frontmatter parsing + modification
-- Test tools array → comma-separated conversion
-- Test field renaming
+**Already installed (ready):**
+- ✅ **commander 14.0.2** - CLI framework
+- ✅ **fs-extra 11.3.3** - File operations
+- ✅ **chalk 5.6.2** - Terminal colors
 
-**Phase 2: Template Variable Substitution (Short-term)**
-- Implement string replacement for `{{VAR}}` syntax
-- Test with XML files (Claude format)
-- Test with JSON metadata generation
+**Add as dependencies (permanent):**
+```bash
+npm install ora@^9.1.0 inquirer@^13.2.1 ejs@^4.0.1
+```
 
-**Phase 3: Atomic Operations (Short-term)**
-- Implement temp directory pattern
-- Test rollback on failure
-- Verify cross-platform behavior
+**Implementation priorities:**
+1. Add interactive prompts (inquirer)
+2. Add progress spinners (ora)
+3. Implement template rendering (EJS for JS/JSON, string replacement for MD)
+4. Build CLI commands (commander)
+5. Implement atomic operations (fs-extra)
 
-**Phase 4: Testing Coverage (Ongoing)**
-- Test frontmatter transformation
-- Test template variable replacement
-- Test atomic install/rollback
-- Test cross-platform paths
+### 🎯 Updated Implementation Priorities
+
+**Phase 1 (ONE-TIME Migration):**
+1. Install temporary dependencies
+2. Build migration scripts in `scripts/migrate/`
+3. Migrate 29 skills from `.github/skills/` → `/templates/skills/`
+4. Migrate 13 agents from `.github/agents/` → `/templates/agents/`
+5. Fix frontmatter (remove unsupported fields, add allowed-tools)
+6. Generate version.json files for skills
+7. Validate all templates with ajv
+8. Generate migration report
+9. **DELETE migration code and temp dependencies**
+
+**Phase 2 (Template-Based Installation):**
+1. Add permanent dependencies (ora, inquirer, ejs)
+2. Implement platform detection
+3. Build interactive CLI (prompts for platform/skills/scope)
+4. Implement template rendering from `/templates/`
+5. Add atomic operations with rollback
+6. Add version tracking
+
+**Phase 3 (Polish & Testing):**
+1. Cross-platform path testing
+2. Error handling and rollback verification
+3. Progress feedback and UX polish
+4. Documentation
+
+### Critical Architecture Notes for Roadmap
+
+1. **Phase 1 is disposable:** All migration code and dependencies are temporary
+2. **No conversion in install.js:** Installation always reads from `/templates/`, never `.github/`
+3. **Templates are pre-corrected:** Phase 1 does ALL frontmatter corrections
+4. **Two separate dependency sets:** Phase 1 (temp) vs Phase 2+ (permanent)
+5. **String replacement for MD:** No template library needed for markdown files
+6. **EJS for structured files:** Use EJS only for JS/JSON that need logic
+
+### Dependency Timeline
+
+```
+Now (start):
+  dependencies: chalk, commander, fs-extra
+  devDependencies: @vitest/ui, vitest
+
+Phase 1 (add → remove):
+  +devDependencies: gray-matter, js-yaml, ajv
+  → Complete migration
+  → Delete scripts/migrate/
+  -devDependencies: gray-matter, js-yaml, ajv
+
+Phase 2+ (final):
+  +dependencies: ora, inquirer, ejs
+  Final: chalk, commander, ejs, fs-extra, inquirer, ora
+```
 
 ---
 
-**Research complete. Stack recommendations are prescriptive and current (2026).**
+**Research complete. Stack is prescriptive, current (2026), and clearly separated by phase lifecycle.**
