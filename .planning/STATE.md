@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-26  
-**Updated By:** GSD Phase Executor (Phase 1 complete - verified 100%)
+**Updated By:** GSD Phase Executor (Plan 02-01 complete - Foundation & Project Structure)
 
 ---
 
@@ -11,32 +11,33 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 1 Complete (100% verified). 29 skills + 13 agents migrated to templates/ with frontmatter corrections. Ready for Phase 2 (Core Installer Foundation).
+**Current Focus:** ⚙️ Phase 2 In Progress (Plan 01/04 complete). Foundation established with bin entry point, error handling, and cli-progress dependency. Core modules next.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 1 of 8 (Template Migration) ✅ COMPLETE  
-**Phase Goal:** ONE-TIME migration of skills/agents to templates/ with frontmatter corrections  
+**Current Phase:** 2 of 8 (Core Installer Foundation) ⚙️ IN PROGRESS  
+**Phase Goal:** Platform detection, file copy engine, and template rendering for Claude installation  
 **Started:** 2026-01-26  
-**Completed:** 2026-01-26  
-**Verification:** 28/28 must-haves (100%) — PASSED  
-**Last Activity:** 2026-01-26 - Phase 1 verified and complete
+**Completed:** In progress  
+**Verification:** TBD  
+**Last Activity:** 2026-01-26 - Completed Plan 02-01 (Foundation & Project Structure)
 
 ### Plan Status
-**Completed Plans:** 4/4 in Phase 1  
-**Next Phase:** Phase 2 - Core Installer Foundation  
-**Status:** Ready to begin Phase 2 planning
+**Completed Plans:** 5/35 total (Phase 1: 4/4, Phase 2: 1/4)  
+**Current Plan:** Phase 2 - Plan 02 (Core Modules)  
+**Status:** Ready for Plan 02-02
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
 Phase 1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
+Phase 2: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans) ⚙️ IN PROGRESS
 
 Overall Progress:
-[████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 11% (4/35 total plans)
+[█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 14% (5/35 total plans)
 ```
 
 ---
@@ -45,9 +46,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 1 (Phase 1 - Template Migration)
-- **Plans Completed:** 4/35
+- **Phases In Progress:** 1 (Phase 2 - Core Installer Foundation)
+- **Plans Completed:** 5/35
 - **Days Active:** 2
-- **Plans Today:** 4
+- **Plans Today:** 5
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -164,6 +166,30 @@ Overall Progress:
     - Codex uses same format as Claude (no translation needed)
     - Rationale: Single template format, translation belongs in installer logic
 
+17. **2026-01-26 (02-01):** ESM modules throughout installer (INSTALLER-01)
+    - All installer modules use import/export syntax
+    - Use import.meta.url for __dirname replacement
+    - Matches project conventions from Phase 1
+    - Rationale: Modern Node.js standard, future-proof
+
+18. **2026-01-26 (02-01):** cli-progress for progress bars (INSTALLER-02)
+    - Chose cli-progress over ora (spinners)
+    - Multi-phase installation benefits from % complete display
+    - Version ^3.12.0, 5.5M+ weekly downloads
+    - Rationale: Better UX for showing installation progress across skills/agents/shared
+
+19. **2026-01-26 (02-01):** Custom error types with exit codes (INSTALLER-03)
+    - InstallError class with code and details properties
+    - EXIT_CODES constants (SUCCESS=0, INVALID_ARGS=2, etc.)
+    - Factory functions for common errors (invalidArgs, missingTemplates, etc.)
+    - Rationale: Programmatic error handling and proper exit status for scripts
+
+20. **2026-01-26 (02-01):** Separation of concerns via bin/lib/ (INSTALLER-04)
+    - Directory structure: io, rendering, paths, cli, errors
+    - Each module has single responsibility
+    - Clear organization for maintainability
+    - Rationale: Follows established patterns for CLI tools
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -173,7 +199,10 @@ Overall Progress:
 - [x] Migrate 28 skills to templates/ (01-02)
 - [x] Migrate 13 agents to templates/ (01-03)
 - [x] Validation and manual review (01-04)
-- [ ] Begin Phase 2: Core Installer Foundation
+- [x] Phase 2 Plan 01: Foundation & Project Structure (02-01)
+- [ ] Phase 2 Plan 02: Core Modules
+- [ ] Phase 2 Plan 03: CLI Orchestration
+- [ ] Phase 2 Plan 04: Installation Flow
 
 ### Blockers
 None
@@ -183,24 +212,23 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Phase 1 Complete!** Completed Plan 01-04: Validation, Report & Manual Review Gate. Generated comprehensive migration report showing 28 skills + 13 agents migrated successfully (76 total files). Created interactive review UI with file browser and external diff viewer integration. Applied 9 corrections during manual review: fixed YAML serialization (removed quotes), handled /workspace/ pattern, converted multi-line descriptions to single-line, created platform-specific get-shit-done skill versions (claude/, copilot/, codex/), and documented tools field translation requirements for Phase 2. All validation checks passed. User approved migration by typing "APPROVED" at explicit approval gate. Phase 1 template migration complete - templates/ directory is now permanent source of truth.
+✅ **Plan 02-01 Complete!** Established installer foundation with three core components: (1) Added cli-progress@3.12.0 dependency for installation progress bars, (2) Created bin/install.js entry point with shebang, executable permissions, and ESM structure using import.meta.url, (3) Defined custom InstallError class with EXIT_CODES constants and factory functions. Created bin/lib/ directory structure with subdirectories for io, rendering, paths, cli, and errors modules. All tasks completed in 14 minutes with atomic commits (87cc0e4, f4e19ea, 4c2b820). No deviations from plan. Entry point verified working.
 
 ### What's Next
-1. **Immediate:** Begin Phase 2 - Core Installer Foundation
-2. **Phase 2 Focus:** Platform detection, file copy engine, template variable injection
-3. **Critical:** Implement tools field translation for Copilot (Claude format → array with aliases)
-4. **Critical:** Handle platform-specific get-shit-done skill (copy correct version based on detected platform)
+1. **Immediate:** Plan 02-02 - Create core modules (file operations, path resolver, template renderer, CLI utilities)
+2. **Phase 2 Focus:** Complete installer foundation by populating bin/lib/ structure
+3. **Critical:** File ops module must handle atomic copy operations
+4. **Critical:** Template renderer must support variable injection ({{PLATFORM}}, {{INSTALL_DIR}}, etc.)
 
 ### Context for Next Session
-- **Phase 1 complete:** ✅ All 28 skills + 13 agents + shared directory migrated to templates/ with validation
-- **Templates ready:** 76 files created with frontmatter corrections and template variables
-- **Platform-specific handling:** get-shit-done skill has three versions (claude/, copilot/, codex/)
-- **Tools field translation:** Templates use Claude format; Phase 2 Copilot installer must translate to array
-- **Critical handoff info:** See "Next Phase Readiness" in 01-04-SUMMARY.md for installation requirements
-- **Next action:** Begin Phase 2 planning and implementation (platform detection + file copy engine)
+- **Foundation complete:** ✅ bin/install.js entry point with ESM structure, cli-progress installed, error handling ready
+- **Directory structure:** bin/lib/ subdirectories created (io, rendering, paths, cli, errors)
+- **Error handling:** InstallError class and factory functions available for all modules
+- **Next action:** Create core modules in Plan 02-02 (file-ops.js, path-resolver.js, template-renderer.js, utils.js)
+- **Verification pattern:** Each module created with unit test verification inline
 
 ### Handoff Notes
-✅ Phase 1 complete! Validation and manual review finished with user approval. Migration report generated at .planning/phases/01-template-migration/01-MIGRATION-REPORT.md showing all 28 skills + 13 agents migrated successfully. 9 corrections applied during manual review (YAML serialization, template variables, platform-specific versions). All validation passed (0 errors). Templates/ directory is permanent source of truth. **Critical for Phase 2:** Tools field translation required (templates use Claude format, Copilot needs array), platform-specific get-shit-done skill versions exist (installer must copy correct one), template variables must be injected during installation. See 01-04-SUMMARY.md "Next Phase Readiness" section for complete handoff details.
+✅ Plan 02-01 complete! Foundation established for installer. Entry point at bin/install.js runs successfully (prints "get-shit-done-multi v2.0.0"). cli-progress dependency added for progress bars during installation. Custom error types with exit codes defined for proper error handling. bin/lib/ directory structure created with separation of concerns (io, rendering, paths, cli, errors). Next plan will populate these directories with core modules. See 02-01-SUMMARY.md for complete details. No blockers.
 
 ---
 
@@ -229,10 +257,18 @@ None
 - `.planning/phases/01-template-migration/01-04-SUMMARY.md` — Validation & manual review (✅ Complete)
 - `.planning/phases/01-template-migration/01-MIGRATION-REPORT.md` — Comprehensive migration report
 - **Phase 1: ✅ COMPLETE**
-- Next: Phase 2 - Core Installer Foundation
+- `.planning/phases/02-core-installer-foundation/02-01-SUMMARY.md` — Foundation & Project Structure (✅ Complete)
+- **Phase 2: ⚙️ IN PROGRESS** (1/4 plans complete)
+- Next: Plan 02-02 - Core Modules
 
 ### Project Files
-- `package.json` — Project metadata (updated with migration dependencies)
+- `package.json` — Project metadata (updated with cli-progress dependency)
+- `bin/install.js` — NPM entry point with shebang (✅ Created in 02-01)
+- `bin/lib/errors/install-error.js` — Custom error types (✅ Created in 02-01)
+- `bin/lib/io/` — File operations module (pending Plan 02-02)
+- `bin/lib/rendering/` — Template renderer (pending Plan 02-02)
+- `bin/lib/paths/` — Path resolver (pending Plan 02-02)
+- `bin/lib/cli/` — CLI utilities (pending Plan 02-02)
 - `scripts/migrate-to-templates.js` — Main migration entry point (✅ Complete, preserved in git)
 - `scripts/lib/frontmatter-parser.js` — YAML parser and validator (✅ Created)
 - `scripts/lib/validator.js` — Error collection engine (✅ Created)
@@ -257,25 +293,25 @@ None
 ### v2.0 — Complete Multi-Platform Installer
 **Goal:** Deploy skills to Claude + Copilot + Codex via npx with interactive UX and atomic transactions  
 **Status:** Implementation Phase  
-**Progress:** 1/7 phases complete (14%)  
+**Progress:** 1.25/7 phases complete (18%)  
 **Started:** 2026-01-25  
 **Target Completion:** TBD
 
 **Phase Breakdown:**
 - Phase 0: Documentation & Planning (✅ Complete - requirements documented)
 - Phase 1: Template Migration (✅ Complete - all skills/agents migrated and validated)
-- Phase 2: Core Installer Foundation (Next - platform detection + file copy)
+- Phase 2: Core Installer Foundation (⚙️ In Progress - 1/4 plans complete)
 - Phase 3: Multi-Platform Support (Pending)
 - Phase 4: Interactive UX (Pending)
 - Phase 5: Atomic Transactions (Pending)
 - Phase 6: Update Detection (Pending)
 - Phase 7: Path Security (Pending)
-- Phase 7: Documentation (Pending)
+- Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 1 complete - templates ready for installation. Ready for Phase 2 (Core Installer Foundation).
+**Current Scope:** Phase 2 Plan 01 complete - bin entry point, error handling, and cli-progress dependency established. Core modules next.
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-26  
-**Ready for:** Phase 2 - Core Installer Foundation
+**Ready for:** Phase 2 Plan 02 - Core Modules
