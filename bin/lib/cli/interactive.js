@@ -2,12 +2,8 @@ import * as p from '@clack/prompts';
 import { detectBinaries } from '../platforms/binary-detector.js';
 import { getInstalledVersion } from '../platforms/detector.js';
 import { adapterRegistry } from '../platforms/registry.js';
-import { install } from '../installer/orchestrator.js';
-import { createMultiBar } from './progress.js';
+import { installPlatforms, getScriptDir } from './installation-core.js';
 import * as logger from './logger.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 /**
  * Run interactive installation mode with beautiful prompts
@@ -37,8 +33,24 @@ export async function runInteractive(options = {}) {
   // Close the lateral line with step message
   p.log.step('Installation starting...');
   
-  // Run installation (Pattern 3 from research)
-  await runInstallation(platforms, scope);
+  // Hand off to shared installation core (same path as CLI mode)
+  const scriptDir = getScriptDir(import.meta.url);
+  
+  try {
+    await installPlatforms(platforms, scope, {
+      scriptDir,
+      verbose: options.verbose || false,
+      useProgressBars: true,
+      showBanner: false // Already showed banner at top
+    });
+    
+    console.log(); // Add spacing at end
+  } catch (error) {
+    // Installation failed
+    console.log();
+    logger.error(`Installation failed: ${error.message}`);
+    process.exit(1);
+  }
 }
 
 /**
@@ -122,88 +134,4 @@ async function promptSelections(detected) {
       }
     }
   );
-}
-
-/**
- * Run installation for selected platforms
- * @param {string[]} platforms - Selected platforms
- * @param {string} scope - Installation scope (global or local)
- * @returns {Promise<void>}
- */
-async function runInstallation(platforms, scope) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  const scriptDir = path.resolve(__dirname, '../..');
-  
-  const isGlobal = scope === 'global';
-  const multiBar = createMultiBar();
-  
-  // Map platform names for display
-  const platformNames = {
-    claude: 'Claude Code',
-    copilot: 'GitHub Copilot CLI',
-    codex: 'Codex CLI'
-  };
-  
-  // Track failures and successes for summary
-  const failures = [];
-  const successes = [];
-  
-  for (const platform of platforms) {
-    try {
-      const platformLabel = platformNames[platform] || platform;
-      console.log(); // Add spacing before each platform installation
-      logger.info(`Installing ${platformLabel}...`);
-      
-      const adapter = adapterRegistry.get(platform);
-      const stats = await install({
-        platform,
-        adapter,
-        isGlobal,
-        scriptDir,
-        multiBar,
-        hideInfo: true // Hide target dir/templates info, but show section headers
-      });
-      
-      successes.push({ platform, platformLabel, stats });
-    } catch (error) {
-      failures.push({ platform: platformNames[platform] || platform, error });
-    }
-  }
-  
-  multiBar.stop();
-  
-  if (failures.length > 0) {
-    console.log();
-    logger.warn(`${failures.length} platform(s) failed to install:`);
-    failures.forEach(f => logger.error(`  ${f.platform}: ${f.error.message}`));
-    
-    if (failures.length === platforms.length) {
-      // All failed - error exit
-      process.exit(1);
-    }
-  }
-  
-  // Show installation complete message with platform names
-  console.log(); // One jump line before
-  if (successes.length > 1) {
-    const names = successes.map(s => s.platform).join(', ');
-    logger.success(`${names} installation complete`, 1);
-  } else if (successes.length === 1) {
-    logger.success(`${successes[0].platform} installation complete`, 1);
-  }
-  
-  // Add next steps section with header
-  logger.header('Next Steps');
-  
-  // Dynamic AI CLI name based on number of platforms
-  const cliName = platforms.length > 1 
-    ? 'your AI CLI' 
-    : platformNames[platforms[0]] || 'your AI CLI';
-  
-  logger.info(`Open ${cliName} and run /gsd-help to see available commands`);
-  logger.info('Try /gsd-diagnose to validate your setup');
-  logger.info('Explore skills with /gsd-list-skills');
-  
-  console.log(); // Add spacing at end
 }

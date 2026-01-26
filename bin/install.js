@@ -11,9 +11,9 @@ import { dirname, join } from 'path';
 import { readFileSync } from 'fs';
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
-import { install } from './lib/installer/orchestrator.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
 import { runInteractive } from './lib/cli/interactive.js';
+import { installPlatforms, getScriptDir } from './lib/cli/installation-core.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -91,47 +91,15 @@ async function main() {
     process.exit(EXIT_CODES.INVALID_ARGS);
   }
   
-  // Show banner
-  logger.banner();
+  const scope = isGlobal ? 'global' : 'local';
   
-  // Install to each platform
-  const platformNames = {
-    claude: 'Claude Code',
-    copilot: 'GitHub Copilot CLI',
-    codex: 'Codex CLI'
-  };
-  
-  for (const platform of platforms) {
-    logger.info(`Installing to ${platform} (${isGlobal ? 'global' : 'local'})...`, 1);
-    
-    const stats = await install({
-      platform,
-      isGlobal,
-      isVerbose: options.verbose || false,
-      scriptDir: __dirname
-    });
-  }
-  
-  // Show installation complete message with platform names
-  console.log(); // One jump line before
-  if (platforms.length > 1) {
-    const names = platforms.join(', ');
-    logger.success(`${names} installation complete`, 1);
-  } else {
-    logger.success(`${platforms[0]} installation complete`, 1);
-  }
-  
-  // Add next steps section with header
-  logger.header('Next Steps');
-  
-  // Dynamic AI CLI name based on number of platforms
-  const cliName = platforms.length > 1 
-    ? 'your AI CLI' 
-    : platformNames[platforms[0]] || 'your AI CLI';
-  
-  logger.info(`Open ${cliName} and run /gsd-help to see available commands`);
-  logger.info('Try /gsd-diagnose to validate your setup');
-  logger.info('Explore skills with /gsd-list-skills');
+  // Use shared installation core (same path as interactive mode)
+  await installPlatforms(platforms, scope, {
+    scriptDir: __dirname,
+    verbose: options.verbose || false,
+    useProgressBars: true,
+    showBanner: true
+  });
 }
 
 // Execute with proper error handling
