@@ -26,11 +26,19 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 4. Installs skills/agents atomically with rollback on failure
 5. Tracks versions for update detection
 
-**Architecture:** Two-phase approach
+**Architecture:** Three-stage approach with manual validation gate
 - **Phase 1 (Migration):** ONE-TIME conversion from `.github/` → `/templates/` with frontmatter corrections
-- **Phase 2+ (Steady State):** `/templates/` becomes permanent source of truth for all future work
-- **Conversion logic:** Temporary, deleted after Phase 1 completes
-- **install.js:** Always uses `/templates/` as source (never `.github/`)
+  - Generates corrected templates
+  - **PAUSES for mandatory manual validation**
+  - Waits for explicit approval before continuing
+- **Approval Gate:** Manual review of generated templates against official specs
+  - User validates frontmatter corrections
+  - User approves template quality
+  - Only after approval: commit migration code to git, then DELETE completely
+- **Phase 2+ (Steady State):** `/templates/` is permanent source, installation code written fresh
+  - No migration dependencies (fresh code, may duplicate some logic)
+  - install.js uses `/templates/` as source (never `.github/`)
+  - Migration code exists ONLY in git history (never executed again)
 
 ## Core Constraints
 
@@ -55,13 +63,23 @@ A **single npx command** (`npx get-shit-done-multi`) that:
 - **Applies to:** ALL phases, ALL testing activities throughout the project
 
 ### Template Conversion Constraints (CRITICAL)
-- **Phase 1 is ONE-TIME MIGRATION:** Convert `.github/` → `/templates/` once, then delete conversion code
+- **Phase 1 is ONE-TIME MIGRATION:** Convert `.github/` → `/templates/` once with frontmatter corrections
+- **MANDATORY MANUAL VALIDATION:** Phase 1 MUST pause after generating templates for manual review
+- **Approval gate:** Phase 2+ can ONLY begin after explicit manual approval of Phase 1 results
 - **Source files are READ-ONLY:** Never modify `.github/`, `.claude/`, or `.codex/` directories
 - **Work in templates/:** All conversions and corrections happen in `/templates/` directory
 - **Frontmatter corrections:** Applied during Phase 1 migration, NOT on source files
-- **After Phase 1:** `/templates/` becomes permanent source of truth
+- **After approval:** `/templates/` becomes permanent source of truth
 - **install.js always uses templates/:** Installation reads from `/templates/`, not `.github/`
-- **Conversion logic is temporary:** Delete migration scripts after Phase 1 completes
+- **Migration code lifecycle:**
+  1. Write migration scripts in Phase 1
+  2. Execute migration → generate /templates/
+  3. PAUSE for manual validation
+  4. After approval: Commit migration code once to git
+  5. DELETE migration code completely from working tree
+  6. Migration code preserved ONLY in git history (never executed again)
+- **NO code preservation:** NO stages, NO shared utilities, NO .archive/ directory
+- **Phase 2+ independence:** Installation code written from scratch (no migration dependencies)
 - **Preserve originals:** Keep `.github/` as historical reference only
 - **Applies to:** Phase 1 migration strategy, affects all subsequent phases
 

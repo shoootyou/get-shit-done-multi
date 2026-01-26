@@ -47,9 +47,9 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ### Phase 1: Template Migration (ONE-TIME)
 
-**Goal:** Migrate `.github/` skills and agents to `/templates/` with frontmatter corrections, establishing permanent source of truth
+**Goal:** Migrate `.github/` skills and agents to `/templates/` with frontmatter corrections, validate manually, establish permanent source of truth
 
-**Type:** ONE-TIME MIGRATION (conversion logic deleted after completion)
+**Type:** ONE-TIME MIGRATION with MANDATORY manual validation gate
 
 **Dependencies:** None (foundation)
 
@@ -78,11 +78,14 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 10. Skills field auto-generated for agents (scans for `/gsd-*` references in content)
 11. All templates validate against official Claude/Copilot specs
 12. Migration script validates 100% success before completion
-13. Migration creates cleanup checklist (delete conversion code after verification)
-14. `.github/` remains untouched (READ-ONLY historical reference)
+13. **MANDATORY PAUSE:** Migration outputs validation report and STOPS
+14. **Manual validation:** User reviews all generated templates, validates frontmatter, checks spec compliance
+15. **Explicit approval required:** User must explicitly approve Phase 1 results before Phase 2 begins
+16. **After approval:** Migration code committed once to git, then DELETED completely from working tree
+17. `.github/` remains untouched (READ-ONLY historical reference)
 
 **Key Deliverables:**
-- `/scripts/migrate-to-templates.js` (ONE-TIME migration script, deleted after Phase 1)
+- `/scripts/migrate-to-templates.js` (ONE-TIME migration script)
 - `/templates/skills/gsd-*/SKILL.md` (29 skills with corrected frontmatter)
 - `/templates/skills/gsd-*/version.json` (29 version files)
 - `/templates/agents/gsd-*.agent.md` (13 agents with corrected frontmatter)
@@ -92,13 +95,22 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Tool name mapping utilities
 - Skill reference extractor (scans agent content for skill references)
 - Validation suite (checks output against official specs)
-- Migration report (shows before/after comparison, validation results)
+- Migration report (shows before/after comparison, validation results, PAUSES for review)
 
-**Post-Phase 1 Actions:**
-- Verify all templates against specs (manual spot-check)
-- Delete `/scripts/migrate-to-templates.js` (no longer needed)
-- Update documentation to reference `/templates/` as source
-- Commit templates to git as permanent source
+**Post-Phase 1 Actions (AFTER MANUAL APPROVAL):**
+1. User validates templates manually (spot-check frontmatter, verify corrections)
+2. User explicitly approves Phase 1 results (verbal confirmation or flag)
+3. Commit migration code to git: `git add scripts/ && git commit -m "feat: Phase 1 migration complete"`
+4. Delete migration code: `rm -rf scripts/migrate-to-templates.js` (preserves git history only)
+5. Commit deletion: `git add -A && git commit -m "chore: remove Phase 1 migration code"`
+6. Update documentation to reference `/templates/` as permanent source
+7. Begin Phase 2 (installation foundation)
+
+**CRITICAL CONSTRAINTS:**
+- NO code preservation beyond git history (no .archive/, no stages/, no shared/)
+- NO reusable components between Phase 1 and Phase 2+
+- Phase 2+ written FRESH (may duplicate logic, that's acceptable)
+- Migration code exists ONLY in git history after deletion
 
 **References:**
 - See `.planning/FRONTMATTER-CORRECTIONS.md` for skill corrections spec
@@ -108,14 +120,15 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - [ ] 01-01-PLAN.md — Migration Script & Frontmatter Parsing (Wave 1)
 - [ ] 01-02-PLAN.md — Skills Migration & Correction (Wave 2)
 - [ ] 01-03-PLAN.md — Agents Migration & Correction (Wave 3)
-- [ ] 01-04-PLAN.md — Validation & Migration Report (Wave 4)
+- [ ] 01-04-PLAN.md — Validation, Report & Manual Review Gate (Wave 4)
 
 **Notes:**
 - This is a ONE-TIME migration, not an ongoing transformation pipeline
+- Phase 1 MUST pause for manual validation (not automated approval)
 - After Phase 1, `/templates/` becomes permanent source of truth
 - `.github/` preserved as historical reference only
-- Conversion logic is temporary and will be deleted
-- Phase 2+ work with `/templates/` only, never touch `.github/` again
+- Migration code committed once, then deleted (preserved only in git history)
+- Phase 2+ has ZERO dependencies on Phase 1 code (fresh implementation)
 
 ---
 
