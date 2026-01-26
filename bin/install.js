@@ -60,7 +60,7 @@ async function main() {
   });
   
   // Show summary
-  logger.summary(stats);
+  logger.summary(stats, 'claude');
 }
 
 // Execute with proper error handling

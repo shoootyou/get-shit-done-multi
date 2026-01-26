@@ -9,7 +9,7 @@ import chalk from 'chalk';
  */
 export function createMultiBar() {
   return new cliProgress.MultiBar({
-    format: chalk.cyan('{bar}') + ' | {phase} | {percentage}% | {value}/{total}',
+    format: ' ' + chalk.cyan('{bar}') + ' | {phase} | {percentage}% | {value}/{total}',
     barCompleteChar: '█',
     barIncompleteChar: '░',
     hideCursor: true,
