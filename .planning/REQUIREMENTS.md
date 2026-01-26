@@ -232,20 +232,21 @@
 - Maintain directory structure for skills
 - **Rationale:** Systematic conversion ensures no content loss
 
-**TEMPLATE-01C: Frontmatter Format Correction**
+**TEMPLATE-01C: Frontmatter Format Correction (SKILLS ONLY)**
+- **APPLIES TO SKILLS ONLY** - Agents have independent structure and are NOT affected
 - **Fix invalid frontmatter fields** during template conversion (NOT on source files):
-  - **Remove unsupported fields:** `skill_version`, `requires_version`, `platforms`, `metadata`
+  - **Remove unsupported fields:** `skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`
   - **Rename field:** `tools` → `allowed-tools`
   - **Convert tools format:** From YAML array `[read, edit]` to comma-separated string `Read, Edit, Bash`
   - **Normalize tool names:** Apply proper capitalization (read→Read, bash→Bash, execute→Bash, etc.)
-- **Create version.json** in each template skill/agent directory:
-  - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata`
+- **Create version.json** in each template skill directory (NOT in agents):
+  - Store removed metadata: `skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`
   - Used for version tracking and platform compatibility checks
-  - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}}`
-- **Official supported frontmatter fields** (per https://code.claude.com/docs/en/slash-commands#frontmatter-reference):
+  - Format: `{"skill_version": "1.9.1", "requires_version": "1.9.0+", "platforms": ["claude", "copilot", "codex"], "metadata": {...}, "arguments": [...]}`
+- **Official supported frontmatter fields for SKILLS** (per https://code.claude.com/docs/en/slash-commands#frontmatter-reference):
   - `name` (optional): Display name
   - `description` (recommended): What the skill does
-  - `argument-hint` (optional): Autocomplete hint
+  - `argument-hint` (optional): Autocomplete hint for expected arguments (e.g., `[issue-number]` or `[filename] [format]`)
   - `disable-model-invocation` (optional): Prevent auto-loading
   - `user-invocable` (optional): Show in `/` menu
   - `allowed-tools` (optional): Tools Claude can use - **comma-separated string, one line**
@@ -253,7 +254,10 @@
   - `context` (optional): Set to `fork` for subagent
   - `agent` (optional): Subagent type when context is fork
   - `hooks` (optional): Lifecycle hooks
-- **Rationale:** Current frontmatter has unsupported fields per official Claude docs, corrections must apply during template generation
+- **Agent frontmatter** (separate structure - to be documented separately):
+  - Agents have simpler structure and different validation rules
+  - Agent corrections (if any) will be defined separately
+- **Rationale:** Current skill frontmatter has unsupported fields per official Claude docs, corrections must apply during template generation. Agents follow different spec.
 
 **TEMPLATE-02: Platform-Specific Transformations**
 - Handle platform differences via adapters (not template duplication)

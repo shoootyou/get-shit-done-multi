@@ -1,19 +1,22 @@
-# Frontmatter Format Corrections
+# Frontmatter Format Corrections (SKILLS ONLY)
 
 **Date:** 2026-01-26  
-**Status:** Documented - To be implemented in Phase 1
+**Status:** Documented - To be implemented in Phase 1  
+**Scope:** SKILLS ONLY - Agents have independent structure
 
 ---
 
 ## Problem
 
-Current skill/agent frontmatter in `.github/skills/` and `.github/agents/` contains **unsupported fields** according to official Claude documentation:
+Current **skill** frontmatter in `.github/skills/` contains **unsupported fields** according to official Claude documentation:
 
 https://code.claude.com/docs/en/slash-commands#frontmatter-reference
 
+**NOTE:** This issue applies to **SKILLS ONLY**. Agents (`.github/agents/*.agent.md`) have a different structure and are NOT affected by these corrections.
+
 ### Invalid Fields Found
 
-All 29 skills and 13 agents have these **unsupported** fields:
+All 29 skills have these **unsupported** fields:
 
 ```yaml
 ---
@@ -23,7 +26,7 @@ skill_version: 1.9.1              # ❌ NOT SUPPORTED
 requires_version: 1.9.0+          # ❌ NOT SUPPORTED
 platforms: [claude, copilot, codex]  # ❌ NOT SUPPORTED
 tools: [read, edit, execute]      # ❌ WRONG FIELD NAME (should be allowed-tools)
-arguments: [...]                  # ✅ OK but not officially documented
+arguments: [{...}]                # ❌ NOT SUPPORTED (should be argument-hint)
 metadata:                         # ❌ NOT SUPPORTED
   platform: copilot
   generated: '2026-01-24'
@@ -41,8 +44,8 @@ Per official documentation, only these fields are supported:
 ---
 name: gsd-new-project
 description: Orchestrate project initialization with parallel research and roadmap creation
-allowed-tools: Read, Write, Bash, Task  # ✅ Comma-separated string, one line
-arguments: [...]                         # ✅ Supported (though not in docs table)
+argument-hint: "[domain]"                # ✅ Optional hint for arguments
+allowed-tools: Read, Write, Bash, Task   # ✅ Comma-separated string, one line
 ---
 ```
 
@@ -63,15 +66,21 @@ arguments: [...]                         # ✅ Supported (though not in docs tab
 
 ## Solution
 
-### 1. Preserve Metadata in version.json
+### 1. Preserve Metadata in version.json (SKILLS ONLY)
 
-Create `version.json` in each skill/agent directory:
+Create `version.json` in each **skill** directory (NOT in agents):
 
 ```json
 {
   "skill_version": "1.9.1",
   "requires_version": "1.9.0+",
   "platforms": ["claude", "copilot", "codex"],
+  "arguments": [{
+    "name": "domain",
+    "type": "string",
+    "required": false,
+    "description": "Project domain for research context"
+  }],
   "metadata": {
     "platform": "copilot",
     "generated": "2026-01-24",
@@ -82,21 +91,28 @@ Create `version.json` in each skill/agent directory:
 }
 ```
 
-### 2. Fix Frontmatter During Template Conversion
+**Agent Note:** Agents do NOT need version.json - they follow a simpler structure.
 
-**CRITICAL:** These corrections happen in `/templates/` directory, **NOT** on source files.
+### 2. Fix Frontmatter During Template Conversion (SKILLS ONLY)
+
+**CRITICAL:** These corrections happen in `/templates/skills/` directory, **NOT** on source files.
+
+**Agents:** Do NOT apply these corrections to agents - they have different structure.
 
 #### Step 1: Copy from source
 ```bash
 cp -r .github/skills/gsd-new-project templates/skills/
 ```
 
-#### Step 2: Fix frontmatter in template
-- Remove: `skill_version`, `requires_version`, `platforms`, `metadata`
+#### Step 2: Fix frontmatter in skill template
+- Remove: `skill_version`, `requires_version`, `platforms`, `metadata`, `arguments`
 - Rename: `tools` → `allowed-tools`
 - Convert format: `[read, edit]` → `Read, Edit, Bash`
+- Convert arguments to argument-hint:
+  - From: `arguments: [{name: domain, ...}]`
+  - To: `argument-hint: "[domain]"`
 
-#### Step 3: Create version.json
+#### Step 3: Create version.json (skills only)
 ```bash
 echo '{"skill_version": "1.9.1", ...}' > templates/skills/gsd-new-project/version.json
 ```
@@ -179,24 +195,63 @@ Each adapter handles platform-specific tool name mappings:
 
 ## Files Affected
 
-- **29 skills** in `.github/skills/*/SKILL.md`
-- **13 agents** in `.github/agents/*.agent.md`
-- **Total:** 42 files need frontmatter correction
+**SKILLS ONLY:**
+- **29 skills** in `.github/skills/*/SKILL.md` need frontmatter correction
+- **Total:** 29 files
+
+**AGENTS:**
+- **13 agents** in `.github/agents/*.agent.md` 
+- **Status:** NO corrections needed - agents have independent structure
+- **Action:** Copy to templates as-is (may need platform-specific adjustments later)
 
 ## Testing Checklist
 
-- [ ] All source files remain unchanged
-- [ ] Templates created in `/templates/` directory
-- [ ] Each template has corrected frontmatter
-- [ ] Each template directory has `version.json`
+**Skills:**
+- [ ] All source files in `.github/skills/` remain unchanged
+- [ ] Skill templates created in `/templates/skills/` directory
+- [ ] Each skill template has corrected frontmatter
+- [ ] Each skill directory has `version.json`
 - [ ] Tool names use official capitalization
 - [ ] `allowed-tools` is comma-separated string
-- [ ] No unsupported fields remain in frontmatter
+- [ ] No unsupported fields remain in skill frontmatter
+- [ ] `argument-hint` field used instead of `arguments` array
+
+**Agents:**
+- [ ] All source files in `.github/agents/` remain unchanged
+- [ ] Agent templates copied to `/templates/agents/` as-is
+- [ ] NO version.json for agents
+- [ ] NO frontmatter corrections for agents (different spec)
 
 ## References
 
-- Official Frontmatter Reference: https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+- Official Frontmatter Reference (Skills): https://code.claude.com/docs/en/slash-commands#frontmatter-reference
 - Official Tools List: https://code.claude.com/docs/en/settings#tools-available-to-claude
+- Official Sub-Agents Reference: https://code.claude.com/docs/en/sub-agents
+
+## Agent Structure (Separate from Skills)
+
+Agents have a simpler frontmatter structure. Based on observation of `.github/agents/*.agent.md`:
+
+```yaml
+---
+name: gsd-executor
+description: Executes GSD plans with atomic commits...
+tools: [read, edit, execute, search]
+metadata:
+  platform: copilot
+  generated: '2026-01-24'
+  templateVersion: 1.0.0
+  projectVersion: 1.9.0
+  projectName: 'get-shit-done-multi'
+---
+```
+
+**Agent corrections (if any) will be defined after researching official agent documentation.**
+
+For now, agents will be copied to templates as-is with minimal changes:
+- Platform-specific tool name mappings (via adapters)
+- Path reference updates
+- No frontmatter field removals/renames for Phase 1
 
 ---
 
