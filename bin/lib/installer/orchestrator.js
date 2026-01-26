@@ -178,7 +178,7 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
   const agentFiles = await readdir(agentsTemplateDir);
   const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
   
-  const total = agents.length + 1; // +1 for versions.json
+  const total = agents.length; // versions.json doesn't count as an agent
   const bar = multiBar ? createProgressBar(multiBar, 'Agents', total) : null;
   
   let count = 0;
@@ -198,7 +198,7 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     logger.verboseComplete(isVerbose);
   }
   
-  // Copy versions.json
+  // Copy versions.json (don't update progress - not counted as agent)
   const versionsFile = join(agentsTemplateDir, 'versions.json');
   if (await pathExists(versionsFile)) {
     logger.verboseInProgress('versions.json', isVerbose);
@@ -206,12 +206,11 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     const content = await readFile(versionsFile, 'utf8');
     const processed = renderTemplate(content, variables);
     await writeFile(join(agentsTargetDir, 'versions.json'), processed);
-    count++;
-    if (bar) updateProgress(bar, count);
+    // Don't increment count or update bar - versions.json is metadata, not an agent
     logger.verboseComplete(isVerbose);
   }
   
-  return agents.length;
+  return agents.length; // Don't count versions.json in agent count
 }
 
 /**
