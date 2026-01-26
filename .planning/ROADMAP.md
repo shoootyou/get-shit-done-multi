@@ -253,6 +253,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 3 (multi-platform support needed for selection)
 
+**Plans:** 1 plan
+
 **Requirements Mapped:**
 - CLI-01: Interactive mode (default)
 - CLI-04: Confirmation flags (`--yes`)
@@ -266,22 +268,27 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 3. Installer detects existing GSD installations and shows their versions
 4. User selects platform from menu (disabled options show "coming soon" for unsupported platforms)
 5. User selects scope (global or local)
-6. User multi-selects skills/agents to install
-7. User confirms installation before any file writes
-8. Progress spinner shows during file operations
-9. Success message shows next steps ("Run /gsd-new-project to start")
+6. Global detection check: If zero CLIs detected, show warning + confirmation before platform selection
+7. Installation proceeds without skill selection or confirmation prompts (streamlined UX)
+8. Progress bars show during file operations (reuses cli-progress MultiBar)
+9. Success message shows next steps ("Run /gsd-help to get started")
 10. Errors show actionable guidance (not generic "failed")
+11. CTRL+C cancellation exits gracefully with exit code 0
 
 **Key Deliverables:**
-- `/bin/lib/prompts/interactive-prompts.js` (clack/prompts integration)
-- `/bin/lib/prompts/intro-outro.js` (welcome/completion messages)
-- Enhanced error handling with specific messages
-- Progress indicators during installation
-- Updated `/bin/install.js` to detect no flags → interactive mode
+- `/bin/lib/cli/interactive.js` (runInteractive orchestrator, @clack/prompts integration)
+- Updated `/bin/install.js` to detect no flags + TTY → interactive mode
+- Progress indicators reused from Phase 2/3 (cli-progress)
+- Error formatting reused from Phase 2/3 (chalk + logger)
+
+**Plans:**
+- [x] 04-01-PLAN.md — Interactive Mode with @clack/prompts (Wave 1)
 
 **Notes:**
 - This is the primary UX for manual installation (most common use case)
 - Flags still work for automation (CI/CD)
+- Installs ALL skills/agents by default (no individual selection)
+- No confirmation prompt before installation (streamlined per user feedback)
 
 ---
 
