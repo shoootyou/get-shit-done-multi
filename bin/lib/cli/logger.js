@@ -3,27 +3,33 @@
 import chalk from 'chalk';
 
 /**
- * Log info message
+ * Log info message with optional indentation
  * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
  */
-export function info(message) {
-  console.log(chalk.blue('ℹ'), message);
+export function info(message, indent = 0) {
+  const prefix = ' '.repeat(indent);
+  console.log(prefix + chalk.blue('ℹ'), message);
 }
 
 /**
- * Log success message
+ * Log success message with optional indentation
  * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
  */
-export function success(message) {
-  console.log(chalk.green('✓'), message);
+export function success(message, indent = 0) {
+  const prefix = ' '.repeat(indent);
+  console.log(prefix + chalk.green('✓'), message);
 }
 
 /**
- * Log warning message
+ * Log warning message with optional indentation
  * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
  */
-export function warn(message) {
-  console.warn(chalk.yellow('⚠'), message);
+export function warn(message, indent = 0) {
+  const prefix = ' '.repeat(indent);
+  console.warn(prefix + chalk.yellow('⚠'), message);
 }
 
 /**
@@ -100,6 +106,15 @@ export function banner() {
  */
 export function summary(stats) {
   console.log();
-  success(`${stats.skills} skills, ${stats.agents} agents installed to ${stats.target}`);
-  info('Try /gsd-help to get started');
+  success(`${stats.skills} skills, ${stats.agents} agents installed to ${stats.target}`, 1);
+  info(`Open your AI CLI and run '/gsd-help' to get started`, 1);
+}
+
+/**
+ * Print section title (for progress phases)
+ * @param {string} title - Section title
+ */
+export function sectionTitle(title) {
+  console.log();
+  console.log(' ' + chalk.bold.cyan(title));
 }

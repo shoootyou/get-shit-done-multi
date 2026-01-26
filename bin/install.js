@@ -49,7 +49,7 @@ async function main() {
   
   // Show banner
   logger.banner();
-  logger.info(`Installing to Claude Code (${isGlobal ? 'global' : 'local'})`);
+  logger.info(`Installing to Claude Code (${isGlobal ? 'global' : 'local'})`, 1);
   
   // Run installation
   const stats = await install({

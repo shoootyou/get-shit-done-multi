@@ -22,8 +22,8 @@ export async function install(options) {
   const targetDir = resolveTargetDirectory(isGlobal, platform);
   const templatesDir = getTemplatesDirectory(scriptDir);
   
-  logger.info(`Target directory: ${targetDir}`);
-  logger.info(`Templates source: ${templatesDir}`);
+  logger.info(`Target directory: ${targetDir}`, 1);
+  logger.info(`Templates source: ${templatesDir}`, 1);
   
   // Validate templates exist
   await validateTemplates(templatesDir);
@@ -33,8 +33,8 @@ export async function install(options) {
   const hasExisting = await pathExists(manifestPath);
   
   if (hasExisting) {
-    logger.warn('Existing installation detected');
-    logger.warn('Installation will overwrite existing files');
+    logger.warn('Existing installation detected', 1);
+    logger.warn('Installation will overwrite existing files', 1);
     // In Phase 4, we'll add interactive confirmation here
     // For now, proceed with overwrite
   }
@@ -49,6 +49,9 @@ export async function install(options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
   
   if (!isVerbose) {
+    // Add section title before progress bars
+    logger.sectionTitle('Installing...');
+    
     // Multi-bar progress for non-verbose mode
     const multiBar = createMultiBar();
     
