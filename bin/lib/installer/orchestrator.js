@@ -1,0 +1,244 @@
+// bin/lib/installer/orchestrator.js
+
+import { join } from 'path';
+import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
+import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
+import { renderTemplate, getClaudeVariables, findUnknownVariables } from '../rendering/template-renderer.js';
+import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } from '../cli/progress.js';
+import * as logger from '../cli/logger.js';
+import { missingTemplates } from '../errors/install-error.js';
+import { readdir, readFile } from 'fs/promises';
+
+/**
+ * Main installation orchestrator
+ * @param {Object} options - Installation options
+ * @returns {Promise<Object>} Installation statistics
+ */
+export async function install(options) {
+  const { platform, isGlobal, isVerbose, scriptDir } = options;
+  
+  // Resolve paths
+  const targetDir = resolveTargetDirectory(isGlobal, platform);
+  const templatesDir = getTemplatesDirectory(scriptDir);
+  
+  logger.info(`Target directory: ${targetDir}`);
+  logger.verbose(`Templates directory: ${templatesDir}`, isVerbose);
+  
+  // Validate templates exist
+  await validateTemplates(templatesDir);
+  
+  // Check for existing installation
+  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
+  const hasExisting = await pathExists(manifestPath);
+  
+  if (hasExisting) {
+    logger.warn('Existing installation detected');
+    logger.warn('Installation will overwrite existing files');
+    // In Phase 4, we'll add interactive confirmation here
+    // For now, proceed with overwrite
+  }
+  
+  // Get template variables
+  const variables = getClaudeVariables(isGlobal);
+  
+  // Create target directory
+  await ensureDirectory(targetDir);
+  
+  // Initialize progress tracking
+  const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
+  
+  if (!isVerbose) {
+    // Multi-bar progress for non-verbose mode
+    const multiBar = createMultiBar();
+    
+    try {
+      // Phase 1: Install skills
+      stats.skills = await installSkills(templatesDir, targetDir, variables, multiBar, isVerbose);
+      
+      // Phase 2: Install agents
+      stats.agents = await installAgents(templatesDir, targetDir, variables, multiBar, isVerbose);
+      
+      // Phase 3: Install shared directory
+      stats.shared = await installShared(templatesDir, targetDir, variables, multiBar, isVerbose);
+      
+      stopAllProgress(multiBar);
+    } catch (error) {
+      stopAllProgress(multiBar);
+      throw error;
+    }
+  } else {
+    // Verbose mode: no progress bars, show files
+    logger.header('Installing Skills');
+    stats.skills = await installSkills(templatesDir, targetDir, variables, null, isVerbose);
+    
+    logger.header('Installing Agents');
+    stats.agents = await installAgents(templatesDir, targetDir, variables, null, isVerbose);
+    
+    logger.header('Installing Shared Directory');
+    stats.shared = await installShared(templatesDir, targetDir, variables, null, isVerbose);
+  }
+  
+  // Generate installation manifest
+  await generateManifest(targetDir, stats, isGlobal);
+  
+  return stats;
+}
+
+/**
+ * Validate templates directory exists
+ */
+async function validateTemplates(templatesDir) {
+  const skillsDir = join(templatesDir, 'skills');
+  const agentsDir = join(templatesDir, 'agents');
+  const sharedDir = join(templatesDir, 'get-shit-done');
+  
+  const skillsExist = await pathExists(skillsDir);
+  const agentsExist = await pathExists(agentsDir);
+  const sharedExist = await pathExists(sharedDir);
+  
+  if (!skillsExist || !agentsExist || !sharedExist) {
+    throw missingTemplates(
+      'Templates directory incomplete',
+      { skillsExist, agentsExist, sharedExist, path: templatesDir }
+    );
+  }
+}
+
+/**
+ * Install skills from templates
+ */
+async function installSkills(templatesDir, targetDir, variables, multiBar, isVerbose) {
+  const skillsTemplateDir = join(templatesDir, 'skills');
+  const skillsTargetDir = join(targetDir, 'skills');
+  
+  // Get skill directories
+  const skillDirs = await readdir(skillsTemplateDir, { withFileTypes: true });
+  const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-'));
+  
+  const total = skills.length;
+  const bar = multiBar ? createProgressBar(multiBar, 'Skills', total) : null;
+  
+  let count = 0;
+  for (const skill of skills) {
+    const srcDir = join(skillsTemplateDir, skill.name);
+    const destDir = join(skillsTargetDir, skill.name);
+    
+    // Copy skill directory
+    await copyDirectory(srcDir, destDir);
+    
+    // Process SKILL.md file
+    const skillFile = join(destDir, 'SKILL.md');
+    await processTemplateFile(skillFile, variables, isVerbose);
+    
+    count++;
+    if (bar) updateProgress(bar, count);
+    logger.verbose(`  → ${skill.name}`, isVerbose);
+  }
+  
+  return count;
+}
+
+/**
+ * Install agents from templates
+ */
+async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose) {
+  const agentsTemplateDir = join(templatesDir, 'agents');
+  const agentsTargetDir = join(targetDir, 'agents');
+  
+  await ensureDirectory(agentsTargetDir);
+  
+  // Get agent files
+  const agentFiles = await readdir(agentsTemplateDir);
+  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
+  
+  const total = agents.length + 1; // +1 for versions.json
+  const bar = multiBar ? createProgressBar(multiBar, 'Agents', total) : null;
+  
+  let count = 0;
+  for (const agent of agents) {
+    const srcFile = join(agentsTemplateDir, agent);
+    const destFile = join(agentsTargetDir, agent);
+    
+    // Read, process, write
+    const content = await readFile(srcFile, 'utf8');
+    const processed = renderTemplate(content, variables);
+    await writeFile(destFile, processed);
+    
+    count++;
+    if (bar) updateProgress(bar, count);
+    logger.verbose(`  → ${agent}`, isVerbose);
+  }
+  
+  // Copy versions.json
+  const versionsFile = join(agentsTemplateDir, 'versions.json');
+  if (await pathExists(versionsFile)) {
+    const content = await readFile(versionsFile, 'utf8');
+    const processed = renderTemplate(content, variables);
+    await writeFile(join(agentsTargetDir, 'versions.json'), processed);
+    count++;
+    if (bar) updateProgress(bar, count);
+    logger.verbose('  → versions.json', isVerbose);
+  }
+  
+  return agents.length;
+}
+
+/**
+ * Install shared directory from templates
+ */
+async function installShared(templatesDir, targetDir, variables, multiBar, isVerbose) {
+  const sharedTemplateDir = join(templatesDir, 'get-shit-done');
+  const sharedTargetDir = join(targetDir, 'get-shit-done');
+  
+  const bar = multiBar ? createProgressBar(multiBar, 'Shared', 1) : null;
+  
+  // Copy entire directory
+  await copyDirectory(sharedTemplateDir, sharedTargetDir);
+  
+  // Process manifest template
+  const manifestFile = join(sharedTargetDir, '.gsd-install-manifest.json');
+  if (await pathExists(manifestFile)) {
+    await processTemplateFile(manifestFile, variables, isVerbose);
+  }
+  
+  if (bar) updateProgress(bar, 1);
+  logger.verbose('  → get-shit-done/', isVerbose);
+  
+  return 1;
+}
+
+/**
+ * Process template file (read, replace variables, write)
+ */
+async function processTemplateFile(filePath, variables, isVerbose) {
+  const content = await readFile(filePath, 'utf8');
+  
+  // Find unknown variables and warn
+  const unknown = findUnknownVariables(content, variables);
+  if (unknown.length > 0 && isVerbose) {
+    logger.warn(`Unknown variables in ${filePath}: ${unknown.join(', ')}`);
+  }
+  
+  const processed = renderTemplate(content, variables);
+  await writeFile(filePath, processed);
+}
+
+/**
+ * Generate installation manifest
+ */
+async function generateManifest(targetDir, stats, isGlobal) {
+  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
+  
+  const manifest = {
+    version: '2.0.0',
+    platform: 'claude',
+    scope: isGlobal ? 'global' : 'local',
+    installedAt: new Date().toISOString(),
+    stats: {
+      skills: stats.skills,
+      agents: stats.agents
+    }
+  };
+  
+  await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+}
