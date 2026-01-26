@@ -14,13 +14,13 @@ Shows version comparison, changelog entries for missed versions, and update inst
 <process>
 
 <step name="get_installed_version">
-Read installed version from VERSION file:
+Read installed version from manifest file:
 
 ```bash
-cat {{PLATFORM_ROOT}}/get-shit-done/VERSION 2>/dev/null
+cat {{PLATFORM_ROOT}}/get-shit-done/.gsd-install-manifest.json 2>/dev/null | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4
 ```
 
-**If VERSION file missing:**
+**If manifest file missing:**
 ```
 ## GSD What's New
 
@@ -28,12 +28,12 @@ cat {{PLATFORM_ROOT}}/get-shit-done/VERSION 2>/dev/null
 
 Your installation doesn't include version tracking.
 
-**To fix:** `npx get-shit-done-multi --global`
+**To fix:** `npx get-shit-done-multi --{{PLATFORM_NAME}}`
 
 This will reinstall with version tracking enabled.
 ```
 
-STOP here if no VERSION file.
+STOP here if no manifest file.
 </step>
 
 <step name="fetch_remote_changelog">
@@ -118,7 +118,7 @@ You're on the latest version.
 </process>
 
 <success_criteria>
-- [ ] Installed version read from VERSION file
+- [ ] Installed version read from .gsd-install-manifest.json
 - [ ] Remote changelog fetched (or graceful fallback to local)
 - [ ] Version comparison displayed clearly
 - [ ] Changes since installed version shown (if any)
