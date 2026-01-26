@@ -946,24 +946,24 @@ async function checkDiskSpace(targetPath) {
 - **`__dirname` in ESM**: Use `fileURLToPath(import.meta.url)` instead
 - **Optimist (CLI parser)**: Unmaintained since 2015, use commander or yargs
 
-## Open Questions
+## Resolved Questions
 
-Things that couldn't be fully resolved:
+All open questions have been resolved with user decisions:
 
-1. **Progress granularity for large directories**
-   - What we know: cli-progress works well for counted items (files, directories)
-   - What's unclear: Best UX when directory has 1000+ files (show per-file or grouped?)
-   - Recommendation: Phase 2 has ~50 files total. Use per-phase progress (skills, agents, shared). File-by-file in verbose mode only.
+1. **Progress granularity for large directories** ✅ RESOLVED
+   - Decision: Use per-phase progress (skills, agents, shared) for default mode
+   - File-by-file detail shown only in verbose mode (`--verbose` flag)
+   - Rationale: Output files go to `.claude/`, `.github/`, `.codex/` or other CLI directories and need to be lightweight (~50 files total)
 
-2. **Optimal disk space buffer**
-   - What we know: 50MB minimum specified in context
-   - What's unclear: Actual space needed depends on template sizes (unknown without measuring)
-   - Recommendation: Use 50MB minimum as specified. Can adjust if too low based on actual usage.
+2. **Optimal disk space buffer** ✅ RESOLVED
+   - Decision: Use 50MB minimum as specified
+   - Rationale: Output consists of lightweight markdown files for CLI skills/agents, 50MB is more than sufficient
+   - Can adjust if measurements show it's too low, but starting point is appropriate
 
-3. **User confirmation mechanism**
-   - What we know: Context specifies prompt for overwrite confirmation
-   - What's unclear: Which library for prompts (inquirer, prompts, readline)
-   - Recommendation: Defer to Phase 4 (Interactive UX). For Phase 2, just warn and proceed.
+3. **User confirmation mechanism** ✅ RESOLVED
+   - Decision: Agreed with recommendation to defer to Phase 4 (Interactive UX)
+   - Phase 2: Just warn and proceed (no prompting library needed yet)
+   - Full interactive prompts come in Phase 4 when @clack/prompts is introduced
 
 ## Sources
 
