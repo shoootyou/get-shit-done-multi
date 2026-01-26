@@ -12,7 +12,9 @@ Key findings: Phase 2 already established template variable replacement (simple 
 
 The critical insight: Don't mix adapter responsibilities. Tool name transformation, file extension determination, and path resolution should all live in adapters, but template variable replacement stays in the existing renderer. Adapters wrap the renderer with platform-specific logic.
 
-**Primary recommendation:** Create PlatformAdapter base class with concrete implementations (ClaudeAdapter, CopilotAdapter, CodexAdapter). Use Registry pattern for adapter lookup. Extend existing orchestrator to accept platform parameter and delegate transformations to adapters. Keep template rendering in existing template-renderer.js.
+**Primary recommendation:** Create PlatformAdapter base class with concrete implementations (ClaudeAdapter, CopilotAdapter, CodexAdapter). Each platform adapter is ISOLATED - NO inheritance between them (ARCHITECTURAL RULE per PLATFORM-02). Use Registry pattern for adapter lookup. Extend existing orchestrator to accept platform parameter and delegate transformations to adapters. Keep template rendering in existing template-renderer.js.
+
+**CRITICAL:** Code duplication between platform adapters is ACCEPTABLE and PREFERRED over coupling. Platform isolation over DRY principle.
 
 ## Standard Stack
 
@@ -888,24 +890,39 @@ describe('AdapterRegistry', () => {
 - Factory pattern for adapters: Strategy pattern with composition is cleaner for runtime selection
 - Handlebars/Mustache for simple variables: Regex replace is simpler and faster
 
-## Open Questions
+## Open Questions ➜ ✅ RESOLVED
 
-Things that couldn't be fully resolved:
+All questions resolved with user decisions (2026-01-26):
 
-1. **Command prefix in code blocks**
-   - What we know: Simple string replace will transform `/gsd-` everywhere
-   - What's unclear: Should code examples be excluded from transformation?
-   - Recommendation: Use simple replace (matches requirements), document in testing that code blocks will be transformed
+### 1. Command prefix in code blocks ✅
+   - **Question:** Should code examples be excluded from transformation?
+   - **Decision:** NO - transform everywhere (text, inline code, code blocks)
+   - **Rationale:** Users copy-paste examples, so they need correct prefix for their platform
+   - **Implementation:** Simple string replace transforms `{{COMMAND_PREFIX}}` in all contexts
+   - **Status:** ✅ APPROVED - Document as expected behavior in tests
 
-2. **Adapter inheritance depth**
-   - What we know: CodexAdapter extends CopilotAdapter (DRY principle)
-   - What's unclear: Is deep inheritance (3 levels) worth the complexity?
-   - Recommendation: Keep CodexAdapter extending CopilotAdapter since 95% identical. Document that command prefix is the only difference.
+### 2. Adapter architecture ✅ (OVERRIDDEN BY USER)
+   - **Original recommendation:** CodexAdapter extends CopilotAdapter (DRY principle)
+   - **User decision:** NO INHERITANCE between platform adapters
+   - **ARCHITECTURAL RULE (PLATFORM-02):** Each platform MUST have its own complete adapter
+   - **Rationale:** Platform isolation over DRY - changes to one platform should NOT affect others
+   - **Implementation:** 
+     - ClaudeAdapter extends PlatformAdapter (complete implementation)
+     - CopilotAdapter extends PlatformAdapter (complete implementation)
+     - CodexAdapter extends PlatformAdapter (complete implementation, code duplication acceptable)
+   - **Status:** ✅ APPROVED - Documented in ARCHITECTURE-DECISION.md and REQUIREMENTS.md
 
-3. **Binary detection timeout**
-   - What we know: exec() can hang if command doesn't exist
-   - What's unclear: What timeout is appropriate for which/where commands?
-   - Recommendation: Set 2-second timeout on exec. If times out, assume binary doesn't exist.
+### 3. Binary detection timeout ✅
+   - **Question:** What timeout for which/where commands?
+   - **Decision:** 2-second timeout on exec()
+   - **Rationale:** Prevents hanging if binary doesn't exist
+   - **Implementation:** `await execAsync('which copilot', { timeout: 2000 })`
+   - **Status:** ✅ APPROVED
+
+**See also:**
+- `.planning/phases/03-multi-platform-support/03-RESEARCH-CLARIFICATIONS.md` — Detailed explanations
+- `.planning/ARCHITECTURE-DECISION.md` — Complete ADR for adapter isolation decision
+- `.planning/REQUIREMENTS.md` — PLATFORM-02 contains architectural rule
 
 ## Sources
 
@@ -931,12 +948,13 @@ Things that couldn't be fully resolved:
 
 **Confidence breakdown:**
 - Standard stack: HIGH - All libraries already in project or Node.js built-ins
-- Architecture patterns: HIGH - Strategy + Registry patterns are industry standard, verified in existing code
+- Architecture patterns: HIGH - Strategy + Registry patterns are industry standard, NO inheritance between platforms (user decision)
 - Tool transformations: HIGH - Requirements document specifies exact mappings
-- Binary detection: HIGH - Standard which/where pattern, verified with test script
+- Binary detection: HIGH - Standard which/where pattern with 2-second timeout (user approved)
 - Frontmatter handling: HIGH - gray-matter is industry standard, already in project
-- Command prefix transformation: HIGH - Simple RegExp, tested in template-renderer
+- Command prefix transformation: HIGH - Simple RegExp transforms everywhere including code blocks (user approved)
 - Pitfalls: MEDIUM - Based on requirements analysis and common adapter pattern mistakes
 
-**Research date:** 2025-01-26
-**Valid until:** 2025-02-25 (30 days - stable patterns and requirements)
+**Research date:** 2026-01-26  
+**Updated:** 2026-01-26 (open questions resolved with user decisions)  
+**Valid until:** 2026-02-25 (30 days - stable patterns and requirements)
