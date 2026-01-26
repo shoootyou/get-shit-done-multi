@@ -1,24 +1,7 @@
 // bin/lib/cli/next-steps.js
 
 import * as logger from './logger.js';
-
-/**
- * Platform name mapping
- */
-const platformNames = {
-  claude: 'Claude Code',
-  copilot: 'GitHub Copilot CLI',
-  codex: 'Codex CLI'
-};
-
-/**
- * Get platform display name
- * @param {string} platform - Platform key (claude, copilot, codex)
- * @returns {string} Display name
- */
-function getPlatformName(platform) {
-  return platformNames[platform] || 'your AI CLI';
-}
+import { getCliName } from '../platforms/platform-names.js';
 
 /**
  * Show next steps after installation
@@ -38,9 +21,7 @@ export function showNextSteps(platforms, indent = 0) {
   const prefix = isCodexOnly ? '$gsd-' : '/gsd-';
   
   // Dynamic CLI name based on number of platforms
-  const cliName = platforms.length === 1 
-    ? getPlatformName(platforms[0]) 
-    : 'your AI CLI';
+  const cliName = getCliName(platforms);
   
   // Show next steps with proper indentation
   logger.info(`Open ${cliName} and run ${prefix}help to see available commands`, indent);

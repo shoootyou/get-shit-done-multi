@@ -1,6 +1,7 @@
 // bin/lib/cli/logger.js
 
 import chalk from 'chalk';
+import { getPlatformName } from '../platforms/platform-names.js';
 
 /**
  * Log info message with optional indentation
@@ -108,12 +109,7 @@ export function banner() {
  * @param {string} platform - Platform name (claude, copilot, codex)
  */
 export function summary(stats, platform) {
-  const platformNames = {
-    claude: 'Claude Code',
-    copilot: 'GitHub Copilot CLI',
-    codex: 'Codex CLI'
-  };
-  const cliName = platformNames[platform] || 'your AI CLI';
+  const cliName = getPlatformName(platform);
 
   console.log();
   success(`${stats.skills} skills, ${stats.agents} agents installed to ${stats.target}`, 1);

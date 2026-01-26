@@ -7,15 +7,7 @@ import { adapterRegistry } from '../platforms/registry.js';
 import { createMultiBar } from './progress.js';
 import * as logger from './logger.js';
 import { showNextSteps } from './next-steps.js';
-
-/**
- * Platform name mapping
- */
-const platformNames = {
-  claude: 'Claude Code',
-  copilot: 'GitHub Copilot CLI',
-  codex: 'Codex CLI'
-};
+import { getPlatformName } from '../platforms/platform-names.js';
 
 /**
  * Core installation function shared by CLI and interactive modes
@@ -58,7 +50,7 @@ export async function installPlatforms(platforms, scope, options = {}) {
   // Install each platform
   for (const platform of platforms) {
     try {
-      const platformLabel = platformNames[platform] || platform;
+      const platformLabel = getPlatformName(platform);
       
       // Show installation starting message
       logger.info(`Installing to ${platform} (${isGlobal ? 'global' : 'local'})...`, 1);
@@ -79,7 +71,7 @@ export async function installPlatforms(platforms, scope, options = {}) {
       successes.push({ platform, platformLabel, stats });
       
     } catch (error) {
-      const platformLabel = platformNames[platform] || platform;
+      const platformLabel = getPlatformName(platform);
       failures.push({ platform, platformLabel, error });
     }
   }
