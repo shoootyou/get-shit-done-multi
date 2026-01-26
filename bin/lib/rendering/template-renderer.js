@@ -1,5 +1,7 @@
 // bin/lib/rendering/template-renderer.js
 
+import { readFile } from '../io/file-operations.js';
+
 /**
  * Template variable replacement
  * Replaces {{VARIABLE}} patterns in file content
@@ -7,11 +9,22 @@
 
 /**
  * Render template by replacing variables
- * @param {string} content - Template content
- * @param {Object} variables - Variable values
- * @returns {string} Rendered content
+ * @param {string} filePath - Path to template file
+ * @param {Object} variables - Template variables to replace
+ * @returns {Promise<string>} Rendered content
  */
-export function renderTemplate(content, variables) {
+export async function renderTemplate(filePath, variables) {
+  const content = await readFile(filePath);
+  return replaceVariables(content, variables);
+}
+
+/**
+ * Replace variables in string content
+ * @param {string} content - Content to process
+ * @param {Object} variables - Template variables
+ * @returns {string} Processed content
+ */
+export function replaceVariables(content, variables) {
   let rendered = content;
   
   for (const [key, value] of Object.entries(variables)) {
@@ -20,20 +33,6 @@ export function renderTemplate(content, variables) {
   }
   
   return rendered;
-}
-
-/**
- * Get platform-specific variables for Claude
- * @param {boolean} isGlobal - Global vs local installation
- * @returns {Object} Variable mappings
- */
-export function getClaudeVariables(isGlobal) {
-  return {
-    PLATFORM_ROOT: isGlobal ? '~/.claude' : '.claude',
-    COMMAND_PREFIX: '/gsd-',
-    VERSION: '2.0.0',
-    PLATFORM_NAME: 'claude'
-  };
 }
 
 /**

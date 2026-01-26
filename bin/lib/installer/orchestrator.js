@@ -4,7 +4,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
 import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
-import { renderTemplate, findUnknownVariables } from '../rendering/template-renderer.js';
+import { renderTemplate, findUnknownVariables, replaceVariables } from '../rendering/template-renderer.js';
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
@@ -214,7 +214,7 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     
     // Read, process, write
     const content = await readFile(srcFile, 'utf8');
-    const processed = renderTemplate(content, variables);
+    const processed = replaceVariables(content, variables);
     await writeFile(destFile, processed);
     
     count++;
@@ -228,7 +228,7 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     logger.verboseInProgress('versions.json', isVerbose);
     
     const content = await readFile(versionsFile, 'utf8');
-    const processed = renderTemplate(content, variables);
+    const processed = replaceVariables(content, variables);
     await writeFile(join(agentsTargetDir, 'versions.json'), processed);
     // Don't increment count or update bar - versions.json is metadata, not an agent
     logger.verboseComplete(isVerbose);
