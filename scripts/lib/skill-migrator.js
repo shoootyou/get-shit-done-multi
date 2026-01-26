@@ -149,8 +149,37 @@ export async function migrateSkill(sourcePath, targetDir, validator) {
     // Create target directory
     await fs.ensureDir(targetSkillDir);
     
-    // Write corrected skill file
-    const newContent = matter.stringify(injectedBody, corrected);
+    // Write corrected skill file with custom YAML options
+    // Use custom stringifier to avoid quotes around comma-separated values
+    const newContent = matter.stringify(injectedBody, corrected, {
+      engines: {
+        yaml: {
+          stringify: (data) => {
+            // Custom YAML serialization to avoid quoting comma-separated strings
+            const lines = [];
+            for (const [key, value] of Object.entries(data)) {
+              if (typeof value === 'string') {
+                // Don't quote strings - write them directly
+                lines.push(`${key}: ${value}`);
+              } else if (Array.isArray(value)) {
+                lines.push(`${key}:`);
+                value.forEach(item => {
+                  lines.push(`  - ${item}`);
+                });
+              } else if (typeof value === 'object' && value !== null) {
+                lines.push(`${key}:`);
+                for (const [subkey, subval] of Object.entries(value)) {
+                  lines.push(`  ${subkey}: ${subval}`);
+                }
+              } else {
+                lines.push(`${key}: ${value}`);
+              }
+            }
+            return lines.join('\n');
+          }
+        }
+      }
+    });
     await fs.writeFile(targetPath, newContent, 'utf-8');
     
     // Write version.json (metadata only - no arguments field)

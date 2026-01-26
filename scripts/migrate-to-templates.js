@@ -73,13 +73,29 @@ async function main() {
   
   await fs.copy(sourceSharedDir, targetSharedDir);
   
-  // Inject template variables into manifest template
-  const manifestPath = path.join(targetSharedDir, '.gsd-install-manifest.json');
-  if (await fs.pathExists(manifestPath)) {
-    let manifestContent = await fs.readFile(manifestPath, 'utf-8');
-    manifestContent = injectTemplateVariables(manifestContent);
-    await fs.writeFile(manifestPath, manifestContent, 'utf-8');
-  }
+  // Inject template variables into all markdown and JSON files in shared directory
+  const processFile = async (filePath) => {
+    const ext = path.extname(filePath);
+    if (ext === '.md' || ext === '.json') {
+      let content = await fs.readFile(filePath, 'utf-8');
+      content = injectTemplateVariables(content);
+      await fs.writeFile(filePath, content, 'utf-8');
+    }
+  };
+  
+  const walkDir = async (dir) => {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walkDir(fullPath);
+      } else {
+        await processFile(fullPath);
+      }
+    }
+  };
+  
+  await walkDir(targetSharedDir);
   
   console.log(chalk.green(`✓ Shared directory copied to templates/get-shit-done/`));
   

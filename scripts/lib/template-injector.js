@@ -11,10 +11,29 @@
 export function injectTemplateVariables(content) {
   let result = content;
   
-  // Replace platform roots
-  result = result.replace(/\.github\//g, '{{PLATFORM_ROOT}}');
-  result = result.replace(/\.claude\//g, '{{PLATFORM_ROOT}}');
-  result = result.replace(/\.codex\//g, '{{PLATFORM_ROOT}}');
+  // Replace platform roots - order matters! Do backtick-wrapped versions first
+  // These handle paths like `~/.claude/get-shit-done/...`
+  result = result.replace(/`~\/\.github\/get-shit-done\//g, '`{{PLATFORM_ROOT}}/get-shit-done/');
+  result = result.replace(/`~\/\.claude\/get-shit-done\//g, '`{{PLATFORM_ROOT}}/get-shit-done/');
+  result = result.replace(/`~\/\.codex\/get-shit-done\//g, '`{{PLATFORM_ROOT}}/get-shit-done/');
+  
+  // Replace remaining home directory variations
+  result = result.replace(/~\/\.github\/get-shit-done\//g, '{{PLATFORM_ROOT}}/get-shit-done/');
+  result = result.replace(/~\/\.claude\/get-shit-done\//g, '{{PLATFORM_ROOT}}/get-shit-done/');
+  result = result.replace(/~\/\.codex\/get-shit-done\//g, '{{PLATFORM_ROOT}}/get-shit-done/');
+  
+  // Replace generic platform root paths (shorter patterns for other references)
+  result = result.replace(/~\/\.github\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/~\/\.claude\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/~\/\.codex\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\.github\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\.claude\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\.codex\//g, '{{PLATFORM_ROOT}}/');
+  
+  // Replace @workspace prefix
+  result = result.replace(/@workspace\/\.github\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/@workspace\/\.claude\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/@workspace\/\.codex\//g, '{{PLATFORM_ROOT}}/');
   
   // Replace command prefixes
   result = result.replace(/\/gsd-/g, '{{COMMAND_PREFIX}}');

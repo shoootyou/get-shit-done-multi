@@ -71,6 +71,9 @@ export async function correctAgentFrontmatter(data, content, skillsDir) {
   }
   
   // Auto-generate skills field by scanning content
+  // NOTE: skills field is Claude-specific. During installation, platform-specific
+  // installers will filter fields based on what each platform supports.
+  // For now, we include it in templates and let installers handle platform differences.
   const skillRefs = await scanForSkillReferences(content, skillsDir);
   if (skillRefs.length > 0) {
     corrected.skills = skillRefs;
@@ -105,8 +108,47 @@ export async function migrateAgent(sourcePath, targetDir, skillsDir, validator) 
       validator.addIssues(targetPath, validationErrors);
     }
     
-    // Write corrected agent file
-    const newContent = matter.stringify(injectedBody, corrected);
+    // Write corrected agent file with custom YAML options
+    // Use custom stringifier to avoid quotes and handle multi-line descriptions
+    const newContent = matter.stringify(injectedBody, corrected, {
+      engines: {
+        yaml: {
+          stringify: (data) => {
+            // Custom YAML serialization
+            const lines = [];
+            for (const [key, value] of Object.entries(data)) {
+              if (key === 'description' && typeof value === 'string') {
+                // Description must be single line
+                const singleLine = value.replace(/\s+/g, ' ').trim();
+                lines.push(`${key}: ${singleLine}`);
+              } else if (key === 'skills' && Array.isArray(value)) {
+                // Skills field - array format
+                lines.push(`${key}:`);
+                value.forEach(item => {
+                  lines.push(`  - ${item}`);
+                });
+              } else if (typeof value === 'string') {
+                // Don't quote strings - write them directly
+                lines.push(`${key}: ${value}`);
+              } else if (Array.isArray(value)) {
+                lines.push(`${key}:`);
+                value.forEach(item => {
+                  lines.push(`  - ${item}`);
+                });
+              } else if (typeof value === 'object' && value !== null) {
+                lines.push(`${key}:`);
+                for (const [subkey, subval] of Object.entries(value)) {
+                  lines.push(`  ${subkey}: ${subval}`);
+                }
+              } else {
+                lines.push(`${key}: ${value}`);
+              }
+            }
+            return lines.join('\n');
+          }
+        }
+      }
+    });
     await fs.writeFile(targetPath, newContent, 'utf-8');
     
     return {
