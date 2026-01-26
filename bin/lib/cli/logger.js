@@ -78,8 +78,8 @@ export function verboseComplete(isVerbose) {
  */
 export function header(title) {
   console.log();
-  console.log(chalk.bold.cyan(title));
-  console.log(chalk.cyan('─'.repeat(title.length)));
+  console.log(' ' + chalk.bold.cyan(title));
+  console.log(' ' + chalk.cyan('─'.repeat(title.length)));
 }
 
 /**
@@ -95,7 +95,6 @@ export function banner() {
   console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝'));
   console.log();
   console.log(chalk.bold.white('  Get Shit Done (Multi-Platform) v2.0.0'));
-  console.log();
   console.log(chalk.gray('  Multi-platform meta-prompting, context engineering and spec-driven development system.'));
   console.log(chalk.gray('   * Forked from TÂCHES: glittercowboy/get-shit-done (Claude Code only)'));
   console.log(chalk.gray('   * Extended for Claude Code, GitHub Copilot CLI, and Codex CLI'));
