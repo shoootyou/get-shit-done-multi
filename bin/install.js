@@ -7,38 +7,71 @@
 
 import { Command } from 'commander';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
+import { readFileSync } from 'fs';
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
 import { install } from './lib/installer/orchestrator.js';
+import { adapterRegistry } from './lib/platforms/registry.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Read package.json for version
+const pkg = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
 
 async function main() {
   const program = new Command();
   
   program
     .name('get-shit-done-multi')
-    .version('2.0.0')
-    .description('Install get-shit-done skills and agents to AI coding assistants')
-    .requiredOption('--claude', 'Install for Claude Code')
-    .option('--global', 'Install globally to ~/.claude/ (default: local)')
-    .option('--local', 'Install locally to .claude/ (explicit)')
-    .option('--verbose', 'Show detailed file-by-file progress')
-    .parse(process.argv);
-
+    .version(pkg.version)
+    .description('Install get-shit-done skills and agents to AI coding assistants');
+  
+  // Platform flags
+  program
+    .option('--claude', 'Install to Claude Code')
+    .option('--copilot', 'Install to GitHub Copilot CLI')
+    .option('--codex', 'Install to Codex CLI');
+  
+  // Scope flags
+  program
+    .option('--global', 'Install globally (~/.claude/, ~/.copilot/, ~/.codex/)')
+    .option('--local', 'Install locally (.claude/, .github/, .codex/)');
+  
+  // Other flags
+  program
+    .option('-y, --yes', 'Skip confirmation prompts')
+    .option('--dry-run', 'Show what would be installed without writing files')
+    .option('-v, --verbose', 'Show detailed output');
+  
+  program.parse(process.argv);
   const options = program.opts();
   
-  // Validate flags
-  if (!options.claude) {
-    logger.error('Missing required flag: --claude');
-    logger.info('Usage: npx get-shit-done-multi --claude [--global|--local] [--verbose]');
-    process.exit(EXIT_CODES.INVALID_ARGS);
+  // Determine platforms to install
+  const platforms = [];
+  if (options.claude) platforms.push('claude');
+  if (options.copilot) platforms.push('copilot');
+  if (options.codex) platforms.push('codex');
+  
+  // If no platform flags, enter interactive mode (Phase 4)
+  if (platforms.length === 0) {
+    logger.info('No platform specified. Interactive mode coming in Phase 4.');
+    logger.info('Usage: npx get-shit-done-multi --claude --global');
+    process.exit(0);
   }
   
-  // Determine scope (default to local if neither specified)
+  // Validate platforms
+  const supported = adapterRegistry.getSupportedPlatforms();
+  for (const platform of platforms) {
+    if (!supported.includes(platform)) {
+      logger.error(`Unknown platform: ${platform}. Supported: ${supported.join(', ')}`);
+      process.exit(EXIT_CODES.INVALID_ARGS);
+    }
+  }
+  
+  // Determine scope (default: local)
   const isGlobal = options.global === true;
   const isLocal = options.local === true;
   
@@ -49,18 +82,22 @@ async function main() {
   
   // Show banner
   logger.banner();
-  logger.info(`Installing to Claude Code (${isGlobal ? 'global' : 'local'})`, 1);
   
-  // Run installation
-  const stats = await install({
-    platform: 'claude',
-    isGlobal,
-    isVerbose: options.verbose || false,
-    scriptDir: __dirname
-  });
+  // Install to each platform
+  for (const platform of platforms) {
+    logger.info(`Installing to ${platform} (${isGlobal ? 'global' : 'local'})...`, 1);
+    
+    const stats = await install({
+      platform,
+      isGlobal,
+      isVerbose: options.verbose || false,
+      scriptDir: __dirname
+    });
+    
+    logger.success(`✓ ${platform} installation complete`, 1);
+  }
   
-  // Show summary
-  logger.summary(stats, 'claude');
+  logger.success('All installations complete!');
 }
 
 // Execute with proper error handling
