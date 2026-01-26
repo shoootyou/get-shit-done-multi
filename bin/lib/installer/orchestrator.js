@@ -13,13 +13,18 @@ import { readdir, readFile } from 'fs/promises';
 /**
  * Main installation orchestrator
  * @param {Object} options - Installation options
+ * @param {string} options.platform - Platform name (claude/copilot/codex)
+ * @param {boolean} options.isGlobal - Global vs local installation
+ * @param {boolean} options.isVerbose - Verbose output
+ * @param {string} options.scriptDir - Script directory path
+ * @param {string} [options.targetDir] - Override target directory (for testing)
  * @returns {Promise<Object>} Installation statistics
  */
 export async function install(options) {
-  const { platform, isGlobal, isVerbose, scriptDir } = options;
+  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride } = options;
   
-  // Resolve paths
-  const targetDir = resolveTargetDirectory(isGlobal, platform);
+  // Resolve paths (allow override for testing)
+  const targetDir = targetDirOverride || resolveTargetDirectory(isGlobal, platform);
   const templatesDir = getTemplatesDirectory(scriptDir);
   
   logger.info(`Target directory: ${targetDir}`, 1);
