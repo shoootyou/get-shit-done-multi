@@ -14,8 +14,8 @@ export async function detectInstallation(platform, scope) {
   }
   
   const basePath = scope === 'global' 
-    ? normalizeHomePath('~/.claude/skills/')
-    : './.claude/skills/';
+    ? normalizeHomePath('~/.claude/skills/gsd/')
+    : './.claude/skills/gsd/';
   
   if (!existsSync(basePath)) {
     return { exists: false, path: basePath, skillCount: 0 };
