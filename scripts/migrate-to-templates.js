@@ -9,6 +9,7 @@ import { Validator } from './lib/validator.js';
 import { injectTemplateVariables } from './lib/template-injector.js';
 import { migrateAllSkills } from './lib/skill-migrator.js';
 import { migrateAllAgents } from './lib/agent-migrator.js';
+import { generateSummary, interactiveReview, requestApproval } from './lib/interactive-review.js';
 
 async function main() {
   console.log(chalk.blue.bold('🔄 Phase 1: ONE-TIME Template Migration\n'));
@@ -82,17 +83,84 @@ async function main() {
   
   console.log(chalk.green(`✓ Shared directory copied to templates/get-shit-done/`));
   
-  // TODO: Validation and manual review (Plan 04)
+  // Generate migration summary
+  console.log(generateSummary(skillsResult, agentsResult));
   
   // Show validation report
   console.log('\n' + validator.generateReport());
   
+  // Block if errors exist
   if (validator.hasErrors()) {
     console.log(chalk.red('\n❌ Migration blocked - fix errors and retry'));
+    
+    // Clean up templates/ directory
+    const templatesDir = path.join(process.cwd(), 'templates');
+    await fs.remove(templatesDir);
+    console.log(chalk.yellow('⚠ Cleaned up templates/ directory'));
+    
     process.exit(1);
   }
   
-  console.log(chalk.green('\n✓ Migration foundation ready'));
+  // Save migration report to phase directory
+  const reportPath = path.join(
+    process.cwd(), 
+    '.planning/phases/01-template-migration/01-MIGRATION-REPORT.md'
+  );
+  
+  const reportContent = `# Phase 1 Migration Report
+
+**Generated:** ${new Date().toISOString()}
+**Status:** ${validator.hasErrors() ? 'Failed' : 'Success'}
+
+${generateSummary(skillsResult, agentsResult)}
+
+## Validation Results
+
+${validator.generateReport()}
+
+## Files Created
+
+### Skills (${skillsResult.total})
+${skillsResult.results.map(r => `- ${r.skillName} → ${r.file}`).join('\n')}
+
+### Agents (${agentsResult.total})
+${agentsResult.results.map(r => `- ${r.agentName} → ${r.file}`).join('\n')}
+
+### Shared Directory
+- templates/get-shit-done/
+
+## Next Steps
+
+After approval:
+1. Commit migration code to git
+2. Delete migration code from working tree
+3. Begin Phase 2 (installation foundation)
+`;
+  
+  await fs.writeFile(reportPath, reportContent, 'utf-8');
+  console.log(chalk.green(`\n✓ Migration report saved: ${reportPath}`));
+  
+  // Interactive review
+  const templatesDir = path.join(process.cwd(), 'templates');
+  await interactiveReview(templatesDir);
+  
+  // Request approval
+  const approved = await requestApproval();
+  
+  if (!approved) {
+    // Clean up templates/
+    await fs.remove(templatesDir);
+    process.exit(0);
+  }
+  
+  console.log(chalk.green('\n✅ Phase 1 migration complete!'));
+  console.log(chalk.cyan('\nNext steps:'));
+  console.log(chalk.gray('  1. Run: git add scripts/ templates/ .planning/'));
+  console.log(chalk.gray('  2. Run: git commit -m "feat(phase-1): complete template migration"'));
+  console.log(chalk.gray('  3. Run: rm -rf scripts/migrate-to-templates.js scripts/lib/'));
+  console.log(chalk.gray('  4. Run: git add -A && git commit -m "chore: remove migration code"'));
+  console.log(chalk.gray('  5. Begin Phase 2 planning\n'));
+
 }
 
 main().catch(err => {
