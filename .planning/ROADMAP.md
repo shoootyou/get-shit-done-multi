@@ -194,6 +194,10 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Plans:** 3 plans
 
+**Completed:** 2026-01-26
+
+**Verification:** 23/23 must-haves verified (100%) — PASSED
+
 **Requirements Mapped:**
 - PLATFORM-01: Platform detection (GSD-specific paths)
 - PLATFORM-01B: Binary detection for recommendations
@@ -231,9 +235,9 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Updated rendering to use adapters for transformations
 
 **Plans:**
-- [ ] 03-01-PLAN.md — Platform Foundation (Wave 1)
-- [ ] 03-02-PLAN.md — Concrete Adapters (Wave 2)
-- [ ] 03-03-PLAN.md — Orchestrator Integration and CLI (Wave 3)
+- [x] 03-01-PLAN.md — Platform Foundation (Wave 1)
+- [x] 03-02-PLAN.md — Concrete Adapters (Wave 2)
+- [x] 03-03-PLAN.md — Orchestrator Integration and CLI (Wave 3)
 
 **Notes:**
 - This validates the adapter pattern with all three platforms
