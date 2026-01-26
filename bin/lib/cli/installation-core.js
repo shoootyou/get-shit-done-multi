@@ -113,7 +113,7 @@ export async function installPlatforms(platforms, scope, options = {}) {
   // Show next steps
   logger.header('Next Steps');
   const successPlatforms = successes.map(s => s.platform);
-  showNextSteps(successPlatforms);
+  showNextSteps(successPlatforms, 1);
   
   return {
     successes,
