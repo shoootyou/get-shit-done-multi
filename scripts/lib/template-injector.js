@@ -35,6 +35,12 @@ export function injectTemplateVariables(content) {
   result = result.replace(/@workspace\/\.claude\//g, '{{PLATFORM_ROOT}}/');
   result = result.replace(/@workspace\/\.codex\//g, '{{PLATFORM_ROOT}}/');
   
+  // Replace /workspace/ prefix (treats /workspace/ as {{PLATFORM_ROOT}})
+  result = result.replace(/\/workspace\/\.github\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\/workspace\/\.claude\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\/workspace\/\.codex\//g, '{{PLATFORM_ROOT}}/');
+  result = result.replace(/\/workspace\/{{PLATFORM_ROOT}}\//g, '{{PLATFORM_ROOT}}/');
+  
   // Replace command prefixes
   result = result.replace(/\/gsd-/g, '{{COMMAND_PREFIX}}');
   result = result.replace(/\$gsd-/g, '{{COMMAND_PREFIX}}');

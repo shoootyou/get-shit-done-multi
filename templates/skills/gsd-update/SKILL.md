@@ -13,8 +13,8 @@ Output: Version comparison, changelog, and updated installation.
 </objective>
 
 <execution_context>
-@/workspace/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/VERSION
-@/workspace/{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/CHANGELOG.md
+@{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/VERSION
+@{{PLATFORM_ROOT}}/copilot/skills/get-shit-done/CHANGELOG.md
 </execution_context>
 
 <process>
