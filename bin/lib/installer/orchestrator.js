@@ -20,11 +20,10 @@ import { readdir, readFile } from 'fs/promises';
  * @param {boolean} options.isVerbose - Verbose output
  * @param {string} options.scriptDir - Script directory path
  * @param {string} [options.targetDir] - Override target directory (for testing)
- * @param {boolean} [options.hideInfo] - Hide info logs (target dir, templates source, command prefix)
  * @returns {Promise<Object>} Installation statistics
  */
 export async function install(options) {
-  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride, hideInfo = false } = options;
+  const { platform, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride } = options;
   
   // Get platform adapter
   const adapter = adapterRegistry.get(platform);
@@ -48,11 +47,10 @@ export async function install(options) {
     PLATFORM_NAME: platform
   };
   
-  if (!hideInfo) {
-    logger.info(`Target directory: ${targetDir}`, 1);
-    logger.info(`Templates source: ${templatesDir}`, 1);
-    logger.info(`Command prefix: ${commandPrefix}`, 1);
-  }
+  // Always show these informational lines - they provide useful context
+  logger.info(`Target directory: ${targetDir}`, 1);
+  logger.info(`Templates source: ${templatesDir}`, 1);
+  logger.info(`Command prefix: ${commandPrefix}`, 1);
   
   // Validate templates exist
   await validateTemplates(templatesDir);

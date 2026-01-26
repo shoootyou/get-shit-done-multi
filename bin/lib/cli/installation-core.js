@@ -73,8 +73,7 @@ export async function installPlatforms(platforms, scope, options = {}) {
         isGlobal,
         isVerbose: verbose,
         scriptDir,
-        multiBar,
-        hideInfo: useProgressBars // Hide info logs when using progress bars
+        multiBar
       });
       
       successes.push({ platform, platformLabel, stats });
