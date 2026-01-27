@@ -53,6 +53,11 @@ export async function findInstallations(scope, customPaths = [], verbose = false
 function getManifestPaths(scope) {
   const homeDir = os.homedir();
   
+  // If no scope is provided (for custom-path-only mode), return empty array
+  if (!scope) {
+    return [];
+  }
+  
   if (scope === 'global') {
     return [
       path.join(homeDir, '.claude', 'get-shit-done', MANIFEST_FILE),
