@@ -504,7 +504,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 pending todo:
+- **Centralize manifest error reasons** (versioning) - Magic strings for error reasons like 'corrupt', 'not_found' repeated across files - add MANIFEST_ERRORS to schema.js
 
 ### Blockers
 None
