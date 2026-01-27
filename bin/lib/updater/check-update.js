@@ -2,9 +2,9 @@ const { readManifestWithRepair } = await import('../version/manifest-reader.js')
 const { compareVersions } = await import('../version/version-checker.js');
 const { banner } = await import('../cli/banner-manager.js');
 const { platformDirs, getManifestPath } = await import('../platforms/platform-paths.js');
+const { showNoInstallationMessage } = await import('./update-messages.js');
 import * as logger from '../cli/logger.js';
 import fs from 'fs-extra';
-import { showNextSteps } from '../cli/next-steps.js';
 
 /**
  * Handle --check-updates flag
@@ -58,7 +58,7 @@ async function checkCustomPath(customPath, currentVersion, verbose) {
         }
 
         console.log('')
-        showNextSteps(['claude', 'copilot', 'codex']);
+        showNoInstallationMessage(['claude', 'copilot', 'codex']);
         return;
     }
 
