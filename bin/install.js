@@ -48,21 +48,21 @@ async function main() {
   // Scope flags
   program
     .option('--global', 'Install globally (~/.claude/, ~/.copilot/, ~/.codex/)')
-    .option('--local', 'Install locally (.claude/, .github/, .codex/)');
+    .option('--local', 'Install locally (.claude/, .github/, .codex/)')
+    .option('--custom-path <path>', 'Additional path for installations');
 
   // Other flags
   program
     .option('-y, --yes', 'Skip confirmation prompts')
     .option('--dry-run', 'Show what would be installed without writing files')
     .option('-v, --verbose', 'Show detailed output')
-    .option('--check-updates', 'Check for updates without installing')
-    .option('--custom-path <path>', 'Additional search path for installations');
+    .option('--check-updates', 'Check for updates without installing');
 
   program.parse(process.argv);
   const options = program.opts();
 
   // Validate --custom-path usage
-  const customPathArgs = process.argv.filter(arg => 
+  const customPathArgs = process.argv.filter(arg =>
     arg.startsWith('--custom-path')
   );
 
