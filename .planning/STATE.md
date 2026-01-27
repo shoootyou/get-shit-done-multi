@@ -440,7 +440,7 @@ Overall Progress:
 - [ ] Phase 5 Plan 02: Manifest Generation (pending)
 
 ### Pending Todos
-1. [Replace multibar progress bars with checkmark completion lines](.planning/todos/pending/2026-01-27-replace-multibar-with-checkmark-lines.md) — Area: tooling
+None
 
 ### Blockers
 None
