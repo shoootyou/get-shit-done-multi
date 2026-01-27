@@ -8,7 +8,6 @@ import { homedir } from 'os';
 import { ensureDirectory, pathExists } from '../io/file-operations.js';
 import { insufficientSpace, permissionDenied } from '../errors/install-error.js';
 import { invalidPath } from '../errors/install-error.js';
-import * as logger from '../cli/logger.js';
 
 const statfsPromise = promisify(statfs);
 
@@ -19,9 +18,11 @@ const statfsPromise = promisify(statfs);
  * @param {boolean} isGlobal - Global vs local installation
  * @param {string} platform - Platform name
  * @throws {InstallError} If any validation fails
- * @returns {Promise<Object>} Validation results with existing installation info
+ * @returns {Promise<Object>} Validation results with existing installation info and warnings
  */
 export async function runPreInstallationChecks(targetDir, templatesDir, isGlobal, platform) {
+  const warnings = [];
+  
   // 1. Validate paths (security check)
   await validatePaths(targetDir, isGlobal);
   
@@ -29,7 +30,8 @@ export async function runPreInstallationChecks(targetDir, templatesDir, isGlobal
   const templateSize = await calculateDirectorySize(templatesDir);
   
   // 3. Check disk space (with 10% buffer)
-  await checkDiskSpace(targetDir, templateSize);
+  const diskSpaceWarning = await checkDiskSpace(targetDir, templateSize);
+  if (diskSpaceWarning) warnings.push(diskSpaceWarning);
   
   // 4. Check write permissions (actual write test)
   await checkWritePermissions(targetDir);
@@ -37,11 +39,12 @@ export async function runPreInstallationChecks(targetDir, templatesDir, isGlobal
   // 5. Detect existing installation (info only, doesn't fail)
   const existingInstall = await detectExistingInstallation(targetDir);
   
-  return { existingInstall, templateSize };
+  return { existingInstall, templateSize, warnings };
 }
 
 /**
  * Check available disk space with 10% buffer
+ * @returns {string|null} Warning message if check failed, null otherwise
  */
 export async function checkDiskSpace(targetDir, requiredBytes) {
   try {
@@ -63,11 +66,13 @@ export async function checkDiskSpace(targetDir, requiredBytes) {
         }
       );
     }
+    
+    return null; // No warning - check passed
   } catch (error) {
     if (error.name === 'InstallError') throw error;
     
-    // If statfs not available (Node < 19), log warning and continue
-    logger.warn('Could not check disk space (requires Node.js 19+)', 2);
+    // If statfs not available (Node < 19), return warning message
+    return 'Could not check disk space (requires Node.js 19+)';
   }
 }
 

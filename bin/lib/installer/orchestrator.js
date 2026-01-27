@@ -61,22 +61,32 @@ export async function install(appVersion, options) {
   );
 
   // Use validation results to enhance existing installation detection
-  const { existingInstall } = validationResults;
+  const { existingInstall, warnings } = validationResults;
 
   // Validate templates exist
   await validateTemplates(templatesDir);
 
-  // Check for existing installation (validation already detected it)
+  // Collect all warnings for display
+  const allWarnings = [...warnings];
+  
+  // Add existing installation warnings
   if (existingInstall) {
+    allWarnings.push(`Existing installation detected (v${existingInstall.version})`);
+    allWarnings.push('Installation will overwrite existing files');
+  }
+
+  // Display warnings in a single block
+  if (allWarnings.length > 0) {
     if (!isVerbose) {
-      logger.warn(`Existing installation detected (v${existingInstall.version})`, 2);
-      logger.warn('Installation will overwrite existing files', 2);
+      // Non-verbose: simple list with ⚠ symbol
+      allWarnings.forEach(warning => logger.warn(warning, 2));
     } else {
+      // Verbose: subtitle + list items
       logger.warnSubtitle('Warnings');
-      logger.listItem(`Existing installation detected (v${existingInstall.version})`, 2);
-      logger.listItem('Installation will overwrite existing files', 2);
+      allWarnings.forEach(warning => logger.listItem(warning, 2));
     }
   } else if (isVerbose) {
+    // Only show "no warnings" in verbose mode
     logger.infoSubtitle('Info');
     logger.listItem('No existing installation found', 2);
   }
