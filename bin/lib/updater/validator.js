@@ -1,4 +1,5 @@
-import { readManifestWithRepair } from '../version/manifest-reader.js';
+import { readManifest } from '../manifests/reader.js';
+import { repairManifest } from '../manifests/repair.js';
 import * as logger from '../cli/logger.js';
 import { compareVersions } from '../version/version-checker.js';
 
@@ -10,7 +11,15 @@ import { compareVersions } from '../version/version-checker.js';
  * @returns {Promise<Object>} Validation result
  */
 export async function validateInstallation(manifestPath, currentVersion, verbose) {
-    const manifestResult = await readManifestWithRepair(manifestPath, verbose);
+    let manifestResult = await readManifest(manifestPath);
+    
+    // If corrupt, try to repair
+    if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+        if (verbose) {
+            logger.verbose(`  Manifest corrupt, attempting repair...`, true);
+        }
+        manifestResult = await repairManifest(manifestPath);
+    }
 
     if (!manifestResult.success) {
         return {

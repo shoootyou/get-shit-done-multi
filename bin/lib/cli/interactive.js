@@ -6,7 +6,8 @@ import * as logger from './logger.js';
 import { platformNames } from '../platforms/platform-names.js';
 import { executeInstallationLoop } from './install-loop.js';
 import { findInstallations } from '../version/installation-finder.js';
-import { readManifestWithRepair } from '../version/manifest-reader.js';
+import { readManifest } from '../manifests/reader.js';
+import { repairManifest } from '../manifests/repair.js';
 import { compareVersions, formatPlatformOption } from '../version/version-checker.js';
 
 /**
@@ -97,7 +98,12 @@ async function discoverInstallationsWithStatus(scope, currentVersion, customPath
   
   await Promise.all(
     found.map(async (install) => {
-      const manifestResult = await readManifestWithRepair(install.path);
+      let manifestResult = await readManifest(install.path);
+      
+      // If corrupt, try to repair
+      if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+        manifestResult = await repairManifest(install.path);
+      }
       
       if (!manifestResult.success) {
         statusMap.set(install.platform, { 

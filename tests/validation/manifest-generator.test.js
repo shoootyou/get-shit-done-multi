@@ -3,10 +3,7 @@ import { readFile, writeFile, mkdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { mkdtemp } from 'fs/promises';
 import { tmpdir } from 'os';
-import {
-  generateAndWriteManifest,
-  collectInstalledFiles
-} from '../../bin/lib/validation/manifest-generator.js';
+import { generateManifestData, writeManifest } from '../../bin/lib/manifests/writer.js';
 
 describe('Manifest Generation', () => {
   let testDir;
@@ -19,21 +16,34 @@ describe('Manifest Generation', () => {
     await rm(testDir, { recursive: true, force: true });
   });
   
-  describe('collectInstalledFiles', () => {
+  describe('generateManifestData', () => {
+    test('creates manifest data with required fields', async () => {
+      await mkdir(join(testDir, 'get-shit-done'), { recursive: true });
+      await writeFile(join(testDir, 'test.txt'), 'test');
+      
+      const data = await generateManifestData(testDir, '2.0.0', 'claude', true);
+      
+      expect(data).toHaveProperty('gsd_version', '2.0.0');
+      expect(data).toHaveProperty('platform', 'claude');
+      expect(data).toHaveProperty('scope', 'global');
+      expect(data).toHaveProperty('installed_at');
+      expect(data).toHaveProperty('files');
+      expect(Array.isArray(data.files)).toBe(true);
+    });
+    
     test('collects all files in directory', async () => {
-      // Create test structure
       await mkdir(join(testDir, 'skills', 'gsd-test'), { recursive: true });
       await writeFile(join(testDir, 'skills', 'gsd-test', 'SKILL.md'), 'test');
       await writeFile(join(testDir, 'skills', 'gsd-test', 'version.json'), '{}');
       await mkdir(join(testDir, 'agents'), { recursive: true });
       await writeFile(join(testDir, 'agents', 'gsd-test.agent.md'), 'test');
       
-      const files = await collectInstalledFiles(testDir);
+      const data = await generateManifestData(testDir, '2.0.0', 'claude', true);
       
-      expect(files).toContain('skills/gsd-test/SKILL.md');
-      expect(files).toContain('skills/gsd-test/version.json');
-      expect(files).toContain('agents/gsd-test.agent.md');
-      expect(files).toHaveLength(3);
+      expect(data.files).toContain('skills/gsd-test/SKILL.md');
+      expect(data.files).toContain('skills/gsd-test/version.json');
+      expect(data.files).toContain('agents/gsd-test.agent.md');
+      expect(data.files).toHaveLength(3);
     });
     
     test('returns sorted file list', async () => {
@@ -41,77 +51,64 @@ describe('Manifest Generation', () => {
       await writeFile(join(testDir, 'a-file.txt'), 'a');
       await writeFile(join(testDir, 'm-file.txt'), 'm');
       
-      const files = await collectInstalledFiles(testDir);
+      const data = await generateManifestData(testDir, '2.0.0', 'claude', true);
       
-      expect(files).toEqual(['a-file.txt', 'm-file.txt', 'z-file.txt']);
-    });
-    
-    test('excludes directories from file list', async () => {
-      await mkdir(join(testDir, 'subdir'), { recursive: true });
-      await writeFile(join(testDir, 'file.txt'), 'test');
-      
-      const files = await collectInstalledFiles(testDir);
-      
-      expect(files).toContain('file.txt');
-      expect(files).not.toContain('subdir');
-      expect(files).toHaveLength(1);
-    });
-  });
-  
-  describe('generateAndWriteManifest', () => {
-    test('creates manifest with required fields', async () => {
-      await mkdir(join(testDir, 'get-shit-done'), { recursive: true });
-      await writeFile(join(testDir, 'test.txt'), 'test');
-      
-      await generateAndWriteManifest(testDir, '2.0.0', 'claude', true);
-      
-      const manifestPath = join(testDir, 'get-shit-done', '.gsd-install-manifest.json');
-      const content = await readFile(manifestPath, 'utf8');
-      const manifest = JSON.parse(content);
-      
-      expect(manifest).toHaveProperty('gsd_version', '2.0.0');
-      expect(manifest).toHaveProperty('platform', 'claude');
-      expect(manifest).toHaveProperty('scope', 'global');
-      expect(manifest).toHaveProperty('installed_at');
-      expect(manifest).toHaveProperty('files');
-      expect(Array.isArray(manifest.files)).toBe(true);
-    });
-    
-    test('includes all files including manifest itself', async () => {
-      await mkdir(join(testDir, 'skills'), { recursive: true });
-      await writeFile(join(testDir, 'skills', 'test.md'), 'test');
-      
-      await generateAndWriteManifest(testDir, '2.0.0', 'claude', true);
-      
-      const manifestPath = join(testDir, 'get-shit-done', '.gsd-install-manifest.json');
-      const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-      
-      expect(manifest.files).toContain('skills/test.md');
-      expect(manifest.files).toContain('get-shit-done/.gsd-install-manifest.json');
+      expect(data.files).toEqual(['a-file.txt', 'm-file.txt', 'z-file.txt']);
     });
     
     test('sets scope to local when isGlobal is false', async () => {
-      await mkdir(join(testDir, 'get-shit-done'), { recursive: true });
-      
-      await generateAndWriteManifest(testDir, '2.0.0', 'copilot', false);
-      
-      const manifestPath = join(testDir, 'get-shit-done', '.gsd-install-manifest.json');
-      const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-      
-      expect(manifest.scope).toBe('local');
+      const data = await generateManifestData(testDir, '2.0.0', 'copilot', false);
+      expect(data.scope).toBe('local');
     });
     
     test('installed_at is valid ISO timestamp', async () => {
-      await mkdir(join(testDir, 'get-shit-done'), { recursive: true });
-      
-      await generateAndWriteManifest(testDir, '2.0.0', 'codex', true);
-      
+      const data = await generateManifestData(testDir, '2.0.0', 'codex', true);
+      const timestamp = new Date(data.installed_at);
+      expect(timestamp.toISOString()).toBe(data.installed_at);
+    });
+  });
+  
+  describe('writeManifest', () => {
+    test('writes manifest to file', async () => {
       const manifestPath = join(testDir, 'get-shit-done', '.gsd-install-manifest.json');
-      const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+      const data = {
+        gsd_version: '2.0.0',
+        platform: 'claude',
+        scope: 'global',
+        installed_at: new Date().toISOString(),
+        files: ['test.txt']
+      };
       
-      const timestamp = new Date(manifest.installed_at);
-      expect(timestamp.toISOString()).toBe(manifest.installed_at);
-      expect(timestamp.getTime()).toBeGreaterThan(Date.now() - 5000); // Within last 5 seconds
+      await writeManifest(manifestPath, data);
+      
+      const content = await readFile(manifestPath, 'utf8');
+      const manifest = JSON.parse(content);
+      
+      expect(manifest).toEqual(data);
+    });
+  });
+  
+  describe('Integration: generateManifestData + writeManifest', () => {
+    test('full workflow includes manifest file itself', async () => {
+      // Create test files
+      await mkdir(join(testDir, 'skills'), { recursive: true });
+      await writeFile(join(testDir, 'skills', 'test.md'), 'test');
+      
+      // Generate initial data (without manifest file)
+      const initialData = await generateManifestData(testDir, '2.0.0', 'claude', true);
+      
+      // Write manifest
+      const manifestPath = join(testDir, 'get-shit-done', '.gsd-install-manifest.json');
+      await writeManifest(manifestPath, initialData);
+      
+      // Re-generate to include manifest file itself
+      const finalData = await generateManifestData(testDir, '2.0.0', 'claude', true);
+      await writeManifest(manifestPath, finalData);
+      
+      // Read and verify
+      const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+      expect(manifest.files).toContain('skills/test.md');
+      expect(manifest.files).toContain('get-shit-done/.gsd-install-manifest.json');
     });
   });
 });

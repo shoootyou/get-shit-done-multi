@@ -2,55 +2,17 @@ import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
 
-export async function readManifestWithRepair(manifestPath) {
-  // Try normal read first
+/**
+ * Attempt to repair a corrupt or missing manifest
+ * Reconstructs manifest from directory structure
+ * 
+ * @param {string} manifestPath - Path to manifest file
+ * @returns {Promise<{success: boolean, manifest?: object, repaired?: boolean, reason?: string, error?: string}>}
+ */
+export async function repairManifest(manifestPath) {
   try {
-    if (!await fs.pathExists(manifestPath)) {
-      return { success: false, reason: 'not_found', manifest: null };
-    }
+    console.warn(`⚠️  Attempting to repair manifest: ${manifestPath}`);
     
-    const content = await fs.readFile(manifestPath, 'utf8');
-    const manifest = JSON.parse(content);
-    
-    // Validate required fields
-    const requiredFields = ['gsd_version', 'platform', 'scope', 'installed_at'];
-    const missingFields = requiredFields.filter(field => !manifest[field]);
-    
-    if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
-    
-    return { success: true, manifest };
-    
-  } catch (error) {
-    // Handle specific error types
-    if (error.code === 'EACCES') {
-      return {
-        success: false,
-        reason: 'permission_denied',
-        error: error.message,
-        manifest: null
-      };
-    }
-    
-    if (error instanceof SyntaxError || error.message.includes('Missing required fields')) {
-      // Attempt repair
-      console.warn(`⚠️  Corrupt manifest detected: ${manifestPath}`);
-      console.warn('   Attempting automatic repair...');
-      return await attemptRepair(manifestPath);
-    }
-    
-    return {
-      success: false,
-      reason: 'unknown_error',
-      error: error.message,
-      manifest: null
-    };
-  }
-}
-
-async function attemptRepair(manifestPath) {
-  try {
     const installDir = path.dirname(manifestPath);
     
     // Scan directory to reconstruct file list
@@ -59,15 +21,18 @@ async function attemptRepair(manifestPath) {
       const entries = await fs.readdir(installDir, { recursive: true, withFileTypes: true });
       for (const entry of entries) {
         if (entry.isFile() && !entry.name.startsWith('.gsd-')) {
-          const relativePath = path.relative(installDir, path.join(entry.path || entry.parentPath, entry.name));
-          files.push({ path: relativePath });
+          const relativePath = path.relative(
+            installDir, 
+            path.join(entry.path || entry.parentPath, entry.name)
+          );
+          files.push(relativePath); // STRING ARRAY - fixed bug!
         }
       }
     } catch (error) {
       console.warn('   Could not scan directory:', error.message);
     }
     
-    // Use 'unknown' for version (per research decision: ignore corrupted data)
+    // Use 'unknown' for version (cannot reconstruct)
     const version = 'unknown';
     
     // Derive platform from directory structure
@@ -83,7 +48,7 @@ async function attemptRepair(manifestPath) {
       platform: platform,
       scope: scope,
       installed_at: new Date().toISOString(),
-      files: files.sort((a, b) => a.path.localeCompare(b.path)),
+      files: files.sort(), // Sorted string array
       _repaired: true,
       _repair_date: new Date().toISOString(),
       _repair_reason: 'corrupt_or_incomplete'
@@ -93,7 +58,12 @@ async function attemptRepair(manifestPath) {
     await fs.writeJson(manifestPath, repairedManifest, { spaces: 2 });
     console.log('   ✓ Manifest repaired successfully');
     
-    return { success: true, manifest: repairedManifest, repaired: true };
+    return { 
+      success: true, 
+      manifest: repairedManifest, 
+      repaired: true 
+    };
+    
   } catch (repairError) {
     return {
       success: false,
@@ -104,6 +74,12 @@ async function attemptRepair(manifestPath) {
   }
 }
 
+/**
+ * Derive platform name from installation path
+ * 
+ * @param {string} installDir - Installation directory path
+ * @returns {string} Platform name or 'unknown'
+ */
 function derivePlatformFromPath(installDir) {
   const parts = installDir.split(path.sep);
   const platformDirIndex = parts.findIndex(p => 

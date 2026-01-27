@@ -12,9 +12,10 @@ import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
 import { readdir, readFile } from 'fs/promises';
 import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
-import { generateAndWriteManifest } from '../validation/manifest-generator.js';
+import { generateManifestData, writeManifest } from '../manifests/writer.js';
 import { compareVersions } from '../version/version-checker.js';
-import { readManifestWithRepair } from '../version/manifest-reader.js';
+import { readManifest } from '../manifests/reader.js';
+import { repairManifest } from '../manifests/repair.js';
 import { confirm } from '@clack/prompts';
 
 /**
@@ -141,7 +142,9 @@ export async function install(appVersion, options) {
   }
 
   // Generate manifest after successful installation (Phase 5)
-  await generateAndWriteManifest(targetDir, appVersion, platform, isGlobal);
+  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
+  const manifestData = await generateManifestData(targetDir, appVersion, platform, isGlobal);
+  await writeManifest(manifestPath, manifestData);
 
   return stats;
 }
@@ -320,7 +323,12 @@ async function validateVersionBeforeInstall(platform, targetDir, currentVersion,
   const manifestPath = join(targetDir, '.gsd-install-manifest.json');
 
   // Try to read existing manifest
-  const manifestResult = await readManifestWithRepair(manifestPath);
+  let manifestResult = await readManifest(manifestPath);
+  
+  // If corrupt, try to repair
+  if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+    manifestResult = await repairManifest(manifestPath);
+  }
 
   if (!manifestResult.success) {
     // No existing installation or unreadable - proceed normally
