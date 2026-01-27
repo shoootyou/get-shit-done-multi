@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import { validateManifest } from './schema.js';
 
 /**
  * Read and validate manifest file
@@ -22,15 +23,14 @@ export async function readManifest(manifestPath) {
     const content = await fs.readFile(manifestPath, 'utf8');
     const manifest = JSON.parse(content);
     
-    // Validate required fields
-    const requiredFields = ['gsd_version', 'platform', 'scope', 'installed_at'];
-    const missingFields = requiredFields.filter(field => !manifest[field]);
+    // Validate using centralized schema
+    const validation = validateManifest(manifest);
     
-    if (missingFields.length > 0) {
+    if (!validation.valid) {
       return {
         success: false,
         reason: 'invalid_schema',
-        error: `Missing required fields: ${missingFields.join(', ')}`,
+        error: `Missing required fields: ${validation.missing.join(', ')}`,
         manifest: null
       };
     }

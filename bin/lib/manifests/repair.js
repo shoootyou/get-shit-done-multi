@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
+import { createManifest } from './schema.js';
 
 /**
  * Attempt to repair a corrupt or missing manifest
@@ -42,17 +43,19 @@ export async function repairManifest(manifestPath) {
     const homeDir = os.homedir();
     const scope = installDir.includes(homeDir) ? 'global' : 'local';
     
-    // Reconstruct manifest
-    const repairedManifest = {
+    // Reconstruct manifest using centralized schema
+    const repairedManifest = createManifest({
       gsd_version: version,
       platform: platform,
       scope: scope,
-      installed_at: new Date().toISOString(),
-      files: files.sort(), // Sorted string array
-      _repaired: true,
-      _repair_date: new Date().toISOString(),
-      _repair_reason: 'corrupt_or_incomplete'
-    };
+      files: files.sort()
+      // installed_at will be auto-filled by createManifest()
+    });
+    
+    // Add repair metadata
+    repairedManifest._repaired = true;
+    repairedManifest._repair_date = new Date().toISOString();
+    repairedManifest._repair_reason = 'corrupt_or_incomplete';
     
     // Write repaired manifest
     await fs.writeJson(manifestPath, repairedManifest, { spaces: 2 });

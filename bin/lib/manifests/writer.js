@@ -1,6 +1,7 @@
 import { readdir, writeFile } from 'fs/promises';
 import { join, relative } from 'path';
 import { ensureDirectory } from '../io/file-operations.js';
+import { createManifest } from './schema.js';
 
 /**
  * Generate manifest data structure from installation directory
@@ -17,14 +18,14 @@ export async function generateManifestData(targetDir, gsdVersion, platform, isGl
   // Collect all installed files
   const files = await collectInstalledFiles(targetDir);
   
-  // Build manifest object
-  return {
+  // Build manifest using centralized schema
+  return createManifest({
     gsd_version: gsdVersion,
     platform: platform,
     scope: isGlobal ? 'global' : 'local',
-    installed_at: new Date().toISOString(),
     files: files
-  };
+    // installed_at will be auto-filled by createManifest()
+  });
 }
 
 /**

@@ -3,7 +3,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
 import { findInstallations } from '../../bin/lib/version/installation-finder.js';
-import { readManifestWithRepair } from '../../bin/lib/version/manifest-reader.js';
+import { readManifest } from '../../bin/lib/manifests/reader.js';
+import { repairManifest } from '../../bin/lib/manifests/repair.js';
 import { compareVersions, formatPlatformOption } from '../../bin/lib/version/version-checker.js';
 
 describe('update-detection integration', () => {
@@ -43,7 +44,7 @@ describe('update-detection integration', () => {
       const found = await findInstallations('local');
       expect(found.length).toBe(1);
       
-      const manifestResult = await readManifestWithRepair(found[0].path);
+      const manifestResult = await readManifest(found[0].path);
       expect(manifestResult.success).toBe(true);
       
       const versionStatus = compareVersions(manifestResult.manifest.gsd_version, '1.9.9');
@@ -80,7 +81,7 @@ describe('update-detection integration', () => {
       process.chdir(testDir);
       
       const found = await findInstallations('local');
-      const manifestResult = await readManifestWithRepair(found[0].path);
+      const manifestResult = await readManifest(found[0].path);
       const versionStatus = compareVersions(manifestResult.manifest.gsd_version, '3.0.0');
       
       expect(versionStatus.status).toBe('major_update');
@@ -112,7 +113,7 @@ describe('update-detection integration', () => {
       process.chdir(testDir);
       
       const found = await findInstallations('local');
-      const manifestResult = await readManifestWithRepair(found[0].path);
+      const manifestResult = await readManifest(found[0].path);
       const versionStatus = compareVersions(manifestResult.manifest.gsd_version, '2.0.0');
       
       expect(versionStatus.status).toBe('up_to_date');
@@ -157,7 +158,7 @@ describe('update-detection integration', () => {
       // Check version statuses
       const statuses = await Promise.all(
         found.map(async (install) => {
-          const manifestResult = await readManifestWithRepair(install.path);
+          const manifestResult = await readManifest(install.path);
           return {
             platform: install.platform,
             status: compareVersions(manifestResult.manifest.gsd_version, '2.0.0')
@@ -194,13 +195,19 @@ describe('update-detection integration', () => {
       process.chdir(testDir);
       
       const found = await findInstallations('local');
-      const manifestResult = await readManifestWithRepair(found[0].path);
+      let manifestResult = await readManifest(found[0].path);
+      
+      // Should detect as corrupt
+      expect(manifestResult.success).toBe(false);
+      expect(manifestResult.reason).toBe('invalid_schema');
+      
+      // Explicitly repair
+      manifestResult = await repairManifest(found[0].path);
       
       // Should succeed after repair
       expect(manifestResult.success).toBe(true);
-      if (manifestResult.repaired) {
-        expect(manifestResult.manifest._repaired).toBe(true);
-      }
+      expect(manifestResult.repaired).toBe(true);
+      expect(manifestResult.manifest._repaired).toBe(true);
     } finally {
       process.chdir(originalCwd);
     }
