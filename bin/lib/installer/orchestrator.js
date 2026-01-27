@@ -13,6 +13,9 @@ import { missingTemplates } from '../errors/install-error.js';
 import { readdir, readFile } from 'fs/promises';
 import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
 import { generateAndWriteManifest } from '../validation/manifest-generator.js';
+import { compareVersions } from '../version/version-checker.js';
+import { readManifestWithRepair } from '../version/manifest-reader.js';
+import { confirm } from '@clack/prompts';
 
 /**
  * Main installation orchestrator
@@ -24,10 +27,11 @@ import { generateAndWriteManifest } from '../validation/manifest-generator.js';
  * @param {boolean} options.isVerbose - Verbose output
  * @param {string} options.scriptDir - Script directory path
  * @param {string} [options.targetDir] - Override target directory (for testing)
+ * @param {boolean} [options.skipPrompts] - Skip confirmation prompts (for -y flag)
  * @returns {Promise<Object>} Installation statistics
  */
 export async function install(appVersion, options) {
-  const { platform, adapter, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride } = options;
+  const { platform, adapter, isGlobal, isVerbose, scriptDir, targetDir: targetDirOverride, skipPrompts } = options;
 
   // Determine target directory
   const targetBase = adapter.getTargetDir(isGlobal);
@@ -36,6 +40,9 @@ export async function install(appVersion, options) {
     : targetBase);
 
   const templatesDir = getTemplatesDirectory(scriptDir);
+  
+  // === NEW: Version validation gate (Phase 6) ===
+  await validateVersionBeforeInstall(platform, targetDir, appVersion, { skipPrompts });
 
   // Get command prefix and path reference for variable replacement
   const commandPrefix = adapter.getCommandPrefix();
@@ -291,4 +298,99 @@ async function processTemplateFile(filePath, variables, isVerbose) {
   const cleaned = cleanFrontmatter(processed);
 
   await writeFile(filePath, cleaned);
+}
+
+/**
+ * Validate version before installation
+ * Blocks downgrades, warns on major updates, asks about customizations
+ * @param {string} platform - Platform name
+ * @param {string} targetDir - Target installation directory
+ * @param {string} currentVersion - Version being installed
+ * @param {Object} options - Options
+ * @param {boolean} [options.skipPrompts] - Skip confirmation prompts
+ */
+async function validateVersionBeforeInstall(platform, targetDir, currentVersion, options = {}) {
+  // Construct manifest path
+  const manifestPath = join(targetDir, '.gsd-install-manifest.json');
+  
+  // Try to read existing manifest
+  const manifestResult = await readManifestWithRepair(manifestPath);
+  
+  if (!manifestResult.success) {
+    // No existing installation or unreadable - proceed normally
+    return;
+  }
+  
+  const manifest = manifestResult.manifest;
+  const versionStatus = compareVersions(manifest.gsd_version, currentVersion);
+  
+  // Get platform display name
+  const platformNames = {
+    'claude': 'Claude Code',
+    'copilot': 'GitHub Copilot',
+    'codex': 'Codex'
+  };
+  const platformDisplay = platformNames[platform] || platform;
+  
+  // Block downgrades completely
+  if (versionStatus.status === 'downgrade') {
+    const errorMessage = `
+Cannot downgrade GSD installation for ${platformDisplay}
+
+  Installed: v${versionStatus.installed}
+  Installer: v${versionStatus.current}
+
+Downgrades are not supported. To use the latest version:
+
+  npx get-shit-done-multi@latest
+
+Or install a specific version:
+
+  npx get-shit-done-multi@${versionStatus.installed}
+    `.trim();
+    
+    throw new Error(errorMessage);
+  }
+  
+  // Warn on major version updates
+  if (versionStatus.status === 'major_update' && !options.skipPrompts) {
+    console.log('');
+    console.log(chalk.yellow(`⚠️  Major version update detected for ${platformDisplay}`));
+    console.log('');
+    console.log(chalk.dim(`   v${versionStatus.installed} → v${versionStatus.current}`));
+    console.log('');
+    console.log('   Major updates may include breaking changes.');
+    console.log('   Your existing workflows might need updates.');
+    console.log('');
+    
+    const confirmed = await confirm({
+      message: `Continue with major version update for ${platformDisplay}?`,
+      initialValue: true
+    });
+    
+    if (!confirmed || confirmed === Symbol.for('clack:cancel')) {
+      throw new Error(`Update cancelled for ${platformDisplay}`);
+    }
+  }
+  
+  // Ask about customization preservation
+  if ((versionStatus.status === 'update_available' || versionStatus.status === 'major_update') && !options.skipPrompts) {
+    console.log('');
+    const preserveCustomizations = await confirm({
+      message: `Preserve customizations for ${platformDisplay}?`,
+      initialValue: true
+    });
+    
+    if (preserveCustomizations && preserveCustomizations !== Symbol.for('clack:cancel')) {
+      console.log('');
+      console.log(chalk.dim('💡 Consider contributing your improvements:'));
+      console.log(chalk.dim('   https://github.com/shoootyou/get-shit-done-multi'));
+      console.log('');
+      
+      // Note: preserveCustomizations flag would be passed through to file operations
+      // For now, we're just informing the user - actual preservation logic
+      // would need to be implemented in file-operations.js
+      logger.info('Note: Customization preservation not yet fully implemented', 2);
+    }
+  }
 }
