@@ -5,148 +5,135 @@ const { banner } = await import('../cli/banner-manager.js')
 import * as logger from '../cli/logger.js';
 
 /**
+ * Validate installations for a specific scope
+ * @param {string} scopeType - Type of scope ('global', 'local', 'custom')
+ * @param {string[]} customPaths - Custom paths to check (empty for standard paths)
+ * @param {string} currentVersion - Current GSD version
+ * @param {boolean} verbose - Verbose mode flag
+ * @returns {Promise<Array>} Array of installation results
+ */
+async function validateScopeInstallations(scopeType, customPaths, currentVersion, verbose) {
+    const found = await findInstallations(scopeType === 'custom' ? '' : scopeType, customPaths, verbose);
+    const results = [];
+
+    if (found.length === 0) {
+        return [];
+    }
+
+    for (const install of found) {
+        if (verbose) {
+            logger.info(`  Found: ${install.path}`);
+        }
+        
+        const manifestResult = await readManifestWithRepair(install.path, verbose);
+        
+        if (manifestResult.success) {
+            if (verbose) {
+                logger.info(`  Manifest read successfully`);
+                logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
+            }
+            
+            // Use platform from manifest if we have 'custom' placeholder
+            const platform = install.platform === 'custom'
+                ? manifestResult.manifest.platform || 'unknown'
+                : install.platform;
+
+            const versionStatus = compareVersions(
+                manifestResult.manifest.gsd_version,
+                currentVersion
+            );
+            
+            results.push({
+                success: true,
+                platform,
+                versionStatus,
+                path: install.path
+            });
+        } else {
+            results.push({
+                success: false,
+                platform: install.platform === 'custom' ? 'custom path' : install.platform,
+                reason: manifestResult.reason,
+                path: install.path
+            });
+        }
+    }
+
+    return results;
+}
+
+/**
  * Handle --check-updates flag
  * @param {object} options - Command line options
  * @param {object} pkg - Package.json object
  */
 export async function handleCheckUpdates(options, pkg) {
     const currentVersion = pkg.version;
-    const customPaths = options.customPath ? [options.customPath] : [];
 
     // Show banner
     banner(currentVersion, false);
 
-    // If custom path is provided, ONLY check that path (skip global/local standard paths)
-    if (options.customPath) {
-        if (options.verbose) {
-            logger.info('Discovery process:');
-            logger.info('  Checking custom path:');
-            logger.info(`    ${options.customPath}`);
-            console.log('');
-        }
+    // Determine scopes to check
+    const scopes = options.customPath
+        ? [{ type: 'custom', label: 'Custom path installations', paths: [options.customPath] }]
+        : [
+            { type: 'global', label: 'Global installations', paths: [] },
+            { type: 'local', label: 'Local installations', paths: [] }
+          ];
 
-        logger.info('Checking custom path installation...');
-        console.log('');
-
-        // Only check custom path installations (pass empty scope to skip standard paths)
-        const customFound = await findInstallations('', customPaths, options.verbose);
-
-        if (customFound.length > 0) {
-            logger.info('Custom path installations:');
-            for (const install of customFound) {
-                if (options.verbose) {
-                    logger.info(`  Found: ${install.path}`);
-                }
-                const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-                if (manifestResult.success) {
-                    if (options.verbose) {
-                        logger.info(`  Manifest read successfully`);
-                        logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-                    }
-                    // Use platform from manifest if we have 'custom' placeholder
-                    const platform = install.platform === 'custom'
-                        ? manifestResult.manifest.platform || 'unknown'
-                        : install.platform;
-
-                    const versionStatus = compareVersions(
-                        manifestResult.manifest.gsd_version,
-                        currentVersion
-                    );
-                    logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-                } else {
-                    logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
-                }
-            }
-        } else {
-            logger.info('Custom path installations: none');
-        }
-
-        return;
-    }
-
-    // Normal flow: check both global and local standard paths
+    // Show discovery process in verbose mode
     if (options.verbose) {
         logger.info('Discovery process:');
-        logger.info('  Checking global paths:');
-        logger.info('    ~/.claude/get-shit-done/');
-        logger.info('    ~/.copilot/get-shit-done/');
-        logger.info('    ~/.codex/get-shit-done/');
-        logger.info('  Checking local paths:');
-        logger.info('    ./.claude/get-shit-done/');
-        logger.info('    ./.github/get-shit-done/');
-        logger.info('    ./.codex/get-shit-done/');
+        if (options.customPath) {
+            logger.info('  Checking custom path:');
+            logger.info(`    ${options.customPath}`);
+        } else {
+            logger.info('  Checking global paths:');
+            logger.info('    ~/.claude/get-shit-done/');
+            logger.info('    ~/.copilot/get-shit-done/');
+            logger.info('    ~/.codex/get-shit-done/');
+            logger.info('  Checking local paths:');
+            logger.info('    ./.claude/get-shit-done/');
+            logger.info('    ./.github/get-shit-done/');
+            logger.info('    ./.codex/get-shit-done/');
+        }
         console.log('');
     }
 
     logger.info('Checking installations...');
     console.log('');
 
-    // Check global installations
-    const globalFound = await findInstallations('global', [], options.verbose);
-
-    if (globalFound.length > 0) {
-        logger.info('Global installations:');
-        for (const install of globalFound) {
-            if (options.verbose) {
-                logger.info(`  Found: ${install.path}`);
-            }
-            const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-            if (manifestResult.success) {
-                if (options.verbose) {
-                    logger.info(`  Manifest read successfully`);
-                    logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-                }
-                // Use platform from manifest if we have 'custom' placeholder
-                const platform = install.platform === 'custom'
-                    ? manifestResult.manifest.platform || 'unknown'
-                    : install.platform;
-
-                const versionStatus = compareVersions(
-                    manifestResult.manifest.gsd_version,
-                    currentVersion
-                );
-                logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-            } else {
-                logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
-            }
+    // Process each scope
+    for (const scope of scopes) {
+        // Use simpleTitle to separate sections (except for single custom path)
+        if (scopes.length > 1) {
+            logger.simpleTitle(scope.label);
         }
-    } else {
-        logger.info('Global installations: none');
-    }
 
-    console.log('');
+        const results = await validateScopeInstallations(
+            scope.type,
+            scope.paths,
+            currentVersion,
+            options.verbose
+        );
 
-    // Check local installations
-    const localFound = await findInstallations('local', [], options.verbose);
-
-    if (localFound.length > 0) {
-        logger.info('Local installations:');
-        for (const install of localFound) {
-            if (options.verbose) {
-                logger.info(`  Found: ${install.path}`);
-            }
-            const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-            if (manifestResult.success) {
-                if (options.verbose) {
-                    logger.info(`  Manifest read successfully`);
-                    logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
+        if (results.length > 0) {
+            logger.info(`${scope.label}:`);
+            for (const result of results) {
+                if (result.success) {
+                    logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, options.verbose)}`);
+                } else {
+                    logger.warn(`  ✗ ${result.platform}: ${result.reason}`);
                 }
-                // Use platform from manifest if we have 'custom' placeholder
-                const platform = install.platform === 'custom'
-                    ? manifestResult.manifest.platform || 'unknown'
-                    : install.platform;
-
-                const versionStatus = compareVersions(
-                    manifestResult.manifest.gsd_version,
-                    currentVersion
-                );
-                logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-            } else {
-                logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
             }
+        } else {
+            logger.info(`${scope.label}: none`);
         }
-    } else {
-        logger.info('Local installations: none');
+
+        // Add spacing between scopes (except for last scope)
+        if (scopes.length > 1 && scope !== scopes[scopes.length - 1]) {
+            console.log('');
+        }
     }
 }
 

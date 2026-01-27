@@ -11,7 +11,8 @@ import { getPlatformName } from '../platforms/platform-names.js';
  * @param {number} indent - Indentation level
  * @param {boolean} fullColor - Apply color to entire line
  * @param {function} logFn - Console function to use (log, warn, error)
- * @param {boolean} condition - Only log if condition is true (default: true)
+ * @param {boolean} condition - Only log if condition is true
+ * @returns {void}
  */
 function logWithIcon(icon, colorFn, message, indent, fullColor, logFn = console.log, condition = true) {
   if (!condition) return;
@@ -35,7 +36,8 @@ function logWithIcon(icon, colorFn, message, indent, fullColor, logFn = console.
 /**
  * Log list item with optional indentation
  * @param {string} message - Message to log
- * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {number} [indent=0] - Number of spaces to indent
+ * @returns {void}
  */
 export function listItem(message, indent = 0) {
   logWithIcon('•', null, message, indent, false);
@@ -44,8 +46,9 @@ export function listItem(message, indent = 0) {
 /**
  * Log info message with optional indentation
  * @param {string} message - Message to log
- * @param {number} indent - Number of spaces to indent (default: 0)
- * @param {boolean} fullColor - Apply color to entire line (default: false)
+ * @param {number} [indent=0] - Number of spaces to indent
+ * @param {boolean} [fullColor=false] - Apply color to entire line
+ * @returns {void}
  */
 export function info(message, indent = 0, fullColor = false) {
   logWithIcon('ℹ', chalk.blue, message, indent, fullColor);
@@ -54,8 +57,9 @@ export function info(message, indent = 0, fullColor = false) {
 /**
  * Log success message with optional indentation
  * @param {string} message - Message to log
- * @param {number} indent - Number of spaces to indent (default: 0)
- * @param {boolean} fullColor - Apply color to entire line (default: false)
+ * @param {number} [indent=0] - Number of spaces to indent
+ * @param {boolean} [fullColor=false] - Apply color to entire line
+ * @returns {void}
  */
 export function success(message, indent = 0, fullColor = false) {
   logWithIcon('✓', chalk.green, message, indent, fullColor);
@@ -64,8 +68,9 @@ export function success(message, indent = 0, fullColor = false) {
 /**
  * Log warning message with optional indentation
  * @param {string} message - Message to log
- * @param {number} indent - Number of spaces to indent (default: 0)
- * @param {boolean} fullColor - Apply color to entire line (default: false)
+ * @param {number} [indent=0] - Number of spaces to indent
+ * @param {boolean} [fullColor=false] - Apply color to entire line
+ * @returns {void}
  */
 export function warn(message, indent = 0, fullColor = false) {
   logWithIcon('⚠', chalk.yellow, message, indent, fullColor, console.warn);
@@ -74,8 +79,9 @@ export function warn(message, indent = 0, fullColor = false) {
 /**
  * Log error message with optional indentation
  * @param {string} message - Message to log
- * @param {number} indent - Number of spaces to indent (default: 0)
- * @param {boolean} fullColor - Apply color to entire line (default: false)
+ * @param {number} [indent=0] - Number of spaces to indent
+ * @param {boolean} [fullColor=false] - Apply color to entire line
+ * @returns {void}
  */
 export function error(message, indent = 0, fullColor = false) {
   logWithIcon('✗', chalk.red, message, indent, fullColor, console.error);
@@ -85,6 +91,7 @@ export function error(message, indent = 0, fullColor = false) {
  * Log verbose message (only if verbose mode)
  * @param {string} message - Message to log
  * @param {boolean} isVerbose - Verbose mode flag
+ * @returns {void}
  */
 export function verbose(message, isVerbose) {
   logWithIcon('→', chalk.gray, message, 2, false, console.log, isVerbose);
