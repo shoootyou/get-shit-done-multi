@@ -423,7 +423,7 @@
 | INSTALL-02 | Phase 2 | ✅ Complete |
 | INSTALL-03 | Phase 2 | ✅ Complete |
 | INSTALL-04 | Phase 4 | Pending |
-| INSTALL-05 | Phase 4 | Pending |
+| INSTALL-05 | Phase 5 | ✅ Complete |
 | PLATFORM-01 | Phase 3 | ✅ Complete |
 | PLATFORM-01B | Phase 3 | ✅ Complete |
 | PLATFORM-02 | Phase 3 | ✅ Complete |
@@ -439,7 +439,7 @@
 | UX-01 | Phase 4 | ✅ Complete |
 | UX-02 | Phase 4 | ✅ Complete |
 | UX-03 | Phase 4 | ✅ Complete |
-| VERSION-01 | Phase 4 | Pending |
+| VERSION-01 | Phase 5 | ✅ Complete |
 | VERSION-02 | Phase 5 | Pending |
 | VERSION-03 | Phase 5 | Pending |
 | SAFETY-01 | Phase 6 | Pending |
