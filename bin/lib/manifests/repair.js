@@ -14,7 +14,12 @@ import * as logger from '../cli/logger.js';
  */
 export async function repairManifest(manifestPath) {
   try {
-    const installDir = path.dirname(manifestPath);
+    let installDir = path.dirname(manifestPath);
+
+    if (installDir.endsWith('get-shit-done')) {
+      // If the directory ends with 'get-shit-done', adjust to its parent directory
+      installDir = path.dirname(installDir);
+    }
 
     // Scan directory to reconstruct file list
     const files = [];
