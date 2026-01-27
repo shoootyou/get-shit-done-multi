@@ -440,7 +440,7 @@ Overall Progress:
 - [ ] Phase 5 Plan 02: Manifest Generation (pending)
 
 ### Pending Todos
-None
+1. [Optimize warning display order - collect all warnings in single block](.planning/todos/pending/2026-01-27-optimize-warning-display-order.md) — Area: tooling
 
 ### Blockers
 None
