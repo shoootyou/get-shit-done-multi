@@ -504,8 +504,7 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 pending todo:
-- **Centralize manifest field definitions** (versioning) - Field names repeated across reader/writer/repair - create schema.js with FIELD_DEFINITIONS and factory functions
+None
 
 ### Blockers
 None
