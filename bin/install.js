@@ -7,9 +7,9 @@
 
 import { Command } from 'commander';
 import { fileURLToPath } from 'url';
-import { resolve, dirname, join } from 'path';
+import { resolve, dirname } from 'path';
 import { readFile } from "fs/promises";
-import { readFileSync } from 'fs';
+import { getTemplatesDirectory } from './lib/paths/path-resolver.js';
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
@@ -80,12 +80,23 @@ async function main() {
 
   const count = platforms.length;
 
+  const templatesDir = getTemplatesDirectory(__dirname);
+  logger.info(`Using templates from: ${templatesDir}`, 1);
+  console.log(); // Jump line after banner
+
   // Install platforms
   for (const platform of platforms) {
-    logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
-      style: 'double',
-      width: 80,
-    });
+    if (platforms.length > 1) {
+      logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
+        style: 'double',
+        width: 80,
+      });
+    } else {
+      logger.blockTitle(`Installing ${getPlatformName(platform)} (${scope})`, {
+        style: 'double',
+        width: 80,
+      });
+    }
 
     await installPlatforms(platform, scope, pkg.version, {
       scriptDir: __dirname,

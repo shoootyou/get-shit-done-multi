@@ -47,9 +47,8 @@ export async function install(appVersion, options) {
   };
 
   // Always show these informational lines - they provide useful context
-  logger.info(`Target directory: ${targetDir}`, 1);
-  logger.info(`Templates source: ${templatesDir}`, 1);
-  logger.info(`Command prefix: ${commandPrefix}`, 1);
+  logger.info(`Target directory: ${targetDir}`, 2);
+  logger.info(`Command prefix: ${commandPrefix}`, 2);
 
   // Validate templates exist
   await validateTemplates(templatesDir);
@@ -58,10 +57,13 @@ export async function install(appVersion, options) {
   const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
   const hasExisting = await pathExists(manifestPath);
 
-  if (hasExisting) {
+  if (!isVerbose && hasExisting) {
+    logger.warn('Existing installation detected', 2);
+    logger.warn('Installation will overwrite existing files', 2);
+  } else {
     logger.warnSubtitle('Warnings');
-    logger.listItem('Existing installation detected', 1);
-    logger.listItem('Installation will overwrite existing files', 1);
+    logger.listItem('Existing installation detected', 2);
+    logger.listItem('Installation will overwrite existing files', 2);
   }
 
   // Create target directory
@@ -97,13 +99,13 @@ export async function install(appVersion, options) {
     }
   } else {
     // Verbose mode: no progress bars, show files
-    logger.header('Installing Skills');
+    logger.simpleSubtitle('Installing Skills');
     stats.skills = await installSkills(templatesDir, targetDir, templateVars, null, isVerbose, platform);
 
-    logger.header('Installing Agents');
+    logger.simpleSubtitle('Installing Agents');
     stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
 
-    logger.header('Installing Shared Directory');
+    logger.simpleSubtitle('Installing Shared Directory');
     stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
   }
 

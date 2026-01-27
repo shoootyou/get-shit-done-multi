@@ -62,10 +62,13 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
     failures.push({ platform, platformLabel, error });
   }
 
-
   // Stop progress bars
   if (multiBar) {
     multiBar.stop();
+  }
+
+  if (!verbose) {
+    console.log(); // Jump line after progress bars
   }
 
   // Show failures if any
@@ -76,9 +79,10 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
 
   // Show success message
   if (successes.length === 1) {
-    console.log();
-    logger.success(`Completed: ${successes[0].platformLabel} installation`, 1);
+    logger.success(`Completed: ${successes[0].platformLabel} installation`, 2);
   }
+
+
 
   return {
     successes,

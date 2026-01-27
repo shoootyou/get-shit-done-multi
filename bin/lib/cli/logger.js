@@ -9,7 +9,7 @@ import { getPlatformName } from '../platforms/platform-names.js';
  * @param {number} indent - Number of spaces to indent (default: 0)
  */
 export function listItem(message, indent = 0) {
-  const prefix = '  '.repeat(indent);
+  const prefix = ' '.repeat(indent);
   console.log(prefix + '•', message);
 }
 
@@ -19,7 +19,7 @@ export function listItem(message, indent = 0) {
  * @param {number} indent - Number of spaces to indent (default: 0)
  */
 export function info(message, indent = 0) {
-  const prefix = '  '.repeat(indent);
+  const prefix = ' '.repeat(indent);
   console.log(prefix + chalk.blue('ℹ'), message);
 }
 
@@ -39,7 +39,7 @@ export function success(message, indent = 0) {
  * @param {number} indent - Number of spaces to indent (default: 0)
  */
 export function warn(message, indent = 0) {
-  const prefix = '  '.repeat(indent);
+  const prefix = ' '.repeat(indent);
   console.warn(prefix + chalk.yellow('⚠'), message);
 }
 
@@ -229,7 +229,7 @@ export function warnSubtitle(message, indent = 0, width = 80) {
 
   const prefix = '  '.repeat(indent);
   const icon = chalk.yellow('⚠');
-  const leftPart = prefix + "───" + icon + " " + message + " ";
+  const leftPart = prefix + "─── " + icon + " " + message + " ";
 
   // Calculate visible length (without ANSI codes)
   const visibleLength = prefix.length + 4 + message.length + 2; // "───⚠ message "
@@ -238,7 +238,6 @@ export function warnSubtitle(message, indent = 0, width = 80) {
   console.log();
   console.warn(' ' + leftPart + dashes);
 }
-
 
 /**
  * Log informational message with optional indentation and trailing dashes
@@ -252,7 +251,28 @@ export function infoSubtitle(message, indent = 0, width = 80) {
 
   const prefix = '  '.repeat(indent);
   const icon = chalk.blue('ℹ');
-  const leftPart = prefix + "───" + icon + " " + message + " ";
+  const leftPart = prefix + "─── " + icon + " " + message + " ";
+
+  // Calculate visible length (without ANSI codes)
+  const visibleLength = prefix.length + 4 + message.length + 2; // "───ℹ message "
+  const remainingWidth = effectiveWidth - visibleLength;
+  const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
+  console.log();
+  console.warn(' ' + leftPart + dashes);
+}
+
+/**
+ * Log informational message with optional indentation and trailing dashes
+ * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {number} width - Maximum width (default: terminal columns or 80)
+ */
+export function simpleSubtitle(message, indent = 0, width = 80) {
+  const terminalWidth = process.stdout.columns || 80;
+  const effectiveWidth = Math.min(width, terminalWidth);
+
+  const prefix = '  '.repeat(indent);
+  const leftPart = prefix + "─── " + message + " ";
 
   // Calculate visible length (without ANSI codes)
   const visibleLength = prefix.length + 4 + message.length + 2; // "───ℹ message "
