@@ -4,6 +4,7 @@ import os from 'os';
 import { createManifest, MANIFEST_ERRORS } from './schema.js';
 import { derivePlatformFromPath } from '../platforms/platform-paths.js';
 import { detectVersionFromDirectory } from '../version/version-detector.js';
+import { scanInstallationFiles } from '../utils/file-scanner.js';
 import * as logger from '../cli/logger.js';
 
 /**
@@ -15,15 +16,7 @@ import * as logger from '../cli/logger.js';
  */
 export async function repairManifest(manifestPath) {
   try {
-    let installDir = path.dirname(manifestPath);
-    let scanDir = installDir; // Directory to scan for files and version
-    
-    if (installDir.endsWith('get-shit-done')) {
-      // Manifest is in get-shit-done directory
-      // Keep installDir for version detection
-      // But adjust scanDir for platform detection if needed
-      scanDir = installDir;
-    }
+    const installDir = path.dirname(manifestPath);
 
     // Derive platform from directory structure
     const platform = derivePlatformFromPath(installDir);
@@ -37,20 +30,10 @@ export async function repairManifest(manifestPath) {
     }
 
     // Scan directory to reconstruct file list
-    const files = [];
-    try {
-      const entries = await fs.readdir(scanDir, { recursive: true, withFileTypes: true });
-      for (const entry of entries) {
-        if (entry.isFile() && !entry.name.startsWith('.gsd-')) {
-          const relativePath = path.relative(
-            scanDir,
-            path.join(entry.path || entry.parentPath, entry.name)
-          );
-          files.push(relativePath); // STRING ARRAY - fixed bug!
-        }
-      }
-    } catch (error) {
-      logger.warn(`Could not scan directory: ${error.message}`, 2);
+    const files = await scanInstallationFiles(installDir);
+    
+    if (files.length === 0) {
+      logger.warn('No installation files found during scan', 2);
     }
 
     // Derive scope from path
@@ -62,7 +45,7 @@ export async function repairManifest(manifestPath) {
       gsd_version: version,
       platform: platform,
       scope: scope,
-      files: files.sort()
+      files: files // Already sorted by scanInstallationFiles
       // installed_at will be auto-filled by createManifest()
     });
 
