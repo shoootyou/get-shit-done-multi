@@ -94,9 +94,7 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
     multiBar.stop();
   }
 
-  if (!verbose) {
-    console.log(); // Jump line after progress bars
-  }
+
 
   // Show failures if any
   if (failures.length === 1) {

@@ -14,6 +14,6 @@ export function showBannerWithContext(scriptDir, version) {
   logger.banner(version);
   
   const templatesDir = getTemplatesDirectory(scriptDir);
-  logger.info(`Using templates from: ${templatesDir}`, 1);
+  logger.info(`Templates: ${templatesDir}`, 1);
   console.log(); // Jump line after banner
 }

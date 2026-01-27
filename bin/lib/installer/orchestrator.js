@@ -98,7 +98,7 @@ export async function install(appVersion, options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
 
   if (!isVerbose) {
-    logger.infoSubtitle('Install progress');
+    logger.simpleSubtitle('Installed components');
     // Simple completion line display for non-verbose mode
     try {
       // Phase 1: Install skills
