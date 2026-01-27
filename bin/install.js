@@ -41,43 +41,44 @@ async function handleCheckUpdates(options, pkg) {
   const currentVersion = pkg.version;
   const customPaths = options.customPath ? [options.customPath] : [];
   
-  console.log(`GSD Installer v${currentVersion}`);
+  // Show banner
+  logger.banner(currentVersion);
   console.log('');
   
   if (options.verbose) {
-    console.log('Discovery process:');
-    console.log('  Checking global paths:');
-    console.log('    ~/.claude/get-shit-done/');
-    console.log('    ~/.copilot/get-shit-done/');
-    console.log('    ~/.codex/get-shit-done/');
-    console.log('  Checking local paths:');
-    console.log('    ./.claude/get-shit-done/');
-    console.log('    ./.github/get-shit-done/');
-    console.log('    ./.codex/get-shit-done/');
+    logger.info('Discovery process:');
+    logger.info('  Checking global paths:');
+    logger.info('    ~/.claude/get-shit-done/');
+    logger.info('    ~/.copilot/get-shit-done/');
+    logger.info('    ~/.codex/get-shit-done/');
+    logger.info('  Checking local paths:');
+    logger.info('    ./.claude/get-shit-done/');
+    logger.info('    ./.github/get-shit-done/');
+    logger.info('    ./.codex/get-shit-done/');
     if (customPaths.length > 0) {
-      console.log('  Custom paths:');
-      customPaths.forEach(p => console.log(`    ${p}`));
+      logger.info('  Custom paths:');
+      customPaths.forEach(p => logger.info(`    ${p}`));
     }
     console.log('');
   }
   
-  console.log('Checking installations...');
+  logger.info('Checking installations...');
   console.log('');
   
   // Check global installations
   const globalFound = await findInstallations('global', customPaths, options.verbose);
   
   if (globalFound.length > 0) {
-    console.log('Global installations:');
+    logger.info('Global installations:');
     for (const install of globalFound) {
       if (options.verbose) {
-        console.log(`  Found: ${install.path}`);
+        logger.info(`  Found: ${install.path}`);
       }
       const manifestResult = await readManifestWithRepair(install.path, options.verbose);
       if (manifestResult.success) {
         if (options.verbose) {
-          console.log(`  Manifest read successfully`);
-          console.log(`  Version: ${manifestResult.manifest.gsd_version}`);
+          logger.info(`  Manifest read successfully`);
+          logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
         }
         // Use platform from manifest if we have 'custom' placeholder
         const platform = install.platform === 'custom' 
@@ -88,13 +89,13 @@ async function handleCheckUpdates(options, pkg) {
           manifestResult.manifest.gsd_version,
           currentVersion
         );
-        console.log(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
+        logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
       } else {
-        console.log(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
+        logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
       }
     }
   } else {
-    console.log('Global installations: none');
+    logger.info('Global installations: none');
   }
   
   console.log('');
@@ -103,16 +104,16 @@ async function handleCheckUpdates(options, pkg) {
   const localFound = await findInstallations('local', customPaths, options.verbose);
   
   if (localFound.length > 0) {
-    console.log('Local installations:');
+    logger.info('Local installations:');
     for (const install of localFound) {
       if (options.verbose) {
-        console.log(`  Found: ${install.path}`);
+        logger.info(`  Found: ${install.path}`);
       }
       const manifestResult = await readManifestWithRepair(install.path, options.verbose);
       if (manifestResult.success) {
         if (options.verbose) {
-          console.log(`  Manifest read successfully`);
-          console.log(`  Version: ${manifestResult.manifest.gsd_version}`);
+          logger.info(`  Manifest read successfully`);
+          logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
         }
         // Use platform from manifest if we have 'custom' placeholder
         const platform = install.platform === 'custom' 
@@ -123,13 +124,13 @@ async function handleCheckUpdates(options, pkg) {
           manifestResult.manifest.gsd_version,
           currentVersion
         );
-        console.log(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
+        logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
       } else {
-        console.log(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
+        logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
       }
     }
   } else {
-    console.log('Local installations: none');
+    logger.info('Local installations: none');
   }
 }
 
