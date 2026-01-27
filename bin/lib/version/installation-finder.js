@@ -4,22 +4,44 @@ import path from 'path';
 
 const MANIFEST_FILE = '.gsd-install-manifest.json';
 
-export async function findInstallations(scope, customPaths = []) {
+export async function findInstallations(scope, customPaths = [], verbose = false) {
   // Get standard paths for scope
   const standardPaths = getManifestPaths(scope);
   
-  // Combine with custom paths
-  const allPaths = [...standardPaths, ...customPaths];
+  // Process custom paths - they need to be manifest paths, not just directories
+  const processedCustomPaths = customPaths.map(p => {
+    // If it's a directory path, add the manifest file name
+    if (!p.endsWith(MANIFEST_FILE)) {
+      return path.join(p, MANIFEST_FILE);
+    }
+    return p;
+  });
+  
+  // Combine with standard paths
+  const allPaths = [...standardPaths, ...processedCustomPaths];
+  
+  if (verbose) {
+    console.log(`  Checking ${allPaths.length} paths...`);
+  }
   
   // Check all paths in parallel (Promise.all safe for read-only)
   const checks = await Promise.all(
     allPaths.map(async (manifestPath) => {
       const exists = await fs.pathExists(manifestPath);
-      if (!exists) return null;
+      if (!exists) {
+        if (verbose) {
+          console.log(`  ✗ Not found: ${manifestPath}`);
+        }
+        return null;
+      }
+      
+      if (verbose) {
+        console.log(`  ✓ Found: ${manifestPath}`);
+      }
       
       return {
         path: manifestPath,
-        scope: deriveScope(manifestPath),
+        scope: deriveScope(manifestPath, scope),
         platform: derivePlatform(manifestPath)
       };
     })
@@ -46,9 +68,18 @@ function getManifestPaths(scope) {
   }
 }
 
-function deriveScope(manifestPath) {
+function deriveScope(manifestPath, hintScope) {
   const homeDir = os.homedir();
-  return manifestPath.startsWith(homeDir) ? 'global' : 'local';
+  // If path starts with home directory, it's global
+  if (manifestPath.startsWith(homeDir)) {
+    return 'global';
+  }
+  // If we have a hint scope from the search, use it
+  if (hintScope) {
+    return hintScope;
+  }
+  // Otherwise assume local
+  return 'local';
 }
 
 function derivePlatform(manifestPath) {
@@ -59,7 +90,12 @@ function derivePlatform(manifestPath) {
     p === '.claude' || p === '.copilot' || p === '.codex' || p === '.github'
   );
   
-  if (platformDirIndex === -1) return 'unknown';
+  if (platformDirIndex === -1) {
+    // For custom paths where we can't derive platform from path,
+    // we'll need to read the manifest to get the platform
+    // Return a placeholder that will be resolved by reading the manifest
+    return 'custom';
+  }
   
   const platformDir = parts[platformDirIndex];
   // Map .github to copilot (local copilot uses .github)
