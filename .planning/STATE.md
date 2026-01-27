@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-27  
-**Updated By:** GSD Executor (Phase 5 Plan 01 Complete)
+**Updated By:** GSD Executor (Phase 5 Plan 02 Complete)
 
 ---
 
@@ -11,23 +11,23 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 5 Plan 01 Complete (Pre-Installation Validation)! Pre-flight validation module prevents ~80% of installation failures by checking disk space (10% buffer), write permissions (actual test file), path security (no traversal), and existing installations before any file writes. 11/11 tests passing. Ready for Plan 05-02: Manifest Generation.
+**Current Focus:** ✅ Phase 5 Complete! Pre-installation validation prevents ~80% of failures (disk space, permissions, paths) + manifest generation with complete file list via post-installation scan. Error logging to .gsd-error.log with user-friendly messages. 13 tests passing (7 unit + 3 integration + 3 existing). Ready for Phase 6.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 5 of 8 (Atomic Transactions and Rollback) 🚧 IN PROGRESS  
+**Current Phase:** 5 of 8 (Atomic Transactions and Rollback) ✅ COMPLETE  
 **Phase Goal:** Pre-installation validation + manifest generation (no rollback implementation per CONTEXT.md scope decision)  
 **Started:** 2026-01-27  
-**Completed:** N/A (1 of 2 plans complete)  
-**Last Activity:** 2026-01-27 - Completed Plan 05-01 (Pre-Installation Validation Module)
+**Completed:** 2026-01-27  
+**Last Activity:** 2026-01-27 - Completed Plan 05-02 (Manifest Generation & Orchestrator Integration)
 
 ### Plan Status
-**Completed Plans:** 15/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 1/2)  
-**Current Plan:** Phase 5 - Plan 02 (Manifest Generation)  
-**Status:** Ready for Plan 05-02 execution
+**Completed Plans:** 16/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2)  
+**Current Plan:** Phase 6 - Next phase (to be planned)  
+**Status:** Phase 5 complete, ready for Phase 6 planning
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 1: [███████████████████████�
 Phase 2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 3: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 4: [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
-Phase 5: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (1/2 plans)
+Phase 5: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 
 Overall Progress:
-[██████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 43% (15/35 total plans)
+[███████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 46% (16/35 total plans)
 ```
 
 ---
@@ -47,11 +47,11 @@ Overall Progress:
 ## Performance Metrics
 
 ### Velocity
-- **Phases Completed:** 4 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX)
-- **Phases In Progress:** 1 (Phase 5 - Atomic Transactions, 1/2 plans complete)
-- **Plans Completed:** 15/35
+- **Phases Completed:** 5 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions)
+- **Phases In Progress:** 0
+- **Plans Completed:** 16/35
 - **Days Active:** 2
-- **Plans Today:** 1
+- **Plans Today:** 2
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -61,7 +61,7 @@ Overall Progress:
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 31/37 (84% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 3 pending)
+- **Requirements Completed:** 33/37 (89% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6+: 4 pending)
 
 ---
 
@@ -329,6 +329,42 @@ Overall Progress:
     - Clear section headers (Warnings, Installing..., Next Steps)
     - Rationale: Clearer output, easier debugging, prevents I/O contention
 
+44. **2026-01-27 (05-01):** fs.statfs() for disk space checks (VALIDATION-01)
+    - Use Node.js 19+ native API for cross-platform disk space checks
+    - Warning fallback for Node < 19 (validation skipped gracefully)
+    - 10% buffer on disk space requirement (not 20% or fixed amount)
+    - Rationale: Native API accurate, 10% buffer safe without being overly conservative
+
+45. **2026-01-27 (05-01):** Actual file write test for permissions (VALIDATION-02)
+    - Test write permissions with actual temp file (not fs.access())
+    - Creates `.gsd-test-write-{timestamp}` then deletes
+    - Catches ACLs, SELinux, read-only mounts
+    - Rationale: Most accurate method, ~1-2ms overhead acceptable
+
+46. **2026-01-27 (05-01):** Validation errors show both technical + friendly (VALIDATION-03)
+    - Validation errors display technical details AND actionable guidance on terminal
+    - Runtime errors show friendly only + log file path
+    - Error logged to .gsd-error.log regardless
+    - Rationale: Validation errors are actionable (user can fix), runtime errors need log investigation
+
+47. **2026-01-27 (05-02):** Two-pass manifest write pattern (MANIFEST-01)
+    - Write empty manifest → scan directory → rewrite with complete file list
+    - Manifest includes itself in files array
+    - Simpler than tracking files during copy operations
+    - Rationale: Post-installation scan simplest approach, ~10ms overhead acceptable
+
+48. **2026-01-27 (05-02):** Minimal manifest structure for v2.0 (MANIFEST-02)
+    - Fields: gsd_version, platform, scope, installed_at, files[]
+    - No checksums (SHA256 hashes would add complexity)
+    - No schema version field (can add in v2.1+ if needed)
+    - Rationale: Keep it simple for v2.0, extensible for future versions
+
+49. **2026-01-27 (05-02):** No rollback implementation in Phase 5 (SCOPE-DECISION-01)
+    - Pre-installation validation only, no rollback on failure
+    - Failed installations leave partial files (user manual cleanup)
+    - Error messages provide clear cleanup instructions
+    - Rationale: Simpler codebase, faster execution, focus on preventing failures vs recovering from them
+
 44. **2026-01-26 (04-01):** Command prefix centralization (INTERACTIVE-REFACTOR-01)
     - Created platform-names.js for platform name utilities
     - Single source of truth for platformNames mapping
@@ -413,24 +449,24 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 05-01 Complete!** Pre-installation validation module implemented: (1) Pre-installation checks (bin/lib/validation/pre-install-checks.js) - runPreInstallationChecks() orchestrator, checkDiskSpace() with fs.statfs() and 10% buffer, checkWritePermissions() with actual temp file test (~1-2ms), validatePaths() blocking path traversal and system directories, detectExistingInstallation() reading manifest file, calculateDirectorySize() helper; (2) Error logging (bin/lib/validation/error-logger.js) - logInstallationError() writing structured log to .gsd-error.log, formatValidationError() showing technical + friendly messages, formatRuntimeError() showing friendly only; (3) Error codes extended (bin/lib/errors/install-error.js) - added invalidPath() factory (exit code 6); (4) Test coverage (tests/validation/pre-install-checks.test.js) - 11 tests passing, 1 skipped (ESM limitation), covers disk space, permissions, path validation, existing installation detection. Duration: 4m 19s. Three commits (8fe99ae, 2bde169, 051ace4). Plan 05-01 complete!
+✅ **Plan 05-02 Complete!** Manifest generation and orchestrator integration: (1) Manifest generator (bin/lib/validation/manifest-generator.js) - generateAndWriteManifest() with two-pass write pattern (include self in file list), collectInstalledFiles() recursive directory scan with sorted output, manifest structure: gsd_version, platform, scope, installed_at, files[]; (2) Orchestrator integration (bin/lib/installer/orchestrator.js) - imported runPreInstallationChecks() from Wave 1, validation runs before validateTemplates, replaced stub generateManifest() with full implementation, enhanced logging with version in warnings; (3) Error logging wrapper (bin/lib/cli/installation-core.js) - wraps all install() calls, logs to .gsd-error.log, validation errors show technical+friendly, runtime errors show friendly only; (4) Test coverage - 7 unit tests (manifest-generator.test.js), 3 integration tests (validation-flow.test.js), all passing. Duration: 5m 59s. Six commits (c54e86a, 9961c9e, 9c5569e, b81e606, cd2a949, 1ea8c24). **Phase 5 Complete!**
 
 ### What's Next
-1. **Immediate:** Phase 5 Plan 02 - Manifest Generation
-2. **Phase 5 Focus:** Generate installation manifest after successful install (no rollback per CONTEXT.md scope decision)
-3. **Phase 5 Achievement:** Pre-flight validation prevents ~80% of installation failures
-4. **Ready:** Validation module ready to integrate into installer orchestrator
+1. **Immediate:** Phase 6 - Next phase (TBD - check ROADMAP.md)
+2. **Phase 5 Achievement:** Pre-installation validation + manifest generation complete (no rollback per scope decision)
+3. **Phase 5 Summary:** Validation prevents ~80% of failures, manifest tracks all installed files, error logging with clear guidance
+4. **Ready:** Phase 5 complete, installer has full validation and tracking capabilities
 
 ### Context for Next Session
-- **Phase 5 Plan 01 complete:** ✅ Pre-installation validation module with disk space, permissions, path security checks
-- **Validation strategy:** ✅ fs.statfs() with 10% buffer, actual temp file write test, path traversal blocking
-- **Error handling:** ✅ Structured logging to .gsd-error.log, technical + friendly validation messages, friendly-only runtime messages
-- **Test coverage:** ✅ 11/11 functional tests passing, comprehensive coverage of validation module
-- **Integration ready:** ✅ Module exports designed for orchestrator integration in Plan 05-02
-- **Next action:** Begin Phase 5 Plan 02 - Manifest Generation
+- **Phase 5 complete:** ✅ Pre-installation validation + manifest generation with complete file list
+- **Validation integration:** ✅ Orchestrator runs checks before any writes (disk space, permissions, paths, existing install)
+- **Manifest tracking:** ✅ Post-installation scan includes all files (two-pass write to include manifest itself)
+- **Error handling:** ✅ Comprehensive logging to .gsd-error.log, split validation (detailed) vs runtime (friendly) messages
+- **Test coverage:** ✅ 13 tests passing (7 unit + 3 integration + 3 existing), full validation + manifest flow coverage
+- **Next action:** Review Phase 6 requirements in ROADMAP.md, plan next phase
 
 ### Handoff Notes
-✅ Plan 05-01 complete! Pre-installation validation module implemented. Pre-checks prevent ~80% of failures by validating disk space (fs.statfs + 10% buffer), write permissions (actual temp file test), path security (blocks traversal/system dirs), and existing installations before any file writes. Error logging writes structured .gsd-error.log. Validation errors show technical details + actionable guidance (e.g., "Free up 1.3 MB"), runtime errors show friendly message only. Test suite: 11 passing, comprehensive coverage (disk space, permissions, paths, manifests). Module fully independent and ready for orchestrator integration. Phase 5 progress: 1/2 plans complete. Ready for Plan 05-02: Manifest Generation. See 05-01-SUMMARY.md for details. No blockers.
+✅ Phase 5 complete! Validation prevents ~80% of installation failures by checking disk space (fs.statfs + 10% buffer), write permissions (actual temp file test), path security (blocks traversal/system dirs), and existing installations before any file writes. Manifest generation creates complete file list via post-installation scan (two-pass write to include manifest itself). Error logging to .gsd-error.log with user-friendly terminal messages. Validation errors show technical details + actionable guidance, runtime errors show friendly message only. Test suite: 13 passing (7 unit + 3 integration + 3 existing). No rollback implementation per Phase 5 scope decision (simpler, faster, focuses on prevention vs recovery). Phase 5: 2/2 plans complete. Overall: 16/35 plans (46%). See 05-02-SUMMARY.md for details. No blockers.
 
 ---
 
