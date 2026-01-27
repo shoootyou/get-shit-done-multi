@@ -40,7 +40,7 @@ export async function install(appVersion, options) {
     : targetBase);
 
   const templatesDir = getTemplatesDirectory(scriptDir);
-  
+
   // === NEW: Version validation gate (Phase 6) ===
   await validateVersionBeforeInstall(platform, targetDir, appVersion, { skipPrompts });
 
@@ -75,7 +75,7 @@ export async function install(appVersion, options) {
 
   // Collect all warnings for display
   const allWarnings = [...warnings];
-  
+
   // Add existing installation warnings
   if (existingInstall) {
     allWarnings.push(`Existing installation detected (v${existingInstall.version})`);
@@ -89,11 +89,13 @@ export async function install(appVersion, options) {
       allWarnings.forEach(warning => logger.warn(warning, 2));
     } else {
       // Verbose: subtitle + list items
-      logger.warnSubtitle('Warnings');
+      console.log();
+      logger.warnSubtitle('Warnings', 0, 80, true);
       allWarnings.forEach(warning => logger.listItem(warning, 2));
     }
   } else if (isVerbose) {
     // Only show "no warnings" in verbose mode
+    console.log();
     logger.infoSubtitle('Info');
     logger.listItem('No existing installation found', 2);
   }
@@ -105,6 +107,7 @@ export async function install(appVersion, options) {
   const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
 
   if (!isVerbose) {
+    console.log();
     logger.simpleSubtitle('Installed components');
     // Simple completion line display for non-verbose mode
     try {
@@ -124,12 +127,15 @@ export async function install(appVersion, options) {
     }
   } else {
     // Verbose mode: no progress bars, show files
+    console.log();
     logger.simpleSubtitle('Installing Skills');
     stats.skills = await installSkills(templatesDir, targetDir, templateVars, null, isVerbose, platform);
 
+    console.log();
     logger.simpleSubtitle('Installing Agents');
     stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
 
+    console.log();
     logger.simpleSubtitle('Installing Shared Directory');
     stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
   }
@@ -312,18 +318,18 @@ async function processTemplateFile(filePath, variables, isVerbose) {
 async function validateVersionBeforeInstall(platform, targetDir, currentVersion, options = {}) {
   // Construct manifest path
   const manifestPath = join(targetDir, '.gsd-install-manifest.json');
-  
+
   // Try to read existing manifest
   const manifestResult = await readManifestWithRepair(manifestPath);
-  
+
   if (!manifestResult.success) {
     // No existing installation or unreadable - proceed normally
     return;
   }
-  
+
   const manifest = manifestResult.manifest;
   const versionStatus = compareVersions(manifest.gsd_version, currentVersion);
-  
+
   // Get platform display name
   const platformNames = {
     'claude': 'Claude Code',
@@ -331,7 +337,7 @@ async function validateVersionBeforeInstall(platform, targetDir, currentVersion,
     'codex': 'Codex'
   };
   const platformDisplay = platformNames[platform] || platform;
-  
+
   // Block downgrades completely
   if (versionStatus.status === 'downgrade') {
     const errorMessage = `
@@ -348,10 +354,10 @@ Or install a specific version:
 
   npx get-shit-done-multi@${versionStatus.installed}
     `.trim();
-    
+
     throw new Error(errorMessage);
   }
-  
+
   // Warn on major version updates
   if (versionStatus.status === 'major_update' && !options.skipPrompts) {
     console.log('');
@@ -362,17 +368,17 @@ Or install a specific version:
     console.log('   Major updates may include breaking changes.');
     console.log('   Your existing workflows might need updates.');
     console.log('');
-    
+
     const confirmed = await confirm({
       message: `Continue with major version update for ${platformDisplay}?`,
       initialValue: true
     });
-    
+
     if (!confirmed || confirmed === Symbol.for('clack:cancel')) {
       throw new Error(`Update cancelled for ${platformDisplay}`);
     }
   }
-  
+
   // Ask about customization preservation
   if ((versionStatus.status === 'update_available' || versionStatus.status === 'major_update') && !options.skipPrompts) {
     console.log('');
@@ -380,13 +386,13 @@ Or install a specific version:
       message: `Preserve customizations for ${platformDisplay}?`,
       initialValue: true
     });
-    
+
     if (preserveCustomizations && preserveCustomizations !== Symbol.for('clack:cancel')) {
       console.log('');
       console.log(chalk.dim('💡 Consider contributing your improvements:'));
       console.log(chalk.dim('   https://github.com/shoootyou/get-shit-done-multi'));
       console.log('');
-      
+
       // Note: preserveCustomizations flag would be passed through to file operations
       // For now, we're just informing the user - actual preservation logic
       // would need to be implemented in file-operations.js

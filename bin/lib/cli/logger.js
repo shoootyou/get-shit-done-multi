@@ -7,48 +7,75 @@ import { getPlatformName } from '../platforms/platform-names.js';
  * Log info message with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function listItem(message, indent = 0) {
+export function listItem(message, indent = 0, fullColor = false) {
   const prefix = ' '.repeat(indent);
-  console.log(prefix + '•', message);
+  if (fullColor) {
+    console.log(prefix + '• ' + message);
+  } else {
+    console.log(prefix + '•', message);
+  }
 }
 
 /**
  * Log info message with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function info(message, indent = 0) {
+export function info(message, indent = 0, fullColor = false) {
   const prefix = ' '.repeat(indent);
-  console.log(prefix + chalk.blue('ℹ'), message);
+  if (fullColor) {
+    console.log(prefix + chalk.blue('ℹ ' + message));
+  } else {
+    console.log(prefix + chalk.blue('ℹ'), message);
+  }
 }
 
 /**
  * Log success message with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function success(message, indent = 0) {
+export function success(message, indent = 0, fullColor = false) {
   const prefix = ' '.repeat(indent);
-  console.log(prefix + chalk.green('✓'), message);
+  if (fullColor) {
+    console.log(prefix + chalk.green('✓ ' + message));
+  } else {
+    console.log(prefix + chalk.green('✓'), message);
+  }
 }
 
 /**
  * Log warning message with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function warn(message, indent = 0) {
+export function warn(message, indent = 0, fullColor = false) {
   const prefix = ' '.repeat(indent);
-  console.warn(prefix + chalk.yellow('⚠'), message);
+  if (fullColor) {
+    console.warn(prefix + chalk.yellow('⚠ ' + message));
+  } else {
+    console.warn(prefix + chalk.yellow('⚠'), message);
+  }
 }
 
 /**
  * Log error message
  * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function error(message) {
-  console.error(chalk.red('✗'), message);
+export function error(message, indent = 0, fullColor = false) {
+  const prefix = ' '.repeat(indent);
+  if (fullColor) {
+    console.error(prefix + chalk.red('✗ ' + message));
+  } else {
+    console.error(prefix + chalk.red('✗'), message);
+  }
 }
 
 /**
@@ -221,48 +248,77 @@ export function simpleTitle(title) {
  * Generic subtitle with optional icon
  * @param {string} message - Message to log
  * @param {object} options - Options
- * @param {'warn'|'info'|'none'} options.type - Subtitle type
+ * @param {'warn'|'info'|'error'|'none'} options.type - Subtitle type
  * @param {number} options.indent - Indentation level
  * @param {number} options.width - Maximum width
+ * @param {boolean} options.fullColor - Apply color to entire line (default: false, only icon colored)
  */
 export function subtitle(message, options = {}) {
-  const { type = 'none', indent = 0, width = 80 } = options;
-  
+  const { type = 'none', indent = 0, width = 80, fullColor = false } = options;
+
   const terminalWidth = process.stdout.columns || 80;
   const effectiveWidth = Math.min(width, terminalWidth);
   const prefix = '  '.repeat(indent);
-  
+
   let icon = '';
-  if (type === 'warn') icon = chalk.yellow('⚠') + ' ';
-  if (type === 'info') icon = chalk.blue('ℹ') + ' ';
-  
-  const leftPart = prefix + "─── " + icon + message + " ";
+  let colorFn = chalk.white;
+
+  if (type === 'warn') {
+    icon = chalk.yellow('⚠') + ' ';
+    colorFn = chalk.yellow;
+  } else if (type === 'info') {
+    icon = chalk.blue('ℹ') + ' ';
+    colorFn = chalk.blue;
+  } else if (type === 'error') {
+    icon = chalk.red('✗') + ' ';
+    colorFn = chalk.red;
+  }
+
+  const textPart = "─── " + icon + message + " ";
   const visibleLength = prefix.length + 4 + (icon ? 2 : 0) + message.length + 1;
   const remainingWidth = effectiveWidth - visibleLength;
   const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
-  
-  console.log();
-  console.log(' ' + leftPart + dashes);
+
+  if (fullColor && type !== 'none') {
+    // Full line in color (icon + text + dashes)
+    console.log(' ' + prefix + colorFn('─── ') + icon + colorFn(message + ' ' + dashes));
+  } else {
+    // Only icon colored, rest in default color
+    console.log(' ' + prefix + textPart + dashes);
+  }
 }
 
 /**
- * Log warning message with optional indentation and trailing dashes
+ * Log error subtitle with optional indentation and trailing dashes
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
  * @param {number} width - Maximum width (default: terminal columns or 80)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function warnSubtitle(message, indent = 0, width = 80) {
-  subtitle(message, { type: 'warn', indent, width });
+export function errorSubtitle(message, indent = 0, width = 80, fullColor = false) {
+  subtitle(message, { type: 'error', indent, width, fullColor });
 }
 
 /**
- * Log informational message with optional indentation and trailing dashes
+ * Log warning subtitle with optional indentation and trailing dashes
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
  * @param {number} width - Maximum width (default: terminal columns or 80)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function infoSubtitle(message, indent = 0, width = 80) {
-  subtitle(message, { type: 'info', indent, width });
+export function warnSubtitle(message, indent = 0, width = 80, fullColor = false) {
+  subtitle(message, { type: 'warn', indent, width, fullColor });
+}
+
+/**
+ * Log informational subtitle with optional indentation and trailing dashes
+ * @param {string} message - Message to log
+ * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {number} width - Maximum width (default: terminal columns or 80)
+ * @param {boolean} fullColor - Apply color to entire line (default: false)
+ */
+export function infoSubtitle(message, indent = 0, width = 80, fullColor = false) {
+  subtitle(message, { type: 'info', indent, width, fullColor });
 }
 
 /**

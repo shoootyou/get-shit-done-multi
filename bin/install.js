@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { resolve, dirname } from 'path';
 import { readFile } from "fs/promises";
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
+import { multipleDirectoryErrors } from './lib/errors/directory-error.js';
 import * as logger from './lib/cli/logger.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
 import { runInteractive } from './lib/cli/interactive.js';
@@ -19,6 +20,7 @@ import { shouldUseInteractiveMode, isValidTTY } from './lib/cli/mode-detector.js
 import { showNextSteps } from './lib/cli/next-steps.js';
 import { showBannerWithContext } from './lib/cli/banner-manager.js';
 import { executeInstallationLoop } from './lib/cli/install-loop.js';
+import { handleCheckUpdates } from './lib/updater/check-update.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -27,193 +29,6 @@ const __dirname = dirname(__filename);
 // Get version from package.json (ESM-safe)
 const pkgPath = resolve(__dirname, "..", "package.json");
 const pkg = JSON.parse(await readFile(pkgPath, "utf8"));
-
-/**
- * Handle --check-updates flag
- * @param {object} options - Command line options
- * @param {object} pkg - Package.json object
- */
-async function handleCheckUpdates(options, pkg) {
-  const { findInstallations } = await import('./lib/version/installation-finder.js');
-  const { readManifestWithRepair } = await import('./lib/version/manifest-reader.js');
-  const { compareVersions, formatPlatformOption } = await import('./lib/version/version-checker.js');
-  
-  const currentVersion = pkg.version;
-  const customPaths = options.customPath ? [options.customPath] : [];
-  
-  // Show banner
-  logger.banner(currentVersion);
-  console.log('');
-  
-  // If custom path is provided, ONLY check that path (skip global/local standard paths)
-  if (options.customPath) {
-    if (options.verbose) {
-      logger.info('Discovery process:');
-      logger.info('  Checking custom path:');
-      logger.info(`    ${options.customPath}`);
-      console.log('');
-    }
-    
-    logger.info('Checking custom path installation...');
-    console.log('');
-    
-    // Only check custom path installations (pass empty scope to skip standard paths)
-    const customFound = await findInstallations('', customPaths, options.verbose);
-    
-    if (customFound.length > 0) {
-      logger.info('Custom path installations:');
-      for (const install of customFound) {
-        if (options.verbose) {
-          logger.info(`  Found: ${install.path}`);
-        }
-        const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-        if (manifestResult.success) {
-          if (options.verbose) {
-            logger.info(`  Manifest read successfully`);
-            logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-          }
-          // Use platform from manifest if we have 'custom' placeholder
-          const platform = install.platform === 'custom' 
-            ? manifestResult.manifest.platform || 'unknown'
-            : install.platform;
-          
-          const versionStatus = compareVersions(
-            manifestResult.manifest.gsd_version,
-            currentVersion
-          );
-          logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-        } else {
-          logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
-        }
-      }
-    } else {
-      logger.info('Custom path installations: none');
-    }
-    
-    return;
-  }
-  
-  // Normal flow: check both global and local standard paths
-  if (options.verbose) {
-    logger.info('Discovery process:');
-    logger.info('  Checking global paths:');
-    logger.info('    ~/.claude/get-shit-done/');
-    logger.info('    ~/.copilot/get-shit-done/');
-    logger.info('    ~/.codex/get-shit-done/');
-    logger.info('  Checking local paths:');
-    logger.info('    ./.claude/get-shit-done/');
-    logger.info('    ./.github/get-shit-done/');
-    logger.info('    ./.codex/get-shit-done/');
-    console.log('');
-  }
-  
-  logger.info('Checking installations...');
-  console.log('');
-  
-  // Check global installations
-  const globalFound = await findInstallations('global', [], options.verbose);
-  
-  if (globalFound.length > 0) {
-    logger.info('Global installations:');
-    for (const install of globalFound) {
-      if (options.verbose) {
-        logger.info(`  Found: ${install.path}`);
-      }
-      const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-      if (manifestResult.success) {
-        if (options.verbose) {
-          logger.info(`  Manifest read successfully`);
-          logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-        }
-        // Use platform from manifest if we have 'custom' placeholder
-        const platform = install.platform === 'custom' 
-          ? manifestResult.manifest.platform || 'unknown'
-          : install.platform;
-        
-        const versionStatus = compareVersions(
-          manifestResult.manifest.gsd_version,
-          currentVersion
-        );
-        logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-      } else {
-        logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
-      }
-    }
-  } else {
-    logger.info('Global installations: none');
-  }
-  
-  console.log('');
-  
-  // Check local installations
-  const localFound = await findInstallations('local', [], options.verbose);
-  
-  if (localFound.length > 0) {
-    logger.info('Local installations:');
-    for (const install of localFound) {
-      if (options.verbose) {
-        logger.info(`  Found: ${install.path}`);
-      }
-      const manifestResult = await readManifestWithRepair(install.path, options.verbose);
-      if (manifestResult.success) {
-        if (options.verbose) {
-          logger.info(`  Manifest read successfully`);
-          logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-        }
-        // Use platform from manifest if we have 'custom' placeholder
-        const platform = install.platform === 'custom' 
-          ? manifestResult.manifest.platform || 'unknown'
-          : install.platform;
-        
-        const versionStatus = compareVersions(
-          manifestResult.manifest.gsd_version,
-          currentVersion
-        );
-        logger.info(`  ${formatStatusLine(platform, versionStatus, options.verbose)}`);
-      } else {
-        logger.warn(`  ✗ ${install.platform === 'custom' ? 'custom path' : install.platform}: ${manifestResult.reason}`);
-      }
-    }
-  } else {
-    logger.info('Local installations: none');
-  }
-}
-
-/**
- * Format status line for --check-updates display
- * @param {string} platform - Platform name
- * @param {object} versionStatus - Version status from compareVersions
- * @param {boolean} verbose - Verbose mode
- * @returns {string} Formatted status line
- */
-function formatStatusLine(platform, versionStatus, verbose) {
-  // Get platform display name
-  const names = {
-    'claude': 'Claude Code',
-    'copilot': 'GitHub Copilot',
-    'codex': 'Codex'
-  };
-  const baseName = names[platform] || platform;
-  
-  if (versionStatus.status === 'up_to_date') {
-    const display = `${baseName} (v${versionStatus.installed})`;
-    return verbose 
-      ? `✓ ${display} (up to date)`
-      : `✓ ${display}`;
-  }
-  
-  if (versionStatus.status === 'update_available') {
-    const display = `${baseName} (v${versionStatus.installed} → v${versionStatus.current})`;
-    return `⬆ ${display} (${versionStatus.updateType} update available)`;
-  }
-  
-  if (versionStatus.status === 'major_update') {
-    const display = `${baseName} (v${versionStatus.installed} → v${versionStatus.current} ⚠️  major)`;
-    return `⚠️  ${display} (major update available)`;
-  }
-  
-  return `? ${baseName}: ${versionStatus.status}`;
-}
 
 async function main() {
   const program = new Command();
@@ -252,14 +67,7 @@ async function main() {
   );
 
   if (customPathArgs.length > 1) {
-    console.error('');
-    console.error('Error: --custom-path can only be specified once.');
-    console.error('To check additional paths, run the installer separately for each path.');
-    console.error('');
-    console.error('Example:');
-    console.error('  npx get-shit-done-multi --custom-path=/path1');
-    console.error('  npx get-shit-done-multi --custom-path=/path2');
-    console.error('');
+    multipleDirectoryErrors();
     process.exit(1);
   }
 
