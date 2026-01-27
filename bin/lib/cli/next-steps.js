@@ -19,11 +19,12 @@ export function showNextSteps(platforms, indent = 0) {
   // Codex uses $gsd-, others use /gsd-
   const isCodexOnly = platforms.length === 1 && platforms[0] === 'codex';
   const prefix = isCodexOnly ? '$gsd-' : '/gsd-';
-  
+
   // Dynamic CLI name based on number of platforms
   const cliName = getCliName(platforms);
-  
+
   // Show next steps with proper indentation
+  logger.blockTitle('Next Steps', { width: 80 });
   logger.info(`Open ${cliName} and run ${prefix}help to see available commands`, indent);
   logger.info(`Try ${prefix}diagnose to validate your setup`, indent);
   logger.info(`Explore skills with ${prefix}list-skills`, indent);
