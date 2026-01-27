@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
 import { createManifest, MANIFEST_ERRORS } from './schema.js';
+import * as logger from '../cli/logger.js';
 
 /**
  * Attempt to repair a corrupt or missing manifest
@@ -12,10 +13,10 @@ import { createManifest, MANIFEST_ERRORS } from './schema.js';
  */
 export async function repairManifest(manifestPath) {
   try {
-    console.warn(`⚠️  Attempting to repair manifest: ${manifestPath}`);
-    
+    logger.warn(`Attempting to repair manifest: ${manifestPath}`, 2);
+
     const installDir = path.dirname(manifestPath);
-    
+
     // Scan directory to reconstruct file list
     const files = [];
     try {
@@ -23,26 +24,26 @@ export async function repairManifest(manifestPath) {
       for (const entry of entries) {
         if (entry.isFile() && !entry.name.startsWith('.gsd-')) {
           const relativePath = path.relative(
-            installDir, 
+            installDir,
             path.join(entry.path || entry.parentPath, entry.name)
           );
           files.push(relativePath); // STRING ARRAY - fixed bug!
         }
       }
     } catch (error) {
-      console.warn('   Could not scan directory:', error.message);
+      logger.warn(`Could not scan directory: ${error.message}`, 2);
     }
-    
+
     // Use 'unknown' for version (cannot reconstruct)
     const version = 'unknown';
-    
+
     // Derive platform from directory structure
     const platform = derivePlatformFromPath(installDir);
-    
+
     // Derive scope from path
     const homeDir = os.homedir();
     const scope = installDir.includes(homeDir) ? 'global' : 'local';
-    
+
     // Reconstruct manifest using centralized schema
     const repairedManifest = createManifest({
       gsd_version: version,
@@ -51,23 +52,24 @@ export async function repairManifest(manifestPath) {
       files: files.sort()
       // installed_at will be auto-filled by createManifest()
     });
-    
+
     // Add repair metadata
     repairedManifest._repaired = true;
     repairedManifest._repair_date = new Date().toISOString();
     repairedManifest._repair_reason = 'corrupt_or_incomplete';
-    
+
     // Write repaired manifest
     await fs.writeJson(manifestPath, repairedManifest, { spaces: 2 });
-    console.log('   ✓ Manifest repaired successfully');
-    
-    return { 
-      success: true, 
-      manifest: repairedManifest, 
-      repaired: true 
+    logger.success('Manifest repaired successfully', 2);
+
+    return {
+      success: true,
+      manifest: repairedManifest,
+      repaired: true
     };
-    
+
   } catch (repairError) {
+    logger.error(`Manifest repair failed: ${repairError.message}`, 2);
     return {
       success: false,
       reason: MANIFEST_ERRORS.REPAIR_FAILED,
@@ -85,12 +87,12 @@ export async function repairManifest(manifestPath) {
  */
 function derivePlatformFromPath(installDir) {
   const parts = installDir.split(path.sep);
-  const platformDirIndex = parts.findIndex(p => 
+  const platformDirIndex = parts.findIndex(p =>
     p === '.claude' || p === '.copilot' || p === '.codex' || p === '.github'
   );
-  
+
   if (platformDirIndex === -1) return 'unknown';
-  
+
   const platformDir = parts[platformDirIndex];
   if (platformDir === '.github') return 'copilot';
   return platformDir.substring(1);

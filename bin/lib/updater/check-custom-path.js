@@ -40,7 +40,7 @@ export async function checkCustomPath(customPath, currentVersion, verbose) {
     }
 
     if (verbose) {
-        logger.info(`  Found: ${manifestPath}`, 2);
+        logger.info(`Manifest found: ${manifestPath}`, 2);
     }
 
     const result = await validateInstallation(manifestPath, currentVersion, verbose);

@@ -17,7 +17,7 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
     // If corrupt or invalid schema, try to repair
     if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
         if (verbose) {
-            logger.verbose(`  Manifest corrupt, attempting repair...`, true);
+            logger.success(`Manifest corrupt, attempting repair...`, 2);
         }
         manifestResult = await repairManifest(manifestPath);
     }
@@ -31,8 +31,8 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
     }
 
     if (verbose) {
-        logger.verbose(`  Manifest read successfully`, true);
-        logger.verbose(`  Version: ${manifestResult.manifest.gsd_version}`, true);
+        logger.success(`Manifest read successfully`, 2);
+        logger.success(`Version: ${manifestResult.manifest.gsd_version}`, 2);
     }
 
     const platform = manifestResult.manifest.platform || 'unknown';
