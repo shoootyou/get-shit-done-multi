@@ -440,7 +440,7 @@ Overall Progress:
 - [ ] Phase 5 Plan 02: Manifest Generation (pending)
 
 ### Pending Todos
-1. [Standardize warning messages to use logger.warn with proper indentation](.planning/todos/pending/2026-01-27-standardize-warning-messages-to-use-logger.md) — Area: tooling
+None
 
 ### Blockers
 None
