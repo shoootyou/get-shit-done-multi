@@ -504,8 +504,7 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 pending todo:
-- `.planning/todos/pending/2026-01-27-fix-custom-path-cli-mode-flow.md` - Fix --custom-path in CLI mode to flow through installation (area: tooling)
+None
 
 ### Blockers
 None
