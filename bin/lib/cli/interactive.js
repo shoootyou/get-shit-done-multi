@@ -8,6 +8,7 @@ import { executeInstallationLoop } from './install-loop.js';
 import { findInstallations } from '../version/installation-finder.js';
 import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
+import { isRepairableError } from '../manifests/schema.js';
 import { compareVersions, formatPlatformOption } from '../version/version-checker.js';
 
 /**
@@ -100,8 +101,8 @@ async function discoverInstallationsWithStatus(scope, currentVersion, customPath
     found.map(async (install) => {
       let manifestResult = await readManifest(install.path);
       
-      // If corrupt, try to repair
-      if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+      // If corrupt or invalid schema, try to repair
+      if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
         manifestResult = await repairManifest(install.path);
       }
       

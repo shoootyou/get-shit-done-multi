@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
-import { createManifest } from './schema.js';
+import { createManifest, MANIFEST_ERRORS } from './schema.js';
 
 /**
  * Attempt to repair a corrupt or missing manifest
@@ -70,7 +70,7 @@ export async function repairManifest(manifestPath) {
   } catch (repairError) {
     return {
       success: false,
-      reason: 'repair_failed',
+      reason: MANIFEST_ERRORS.REPAIR_FAILED,
       error: repairError.message,
       manifest: null
     };

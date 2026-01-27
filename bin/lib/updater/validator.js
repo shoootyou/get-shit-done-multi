@@ -1,5 +1,6 @@
 import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
+import { isRepairableError } from '../manifests/schema.js';
 import * as logger from '../cli/logger.js';
 import { compareVersions } from '../version/version-checker.js';
 
@@ -12,9 +13,9 @@ import { compareVersions } from '../version/version-checker.js';
  */
 export async function validateInstallation(manifestPath, currentVersion, verbose) {
     let manifestResult = await readManifest(manifestPath);
-    
-    // If corrupt, try to repair
-    if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+
+    // If corrupt or invalid schema, try to repair
+    if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
         if (verbose) {
             logger.verbose(`  Manifest corrupt, attempting repair...`, true);
         }

@@ -34,6 +34,59 @@ const FIELD_DEFINITIONS = {
 };
 
 /**
+ * Manifest operation error codes
+ * Used by reader, repair, and consumers for type-safe error handling
+ * 
+ * @example
+ * import { MANIFEST_ERRORS, isRepairableError } from './schema.js';
+ * 
+ * if (result.reason === MANIFEST_ERRORS.CORRUPT) {
+ *   // handle corrupt manifest
+ * }
+ * 
+ * if (isRepairableError(result.reason)) {
+ *   await repairManifest(path);
+ * }
+ */
+export const MANIFEST_ERRORS = {
+  /** Manifest file not found at expected path */
+  NOT_FOUND: 'not_found',
+  
+  /** Manifest is missing required fields or has invalid structure */
+  INVALID_SCHEMA: 'invalid_schema',
+  
+  /** Permission denied when trying to read manifest */
+  PERMISSION_DENIED: 'permission_denied',
+  
+  /** Manifest file contains invalid JSON or is corrupted */
+  CORRUPT: 'corrupt',
+  
+  /** Unknown error occurred during manifest read */
+  UNKNOWN_ERROR: 'unknown_error',
+  
+  /** Failed to repair corrupted manifest */
+  REPAIR_FAILED: 'repair_failed'
+};
+
+/**
+ * Check if a manifest error can be repaired
+ * Corrupt and invalid schema errors can be fixed by reconstructing from directory
+ * 
+ * @param {string} reason - Error reason from readManifest() or repairManifest()
+ * @returns {boolean} True if error is repairable
+ * 
+ * @example
+ * const result = await readManifest(path);
+ * if (!result.success && isRepairableError(result.reason)) {
+ *   const repaired = await repairManifest(path);
+ * }
+ */
+export function isRepairableError(reason) {
+  return reason === MANIFEST_ERRORS.CORRUPT || 
+         reason === MANIFEST_ERRORS.INVALID_SCHEMA;
+}
+
+/**
  * Create manifest object from partial data
  * Automatically fills in defaults for missing fields
  * 

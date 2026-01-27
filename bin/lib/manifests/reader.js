@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { validateManifest } from './schema.js';
+import { validateManifest, MANIFEST_ERRORS } from './schema.js';
 
 /**
  * Read and validate manifest file
@@ -14,7 +14,7 @@ export async function readManifest(manifestPath) {
     if (!await fs.pathExists(manifestPath)) {
       return { 
         success: false, 
-        reason: 'not_found', 
+        reason: MANIFEST_ERRORS.NOT_FOUND,
         manifest: null 
       };
     }
@@ -29,7 +29,7 @@ export async function readManifest(manifestPath) {
     if (!validation.valid) {
       return {
         success: false,
-        reason: 'invalid_schema',
+        reason: MANIFEST_ERRORS.INVALID_SCHEMA,
         error: `Missing required fields: ${validation.missing.join(', ')}`,
         manifest: null
       };
@@ -43,7 +43,7 @@ export async function readManifest(manifestPath) {
     if (error.code === 'EACCES') {
       return {
         success: false,
-        reason: 'permission_denied',
+        reason: MANIFEST_ERRORS.PERMISSION_DENIED,
         error: error.message,
         manifest: null
       };
@@ -53,7 +53,7 @@ export async function readManifest(manifestPath) {
     if (error instanceof SyntaxError) {
       return {
         success: false,
-        reason: 'corrupt',
+        reason: MANIFEST_ERRORS.CORRUPT,
         error: 'Invalid JSON format',
         manifest: null
       };
@@ -62,7 +62,7 @@ export async function readManifest(manifestPath) {
     // Unknown errors
     return {
       success: false,
-      reason: 'unknown_error',
+      reason: MANIFEST_ERRORS.UNKNOWN_ERROR,
       error: error.message,
       manifest: null
     };

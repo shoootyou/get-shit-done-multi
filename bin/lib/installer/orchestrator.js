@@ -16,6 +16,7 @@ import { generateManifestData, writeManifest } from '../manifests/writer.js';
 import { compareVersions } from '../version/version-checker.js';
 import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
+import { isRepairableError } from '../manifests/schema.js';
 import { confirm } from '@clack/prompts';
 
 /**
@@ -325,8 +326,8 @@ async function validateVersionBeforeInstall(platform, targetDir, currentVersion,
   // Try to read existing manifest
   let manifestResult = await readManifest(manifestPath);
   
-  // If corrupt, try to repair
-  if (!manifestResult.success && manifestResult.reason === 'corrupt') {
+  // If corrupt or invalid schema, try to repair
+  if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
     manifestResult = await repairManifest(manifestPath);
   }
 
