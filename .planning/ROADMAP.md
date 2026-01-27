@@ -296,35 +296,49 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
-### Phase 5: Atomic Transactions and Rollback
+### Phase 5: Pre-Installation Validation & Manifest Generation
 
-**Goal:** Installation fails mid-process → all completed operations rollback, leaving no partial state
+**Goal:** Validate installation conditions before any writes, generate manifest after successful installation
 
-**Dependencies:** Phase 2-3 (needs file operations and adapters)
+**SCOPE CHANGE:** No rollback implementation. Focus on prevention (validation) over recovery.
+
+**Dependencies:** Phase 2-4 (needs file operations, adapters, and interactive CLI)
+
+**Plans:** 2 plans
 
 **Requirements Mapped:**
-- INSTALL-04: Atomic operations with rollback
 - INSTALL-05: Pre-installation validation
 - VERSION-01: Installation manifest
+- (INSTALL-04 deferred - no rollback in Phase 5)
 
 **Success Criteria:**
-1. Installer tracks every file write and directory creation
-2. On failure (permission denied, disk full, etc.), rollback undoes all operations in reverse order
-3. User is left with clean state (either fully installed or nothing changed)
-4. Pre-installation checks detect problems before any writes (disk space, permissions, conflicts)
-5. Manifest written to `/get-shit-done/.gsd-install-manifest.json` in each installation path after successful installation
-6. Manifest includes: version (2.0.0), timestamp, installed files, platform, scope (global/local)
+1. Pre-installation disk space check (exact + 10% buffer)
+2. Pre-installation permission check (test actual write)
+3. Existing installation detection (read manifest)
+4. Path validation (no traversal, no system directories)
+5. Manifest generation after successful install
+6. Manifest includes: gsd_version, platform, scope, timestamp, file list
+7. Error logging to `.gsd-error.log` in target directory
+8. User-friendly error messages on terminal
+9. Actionable guidance on validation failures
+10. Clear retry instructions on installation failure
 
 **Key Deliverables:**
-- `/bin/lib/io/transaction.js` (InstallTransaction class)
-- `/bin/lib/io/operations.js` (WriteFile, CreateDir operations with undo)
-- `/bin/lib/validation/pre-install-checks.js` (disk space, permissions)
-- `/bin/lib/validation/conflict-detection.js` (check existing files)
-- Installation manifest generation
+- `/bin/lib/validation/pre-install-checks.js` (validation functions)
+- `/bin/lib/validation/manifest-generator.js` (manifest with file list)
+- `/bin/lib/validation/error-logger.js` (error logging and formatting)
+- Updated `orchestrator.js` with validation gate and manifest generation
+- Updated `installation-core.js` with error logging wrapper
+
+**Plans:**
+- [ ] 05-01-PLAN.md — Pre-Installation Validation Module (Wave 1)
+- [ ] 05-02-PLAN.md — Manifest Generation & Integration (Wave 2)
 
 **Notes:**
-- This addresses Critical Risk #1 (partial installations) from research/risks.md
-- Transaction pattern: track operations → execute → rollback on error
+- Prevention over recovery: validation catches ~80% of failures before writes
+- No rollback complexity: simpler codebase, faster execution
+- Manual cleanup required on failure (clear instructions provided)
+- Trade-off accepted: partial installations possible but rare
 
 ---
 
