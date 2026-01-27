@@ -1,4 +1,5 @@
 import { PlatformAdapter } from './base-adapter.js';
+import { getPlatformDir, getPathReference } from './platform-paths.js';
 
 /**
  * Platform adapter for GitHub Copilot CLI
@@ -38,7 +39,8 @@ export class CopilotAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getTargetDir(isGlobal) {
-    return isGlobal ? '~/.copilot' : '.github';
+    const dir = getPlatformDir('copilot', isGlobal);
+    return isGlobal ? `~/${dir}` : dir;
   }
   
   /**
@@ -54,7 +56,7 @@ export class CopilotAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getPathReference() {
-    return '.github';
+    return getPathReference('copilot');
   }
   
   /**

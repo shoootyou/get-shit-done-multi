@@ -1,4 +1,5 @@
 import { PlatformAdapter } from './base-adapter.js';
+import { getPlatformDir, getPathReference } from './platform-paths.js';
 
 /**
  * Platform adapter for Codex CLI
@@ -45,7 +46,8 @@ export class CodexAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getTargetDir(isGlobal) {
-    return isGlobal ? '~/.codex' : '.codex';
+    const dir = getPlatformDir('codex', isGlobal);
+    return isGlobal ? `~/${dir}` : dir;
   }
   
   /**
@@ -62,7 +64,7 @@ export class CodexAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getPathReference() {
-    return '.codex';
+    return getPathReference('codex');
   }
   
   /**

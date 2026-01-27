@@ -1,8 +1,7 @@
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
-
-const MANIFEST_FILE = '.gsd-install-manifest.json';
+import { getAllGlobalPaths, getAllLocalPaths, derivePlatformFromPath, MANIFEST_FILE } from '../platforms/platform-paths.js';
 
 export async function findInstallations(scope, customPaths = [], verbose = false) {
   // Get standard paths for scope
@@ -42,7 +41,7 @@ export async function findInstallations(scope, customPaths = [], verbose = false
       return {
         path: manifestPath,
         scope: deriveScope(manifestPath, scope),
-        platform: derivePlatform(manifestPath)
+        platform: derivePlatformFromPath(manifestPath)
       };
     })
   );
@@ -51,25 +50,15 @@ export async function findInstallations(scope, customPaths = [], verbose = false
 }
 
 function getManifestPaths(scope) {
-  const homeDir = os.homedir();
-  
   // If no scope is provided (for custom-path-only mode), return empty array
   if (!scope) {
     return [];
   }
   
   if (scope === 'global') {
-    return [
-      path.join(homeDir, '.claude', 'get-shit-done', MANIFEST_FILE),
-      path.join(homeDir, '.copilot', 'get-shit-done', MANIFEST_FILE),
-      path.join(homeDir, '.codex', 'get-shit-done', MANIFEST_FILE)
-    ];
+    return getAllGlobalPaths();
   } else {
-    return [
-      path.join(process.cwd(), '.claude', 'get-shit-done', MANIFEST_FILE),
-      path.join(process.cwd(), '.github', 'get-shit-done', MANIFEST_FILE),
-      path.join(process.cwd(), '.codex', 'get-shit-done', MANIFEST_FILE)
-    ];
+    return getAllLocalPaths();
   }
 }
 
@@ -85,25 +74,4 @@ function deriveScope(manifestPath, hintScope) {
   }
   // Otherwise assume local
   return 'local';
-}
-
-function derivePlatform(manifestPath) {
-  // Extract platform from path structure
-  // Example: ~/.claude/get-shit-done/... → 'claude'
-  const parts = manifestPath.split(path.sep);
-  const platformDirIndex = parts.findIndex(p => 
-    p === '.claude' || p === '.copilot' || p === '.codex' || p === '.github'
-  );
-  
-  if (platformDirIndex === -1) {
-    // For custom paths where we can't derive platform from path,
-    // we'll need to read the manifest to get the platform
-    // Return a placeholder that will be resolved by reading the manifest
-    return 'custom';
-  }
-  
-  const platformDir = parts[platformDirIndex];
-  // Map .github to copilot (local copilot uses .github)
-  if (platformDir === '.github') return 'copilot';
-  return platformDir.substring(1); // Remove leading dot
 }

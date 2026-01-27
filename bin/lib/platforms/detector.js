@@ -1,7 +1,6 @@
 // bin/lib/platforms/detector.js
 import { pathExists } from '../io/file-operations.js';
-import { homedir } from 'os';
-import { join } from 'path';
+import { getManifestPath } from './platform-paths.js';
 
 /**
  * Detect GSD installations by checking for manifest files
@@ -14,17 +13,11 @@ export async function detectInstallations() {
     codex: { global: false, local: false, version: null }
   };
   
-  const home = homedir();
-  
-  // Check global installations
-  results.claude.global = await isGSDInstalled(join(home, '.claude'));
-  results.copilot.global = await isGSDInstalled(join(home, '.copilot'));
-  results.codex.global = await isGSDInstalled(join(home, '.codex'));
-  
-  // Check local installations (current directory)
-  results.claude.local = await isGSDInstalled('.claude');
-  results.copilot.local = await isGSDInstalled('.github');
-  results.codex.local = await isGSDInstalled('.codex');
+  // Check all platforms for global and local installations
+  for (const platform of ['claude', 'copilot', 'codex']) {
+    results[platform].global = await isGSDInstalled(platform, true);
+    results[platform].local = await isGSDInstalled(platform, false);
+  }
   
   // TODO: Read version from manifest (Phase 6 - VERSION-02)
   // For now, just detect presence
@@ -33,13 +26,13 @@ export async function detectInstallations() {
 }
 
 /**
- * Check if GSD is installed in a directory
- * @param {string} dir - Directory to check
+ * Check if GSD is installed for a platform
+ * @param {string} platform - Platform ID (claude, copilot, codex)
+ * @param {boolean} isGlobal - Check global or local scope
  * @returns {Promise<boolean>}
  */
-async function isGSDInstalled(dir) {
-  // GSD is installed if manifest exists
-  const manifestPath = join(dir, 'get-shit-done', '.gsd-install-manifest.json');
+async function isGSDInstalled(platform, isGlobal) {
+  const manifestPath = getManifestPath(platform, isGlobal);
   return await pathExists(manifestPath);
 }
 

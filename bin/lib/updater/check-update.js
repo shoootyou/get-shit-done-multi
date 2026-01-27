@@ -1,7 +1,8 @@
 const { findInstallations } = await import('../version/installation-finder.js');
 const { readManifestWithRepair } = await import('../version/manifest-reader.js');
 const { compareVersions, formatPlatformOption } = await import('../version/version-checker.js');
-const { banner } = await import('../cli/banner-manager.js')
+const { banner } = await import('../cli/banner-manager.js');
+const { getInstallPath } = await import('../platforms/platform-paths.js');
 import * as logger from '../cli/logger.js';
 
 /**

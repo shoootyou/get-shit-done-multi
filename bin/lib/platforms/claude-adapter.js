@@ -1,4 +1,5 @@
 import { PlatformAdapter } from './base-adapter.js';
+import { getPlatformDir, getPathReference } from './platform-paths.js';
 
 /**
  * Platform adapter for Claude Code
@@ -26,7 +27,8 @@ export class ClaudeAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getTargetDir(isGlobal) {
-    return isGlobal ? '~/.claude' : '.claude';
+    const dir = getPlatformDir('claude', isGlobal);
+    return isGlobal ? `~/${dir}` : dir;
   }
   
   /**
@@ -42,7 +44,7 @@ export class ClaudeAdapter extends PlatformAdapter {
    * @returns {string}
    */
   getPathReference() {
-    return '.claude';
+    return getPathReference('claude');
   }
   
   /**
