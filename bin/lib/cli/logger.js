@@ -90,11 +90,12 @@ export function error(message, indent = 0, fullColor = false) {
 /**
  * Log verbose message (only if verbose mode)
  * @param {string} message - Message to log
+ * @param {number} [indent=0] - Number of spaces to indent
  * @param {boolean} isVerbose - Verbose mode flag
  * @returns {void}
  */
-export function verbose(message, isVerbose) {
-  logWithIcon('→', chalk.gray, message, 2, false, console.log, isVerbose);
+export function verbose(message, indent = 0, isVerbose) {
+  logWithIcon('→', chalk.gray, message, indent, false, console.log, isVerbose);
 }
 
 /**

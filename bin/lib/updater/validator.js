@@ -34,7 +34,6 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
 
     if (verbose) {
         logger.success(`Manifest read successfully`, 2);
-        logger.success(`Version: ${manifestResult.manifest.gsd_version}`, 2);
     }
 
     const platform = manifestResult.manifest.platform || 'unknown';
