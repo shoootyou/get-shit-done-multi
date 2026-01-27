@@ -58,7 +58,7 @@ async function checkCustomPath(customPath, currentVersion, verbose) {
         }
 
         console.log('')
-        showNoInstallationMessage(['claude', 'copilot', 'codex']);
+        showNoInstallationMessage();
         return;
     }
 

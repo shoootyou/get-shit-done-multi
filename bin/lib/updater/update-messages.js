@@ -5,19 +5,27 @@ import * as logger from '../cli/logger.js';
 /**
  * Show message when no installation is found
  * @param {string[]} platforms - Array of platform keys (claude, copilot, codex)
- * @param {number} indent - Number of spaces to indent (default: 1)
  */
-export function showNoInstallationMessage(platforms, indent = 1) {
-  logger.blockTitle('No Installation Found', { width: 80 });
-  logger.info('GSD is not installed at this location', indent);
+export function showNoInstallationMessage(platforms) {
+  logger.blockTitle('Next Steps', { width: 80 });
+  logger.verbose('To install GSD Multi, run one of these commands:', 1);
+
+  let nonePlatforms = false;
+  if (!Array.isArray(platforms) || platforms.length === 0) { nonePlatforms = true; }
+
+  if (nonePlatforms || platforms.includes('claude')) {
+    logger.listItem('npx get-shit-done-multi --claude --custom-path=/my/custom/path', 3);
+  }
+  if (nonePlatforms || platforms.includes('copilot')) {
+    logger.listItem('npx get-shit-done-multi --copilot --custom-path=/my/custom/path', 3);
+  }
+  if (nonePlatforms || platforms.includes('codex')) {
+    logger.listItem('npx get-shit-done-multi --codex --custom-path=/my/custom/path', 3);
+  }
+
   console.log('');
-  logger.info('To install GSD, run one of these commands:', indent);
-  logger.info('  npx get-shit-done-multi --claude --global', indent + 1);
-  logger.info('  npx get-shit-done-multi --copilot --local', indent + 1);
-  logger.info('  npx get-shit-done-multi --codex --global', indent + 1);
-  console.log('');
-  logger.info('Or run in interactive mode:', indent);
-  logger.info('  npx get-shit-done-multi', indent + 1);
+  logger.verbose('Or run in interactive mode:', 1);
+  logger.listItem('npx get-shit-done-multi --custom-path=/my/custom/path', 3);
 }
 
 /**
@@ -33,7 +41,7 @@ export function showUpdateAvailableMessage(platform, currentVersion, availableVe
   logger.info(`${platform}: v${currentVersion} → v${availableVersion} (${updateType} update)`, indent);
   console.log('');
   logger.info('To update, run the installer again with the same flags you used initially', indent);
-  logger.info('Example: npx get-shit-done-multi --claude --global', indent + 1);
+  logger.listItem('Example: npx get-shit-done-multi --claude --global', indent + 1);
 }
 
 /**
