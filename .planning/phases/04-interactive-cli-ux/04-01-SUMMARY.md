@@ -48,15 +48,23 @@ Add interactive mode with @clack/prompts for beautiful UX when no CLI flags prov
    - `bin/lib/cli/flag-parser.js` - Platform/scope flag parsing
    - `bin/lib/cli/mode-detector.js` - Interactive mode detection
    - `bin/lib/platforms/platform-names.js` - Platform name utilities
+   - `bin/lib/cli/banner-manager.js` - Banner and context display (refinement)
+   - `bin/lib/cli/install-loop.js` - Installation loop centralization (refinement)
 
-6. **Documentation** (`bin/lib/cli/README.md`)
+6. **Logger Unification** (`bin/lib/cli/logger.js` - refinement)
+   - Created generic `subtitle()` function with type parameter
+   - `warnSubtitle()`, `infoSubtitle()`, `simpleSubtitle()` now delegate
+   - Reduced code duplication from 63 lines to 28 lines
+   - Consistent subtitle formatting across all output
+
+7. **Documentation** (`bin/lib/cli/README.md`)
    - Architecture overview (371 lines)
    - Adapter → Core pattern documentation
    - Command prefix rules
    - Extension points for future features
 
 ### Orchestrator Improvements
-7. **Multi-Platform Output** (`bin/lib/installer/orchestrator.js`)
+8. **Multi-Platform Output** (`bin/lib/installer/orchestrator.js`)
    - Platform-labeled progress bars ("claude Skills" not just "Skills")
    - Proper sequential installation
    - Clean section headers (Warnings, Installing...)
@@ -134,17 +142,20 @@ All deviations improved code quality, eliminated duplication, and enhanced UX. C
 ## Artifacts Created
 
 ### Code Files
-- bin/lib/cli/interactive.js (200 lines)
-- bin/lib/cli/installation-core.js (175 lines)
-- bin/lib/cli/next-steps.js (50 lines)
+- bin/lib/cli/interactive.js (135 lines - final)
+- bin/lib/cli/installation-core.js (115 lines - final)
+- bin/lib/cli/next-steps.js (57 lines)
 - bin/lib/cli/usage.js (40 lines)
 - bin/lib/cli/flag-parser.js (35 lines)
 - bin/lib/cli/mode-detector.js (30 lines)
+- bin/lib/cli/banner-manager.js (19 lines - refinement)
+- bin/lib/cli/install-loop.js (39 lines - refinement)
 - bin/lib/platforms/platform-names.js (32 lines)
 - bin/lib/cli/README.md (371 lines)
 
 ### Modified Files
-- bin/install.js (refactored from 119 to 97 lines)
+- bin/install.js (refactored from 119 to 82 lines - final after refinements)
+- bin/lib/cli/logger.js (unified subtitle functions - refinement)
 - bin/lib/installer/orchestrator.js (multi-platform improvements)
 - package.json (added @clack/prompts@^0.11.0)
 
@@ -174,6 +185,21 @@ Primary commits (chronological):
 - `eaa773a` - fix(04-01): fix multi-platform output duplication
 
 Total: 13 commits over iterative refinement
+
+**Post-completion refinement commits:**
+- `3ab9b88` - refactor(04-01): Messages for cli and with parameter
+- `5f27124` - fix(04-01): jump lines and indentation
+- `67a30e9` - fix(04-01): Fix interactive menu and centralize process
+- `d003bf6` - fix(04-01): Refactor and unify CLI logic under /bin/lib/cli
+
+**Refinement improvements:**
+- Created `bin/lib/cli/install-loop.js` to centralize installation loop
+- Created `bin/lib/cli/banner-manager.js` for banner display
+- Unified subtitle functions in `logger.js` (reduced 63 → 28 lines)
+- Eliminated code duplication between install.js and interactive.js
+- Both CLI and interactive modes now use shared `executeInstallationLoop()`
+
+Total: 17 commits (13 initial + 4 refinement)
 
 ## Must-Have Verification
 

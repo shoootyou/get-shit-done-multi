@@ -342,6 +342,25 @@ Overall Progress:
     - Reduced install.js from 119 to 97 lines
     - Rationale: Clean code organization, single responsibility per module
 
+46. **2026-01-27 (04-01 refinement):** CLI logic unification (CLI-UNIFICATION-01)
+    - Created install-loop.js to centralize installation loop logic
+    - Created banner-manager.js for banner and context display
+    - Unified subtitle functions in logger.js with generic subtitle() function
+    - Eliminated code duplication between install.js and interactive.js
+    - Rationale: DRY principle, single source of truth for installation flow
+
+47. **2026-01-27 (04-01 refinement):** Logger function consolidation (CLI-UNIFICATION-02)
+    - Created generic subtitle() function with type parameter ('warn', 'info', 'none')
+    - warnSubtitle(), infoSubtitle(), simpleSubtitle() now delegate to subtitle()
+    - Reduced code duplication from 63 lines to 28 lines
+    - Rationale: Eliminate repetitive subtitle implementation code
+
+48. **2026-01-27 (04-01 refinement):** Installation loop centralization (CLI-UNIFICATION-03)
+    - Created executeInstallationLoop() shared function in install-loop.js
+    - Both CLI mode (install.js) and interactive mode (interactive.js) use same loop
+    - Eliminated ~40 lines of duplicated loop logic
+    - Rationale: Single place to update multi-platform installation logic
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -431,13 +450,16 @@ None
 
 ### Project Files
 - `package.json` — Project metadata (updated with @clack/prompts, cli-progress, chalk, fs-extra)
-- `bin/install.js` — NPM entry point (✅ Updated in 04-01, refactored to 97 lines)
+- `bin/install.js` — NPM entry point (✅ Updated in 04-01, refactored to 82 lines)
 - `bin/lib/errors/install-error.js` — Custom error types (✅ Created in 02-01)
 - `bin/lib/io/file-operations.js` — File operations with fs-extra (✅ Created in 02-02)
 - `bin/lib/paths/path-resolver.js` — Path validation and security (✅ Created in 02-02)
 - `bin/lib/rendering/template-renderer.js` — Template variable replacement (✅ Created in 02-02)
+- `bin/lib/rendering/frontmatter-cleaner.js` — Frontmatter cleaning utilities (✅ Created in 02-02)
+- `bin/lib/cli/banner-manager.js` — Banner and context display (✅ Created in 04-01 refinement)
+- `bin/lib/cli/install-loop.js` — Installation loop logic (✅ Created in 04-01 refinement)
 - `bin/lib/cli/progress.js` — Progress bar utilities (✅ Created in 02-02)
-- `bin/lib/cli/logger.js` — Logging with chalk (✅ Created in 02-02)
+- `bin/lib/cli/logger.js` — Logging with chalk and subtitle unification (✅ Created in 02-02, enhanced in 04-01)
 - `bin/lib/cli/interactive.js` — Interactive mode orchestrator (✅ Created in 04-01)
 - `bin/lib/cli/installation-core.js` — Shared installation logic (✅ Created in 04-01)
 - `bin/lib/cli/next-steps.js` — Next steps display (✅ Created in 04-01)
