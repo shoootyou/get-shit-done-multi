@@ -37,7 +37,6 @@ export async function readManifest(manifestPath) {
     
     // Success
     return { success: true, manifest };
-    
   } catch (error) {
     // Permission errors
     if (error.code === 'EACCES') {

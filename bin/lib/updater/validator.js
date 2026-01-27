@@ -3,6 +3,7 @@ import { repairManifest } from '../manifests/repair.js';
 import { isRepairableError } from '../manifests/schema.js';
 import * as logger from '../cli/logger.js';
 import { compareVersions } from '../version/version-checker.js';
+import { MANIFEST_ERRORS } from '../manifests/schema.js';
 
 /**
  * Validate a single installation
@@ -17,7 +18,7 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
     // If corrupt or invalid schema, try to repair
     if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
         if (verbose) {
-            logger.success(`Manifest corrupt, attempting repair...`, 2);
+            logger.warn(`Manifest corrupt, attempting repair...`, 2);
         }
         manifestResult = await repairManifest(manifestPath);
     }

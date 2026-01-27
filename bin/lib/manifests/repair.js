@@ -13,8 +13,6 @@ import * as logger from '../cli/logger.js';
  */
 export async function repairManifest(manifestPath) {
   try {
-    logger.warn(`Attempting to repair manifest: ${manifestPath}`, 2);
-
     const installDir = path.dirname(manifestPath);
 
     // Scan directory to reconstruct file list
