@@ -9,17 +9,16 @@ import { Command } from 'commander';
 import { fileURLToPath } from 'url';
 import { resolve, dirname } from 'path';
 import { readFile } from "fs/promises";
-import { getTemplatesDirectory } from './lib/paths/path-resolver.js';
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import * as logger from './lib/cli/logger.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
-import { getPlatformName } from './lib/platforms/platform-names.js';
 import { runInteractive } from './lib/cli/interactive.js';
-import { installPlatforms } from './lib/cli/installation-core.js';
 import { showUsageError } from './lib/cli/usage.js';
 import { parsePlatformFlags, parseScope } from './lib/cli/flag-parser.js';
 import { shouldUseInteractiveMode, isValidTTY } from './lib/cli/mode-detector.js';
 import { showNextSteps } from './lib/cli/next-steps.js';
+import { showBannerWithContext } from './lib/cli/banner-manager.js';
+import { executeInstallationLoop } from './lib/cli/install-loop.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -61,12 +60,8 @@ async function main() {
   // Parse platforms
   const platforms = parsePlatformFlags(options, adapterRegistry);
 
-  // Show banner with version
-  logger.banner(`${pkg.version}`);
-
-  const templatesDir = getTemplatesDirectory(__dirname);
-  logger.info(`Using templates from: ${templatesDir}`, 1);
-  console.log(); // Jump line after banner
+  // Show banner with version and context
+  showBannerWithContext(__dirname, pkg.version);
 
   // Check for interactive mode
   if (shouldUseInteractiveMode(platforms, isValidTTY())) {
@@ -78,30 +73,12 @@ async function main() {
       process.exit(EXIT_CODES.INVALID_ARGS);
     }
 
-    // Parse scope
+    // Parse scope and execute installation loop
     const scope = parseScope(options);
-    const count = platforms.length;
-
-    // Install platforms
-    for (const platform of platforms) {
-      if (platforms.length > 1) {
-        logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
-          style: 'double',
-          width: 80,
-        });
-      } else {
-        logger.blockTitle(`Installing ${getPlatformName(platform)} (${scope})`, {
-          style: 'double',
-          width: 80,
-        });
-      }
-
-      await installPlatforms(platform, scope, pkg.version, {
-        scriptDir: __dirname,
-        verbose: options.verbose || false,
-      });
-      console.log(); // One jump line between platform installations
-    }
+    await executeInstallationLoop(platforms, scope, pkg.version, {
+      scriptDir: __dirname,
+      verbose: options.verbose || false,
+    });
   }
 
   showNextSteps(platforms, 1);

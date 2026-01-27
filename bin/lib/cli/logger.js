@@ -218,25 +218,41 @@ export function simpleTitle(title) {
 }
 
 /**
+ * Generic subtitle with optional icon
+ * @param {string} message - Message to log
+ * @param {object} options - Options
+ * @param {'warn'|'info'|'none'} options.type - Subtitle type
+ * @param {number} options.indent - Indentation level
+ * @param {number} options.width - Maximum width
+ */
+export function subtitle(message, options = {}) {
+  const { type = 'none', indent = 0, width = 80 } = options;
+  
+  const terminalWidth = process.stdout.columns || 80;
+  const effectiveWidth = Math.min(width, terminalWidth);
+  const prefix = '  '.repeat(indent);
+  
+  let icon = '';
+  if (type === 'warn') icon = chalk.yellow('⚠') + ' ';
+  if (type === 'info') icon = chalk.blue('ℹ') + ' ';
+  
+  const leftPart = prefix + "─── " + icon + message + " ";
+  const visibleLength = prefix.length + 4 + (icon ? 2 : 0) + message.length + 1;
+  const remainingWidth = effectiveWidth - visibleLength;
+  const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
+  
+  console.log();
+  console.log(' ' + leftPart + dashes);
+}
+
+/**
  * Log warning message with optional indentation and trailing dashes
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
  * @param {number} width - Maximum width (default: terminal columns or 80)
  */
 export function warnSubtitle(message, indent = 0, width = 80) {
-  const terminalWidth = process.stdout.columns || 80;
-  const effectiveWidth = Math.min(width, terminalWidth);
-
-  const prefix = '  '.repeat(indent);
-  const icon = chalk.yellow('⚠');
-  const leftPart = prefix + "─── " + icon + " " + message + " ";
-
-  // Calculate visible length (without ANSI codes)
-  const visibleLength = prefix.length + 4 + message.length + 2; // "───⚠ message "
-  const remainingWidth = effectiveWidth - visibleLength;
-  const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
-  console.log();
-  console.warn(' ' + leftPart + dashes);
+  subtitle(message, { type: 'warn', indent, width });
 }
 
 /**
@@ -246,38 +262,15 @@ export function warnSubtitle(message, indent = 0, width = 80) {
  * @param {number} width - Maximum width (default: terminal columns or 80)
  */
 export function infoSubtitle(message, indent = 0, width = 80) {
-  const terminalWidth = process.stdout.columns || 80;
-  const effectiveWidth = Math.min(width, terminalWidth);
-
-  const prefix = '  '.repeat(indent);
-  const icon = chalk.blue('ℹ');
-  const leftPart = prefix + "─── " + icon + " " + message + " ";
-
-  // Calculate visible length (without ANSI codes)
-  const visibleLength = prefix.length + 4 + message.length + 2; // "───ℹ message "
-  const remainingWidth = effectiveWidth - visibleLength;
-  const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
-  console.log();
-  console.warn(' ' + leftPart + dashes);
+  subtitle(message, { type: 'info', indent, width });
 }
 
 /**
- * Log informational message with optional indentation and trailing dashes
+ * Log simple subtitle message with optional indentation and trailing dashes
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
  * @param {number} width - Maximum width (default: terminal columns or 80)
  */
 export function simpleSubtitle(message, indent = 0, width = 80) {
-  const terminalWidth = process.stdout.columns || 80;
-  const effectiveWidth = Math.min(width, terminalWidth);
-
-  const prefix = '  '.repeat(indent);
-  const leftPart = prefix + "─── " + message + " ";
-
-  // Calculate visible length (without ANSI codes)
-  const visibleLength = prefix.length + 4 + message.length + 2; // "───ℹ message "
-  const remainingWidth = effectiveWidth - visibleLength;
-  const dashes = remainingWidth > 0 ? '─'.repeat(remainingWidth) : '';
-  console.log();
-  console.warn(' ' + leftPart + dashes);
+  subtitle(message, { type: 'none', indent, width });
 }

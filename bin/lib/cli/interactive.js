@@ -1,10 +1,10 @@
 import * as p from '@clack/prompts';
 import { detectBinaries } from '../platforms/binary-detector.js';
 import { getInstalledVersion } from '../platforms/detector.js';
-import { getPlatformName } from '../platforms/platform-names.js';
-import { installPlatforms, getScriptDir } from './installation-core.js';
+import { getScriptDir } from './installation-core.js';
 import * as logger from './logger.js';
 import { platformNames } from '../platforms/platform-names.js';
+import { executeInstallationLoop } from './install-loop.js';
 
 /**
  * Run interactive installation mode with beautiful prompts
@@ -37,27 +37,11 @@ export async function runInteractive(appVersion, options = {}) {
   console.log();
 
   try {
-    const count = platforms.length;
-    for (const platform of platforms) {
-      if (platforms.length > 1) {
-        logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
-          style: 'double',
-          width: 80,
-        });
-      } else {
-        logger.blockTitle(`Installing ${getPlatformName(platform)} (${scope})`, {
-          style: 'double',
-          width: 80,
-        });
-      }
-
-      await installPlatforms(platform, scope, appVersion, {
-        scriptDir,
-        verbose: options.verbose || false,
-      });
-
-      console.log(); // Add spacing at end
-    }
+    // Execute installation loop for selected platforms
+    await executeInstallationLoop(platforms, scope, appVersion, {
+      scriptDir,
+      verbose: options.verbose || false,
+    });
   } catch (error) {
     // Installation failed
     console.log();
