@@ -82,8 +82,6 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
     logger.success(`Completed: ${successes[0].platformLabel} installation`, 2);
   }
 
-
-
   return {
     successes,
     failures,

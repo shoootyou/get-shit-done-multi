@@ -61,48 +61,47 @@ async function main() {
   // Parse platforms
   const platforms = parsePlatformFlags(options, adapterRegistry);
 
-  // Check for interactive mode
-  if (shouldUseInteractiveMode(platforms, isValidTTY())) {
-    await runInteractive(options);
-    process.exit(0);
-  }
-
-  // Non-interactive without flags - show usage
-  if (platforms.length === 0 && !isValidTTY()) {
-    showUsageError();
-    process.exit(EXIT_CODES.INVALID_ARGS);
-  }
-
-  // Parse scope
-  const scope = parseScope(options);
-
+  // Show banner with version
   logger.banner(`${pkg.version}`);
-
-  const count = platforms.length;
 
   const templatesDir = getTemplatesDirectory(__dirname);
   logger.info(`Using templates from: ${templatesDir}`, 1);
   console.log(); // Jump line after banner
 
-  // Install platforms
-  for (const platform of platforms) {
-    if (platforms.length > 1) {
-      logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
-        style: 'double',
-        width: 80,
-      });
-    } else {
-      logger.blockTitle(`Installing ${getPlatformName(platform)} (${scope})`, {
-        style: 'double',
-        width: 80,
-      });
+  // Check for interactive mode
+  if (shouldUseInteractiveMode(platforms, isValidTTY())) {
+    await runInteractive(pkg.version, options);
+  } else {
+    // Non-interactive without flags - show usage
+    if (platforms.length === 0 && !isValidTTY()) {
+      showUsageError();
+      process.exit(EXIT_CODES.INVALID_ARGS);
     }
 
-    await installPlatforms(platform, scope, pkg.version, {
-      scriptDir: __dirname,
-      verbose: options.verbose || false,
-    });
-    console.log(); // One jump line between platform installations
+    // Parse scope
+    const scope = parseScope(options);
+    const count = platforms.length;
+
+    // Install platforms
+    for (const platform of platforms) {
+      if (platforms.length > 1) {
+        logger.blockTitle(`Installing ${platforms.indexOf(platform) + 1}/${count} - ${getPlatformName(platform)} (${scope})`, {
+          style: 'double',
+          width: 80,
+        });
+      } else {
+        logger.blockTitle(`Installing ${getPlatformName(platform)} (${scope})`, {
+          style: 'double',
+          width: 80,
+        });
+      }
+
+      await installPlatforms(platform, scope, pkg.version, {
+        scriptDir: __dirname,
+        verbose: options.verbose || false,
+      });
+      console.log(); // One jump line between platform installations
+    }
   }
 
   showNextSteps(platforms, 1);
