@@ -129,6 +129,50 @@ async function discoverInstallationsWithStatus(scope, currentVersion, customPath
 async function promptSelections(detected, appVersion, options = {}) {
   // Discover installations for both global and local scopes
   const customPaths = options.customPath ? [options.customPath] : [];
+  
+  // If custom path is provided, treat it as implicit local scope and skip scope prompt
+  if (options.customPath) {
+    const localInstallations = await discoverInstallationsWithStatus('local', appVersion, customPaths);
+    
+    const platforms = await p.group(
+      {
+        platforms: () => {
+          return p.multiselect({
+            message: 'Select platforms to install GSD:',
+            options: [
+              {
+                value: 'claude',
+                label: formatPlatformOption('claude', localInstallations.get('claude')),
+                hint: getHintForPlatform('claude', localInstallations.get('claude'), detected.claude)
+              },
+              {
+                value: 'copilot',
+                label: formatPlatformOption('copilot', localInstallations.get('copilot')),
+                hint: getHintForPlatform('copilot', localInstallations.get('copilot'), detected.copilot)
+              },
+              {
+                value: 'codex',
+                label: formatPlatformOption('codex', localInstallations.get('codex')),
+                hint: getHintForPlatform('codex', localInstallations.get('codex'), detected.codex)
+              }
+            ],
+            required: true
+          });
+        }
+      },
+      {
+        onCancel: () => {
+          p.cancel('Installation cancelled.');
+          process.exit(0);
+        }
+      }
+    );
+    
+    // Return with implicit local scope
+    return { platforms: platforms.platforms, scope: 'local' };
+  }
+  
+  // Normal flow: prompt for both scope and platforms
   const globalInstallations = await discoverInstallationsWithStatus('global', appVersion, customPaths);
   const localInstallations = await discoverInstallationsWithStatus('local', appVersion, customPaths);
   
