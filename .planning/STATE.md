@@ -504,7 +504,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 pending todo:
+- **Fix manifest file structure inconsistency** (versioning) - `generateAndWriteManifest` creates `files: ["path"]` but `readManifestWithRepair` creates `files: [{path: "path"}]` - inconsistent data structures need alignment
 
 ### Blockers
 None
