@@ -1,6 +1,7 @@
 // bin/lib/updater/check-custom-path.js
 
-import { formatStatusLine, validateInstallation } from './format-status.js';
+import { formatStatusLine } from './format-status.js';
+import { validateInstallation } from './validator.js';
 import { showNoInstallationMessage } from './update-messages.js';
 import * as logger from '../cli/logger.js';
 import fs from 'fs-extra';
@@ -25,7 +26,7 @@ export async function checkCustomPath(customPath, currentVersion, verbose) {
 
     console.log('')
     logger.simpleSubtitle('Custom path status');
-    
+
     if (!exists) {
         logger.error('Installation not found', 2);
         if (verbose) {
