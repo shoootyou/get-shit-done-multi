@@ -4,18 +4,41 @@ import chalk from 'chalk';
 import { getPlatformName } from '../platforms/platform-names.js';
 
 /**
- * Log info message with optional indentation
+ * Internal: Base function for logging with icon and optional color
+ * @param {string} icon - Icon to display
+ * @param {function|null} colorFn - Chalk color function (null for no color)
+ * @param {string} message - Message to log
+ * @param {number} indent - Indentation level
+ * @param {boolean} fullColor - Apply color to entire line
+ * @param {function} logFn - Console function to use (log, warn, error)
+ * @param {boolean} condition - Only log if condition is true (default: true)
+ */
+function logWithIcon(icon, colorFn, message, indent, fullColor, logFn = console.log, condition = true) {
+  if (!condition) return;
+  
+  const prefix = ' '.repeat(indent);
+  
+  // No color function - plain output
+  if (!colorFn) {
+    logFn(prefix + icon, message);
+    return;
+  }
+  
+  // With color function
+  if (fullColor) {
+    logFn(prefix + colorFn(icon + ' ' + message));
+  } else {
+    logFn(prefix + colorFn(icon), message);
+  }
+}
+
+/**
+ * Log list item with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
- * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
-export function listItem(message, indent = 0, fullColor = false) {
-  const prefix = ' '.repeat(indent);
-  if (fullColor) {
-    console.log(prefix + '• ' + message);
-  } else {
-    console.log(prefix + '•', message);
-  }
+export function listItem(message, indent = 0) {
+  logWithIcon('•', null, message, indent, false);
 }
 
 /**
@@ -25,12 +48,7 @@ export function listItem(message, indent = 0, fullColor = false) {
  * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
 export function info(message, indent = 0, fullColor = false) {
-  const prefix = ' '.repeat(indent);
-  if (fullColor) {
-    console.log(prefix + chalk.blue('ℹ ' + message));
-  } else {
-    console.log(prefix + chalk.blue('ℹ'), message);
-  }
+  logWithIcon('ℹ', chalk.blue, message, indent, fullColor);
 }
 
 /**
@@ -40,12 +58,7 @@ export function info(message, indent = 0, fullColor = false) {
  * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
 export function success(message, indent = 0, fullColor = false) {
-  const prefix = ' '.repeat(indent);
-  if (fullColor) {
-    console.log(prefix + chalk.green('✓ ' + message));
-  } else {
-    console.log(prefix + chalk.green('✓'), message);
-  }
+  logWithIcon('✓', chalk.green, message, indent, fullColor);
 }
 
 /**
@@ -55,27 +68,17 @@ export function success(message, indent = 0, fullColor = false) {
  * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
 export function warn(message, indent = 0, fullColor = false) {
-  const prefix = ' '.repeat(indent);
-  if (fullColor) {
-    console.warn(prefix + chalk.yellow('⚠ ' + message));
-  } else {
-    console.warn(prefix + chalk.yellow('⚠'), message);
-  }
+  logWithIcon('⚠', chalk.yellow, message, indent, fullColor, console.warn);
 }
 
 /**
- * Log error message
+ * Log error message with optional indentation
  * @param {string} message - Message to log
  * @param {number} indent - Number of spaces to indent (default: 0)
  * @param {boolean} fullColor - Apply color to entire line (default: false)
  */
 export function error(message, indent = 0, fullColor = false) {
-  const prefix = ' '.repeat(indent);
-  if (fullColor) {
-    console.error(prefix + chalk.red('✗ ' + message));
-  } else {
-    console.error(prefix + chalk.red('✗'), message);
-  }
+  logWithIcon('✗', chalk.red, message, indent, fullColor, console.error);
 }
 
 /**
@@ -84,9 +87,7 @@ export function error(message, indent = 0, fullColor = false) {
  * @param {boolean} isVerbose - Verbose mode flag
  */
 export function verbose(message, isVerbose) {
-  if (isVerbose) {
-    console.log(chalk.gray('  →'), message);
-  }
+  logWithIcon('→', chalk.gray, message, 2, false, console.log, isVerbose);
 }
 
 /**
@@ -95,9 +96,8 @@ export function verbose(message, isVerbose) {
  * @param {boolean} isVerbose - Verbose mode flag
  */
 export function verboseInProgress(message, isVerbose) {
-  if (isVerbose) {
-    process.stdout.write(chalk.blue('  → ') + message);
-  }
+  if (!isVerbose) return;
+  process.stdout.write(chalk.blue('  → ') + message);
 }
 
 /**
@@ -105,9 +105,8 @@ export function verboseInProgress(message, isVerbose) {
  * @param {boolean} isVerbose - Verbose mode flag
  */
 export function verboseComplete(isVerbose) {
-  if (isVerbose) {
-    process.stdout.write(' ' + chalk.green('✓') + '\n');
-  }
+  if (!isVerbose) return;
+  process.stdout.write(' ' + chalk.green('✓') + '\n');
 }
 
 /**
