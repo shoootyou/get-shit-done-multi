@@ -14,21 +14,27 @@ import { ensureDirectory } from '../io/file-operations.js';
  * @param {boolean} isGlobal - Global vs local installation
  */
 export async function generateAndWriteManifest(targetDir, gsdVersion, platform, isGlobal) {
-  // Collect all installed files (post-installation scan)
-  const files = await collectInstalledFiles(targetDir);
+  // Write manifest first with empty files list
+  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
+  await ensureDirectory(join(targetDir, 'get-shit-done'));
   
-  // Build manifest object (context decision 3.3 structure)
+  // Build initial manifest object (context decision 3.3 structure)
   const manifest = {
     gsd_version: gsdVersion,
     platform: platform,
     scope: isGlobal ? 'global' : 'local',
     installed_at: new Date().toISOString(),
-    files: files
+    files: [] // Will be populated after write
   };
   
-  // Write to target directory
-  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
-  await ensureDirectory(join(targetDir, 'get-shit-done'));
+  // Write manifest to disk first
+  await writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+  
+  // Now collect all files including the manifest itself (post-installation scan)
+  const files = await collectInstalledFiles(targetDir);
+  manifest.files = files;
+  
+  // Rewrite manifest with complete file list
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
 }
 
