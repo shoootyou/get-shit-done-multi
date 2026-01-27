@@ -6,7 +6,6 @@ import { install } from '../installer/orchestrator.js';
 import { adapterRegistry } from '../platforms/registry.js';
 import { createMultiBar } from './progress.js';
 import * as logger from './logger.js';
-import { showNextSteps } from './next-steps.js';
 import { getPlatformName } from '../platforms/platform-names.js';
 import { logInstallationError, formatValidationError, formatRuntimeError } from '../validation/error-logger.js';
 

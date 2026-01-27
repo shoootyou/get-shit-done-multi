@@ -105,7 +105,7 @@ async function main() {
     });
   }
 
-  showNextSteps(platforms, 1);
+  showNextSteps(platforms);
 }
 
 // Execute with proper error handling

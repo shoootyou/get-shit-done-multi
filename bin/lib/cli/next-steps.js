@@ -12,9 +12,9 @@ import { getCliName } from '../platforms/platform-names.js';
  * - Multiple platforms: uses /gsd- prefix (common denominator)
  * 
  * @param {string[]} platforms - Array of platform keys (claude, copilot, codex)
- * @param {number} indent - Number of spaces to indent (default: 0)
+ * @param {number} indent - Number of spaces to indent (default: 1)
  */
-export function showNextSteps(platforms, indent = 0) {
+export function showNextSteps(platforms, indent = 1) {
   // Determine command prefix based on platforms
   // Codex uses $gsd-, others use /gsd-
   const isCodexOnly = platforms.length === 1 && platforms[0] === 'codex';

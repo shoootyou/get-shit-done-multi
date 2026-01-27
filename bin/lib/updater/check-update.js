@@ -4,6 +4,7 @@ const { banner } = await import('../cli/banner-manager.js');
 const { platformDirs, getManifestPath } = await import('../platforms/platform-paths.js');
 import * as logger from '../cli/logger.js';
 import fs from 'fs-extra';
+import { showNextSteps } from '../cli/next-steps.js';
 
 /**
  * Handle --check-updates flag
@@ -16,7 +17,7 @@ export async function handleCheckUpdates(options, pkg) {
     // Show banner
     banner(currentVersion, false);
 
-    logger.blockTitle('Checking Installations', { style: 'double', width: 80 });
+    logger.blockTitle('Check for updates', { style: 'double', width: 80 });
 
     // If custom path is provided, ONLY check that path
     if (options.customPath) {
@@ -37,26 +38,36 @@ export async function handleCheckUpdates(options, pkg) {
  * @param {boolean} verbose - Verbose mode flag
  */
 async function checkCustomPath(customPath, currentVersion, verbose) {
-    logger.simpleSubtitle('Custom path installations');
-    
+    logger.info(`Mode: Custom Path`, 2);
+    logger.info(`Path: ${customPath}`, 2);
+
     // Custom path should point to a directory containing get-shit-done/
     const manifestPath = customPath.endsWith('.gsd-install-manifest.json')
         ? customPath
         : `${customPath}/get-shit-done/.gsd-install-manifest.json`;
-    
+
     const exists = await fs.pathExists(manifestPath);
-    
+
+    console.log('')
+    logger.simpleSubtitle('Custom path status');
     if (!exists) {
-        logger.info('Custom path installations: none');
+        logger.error('Installation not found', 2);
+        if (verbose) {
+            logger.error('Expected manifest file at:', 2);
+            logger.error(`${manifestPath}`, 4);
+        }
+
+        console.log('')
+        showNextSteps(['claude', 'copilot', 'codex']);
         return;
     }
-    
+
     if (verbose) {
-        logger.info(`  Found: ${manifestPath}`);
+        logger.info(`  Found: ${manifestPath}`, 2);
     }
-    
+
     const result = await validateInstallation(manifestPath, currentVersion, verbose);
-    
+
     if (result.success) {
         logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, verbose)}`);
     } else {
@@ -71,36 +82,36 @@ async function checkCustomPath(customPath, currentVersion, verbose) {
  */
 async function checkGlobalInstallations(currentVersion, verbose) {
     logger.simpleSubtitle('Global installations');
-    
+
     const platforms = Object.keys(platformDirs);
     let foundAny = false;
-    
+
     for (const platform of platforms) {
         const manifestPath = getManifestPath(platform, true);
         const exists = await fs.pathExists(manifestPath);
-        
+
         if (!exists) {
             if (verbose) {
                 logger.verbose(`  ${platform}: not found`, true);
             }
             continue;
         }
-        
+
         foundAny = true;
-        
+
         if (verbose) {
             logger.info(`  Found: ${manifestPath}`);
         }
-        
+
         const result = await validateInstallation(manifestPath, currentVersion, verbose);
-        
+
         if (result.success) {
             logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, verbose)}`);
         } else {
             logger.warn(`  ✗ ${result.platform}: ${result.reason}`);
         }
     }
-    
+
     if (!foundAny) {
         logger.info('Global installations: none');
     }
@@ -113,36 +124,36 @@ async function checkGlobalInstallations(currentVersion, verbose) {
  */
 async function checkLocalInstallations(currentVersion, verbose) {
     logger.simpleSubtitle('Local installations');
-    
+
     const platforms = Object.keys(platformDirs);
     let foundAny = false;
-    
+
     for (const platform of platforms) {
         const manifestPath = getManifestPath(platform, false);
         const exists = await fs.pathExists(manifestPath);
-        
+
         if (!exists) {
             if (verbose) {
                 logger.verbose(`  ${platform}: not found`, true);
             }
             continue;
         }
-        
+
         foundAny = true;
-        
+
         if (verbose) {
             logger.info(`  Found: ${manifestPath}`);
         }
-        
+
         const result = await validateInstallation(manifestPath, currentVersion, verbose);
-        
+
         if (result.success) {
             logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, verbose)}`);
         } else {
             logger.warn(`  ✗ ${result.platform}: ${result.reason}`);
         }
     }
-    
+
     if (!foundAny) {
         logger.info('Local installations: none');
     }
@@ -157,7 +168,7 @@ async function checkLocalInstallations(currentVersion, verbose) {
  */
 async function validateInstallation(manifestPath, currentVersion, verbose) {
     const manifestResult = await readManifestWithRepair(manifestPath, verbose);
-    
+
     if (!manifestResult.success) {
         return {
             success: false,
@@ -165,18 +176,18 @@ async function validateInstallation(manifestPath, currentVersion, verbose) {
             reason: manifestResult.reason
         };
     }
-    
+
     if (verbose) {
         logger.verbose(`  Manifest read successfully`, true);
         logger.verbose(`  Version: ${manifestResult.manifest.gsd_version}`, true);
     }
-    
+
     const platform = manifestResult.manifest.platform || 'unknown';
     const versionStatus = compareVersions(
         manifestResult.manifest.gsd_version,
         currentVersion
     );
-    
+
     return {
         success: true,
         platform,

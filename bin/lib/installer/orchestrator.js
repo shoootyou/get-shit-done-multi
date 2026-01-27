@@ -90,7 +90,7 @@ export async function install(appVersion, options) {
     } else {
       // Verbose: subtitle + list items
       console.log();
-      logger.warnSubtitle('Warnings', 0, 80, true);
+      logger.warnSubtitle('Warnings',0, 80, true);
       allWarnings.forEach(warning => logger.listItem(warning, 2));
     }
   } else if (isVerbose) {
