@@ -23,7 +23,8 @@ export const EXIT_CODES = {
   INVALID_ARGS: 2,
   MISSING_TEMPLATES: 3,
   PERMISSION_DENIED: 4,
-  INSUFFICIENT_SPACE: 5
+  INSUFFICIENT_SPACE: 5,
+  INVALID_PATH: 6
 };
 
 /**
@@ -43,4 +44,11 @@ export function permissionDenied(message, details = null) {
 
 export function insufficientSpace(message, details = null) {
   return new InstallError(message, EXIT_CODES.INSUFFICIENT_SPACE, details);
+}
+
+/**
+ * Error code 6: Invalid path (traversal, system directory)
+ */
+export function invalidPath(message, details = null) {
+  return new InstallError(message, EXIT_CODES.INVALID_PATH, details);
 }
