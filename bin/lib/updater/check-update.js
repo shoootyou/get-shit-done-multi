@@ -42,9 +42,7 @@ async function checkCustomPath(customPath, currentVersion, verbose) {
     logger.info(`Path: ${customPath}`, 2);
 
     // Custom path should point to a directory containing get-shit-done/
-    const manifestPath = customPath.endsWith('.gsd-install-manifest.json')
-        ? customPath
-        : `${customPath}/get-shit-done/.gsd-install-manifest.json`;
+    const manifestPath = `${customPath}/get-shit-done/.gsd-install-manifest.json`;
 
     const exists = await fs.pathExists(manifestPath);
 
@@ -63,7 +61,7 @@ async function checkCustomPath(customPath, currentVersion, verbose) {
     }
 
     if (verbose) {
-        logger.info(`  Found: ${manifestPath}`, 2);
+        logger.success(`Manifest found: ${manifestPath}`, 2);
     }
 
     const result = await validateInstallation(manifestPath, currentVersion, verbose);
@@ -100,7 +98,7 @@ async function checkGlobalInstallations(currentVersion, verbose) {
         foundAny = true;
 
         if (verbose) {
-            logger.info(`  Found: ${manifestPath}`);
+            logger.success(`Manifest found: ${manifestPath}`, 2);
         }
 
         const result = await validateInstallation(manifestPath, currentVersion, verbose);
