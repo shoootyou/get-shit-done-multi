@@ -12,6 +12,7 @@ import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
 import { readdir, readFile } from 'fs/promises';
 import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
+import { generateAndWriteManifest } from '../validation/manifest-generator.js';
 
 /**
  * Main installation orchestrator
@@ -123,8 +124,8 @@ export async function install(appVersion, options) {
     stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
   }
 
-  // Generate installation manifest
-  await generateManifest(targetDir, stats, isGlobal, platform);
+  // Generate manifest after successful installation (Phase 5)
+  await generateAndWriteManifest(targetDir, appVersion, platform, isGlobal);
 
   return stats;
 }
@@ -302,24 +303,4 @@ async function processTemplateFile(filePath, variables, isVerbose) {
   const cleaned = cleanFrontmatter(processed);
 
   await writeFile(filePath, cleaned);
-}
-
-/**
- * Generate installation manifest
- */
-async function generateManifest(targetDir, stats, isGlobal, platform) {
-  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
-
-  const manifest = {
-    version: '2.0.0',
-    platform: platform,
-    scope: isGlobal ? 'global' : 'local',
-    installedAt: new Date().toISOString(),
-    stats: {
-      skills: stats.skills,
-      agents: stats.agents
-    }
-  };
-
-  await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 }
