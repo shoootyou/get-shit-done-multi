@@ -18,9 +18,9 @@
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6 of 8 (Versioning and Upgrade Detection) — READY FOR PLANNING  
-**Phase Goal:** TBD (Phase 6 not yet planned)  
-**Status:** Phase 5 complete, Phase 6 ready for discussion and planning
+**Current Phase:** 6 of 8 (Update Detection and Versioning) — CONTEXT COMPLETE, READY FOR PLANNING  
+**Phase Goal:** User re-runs installer → sees installed version, gets prompted if update available, can upgrade  
+**Status:** Phase 6 context gathered through user discussion, ready for planning
 
 ### Plan Status
 **Completed Plans:** 16/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2)  
