@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-27  
-**Updated By:** GSD Executor (Phase 5 Plan 02 Complete)
+**Updated By:** GSD Executor (Phase 6 Plan 01 Complete)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 5 Complete! Pre-installation validation prevents ~80% of failures (disk space, permissions, paths) + manifest generation with complete file list via post-installation scan. Error logging to .gsd-error.log with user-friendly messages. 13 tests passing (7 unit + 3 integration + 3 existing). Ready for Phase 6.
+**Current Focus:** ✅ Phase 6 Plan 01 Complete! Core version detection modules built: installation finder with parallel discovery, manifest reader with auto-repair, and version checker using semver for update/downgrade/major-bump detection. 22 tests passing. Ready for Phase 6 Plan 02 (Update Detection UI Integration).
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6 of 8 (Update Detection and Versioning) — CONTEXT COMPLETE, READY FOR PLANNING  
+**Current Phase:** 6 of 8 (Update Detection and Versioning) — IN PROGRESS  
 **Phase Goal:** User re-runs installer → sees installed version, gets prompted if update available, can upgrade  
-**Status:** Phase 6 context gathered through user discussion, ready for planning
+**Status:** Phase 6 Plan 01 complete (Core Version Detection Modules). Ready for Plan 02.
 
 ### Plan Status
-**Completed Plans:** 16/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2)  
-**Current Plan:** Phase 6 - Next phase (to be planned)  
-**Status:** Phase 5 complete, ready for Phase 6 planning
+**Completed Plans:** 17/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 1/?)  
+**Current Plan:** 06-01 complete - Core Version Detection Modules  
+**Status:** Ready for next Phase 6 plan (Update Detection UI Integration)
 
 ### Progress Bar
 ```
@@ -35,9 +35,10 @@ Phase 2: [███████████████████████�
 Phase 3: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 4: [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 Phase 5: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
+Phase 6: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans) 🔄 IN PROGRESS
 
 Overall Progress:
-[███████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 46% (16/35 total plans)
+[████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 49% (17/35 total plans)
 ```
 
 ---
@@ -46,10 +47,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 5 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions)
-- **Phases In Progress:** 0
-- **Plans Completed:** 16/35
+- **Phases In Progress:** 1 (Phase 6 - Update Detection and Versioning)
+- **Plans Completed:** 17/35
 - **Days Active:** 2
-- **Plans Today:** 2
+- **Plans Today:** 3
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -59,7 +60,7 @@ Overall Progress:
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 33/37 (89% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6+: 4 pending)
+- **Requirements Completed:** 34/37 (92% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6: 1, Phase 7+: 3 pending)
 
 ---
 
@@ -419,6 +420,36 @@ Overall Progress:
     - Contrast with validation errors which show both
     - Rationale: Keep terminal clean, preserve debugging info in log file
 
+53. **2026-01-27 (06-01):** Use semver package for all version operations (VERSION-01)
+    - semver ^7.7.3 is npm's official semantic version parser
+    - Handles prerelease, build metadata, version coercion
+    - Prevents bugs from manual string comparison (1.10.0 vs 1.9.0)
+    - Rationale: Battle-tested, handles edge cases, industry standard
+
+54. **2026-01-27 (06-01):** Parallel path checking with Promise.all (VERSION-02)
+    - Check 6 standard manifest paths simultaneously (not sequentially)
+    - Safe for read-only operations, no race conditions
+    - Reduces discovery latency from ~60ms to ~10ms
+    - Rationale: Performance optimization for common operation
+
+55. **2026-01-27 (06-01):** Automatic manifest repair via directory scan (VERSION-03)
+    - On corrupt JSON or missing fields → scan directory from scratch
+    - Create brand new manifest with version='unknown'
+    - Mark with _repaired flag and _repair_date timestamp
+    - Rationale: Recover gracefully instead of failing, ignore corrupted data
+
+56. **2026-01-27 (06-01):** Downgrade detection with blocking flag (VERSION-04)
+    - Detect when installer version < installed version
+    - Block completely (no --force override allowed)
+    - Return blocking: true flag for UI to prevent installation
+    - Rationale: Downgrades not supported per 06-CONTEXT.md decision 2.3
+
+57. **2026-01-27 (06-01):** Major version jump detection (VERSION-05)
+    - Detect major version increase (2.x → 3.x) using semver.major()
+    - Return majorJump field for UI warning display
+    - Separate status='major_update' from regular updates
+    - Rationale: Warn users about potential breaking changes per 06-CONTEXT.md 2.4
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -437,7 +468,9 @@ Overall Progress:
 - [x] Phase 3 Plan 03: Orchestrator Integration (03-03)
 - [x] Phase 4 Plan 01: Interactive Mode (04-01)
 - [x] Phase 5 Plan 01: Pre-Installation Validation (05-01)
-- [ ] Phase 5 Plan 02: Manifest Generation (pending)
+- [x] Phase 5 Plan 02: Manifest Generation (05-02)
+- [x] Phase 6 Plan 01: Core Version Detection Modules (06-01)
+- [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
 None
@@ -575,15 +608,23 @@ None
 - Phase 2: Core Installer Foundation (✅ Complete - 4/4 plans complete)
 - Phase 3: Multi-Platform Support (✅ Complete - 3/3 plans complete)
 - Phase 4: Interactive CLI with Beautiful UX (✅ Complete - 1/1 plans complete)
-- Phase 5: Atomic Transactions (Pending)
-- Phase 6: Update Detection (Pending)
+- Phase 5: Atomic Transactions (✅ Complete - 2/2 plans complete)
+- Phase 6: Update Detection (🔄 In Progress - 1/5 plans complete)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 4 complete - Interactive UX with @clack/prompts. Users run `npx get-shit-done-multi` without flags → beautiful prompts. Architecture refactored to Adapter → Core pattern. Both CLI and interactive modes share installation core. Zero CLI detection warning implemented. 32/32 must-haves verified. Phase 5: Atomic Transactions and Rollback next.
+**Current Scope:** Phase 6 Plan 01 complete - Core version detection modules. Three independent modules built: installation finder with parallel discovery, manifest reader with auto-repair, and version checker using semver. 22 tests passing. Ready for Plan 02 (Update Detection UI Integration).
+
+---
+
+## Session Continuity
+
+**Last session:** 2026-01-27T13:32:04Z  
+**Stopped at:** Completed 06-01-PLAN.md (Core Version Detection Modules)  
+**Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
-**Last updated:** 2026-01-26  
-**Ready for:** Phase 5 - Atomic Transactions and Rollback
+**Last updated:** 2026-01-27  
+**Ready for:** Phase 6 Plan 02 - Update Detection UI Integration
