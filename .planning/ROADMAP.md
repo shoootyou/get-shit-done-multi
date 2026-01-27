@@ -352,6 +352,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 5 (needs installation manifest)
 
+**Plans:** 2 plans
+
 **Requirements Mapped:**
 - VERSION-02: Update detection
 - VERSION-03: Version display
@@ -377,6 +379,10 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - `/bin/lib/version/installation-finder.js` (discover all GSD installations)
 - Update prompts in interactive mode (per platform)
 - Version display in `--version` output showing all installations
+
+**Plans:**
+- [ ] 06-01-PLAN.md — Core Version Detection Modules (Wave 1)
+- [ ] 06-02-PLAN.md — Interactive CLI Integration & Update Flow (Wave 2)
 
 **Notes:**
 - Uses semver for comparison (handles major/minor/patch)
