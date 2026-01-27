@@ -7,7 +7,7 @@ import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../
 import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
 import { renderTemplate, findUnknownVariables, replaceVariables } from '../rendering/template-renderer.js';
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
-import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } from '../cli/progress.js';
+import { createMultiBar, createProgressBar, updateProgress, stopAllProgress, displayCompletionLine } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
 import { readdir, readFile } from 'fs/promises';
@@ -89,27 +89,20 @@ export async function install(appVersion, options) {
 
   if (!isVerbose) {
     logger.infoSubtitle('Progress');
-    // Multi-bar progress for non-verbose mode (no section title - shown in installation-core.js)
-    const multiBar = options.multiBar || createMultiBar();
-
+    // Simple completion line display for non-verbose mode
     try {
       // Phase 1: Install skills
-      stats.skills = await installSkills(templatesDir, targetDir, templateVars, multiBar, isVerbose, platform);
+      stats.skills = await installSkills(templatesDir, targetDir, templateVars, null, isVerbose, platform);
+      displayCompletionLine('Skills', stats.skills, stats.skills);
 
       // Phase 2: Install agents
-      stats.agents = await installAgents(templatesDir, targetDir, templateVars, multiBar, isVerbose);
+      stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
+      displayCompletionLine('Agents', stats.agents, stats.agents);
 
       // Phase 3: Install shared directory
-      stats.shared = await installShared(templatesDir, targetDir, templateVars, multiBar, isVerbose);
-
-      // Only stop if we created it (not if passed from interactive mode)
-      if (!options.multiBar) {
-        stopAllProgress(multiBar);
-      }
+      stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
+      displayCompletionLine('Shared', stats.shared, stats.shared);
     } catch (error) {
-      if (!options.multiBar) {
-        stopAllProgress(multiBar);
-      }
       throw error;
     }
   } else {
@@ -165,10 +158,6 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
   const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
   const hasGetShitDone = await pathExists(getShitDoneTemplateDir);
 
-  const total = skills.length + (hasGetShitDone ? 1 : 0);
-  const barLabel = 'Skills';
-  const bar = multiBar ? createProgressBar(multiBar, barLabel, total) : null;
-
   let count = 0;
 
   // Install regular skills
@@ -186,7 +175,6 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
     await processTemplateFile(skillFile, variables, isVerbose);
 
     count++;
-    if (bar) updateProgress(bar, count);
     logger.verboseComplete(isVerbose);
   }
 
@@ -201,7 +189,6 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
     await processTemplateFile(skillFile, variables, isVerbose);
 
     count++;
-    if (bar) updateProgress(bar, count);
     logger.verboseComplete(isVerbose);
   }
 
@@ -221,10 +208,6 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
   const agentFiles = await readdir(agentsTemplateDir);
   const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
 
-  const total = agents.length; // versions.json doesn't count as an agent
-  const barLabel = 'Agents';
-  const bar = multiBar ? createProgressBar(multiBar, barLabel, total) : null;
-
   let count = 0;
   for (const agent of agents) {
     logger.verboseInProgress(agent, isVerbose);
@@ -238,7 +221,6 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     await writeFile(destFile, processed);
 
     count++;
-    if (bar) updateProgress(bar, count);
     logger.verboseComplete(isVerbose);
   }
 
@@ -250,7 +232,7 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
     const content = await readFile(versionsFile, 'utf8');
     const processed = replaceVariables(content, variables);
     await writeFile(join(agentsTargetDir, 'versions.json'), processed);
-    // Don't increment count or update bar - versions.json is metadata, not an agent
+    // Don't increment count - versions.json is metadata, not an agent
     logger.verboseComplete(isVerbose);
   }
 
@@ -264,9 +246,6 @@ async function installShared(templatesDir, targetDir, variables, multiBar, isVer
   const sharedTemplateDir = join(templatesDir, 'get-shit-done');
   const sharedTargetDir = join(targetDir, 'get-shit-done');
 
-  const barLabel = 'Shared';
-  const bar = multiBar ? createProgressBar(multiBar, barLabel, 1) : null;
-
   logger.verboseInProgress('get-shit-done/', isVerbose);
 
   // Copy entire directory
@@ -278,7 +257,6 @@ async function installShared(templatesDir, targetDir, variables, multiBar, isVer
     await processTemplateFile(manifestFile, variables, isVerbose);
   }
 
-  if (bar) updateProgress(bar, 1);
   logger.verboseComplete(isVerbose);
 
   return 1;

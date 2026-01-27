@@ -52,3 +52,14 @@ export function completeProgress(bar) {
 export function stopAllProgress(multiBar) {
   multiBar.stop();
 }
+
+/**
+ * Display completion line with checkmark
+ * @param {string} phase - Phase name (e.g., 'Skills', 'Agents', 'Shared')
+ * @param {number} count - Total count
+ * @param {number} total - Total items
+ */
+export function displayCompletionLine(phase, count, total) {
+  const percentage = total > 0 ? Math.round((count / total) * 100) : 100;
+  console.log(`  ${chalk.green('✓')} ${phase} installed | ${percentage}% | ${count}/${total}`);
+}
