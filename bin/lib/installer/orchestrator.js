@@ -11,6 +11,7 @@ import { createMultiBar, createProgressBar, updateProgress, stopAllProgress } fr
 import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
 import { readdir, readFile } from 'fs/promises';
+import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
 
 /**
  * Main installation orchestrator
@@ -50,20 +51,33 @@ export async function install(appVersion, options) {
   logger.info(`Target directory: ${targetDir}`, 2);
   logger.info(`Command prefix: ${commandPrefix}`, 2);
 
+  // === NEW: Pre-installation validation gate (Phase 5) ===
+  const validationResults = await runPreInstallationChecks(
+    targetDir,
+    templatesDir,
+    isGlobal,
+    platform
+  );
+
+  // Use validation results to enhance existing installation detection
+  const { existingInstall } = validationResults;
+
   // Validate templates exist
   await validateTemplates(templatesDir);
 
-  // Check for existing installation
-  const manifestPath = join(targetDir, 'get-shit-done', '.gsd-install-manifest.json');
-  const hasExisting = await pathExists(manifestPath);
-
-  if (!isVerbose && hasExisting) {
-    logger.warn('Existing installation detected', 2);
-    logger.warn('Installation will overwrite existing files', 2);
-  } else {
-    logger.warnSubtitle('Warnings');
-    logger.listItem('Existing installation detected', 2);
-    logger.listItem('Installation will overwrite existing files', 2);
+  // Check for existing installation (validation already detected it)
+  if (existingInstall) {
+    if (!isVerbose) {
+      logger.warn(`Existing installation detected (v${existingInstall.version})`, 2);
+      logger.warn('Installation will overwrite existing files', 2);
+    } else {
+      logger.warnSubtitle('Warnings');
+      logger.listItem(`Existing installation detected (v${existingInstall.version})`, 2);
+      logger.listItem('Installation will overwrite existing files', 2);
+    }
+  } else if (isVerbose) {
+    logger.infoSubtitle('Info');
+    logger.listItem('No existing installation found', 2);
   }
 
   // Create target directory
