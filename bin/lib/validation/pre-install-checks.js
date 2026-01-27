@@ -48,7 +48,13 @@ export async function runPreInstallationChecks(targetDir, templatesDir, isGlobal
  */
 export async function checkDiskSpace(targetDir, requiredBytes) {
   try {
-    const stats = await statfsPromise(targetDir);
+    // Use parent directory if target doesn't exist yet (first install)
+    let checkPath = targetDir;
+    if (!await pathExists(targetDir)) {
+      checkPath = resolve(targetDir, '..');
+    }
+    
+    const stats = await statfsPromise(checkPath);
     const availableBytes = stats.bavail * stats.bsize;
     
     // Add 10% buffer (context decision)
