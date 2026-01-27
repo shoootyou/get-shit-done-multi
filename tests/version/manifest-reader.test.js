@@ -66,6 +66,14 @@ describe('manifest reader and repair', () => {
       const installDir = path.join(testDir, '.claude', 'get-shit-done');
       await fs.ensureDir(installDir);
       
+      // Create a version file so repair can detect version
+      const skillDir = path.join(installDir, 'skills', 'get-shit-done', 'claude');
+      await fs.ensureDir(skillDir);
+      await fs.writeJson(path.join(skillDir, 'version.json'), {
+        version: '1.9.0',
+        platform: 'claude'
+      });
+      
       const manifestPath = path.join(installDir, '.gsd-install-manifest.json');
       await fs.writeJson(manifestPath, { incomplete: true });
       
@@ -78,6 +86,14 @@ describe('manifest reader and repair', () => {
     it('should mark repaired manifests with metadata', async () => {
       const installDir = path.join(testDir, '.claude', 'get-shit-done');
       await fs.ensureDir(installDir);
+      
+      // Create version file
+      const skillDir = path.join(installDir, 'skills', 'get-shit-done', 'claude');
+      await fs.ensureDir(skillDir);
+      await fs.writeJson(path.join(skillDir, 'version.json'), {
+        version: '1.9.0',
+        platform: 'claude'
+      });
       
       // Create some files to scan
       await fs.writeFile(path.join(installDir, 'test.txt'), 'test');
@@ -95,6 +111,16 @@ describe('manifest reader and repair', () => {
     it('should use string array for files (not object array)', async () => {
       const installDir = path.join(testDir, '.codex', 'get-shit-done');
       await fs.ensureDir(installDir);
+      
+      // Create version file
+      const agentsDir = path.join(installDir, 'agents');
+      await fs.ensureDir(agentsDir);
+      await fs.writeJson(path.join(agentsDir, 'versions.json'), {
+        'gsd-executor': {
+          metadata: { projectVersion: '1.8.5' }
+        }
+      });
+      
       await fs.writeFile(path.join(installDir, 'test.txt'), 'test');
       
       const manifestPath = path.join(installDir, '.gsd-install-manifest.json');

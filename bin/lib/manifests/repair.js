@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 import { createManifest, MANIFEST_ERRORS } from './schema.js';
 import { derivePlatformFromPath } from '../platforms/platform-paths.js';
+import { detectVersionFromDirectory } from '../version/version-detector.js';
 import * as logger from '../cli/logger.js';
 
 /**
@@ -15,20 +16,34 @@ import * as logger from '../cli/logger.js';
 export async function repairManifest(manifestPath) {
   try {
     let installDir = path.dirname(manifestPath);
-
+    let scanDir = installDir; // Directory to scan for files and version
+    
     if (installDir.endsWith('get-shit-done')) {
-      // If the directory ends with 'get-shit-done', adjust to its parent directory
-      installDir = path.dirname(installDir);
+      // Manifest is in get-shit-done directory
+      // Keep installDir for version detection
+      // But adjust scanDir for platform detection if needed
+      scanDir = installDir;
+    }
+
+    // Derive platform from directory structure
+    const platform = derivePlatformFromPath(installDir);
+
+    // Detect version from installation directory
+    const versionInfo = await detectVersionFromDirectory(installDir, platform);
+    const version = versionInfo.version;
+    
+    if (version !== 'unknown') {
+      logger.info(`Detected version ${version} from ${versionInfo.source}`, 2);
     }
 
     // Scan directory to reconstruct file list
     const files = [];
     try {
-      const entries = await fs.readdir(installDir, { recursive: true, withFileTypes: true });
+      const entries = await fs.readdir(scanDir, { recursive: true, withFileTypes: true });
       for (const entry of entries) {
         if (entry.isFile() && !entry.name.startsWith('.gsd-')) {
           const relativePath = path.relative(
-            installDir,
+            scanDir,
             path.join(entry.path || entry.parentPath, entry.name)
           );
           files.push(relativePath); // STRING ARRAY - fixed bug!
@@ -37,12 +52,6 @@ export async function repairManifest(manifestPath) {
     } catch (error) {
       logger.warn(`Could not scan directory: ${error.message}`, 2);
     }
-
-    // Use 'unknown' for version (cannot reconstruct)
-    const version = 'unknown';
-
-    // Derive platform from directory structure
-    const platform = derivePlatformFromPath(installDir);
 
     // Derive scope from path
     const homeDir = os.homedir();
