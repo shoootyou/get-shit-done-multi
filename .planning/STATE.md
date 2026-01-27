@@ -440,7 +440,7 @@ Overall Progress:
 - [ ] Phase 5 Plan 02: Manifest Generation (pending)
 
 ### Pending Todos
-None
+1 todo in `.planning/todos/pending/`
 
 ### Blockers
 None
