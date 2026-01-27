@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
 import { createManifest, MANIFEST_ERRORS } from './schema.js';
+import { derivePlatformFromPath } from '../platforms/platform-paths.js';
 import * as logger from '../cli/logger.js';
 
 /**
@@ -51,6 +52,16 @@ export async function repairManifest(manifestPath) {
       // installed_at will be auto-filled by createManifest()
     });
 
+    if (repairedManifest.gsd_version === 'unknown') {
+      return {
+        success: false,
+        reason: MANIFEST_ERRORS.REPAIR_FAILED,
+        repaired: false,
+        error: 'Could not determine GSD version during repair',
+        manifest: null
+      };
+    }
+
     // Add repair metadata
     repairedManifest._repaired = true;
     repairedManifest._repair_date = new Date().toISOString();
@@ -72,26 +83,10 @@ export async function repairManifest(manifestPath) {
       success: false,
       reason: MANIFEST_ERRORS.REPAIR_FAILED,
       error: repairError.message,
+      repaired: false,
       manifest: null
     };
   }
 }
 
-/**
- * Derive platform name from installation path
- * 
- * @param {string} installDir - Installation directory path
- * @returns {string} Platform name or 'unknown'
- */
-function derivePlatformFromPath(installDir) {
-  const parts = installDir.split(path.sep);
-  const platformDirIndex = parts.findIndex(p =>
-    p === '.claude' || p === '.copilot' || p === '.codex' || p === '.github'
-  );
 
-  if (platformDirIndex === -1) return 'unknown';
-
-  const platformDir = parts[platformDirIndex];
-  if (platformDir === '.github') return 'copilot';
-  return platformDir.substring(1);
-}

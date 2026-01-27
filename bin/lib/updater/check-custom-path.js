@@ -47,7 +47,12 @@ export async function checkCustomPath(customPath, currentVersion, verbose) {
 
     if (result.success) {
         logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, verbose)}`, 2);
+        return
+    } else if (!result.repaired) {
+        logger.error(`Was not possible to repair manifest:`, 2, true);
     } else {
-        logger.warn(`  ✗ ${result.platform}: ${result.reason}`, 2);
+        logger.error(`Unknown error: ${result.reason}`, 2, true);
     }
+
+    logger.error(`${result.reason}`, 3, true);
 }

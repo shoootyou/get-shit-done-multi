@@ -93,20 +93,23 @@ export function getPathReference(platform) {
 export function derivePlatformFromPath(manifestPath) {
   const parts = manifestPath.split(path.sep);
   
-  // Find platform directory in path
-  const platformDir = parts.find(p => 
-    p === '.claude' || p === '.copilot' || p === '.codex' || p === '.github'
-  );
+  // Find platform directory in path by checking against platformDirs
+  const platformDir = parts.find(p => {
+    return Object.values(platformDirs).some(dirs => 
+      p === dirs.global || p === dirs.local
+    );
+  });
   
   if (!platformDir) {
     return 'custom';
   }
   
-  // Map .github to copilot (local copilot uses .github)
-  if (platformDir === '.github') {
-    return 'copilot';
+  // Map directory back to platform ID
+  for (const [platform, dirs] of Object.entries(platformDirs)) {
+    if (platformDir === dirs.global || platformDir === dirs.local) {
+      return platform;
+    }
   }
   
-  // Remove leading dot
-  return platformDir.substring(1);
+  return 'custom';
 }

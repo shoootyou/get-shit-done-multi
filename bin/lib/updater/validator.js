@@ -27,7 +27,8 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
         return {
             success: false,
             platform: 'unknown',
-            reason: manifestResult.reason
+            repaired: manifestResult.repaired || false,
+            reason: manifestResult.error || manifestResult.reason || MANIFEST_ERRORS.UNKNOWN_ERROR
         };
     }
 
