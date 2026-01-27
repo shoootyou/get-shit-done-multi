@@ -5,6 +5,9 @@ import { getScriptDir } from './installation-core.js';
 import * as logger from './logger.js';
 import { platformNames } from '../platforms/platform-names.js';
 import { executeInstallationLoop } from './install-loop.js';
+import { findInstallations } from '../version/installation-finder.js';
+import { readManifestWithRepair } from '../version/manifest-reader.js';
+import { compareVersions, formatPlatformOption } from '../version/version-checker.js';
 
 /**
  * Run interactive installation mode with beautiful prompts
@@ -27,7 +30,7 @@ export async function runInteractive(appVersion, options = {}) {
   }
 
   // Prompt for selections (Pattern 5 from research)
-  const { platforms, scope } = await promptSelections(detected);
+  const { platforms, scope } = await promptSelections(detected, appVersion, options);
 
   // Hand off to shared installation core (same path as CLI mode)
   const scriptDir = getScriptDir(import.meta.url);
@@ -81,40 +84,56 @@ async function showGlobalDetectionWarning() {
 }
 
 /**
+ * Discover installations with version status
+ * @param {string} scope - Installation scope (global/local)
+ * @param {string} currentVersion - Current installer version
+ * @param {Array} customPaths - Custom search paths
+ * @returns {Promise<Map>} Map of platform to version status
+ */
+async function discoverInstallationsWithStatus(scope, currentVersion, customPaths = []) {
+  const found = await findInstallations(scope, customPaths);
+  
+  const statusMap = new Map();
+  
+  await Promise.all(
+    found.map(async (install) => {
+      const manifestResult = await readManifestWithRepair(install.path);
+      
+      if (!manifestResult.success) {
+        statusMap.set(install.platform, { 
+          status: 'unknown', 
+          reason: manifestResult.reason 
+        });
+        return;
+      }
+      
+      const versionStatus = compareVersions(
+        manifestResult.manifest.gsd_version,
+        currentVersion
+      );
+      
+      statusMap.set(install.platform, versionStatus);
+    })
+  );
+  
+  return statusMap;
+}
+
+/**
  * Prompt user for platform and scope selections
  * @param {object} detected - Platform detection results
+ * @param {string} appVersion - Current installer version
+ * @param {object} options - Options with customPath
  * @returns {Promise<{platforms: string[], scope: string}>}
  */
-async function promptSelections(detected) {
-  // Get installed versions
-  const versions = {};
-  for (const platform of Object.keys(platformNames)) {
-    versions[platform] = await getInstalledVersion(platform);
-  }
-
+async function promptSelections(detected, appVersion, options = {}) {
+  // Discover installations for both global and local scopes
+  const customPaths = options.customPath ? [options.customPath] : [];
+  const globalInstallations = await discoverInstallationsWithStatus('global', appVersion, customPaths);
+  const localInstallations = await discoverInstallationsWithStatus('local', appVersion, customPaths);
+  
   return await p.group(
     {
-      platforms: () => p.multiselect({
-        message: 'Select platforms to install GSD:',
-        options: [
-          {
-            value: 'claude',
-            label: 'Claude Code',
-            hint: versions.claude ? `v${versions.claude}` : (detected.claude ? 'detected' : 'Install CLI first')
-          },
-          {
-            value: 'copilot',
-            label: 'GitHub Copilot CLI',
-            hint: versions.copilot ? `v${versions.copilot}` : (detected.copilot ? 'detected' : 'Install CLI first')
-          },
-          {
-            value: 'codex',
-            label: 'Codex CLI',
-            hint: versions.codex ? `v${versions.codex}` : (detected.codex ? 'detected' : 'Install CLI first')
-          }
-        ],
-        required: true
-      }),
       scope: () => p.select({
         message: 'Installation scope:',
         options: [
@@ -122,7 +141,33 @@ async function promptSelections(detected) {
           { value: 'global', label: 'Global (~/.claude/, ~/.copilot/, ~/.codex/)' }
         ],
         initialValue: 'local'
-      })
+      }),
+      platforms: ({ results }) => {
+        // Use the appropriate installation map based on selected scope
+        const installationMap = results.scope === 'global' ? globalInstallations : localInstallations;
+        
+        return p.multiselect({
+          message: 'Select platforms to install GSD:',
+          options: [
+            {
+              value: 'claude',
+              label: formatPlatformOption('claude', installationMap.get('claude')),
+              hint: getHintForPlatform('claude', installationMap.get('claude'), detected.claude)
+            },
+            {
+              value: 'copilot',
+              label: formatPlatformOption('copilot', installationMap.get('copilot')),
+              hint: getHintForPlatform('copilot', installationMap.get('copilot'), detected.copilot)
+            },
+            {
+              value: 'codex',
+              label: formatPlatformOption('codex', installationMap.get('codex')),
+              hint: getHintForPlatform('codex', installationMap.get('codex'), detected.codex)
+            }
+          ],
+          required: true
+        });
+      }
     },
     {
       onCancel: () => {
@@ -131,4 +176,30 @@ async function promptSelections(detected) {
       }
     }
   );
+}
+
+/**
+ * Get hint for platform option based on version status
+ * @param {string} platform - Platform name
+ * @param {object} versionStatus - Version status from compareVersions
+ * @param {boolean} binaryDetected - Whether binary was detected
+ * @returns {string} Hint text
+ */
+function getHintForPlatform(platform, versionStatus, binaryDetected) {
+  if (versionStatus) {
+    if (versionStatus.status === 'update_available') {
+      return `${versionStatus.updateType} update available`;
+    }
+    if (versionStatus.status === 'major_update') {
+      return 'Major update available (breaking changes)';
+    }
+    if (versionStatus.status === 'up_to_date') {
+      return 'Already installed (up to date)';
+    }
+    if (versionStatus.status === 'unknown') {
+      return 'Installed (version unknown)';
+    }
+  }
+  
+  return binaryDetected ? 'Detected' : 'Not detected';
 }
