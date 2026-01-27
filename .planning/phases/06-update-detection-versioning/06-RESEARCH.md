@@ -433,7 +433,7 @@ const found = checks.filter(c => c.exists).map(c => c.path);
 ### Pitfall 4: Not Validating Manifest Structure After Parse
 **What goes wrong:** JSON.parse succeeds but manifest is missing required fields
 **Why it happens:** Partial file corruption or manual editing
-**How to avoid:** Validate required fields exist after successful parse
+**How to avoid:** Validate required fields exist after successful parse, treat invalid manifests as corrupt and regenerate from directory scan
 **Warning signs:** Installer crashes later when accessing manifest.gsd_version
 
 **Example of solution:**
@@ -444,10 +444,17 @@ const manifest = JSON.parse(content);
 const required = ['gsd_version', 'platform', 'scope', 'installed_at'];
 for (const field of required) {
   if (!manifest[field]) {
-    throw new Error(`Manifest missing required field: ${field}`);
+    // Treat as corrupted - regenerate from directory scan
+    return await repairManifestFromDirectory(path);
   }
 }
 ```
+
+**Updated approach (per user decision):**
+- On corrupt JSON OR missing required fields → ignore corrupted manifest completely
+- Scan directory from scratch, create brand new manifest
+- Mark with `_repaired: true` flag
+- Don't try to extract partial data from corrupted file
 
 ### Pitfall 5: Forgetting Version Coercion
 **What goes wrong:** semver.gt('v1.2.3', '1.2.4') throws error or returns incorrect result
@@ -736,6 +743,44 @@ function formatStatusLine(install) {
 }
 ```
 
+### Example 6: CLI Flag Validation (--custom-path)
+```javascript
+// Source: CLI best practices + user requirements
+import { Command } from 'commander';
+
+export function parseCLIOptions() {
+  const program = new Command();
+  
+  program
+    .option('--check-updates', 'Check for updates without installing')
+    .option('--verbose', 'Show detailed discovery information')
+    .option('--custom-path <path>', 'Check additional custom installation path')
+    // ... other options
+
+  program.parse();
+  const options = program.opts();
+  
+  // Validate --custom-path usage
+  const customPathArgs = process.argv.filter(arg => 
+    arg.startsWith('--custom-path')
+  );
+  
+  if (customPathArgs.length > 1) {
+    console.error('');
+    console.error('Error: --custom-path can only be specified once.');
+    console.error('To check additional paths, run the installer separately for each path.');
+    console.error('');
+    console.error('Example:');
+    console.error('  npx get-shit-done-multi --custom-path=/path1');
+    console.error('  npx get-shit-done-multi --custom-path=/path2');
+    console.error('');
+    process.exit(1);
+  }
+  
+  return options;
+}
+```
+
 ## State of the Art
 
 | Old Approach | Current Approach | When Changed | Impact |
@@ -751,24 +796,30 @@ function formatStatusLine(install) {
 - **String-based version comparison**: Never use `>` `<` on version strings - always use semver
 - **Synchronous file operations**: Use async/await with fs-extra for better performance
 
-## Open Questions
+## Open Questions Resolved
 
-Things that couldn't be fully resolved:
+All questions have been resolved through user clarification:
 
-1. **Manifest repair heuristics**
-   - What we know: Can scan directory, check package.json, reconstruct basic structure
-   - What's unclear: How to determine original install date, exact version if package.json missing
-   - Recommendation: Use 'unknown' for missing data, mark with _repaired flag, log to error log
+1. **Manifest repair heuristics** — RESOLVED
+   - **Decision:** Ignore corrupted manifest completely, scan directory from scratch, create brand new manifest
+   - **Rationale:** Simpler approach, avoids trying to extract partial data from corrupted files
+   - **Implementation:** On corrupt JSON or missing required fields, treat as new installation and regenerate manifest via directory scan
+   - **Mark repaired:** Add `_repaired: true` flag to regenerated manifest
 
-2. **Customization detection accuracy**
-   - What we know: Can use fs.copy with overwrite:false to preserve existing files
-   - What's unclear: How to detect which files were intentionally customized vs accidentally modified
-   - Recommendation: Ask user once (preserve Y/n), don't try to auto-detect customizations
+2. **Customization detection accuracy** — RESOLVED
+   - **Decision:** Ask user once (preserve Y/n), don't auto-detect customizations
+   - **Rationale:** Avoids complexity of trying to distinguish intentional vs accidental changes
+   - **Implementation:** Simple prompt before update: "Preserve customizations? [Y/n]"
 
-3. **Performance with many custom paths (--custom-path)**
-   - What we know: Parallel checks work well for 6 known paths
-   - What's unclear: Performance impact if user provides 20+ custom paths
-   - Recommendation: Still use Promise.all (filesystem is bottleneck, not JS), but could add warning if >10 paths
+3. **--custom-path flag usage** — RESOLVED
+   - **Decision:** Only allow once with single path, throw error if specified multiple times
+   - **Rationale:** Keep usage simple, users run installer multiple times for multiple custom paths
+   - **Error message:** "Error: --custom-path can only be specified once. To check additional paths, run the installer separately for each path."
+   - **Implementation:** Validate CLI args, reject duplicate --custom-path flags
+
+## Open Questions (None Remaining)
+
+All architectural decisions resolved. Ready for planning.
 
 ## Sources
 
