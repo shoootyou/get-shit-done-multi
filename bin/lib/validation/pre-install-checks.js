@@ -8,6 +8,7 @@ import { homedir } from 'os';
 import { ensureDirectory, pathExists } from '../io/file-operations.js';
 import { insufficientSpace, permissionDenied } from '../errors/install-error.js';
 import { invalidPath } from '../errors/install-error.js';
+import * as logger from '../cli/logger.js';
 
 const statfsPromise = promisify(statfs);
 
@@ -66,7 +67,7 @@ export async function checkDiskSpace(targetDir, requiredBytes) {
     if (error.name === 'InstallError') throw error;
     
     // If statfs not available (Node < 19), log warning and continue
-    console.warn('Warning: Could not check disk space (requires Node.js 19+)');
+    logger.warn('Could not check disk space (requires Node.js 19+)', 2);
   }
 }
 
