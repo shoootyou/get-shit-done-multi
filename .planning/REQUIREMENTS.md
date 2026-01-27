@@ -32,17 +32,26 @@
 - Maintain directory structure: skills are `.xxx/skills/gsd-<name>/SKILL.md`
 - **Rationale:** Transform universal templates to platform-specific
 
-**INSTALL-04: Atomic Operations with Rollback**
-- Track all file operations during installation
-- On failure, rollback all completed operations in reverse order
-- Leave no partial installation state
-- **Rationale:** Critical Risk #1 mitigation (see research/risks.md)
+**INSTALL-04: Atomic Operations with Pre-Flight Validation**
+- Run comprehensive pre-flight validation before any writes
+- Pre-installation checks prevent ~80% of failures (disk space, permissions, paths)
+- On validation failure, no files written (atomic behavior)
+- **Rollback deferred:** Post-validation failures leave partial files (out of scope for v2.0)
+  - Trade-off: Pre-flight validation reduces post-start failures to ~20%
+  - Future: v2.1+ can add rollback based on user feedback
+- **Rationale:** Pre-flight validation provides atomic behavior for common failure modes while keeping implementation simple
+- **Implementation:** Validation gate in orchestrator before any file operations
 
 **INSTALL-05: Pre-Installation Validation**
-- Check available disk space (minimum 50MB)
-- Verify write permissions to target directory
-- Detect file conflicts (warn before overwriting)
-- **Rationale:** Prevent failures mid-installation
+- Check available disk space with 10% buffer
+  - Use parent directory for check if target doesn't exist yet (first install)
+  - Prevents false "Node.js 19+" warnings on first installation
+- Verify write permissions to target directory with actual write test
+- Validate paths for security (no traversal, no system directories)
+- Detect existing installation from manifest files
+- Collect warnings (non-fatal) to display after validation passes
+- **Rationale:** Prevent ~80% of failures before any writes occur
+- **Implementation:** Pre-flight validation gate in orchestrator before template validation
 
 ### Category: Platform Support (PLATFORM)
 
@@ -171,15 +180,19 @@
 - **Rationale:** Premium CLI experience
 
 **UX-03: Error Handling with Guidance**
-- Catch common errors (no permissions, disk full, platform not installed)
-- Show specific error message (not generic "failed")
-- Provide next steps (e.g., "Run with sudo" or "Free up disk space")
-- **Rationale:** Users can self-recover from failures
+- Catch common errors (insufficient space, no permissions, invalid paths, existing installation)
+- Show specific error messages with context (not generic "failed")
+- Provide actionable next steps based on error type
+- Log all errors to `.gsd-error.log` in target directory
+- Validation errors show both technical + friendly messages on terminal
+- Runtime errors show friendly message on terminal + technical details in log file
+- **Rationale:** Users can self-recover from failures with clear guidance
+- **Implementation:** Error logging wrapper in installation entry point with error type detection
 
 ### Category: Version Management (VERSION)
 
 **VERSION-01: Installation Manifest**
-- Write `/get-shit-done/.gsd-install-manifest.json` after installation
+- Write `.gsd-install-manifest.json` to target directory after successful installation
 - Place in each installation path:
   - `.claude/get-shit-done/.gsd-install-manifest.json`
   - `.github/get-shit-done/.gsd-install-manifest.json`
@@ -187,9 +200,12 @@
   - `~/.claude/get-shit-done/.gsd-install-manifest.json`
   - `~/.copilot/get-shit-done/.gsd-install-manifest.json`
   - `~/.codex/get-shit-done/.gsd-install-manifest.json`
-- Include: version, timestamp, installed files, platform, scope (global/local)
-- Template exists at `/get-shit-done/.gsd-install-manifest.json` and is updated during installation
+- Include: gsd_version, platform, scope (global/local), installed_at (ISO timestamp), files[] (sorted)
+- Generated via post-installation directory scan with two-pass write (empty → scan → rewrite with complete list)
+- Manifest includes itself in files array
+- No checksums or schema_version (can extend in v2.1+)
 - **Rationale:** Track what was installed for updates/uninstall, support multiple installations
+- **Implementation:** `generateAndWriteManifest()` called after all installation phases complete
 
 **VERSION-02: Update Detection**
 - On re-run, check ALL installed versions from manifests in all paths
