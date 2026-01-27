@@ -1,6 +1,7 @@
 const { findInstallations } = await import('../version/installation-finder.js');
 const { readManifestWithRepair } = await import('../version/manifest-reader.js');
 const { compareVersions, formatPlatformOption } = await import('../version/version-checker.js');
+const { banner } = await import('../cli/banner-manager.js')
 import * as logger from '../cli/logger.js';
 
 /**
@@ -13,8 +14,7 @@ export async function handleCheckUpdates(options, pkg) {
     const customPaths = options.customPath ? [options.customPath] : [];
 
     // Show banner
-    logger.banner(currentVersion);
-    console.log('');
+    banner(currentVersion, false);
 
     // If custom path is provided, ONLY check that path (skip global/local standard paths)
     if (options.customPath) {

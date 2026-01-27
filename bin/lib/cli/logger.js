@@ -190,26 +190,6 @@ export function blockTitle(title, opts = {}) {
   console.log(' ' + chalk.dim(lineBottom));
 }
 
-/**
- * Print banner with ASCII art
- * @param {string} appVersion - Version string 
- */
-export function banner(appVersion) {
-  console.log();
-  console.log(chalk.cyan('   ██████╗ ███████╗██████╗     ███╗   ███╗██╗   ██╗██╗  ████████╗██╗'));
-  console.log(chalk.cyan('  ██╔════╝ ██╔════╝██╔══██╗    ████╗ ████║██║   ██║██║  ╚══██╔══╝██║'));
-  console.log(chalk.cyan('  ██║  ███╗███████╗██║  ██║    ██╔████╔██║██║   ██║██║     ██║   ██║'));
-  console.log(chalk.cyan('  ██║   ██║╚════██║██║  ██║    ██║╚██╔╝██║██║   ██║██║     ██║   ██║'));
-  console.log(chalk.cyan('  ╚██████╔╝███████║██████╔╝    ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║'));
-  console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝'));
-  console.log();
-  console.log(chalk.bold.white(`  Get Shit Done (Multi-Platform) v${appVersion}`));
-  console.log(chalk.gray('  Multi-platform meta-prompting, context engineering and spec-driven development system.'));
-  console.log(chalk.gray('   * Forked from TÂCHES: glittercowboy/get-shit-done (Claude Code only)'));
-  console.log(chalk.gray('   * Extended for Claude Code, GitHub Copilot CLI, and Codex CLI'));
-  console.log(chalk.gray('   * Maintained by shoootyou/get-shit-done-multi'));
-  console.log();
-}
 
 /**
  * Print final summary
