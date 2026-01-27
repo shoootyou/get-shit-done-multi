@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-27  
-**Updated By:** GSD Executor (Phase 6 Plan 01 Complete)
+**Updated By:** GSD Executor (Phase 6 Plan 02 Complete)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 6 Plan 01 Complete! Core version detection modules built: installation finder with parallel discovery, manifest reader with auto-repair, and version checker using semver for update/downgrade/major-bump detection. 22 tests passing. Ready for Phase 6 Plan 02 (Update Detection UI Integration).
+**Current Focus:** ✅ Phase 6 Complete! Interactive CLI integration with version detection: --check-updates flag with verbose mode, inline version status in platform selection, orchestrator validation gates (downgrade blocking, major update warnings, customization preservation), 5 integration tests passing. Phase 6 delivers complete update detection and versioning system. Ready for Phase 7 (Path Security).
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6 of 8 (Update Detection and Versioning) — IN PROGRESS  
+**Current Phase:** 6 of 8 (Update Detection and Versioning) — ✅ COMPLETE  
 **Phase Goal:** User re-runs installer → sees installed version, gets prompted if update available, can upgrade  
-**Status:** Phase 6 Plan 01 complete (Core Version Detection Modules). Ready for Plan 02.
+**Status:** Phase 6 complete (Plans 01 & 02). Ready for Phase 7 (Path Security and Validation).
 
 ### Plan Status
-**Completed Plans:** 17/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 1/?)  
-**Current Plan:** 06-01 complete - Core Version Detection Modules  
-**Status:** Ready for next Phase 6 plan (Update Detection UI Integration)
+**Completed Plans:** 19/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 2/2)  
+**Current Plan:** 06-02 complete - Interactive CLI Integration & Update Flow  
+**Status:** Phase 6 complete. Ready for Phase 7.
 
 ### Progress Bar
 ```
@@ -35,10 +35,10 @@ Phase 2: [███████████████████████�
 Phase 3: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 4: [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 Phase 5: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
-Phase 6: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans) 🔄 IN PROGRESS
+Phase 6: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 
 Overall Progress:
-[████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 49% (17/35 total plans)
+[██████████████████████████░░░░░░░░░░░░░░░░░░░░░░] 54% (19/35 total plans)
 ```
 
 ---
@@ -46,11 +46,11 @@ Overall Progress:
 ## Performance Metrics
 
 ### Velocity
-- **Phases Completed:** 5 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions)
-- **Phases In Progress:** 1 (Phase 6 - Update Detection and Versioning)
-- **Plans Completed:** 17/35
+- **Phases Completed:** 6 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning)
+- **Phases In Progress:** 0
+- **Plans Completed:** 19/35
 - **Days Active:** 2
-- **Plans Today:** 3
+- **Plans Today:** 4
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -60,7 +60,7 @@ Overall Progress:
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 34/37 (92% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6: 1, Phase 7+: 3 pending)
+- **Requirements Completed:** 36/37 (97% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6: 2, Phase 7+: 1 pending)
 
 ---
 
@@ -450,9 +450,40 @@ Overall Progress:
     - Separate status='major_update' from regular updates
     - Rationale: Warn users about potential breaking changes per 06-CONTEXT.md 2.4
 
+58. **2026-01-27 (06-02):** Verbose mode discovery detail (VERSION-06)
+    - Verbose flag shows path checking, file discovery, manifest content
+    - Normal mode shows only final results
+    - Helps users debug installation detection issues
+    - Rationale: Users need visibility into discovery process for troubleshooting
+
+59. **2026-01-27 (06-02):** Custom path platform detection (VERSION-07)
+    - Custom paths return 'custom' placeholder from derivePlatform()
+    - Platform resolved by reading manifest.platform field
+    - Fallback to 'unknown' if manifest invalid
+    - Rationale: Non-standard paths don't follow directory structure conventions
+
+60. **2026-01-27 (06-02):** Downgrade blocking in orchestrator (VERSION-08)
+    - Block downgrades completely before installation begins
+    - Show clear error with version info and npx instructions
+    - No way to override (by design - prevent data loss)
+    - Rationale: Downgrades can corrupt installations per 06-CONTEXT.md 2.3
+
+61. **2026-01-27 (06-02):** Major update confirmation prompts (VERSION-09)
+    - Require explicit confirmation for major version updates
+    - Show breaking changes warning
+    - Skippable via --yes flag for automation
+    - Rationale: Major updates may break existing workflows per 06-CONTEXT.md 2.4
+
+62. **2026-01-27 (06-02):** Customization preservation prompts (VERSION-10)
+    - Prompt users about preserving modifications
+    - Show contribution link to encourage upstream fixes
+    - Note: Actual preservation logic not yet implemented
+    - Rationale: Encourage contribution while informing about customizations per 06-CONTEXT.md 3.1
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
+- Customization preservation: prompt exists but file-level preservation not implemented yet
 
 ### Todos
 - [x] Create migration script foundation (01-01)
