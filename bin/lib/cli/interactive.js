@@ -46,6 +46,7 @@ export async function runInteractive(appVersion, options = {}) {
     await executeInstallationLoop(platforms, scope, appVersion, {
       scriptDir,
       verbose: options.verbose || false,
+      customPath: options.customPath || null,
     });
   } catch (error) {
     // Installation failed

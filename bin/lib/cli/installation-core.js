@@ -22,12 +22,14 @@ import { logInstallationError, formatValidationError, formatRuntimeError } from 
  * @param {Object} options - Additional options
  * @param {string} options.scriptDir - Script directory path
  * @param {boolean} [options.verbose] - Show verbose output
+ * @param {string|null} [options.customPath] - Custom installation path (overrides default target)
  * @returns {Promise<Object>} Installation results
  */
 export async function installPlatforms(platform, scope, appVersion, options = {}) {
   const {
     scriptDir,
     verbose = false,
+    customPath = null,
   } = options;
 
   const isGlobal = scope === 'global';
@@ -54,6 +56,7 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
       isGlobal,
       isVerbose: verbose,
       scriptDir,
+      targetDir: customPath,
       multiBar
     });
 
