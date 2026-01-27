@@ -18,7 +18,7 @@ import { showUsageError } from './lib/cli/usage.js';
 import { parsePlatformFlags, parseScope } from './lib/cli/flag-parser.js';
 import { shouldUseInteractiveMode, isValidTTY } from './lib/cli/mode-detector.js';
 import { showNextSteps } from './lib/cli/next-steps.js';
-import { showBannerWithContext } from './lib/cli/banner-manager.js';
+import { banner } from './lib/cli/banner-manager.js';
 import { executeInstallationLoop } from './lib/cli/install-loop.js';
 import { handleCheckUpdates } from './lib/updater/check-update.js';
 
@@ -81,7 +81,7 @@ async function main() {
   const platforms = parsePlatformFlags(options, adapterRegistry);
 
   // Show banner with version and context
-  showBannerWithContext(__dirname, pkg.version);
+  banner(pkg.version, true, __dirname);
 
   // Check for interactive mode
   if (shouldUseInteractiveMode(platforms, isValidTTY())) {

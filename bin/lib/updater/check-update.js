@@ -5,64 +5,6 @@ const { banner } = await import('../cli/banner-manager.js')
 import * as logger from '../cli/logger.js';
 
 /**
- * Validate installations for a specific scope
- * @param {string} scopeType - Type of scope ('global', 'local', 'custom')
- * @param {string[]} customPaths - Custom paths to check (empty for standard paths)
- * @param {string} currentVersion - Current GSD version
- * @param {boolean} verbose - Verbose mode flag
- * @returns {Promise<Array>} Array of installation results
- */
-async function validateScopeInstallations(scopeType, customPaths, currentVersion, verbose) {
-    const found = await findInstallations(scopeType === 'custom' ? '' : scopeType, customPaths, verbose);
-    const results = [];
-
-    if (found.length === 0) {
-        return [];
-    }
-
-    for (const install of found) {
-        if (verbose) {
-            logger.info(`  Found: ${install.path}`);
-        }
-        
-        const manifestResult = await readManifestWithRepair(install.path, verbose);
-        
-        if (manifestResult.success) {
-            if (verbose) {
-                logger.info(`  Manifest read successfully`);
-                logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
-            }
-            
-            // Use platform from manifest if we have 'custom' placeholder
-            const platform = install.platform === 'custom'
-                ? manifestResult.manifest.platform || 'unknown'
-                : install.platform;
-
-            const versionStatus = compareVersions(
-                manifestResult.manifest.gsd_version,
-                currentVersion
-            );
-            
-            results.push({
-                success: true,
-                platform,
-                versionStatus,
-                path: install.path
-            });
-        } else {
-            results.push({
-                success: false,
-                platform: install.platform === 'custom' ? 'custom path' : install.platform,
-                reason: manifestResult.reason,
-                path: install.path
-            });
-        }
-    }
-
-    return results;
-}
-
-/**
  * Handle --check-updates flag
  * @param {object} options - Command line options
  * @param {object} pkg - Package.json object
@@ -79,35 +21,16 @@ export async function handleCheckUpdates(options, pkg) {
         : [
             { type: 'global', label: 'Global installations', paths: [] },
             { type: 'local', label: 'Local installations', paths: [] }
-          ];
+        ];
 
-    // Show discovery process in verbose mode
-    if (options.verbose) {
-        logger.info('Discovery process:');
-        if (options.customPath) {
-            logger.info('  Checking custom path:');
-            logger.info(`    ${options.customPath}`);
-        } else {
-            logger.info('  Checking global paths:');
-            logger.info('    ~/.claude/get-shit-done/');
-            logger.info('    ~/.copilot/get-shit-done/');
-            logger.info('    ~/.codex/get-shit-done/');
-            logger.info('  Checking local paths:');
-            logger.info('    ./.claude/get-shit-done/');
-            logger.info('    ./.github/get-shit-done/');
-            logger.info('    ./.codex/get-shit-done/');
-        }
-        console.log('');
-    }
-
-    logger.info('Checking installations...');
-    console.log('');
+    logger.blockTitle('Checking Installations', { style: 'double', width: 80 });
 
     // Process each scope
     for (const scope of scopes) {
         // Use simpleTitle to separate sections (except for single custom path)
         if (scopes.length > 1) {
-            logger.simpleTitle(scope.label);
+            console.log('');
+            logger.simpleSubtitle(scope.label);
         }
 
         const results = await validateScopeInstallations(
@@ -118,7 +41,7 @@ export async function handleCheckUpdates(options, pkg) {
         );
 
         if (results.length > 0) {
-            logger.info(`${scope.label}:`);
+            // logger.info(`${scope.label}:`);
             for (const result of results) {
                 if (result.success) {
                     logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, options.verbose)}`);
@@ -171,4 +94,63 @@ function formatStatusLine(platform, versionStatus, verbose) {
     }
 
     return `? ${baseName}: ${versionStatus.status}`;
+}
+
+
+/**
+ * Validate installations for a specific scope
+ * @param {string} scopeType - Type of scope ('global', 'local', 'custom')
+ * @param {string[]} customPaths - Custom paths to check (empty for standard paths)
+ * @param {string} currentVersion - Current GSD version
+ * @param {boolean} verbose - Verbose mode flag
+ * @returns {Promise<Array>} Array of installation results
+ */
+async function validateScopeInstallations(scopeType, customPaths, currentVersion, verbose) {
+    const found = await findInstallations(scopeType === 'custom' ? '' : scopeType, customPaths, verbose);
+    const results = [];
+
+    if (found.length === 0) {
+        return [];
+    }
+
+    for (const install of found) {
+        if (verbose) {
+            logger.info(`  Found: ${install.path}`);
+        }
+
+        const manifestResult = await readManifestWithRepair(install.path, verbose);
+
+        if (manifestResult.success) {
+            if (verbose) {
+                logger.info(`  Manifest read successfully`);
+                logger.info(`  Version: ${manifestResult.manifest.gsd_version}`);
+            }
+
+            // Use platform from manifest if we have 'custom' placeholder
+            const platform = install.platform === 'custom'
+                ? manifestResult.manifest.platform || 'unknown'
+                : install.platform;
+
+            const versionStatus = compareVersions(
+                manifestResult.manifest.gsd_version,
+                currentVersion
+            );
+
+            results.push({
+                success: true,
+                platform,
+                versionStatus,
+                path: install.path
+            });
+        } else {
+            results.push({
+                success: false,
+                platform: install.platform === 'custom' ? 'custom path' : install.platform,
+                reason: manifestResult.reason,
+                path: install.path
+            });
+        }
+    }
+
+    return results;
 }

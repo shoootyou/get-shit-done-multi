@@ -20,27 +20,20 @@ export function banner(appVersion, attribution = true, scriptDir = null) {
   console.log(chalk.cyan('   ╚═════╝ ╚══════╝╚═════╝     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝'));
   console.log();
   console.log(chalk.bold.white(`  Get Shit Done (Multi-Platform) v${appVersion}`));
-  
+
   if (attribution) {
     console.log(chalk.gray('  Multi-platform meta-prompting, context engineering and spec-driven development system.'));
     console.log(chalk.gray('   * Forked from TÂCHES: glittercowboy/get-shit-done (Claude Code only)'));
     console.log(chalk.gray('   * Extended for Claude Code, GitHub Copilot CLI, and Codex CLI'));
     console.log(chalk.gray('   * Maintained by shoootyou/get-shit-done-multi'));
   }
-  
+
   // Show templates directory if scriptDir provided
   if (scriptDir) {
+    console.log('');
     const templatesDir = getTemplatesDirectory(scriptDir);
     logger.info(`Templates: ${templatesDir}`, 1);
   }
-  
-  console.log();
-}
 
-/**
- * @deprecated Use banner() with scriptDir parameter instead
- * Show application banner with context information
- */
-export function showBannerWithContext(scriptDir, version, attribution) {
-  banner(version, attribution, scriptDir);
+  console.log();
 }
