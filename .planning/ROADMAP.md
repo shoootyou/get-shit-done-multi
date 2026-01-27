@@ -381,8 +381,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Version display in `--version` output showing all installations
 
 **Plans:**
-- [ ] 06-01-PLAN.md — Core Version Detection Modules (Wave 1)
-- [ ] 06-02-PLAN.md — Interactive CLI Integration & Update Flow (Wave 2)
+- [x] 06-01-PLAN.md — Core Version Detection Modules (Wave 1)
+- [x] 06-02-PLAN.md — Interactive CLI Integration & Update Flow (Wave 2)
 
 **Notes:**
 - Uses semver for comparison (handles major/minor/patch)
