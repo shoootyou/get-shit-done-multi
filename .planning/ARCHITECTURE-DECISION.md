@@ -111,3 +111,97 @@ transformTools(tools) {
 **Approved by:** User (2026-01-26)  
 **Documented by:** Phase 3 Research  
 **Next Action:** Phase 3 planning will implement this architecture
+
+---
+
+# Architecture Decision: Centralized Path Management
+
+**Date:** 2026-01-27  
+**Decision:** Platform paths centralized in dedicated module  
+**Status:** ✅ IMPLEMENTED
+
+## Context
+
+Platform-specific paths (`.claude`, `.github`, `.codex`, `.copilot`) and shared paths (`get-shit-done`, `.gsd-install-manifest.json`) were hardcoded across ~10 files. This created maintenance issues and made adding new platforms error-prone.
+
+## Decision
+
+**Create `bin/lib/platforms/platform-paths.js` as single source of truth for all GSD path definitions.**
+
+Similar to `platform-names.js` providing centralized name mapping, `platform-paths.js` provides centralized path management.
+
+## Implementation
+
+### Module Structure
+
+```javascript
+// Platform directory mappings
+export const platformDirs = {
+  claude: { global: '.claude', local: '.claude' },
+  copilot: { global: '.copilot', local: '.github' },
+  codex: { global: '.codex', local: '.codex' }
+};
+
+// Shared constants
+export const SHARED_DIR = 'get-shit-done';
+export const MANIFEST_FILE = '.gsd-install-manifest.json';
+
+// Helper functions
+export function getPlatformDir(platform, isGlobal)
+export function getInstallPath(platform, isGlobal)
+export function getManifestPath(platform, isGlobal)
+export function getAllGlobalPaths()
+export function getAllLocalPaths()
+export function getPathReference(platform)
+export function derivePlatformFromPath(manifestPath)
+```
+
+### Refactored Files
+
+1. **Platform Adapters** - Use `getPlatformDir()` and `getPathReference()`
+   - `claude-adapter.js`
+   - `copilot-adapter.js`
+   - `codex-adapter.js`
+
+2. **Detection** - Use `getManifestPath()`
+   - `detector.js`
+
+3. **Installation Finder** - Use `getAllGlobalPaths()` and `getAllLocalPaths()`
+   - `installation-finder.js`
+   - `derivePlatformFromPath()` moved to platform-paths.js
+
+4. **Check Updates** - Import `getInstallPath()` for future use
+   - `check-update.js`
+
+## Benefits
+
+1. **Single Source of Truth**: All paths defined in one place
+2. **Consistent Pattern**: Mirrors `platform-names.js` API style
+3. **Easier Maintenance**: Change paths once, works everywhere
+4. **Better Extensibility**: New platforms just add to `platformDirs`
+5. **Reduced Duplication**: No more scattered path logic
+
+## Consequences
+
+### Positive
+- ✅ All path definitions centralized
+- ✅ Easier to add new platforms
+- ✅ Reduced maintenance burden
+- ✅ Consistent with existing patterns (platform-names.js)
+- ✅ Better documented path structure
+
+### Neutral
+- ↔️ One additional import in files that use paths
+- ↔️ Small learning curve for new contributors
+
+## Related Modules
+
+- `platform-names.js` - Centralized platform name mapping
+- `platform-paths.js` - Centralized platform path mapping
+- `base-adapter.js` - Platform adapter interface
+
+---
+
+**Implemented by:** Refactor commit (2026-01-27)  
+**Files changed:** 7 files, 141 insertions(+), 61 deletions(-)  
+**Related TODO:** `.planning/todos/done/2026-01-27-centralize-platform-path-management.md`
