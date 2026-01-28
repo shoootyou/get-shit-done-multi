@@ -27,18 +27,18 @@ export async function promptMigration(platform, oldVersion, backupPath, options 
   logger.listItem('Remove old files', 4);
   logger.listItem('Install v2.0.0', 4);
   console.log();
-  
+
   // Simple Yes/No confirmation (CONTEXT D1.2)
   const confirmed = await p.confirm({
     message: 'Create backup and upgrade?',
     initialValue: true
   });
-  
+
   if (p.isCancel(confirmed)) {
     p.cancel('Installation cancelled.');
     return false;
   }
-  
+
   return confirmed;
 }
 
@@ -49,8 +49,8 @@ export async function promptMigration(platform, oldVersion, backupPath, options 
  */
 export async function showBackupSuccess(backupPath) {
   console.log();
-  logger.success(`✓ Backup created: ${backupPath}`);
-  logger.info('You can delete this manually after verifying the installation.', 2);
+  logger.success(`Backup created: ${backupPath}`, 1);
+  logger.info('You can delete this manually after verifying the installation.', 1);
   console.log();
 }
 
@@ -91,10 +91,10 @@ export async function performMigration(platform, oldVersion, targetDir, options 
     if (!paths || paths.length === 0) {
       return { success: false, error: 'No old files found' };
     }
-    
+
     // 2. Create backup directory
     const backupDir = await createBackupDirectory(oldVersion, targetDir);
-    
+
     // 3. Prompt user (unless skipPrompts)
     if (!options.skipPrompts) {
       const confirmed = await promptMigration(platform, oldVersion, backupDir, options);
@@ -102,14 +102,14 @@ export async function performMigration(platform, oldVersion, targetDir, options 
         return { success: false, error: 'User declined' };
       }
     }
-    
+
     // 4. Create backup (with disk space check)
     const result = await createBackup(platform, oldVersion, paths, targetDir);
-    
+
     // 5. Show result
     if (result.success) {
       await showBackupSuccess(result.backupPath);
-      
+
       // Remove old files after successful backup
       for (const path of paths) {
         try {
@@ -121,7 +121,7 @@ export async function performMigration(platform, oldVersion, targetDir, options 
           logger.warn(`Could not remove ${path}: ${error.message}`, 2);
         }
       }
-      
+
       return { success: true, backupPath: result.backupPath };
     } else {
       await showBackupFailure(new Error('Copy failed'), result.backupPath);
@@ -133,7 +133,7 @@ export async function performMigration(platform, oldVersion, targetDir, options 
       await showBackupFailure(error, null);
       return { success: false, error: error.message };
     }
-    
+
     // Unexpected errors
     await showBackupFailure(error, null);
     return { success: false, error: error.message };

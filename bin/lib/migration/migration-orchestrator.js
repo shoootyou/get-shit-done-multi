@@ -19,10 +19,10 @@ import { performMigration } from './migration-manager.js';
  */
 export async function checkAndMigrateOldVersions(cwd, options = {}) {
   const { skipPrompts = false } = options;
-  
+
   // Detect all old versions
   const oldVersions = await detectAllOldVersions(cwd);
-  
+
   // No old versions found - success
   if (oldVersions.length === 0) {
     return {
@@ -32,19 +32,18 @@ export async function checkAndMigrateOldVersions(cwd, options = {}) {
       error: null
     };
   }
-  
+
   // Display detected old versions
   console.log();
   logger.warnSubtitle('Old Versions Detected', 0, 80, true);
-  
+
   for (const old of oldVersions) {
     logger.warn(`${old.platform}: v${old.version} (incompatible with v2.0.0)`, 2);
   }
-  console.log();
-  
+
   // Migrate each platform sequentially
   let migrationsPerformed = 0;
-  
+
   for (const old of oldVersions) {
     const migrationResult = await performMigration(
       old.platform,
@@ -52,7 +51,7 @@ export async function checkAndMigrateOldVersions(cwd, options = {}) {
       cwd,
       { skipPrompts }
     );
-    
+
     // Handle migration failure
     if (!migrationResult.success) {
       if (migrationResult.error === 'User declined') {
@@ -71,14 +70,13 @@ export async function checkAndMigrateOldVersions(cwd, options = {}) {
         };
       }
     }
-    
+
     migrationsPerformed++;
   }
-  
+
   // All migrations complete
-  logger.success('All migrations complete. Continuing with v2.0.0 installation...');
-  console.log();
-  
+  logger.success('All migrations complete. Continuing with v2.0.0 installation...', 1);
+
   return {
     success: true,
     migrationsPerformed,
