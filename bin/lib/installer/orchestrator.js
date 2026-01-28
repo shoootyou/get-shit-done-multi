@@ -22,6 +22,8 @@ import { confirm } from '@clack/prompts';
 import { detectOldVersion } from '../version/old-version-detector.js';
 import { performMigration } from '../migration/migration-manager.js';
 import { validateAllPaths } from '../validation/path-validator.js';
+import { isSymlink, resolveSymlinkSingleLevel } from '../paths/symlink-resolver.js';
+import { installError } from '../errors/install-error.js';
 
 /**
  * Main installation orchestrator
@@ -46,6 +48,9 @@ export async function install(appVersion, options) {
     : targetBase);
 
   const templatesDir = getTemplatesDirectory(scriptDir);
+
+  // === NEW: Symlink detection and confirmation (Phase 7) ===
+  await checkSymlinkAndConfirm(targetDir, skipPrompts);
 
   // === NEW: Old version migration check (Phase 6.1) ===
   const oldVersionResult = await detectOldVersion(platform, targetDir);
@@ -491,6 +496,44 @@ async function processTemplateFile(filePath, variables, isVerbose) {
   const cleaned = cleanFrontmatter(processed);
 
   await writeFile(filePath, cleaned);
+}
+
+/**
+ * Check for symlinks and get user confirmation
+ * @param {string} targetDir - Directory to check
+ * @param {boolean} skipPrompts - Skip prompts (for -y flag or non-interactive)
+ * @returns {Promise<void>}
+ * @throws {Error} If user cancels or symlinks not allowed in non-interactive mode
+ */
+async function checkSymlinkAndConfirm(targetDir, skipPrompts = false) {
+  if (await isSymlink(targetDir)) {
+    const symlinkInfo = await resolveSymlinkSingleLevel(targetDir);
+    
+    // Check if we're in non-interactive mode (skipPrompts = true or ALLOW_SYMLINKS env var)
+    const allowSymlinks = skipPrompts || process.env.ALLOW_SYMLINKS === 'true';
+    
+    if (!allowSymlinks) {
+      // Interactive mode - prompt for confirmation
+      console.log(''); // blank line
+      logger.warn(`⚠ Symlink detected in installation path`);
+      console.log(`  Path: ${targetDir}`);
+      console.log(`  Points to: ${symlinkInfo.target}`);
+      console.log('');
+      
+      const confirmed = await confirm({
+        message: 'Installation will write files to the symlink target. Continue?',
+        initialValue: false
+      });
+      
+      if (!confirmed) {
+        logger.info('Installation cancelled.', 2);
+        process.exit(0);
+      }
+    } else {
+      // Non-interactive mode or skipPrompts - just log
+      logger.warn(`⚠ Symlink detected: ${targetDir} → ${symlinkInfo.target}`, 2);
+    }
+  }
 }
 
 /**
