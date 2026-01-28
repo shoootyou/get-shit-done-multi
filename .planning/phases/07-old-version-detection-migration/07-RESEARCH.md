@@ -488,34 +488,30 @@ if (validation.totalErrors > 0) {
 - **Path validation without URL decoding:** Common attack vector, must decode first (recognized ~2017)
 - **Case-sensitive Windows reserved name checks:** Must be case-insensitive for cross-platform compatibility (Windows file system behavior)
 
-## Open Questions
+## Resolved Decisions
 
-Things that couldn't be fully resolved:
+Open questions from initial research, now resolved with user confirmation:
 
-1. **Null byte handling on modern Node.js**
-   - What we know: Null bytes (`\x00`) can cause issues with some C libraries that truncate strings
-   - What's unclear: Does modern Node.js (v18+) handle null bytes safely internally, or is explicit checking still needed?
-   - Recommendation: Include explicit null byte check for defense in depth (LOW overhead, HIGH security benefit)
+1. **Null byte handling on modern Node.js** ✅ RESOLVED
+   - Decision: Include explicit null byte check for defense in depth
+   - Rationale: LOW overhead, HIGH security benefit; doesn't rely on Node.js internal handling
 
-2. **URL decoding error handling**
-   - What we know: `decodeURIComponent()` throws on malformed input (e.g., lone `%` or `%2`)
-   - What's unclear: Should malformed encoding be treated as attack (reject) or user error (helpful message)?
-   - Recommendation: Reject with clear error message; malformed encoding is suspicious
+2. **URL decoding error handling** ✅ RESOLVED
+   - Decision: Reject with clear error message; treat malformed encoding as suspicious
+   - Rationale: Malformed encoding is unusual and potentially malicious; better to fail safely
 
-3. **Performance impact of defense-in-depth**
-   - What we know: Benchmarks show ~0.003ms per file for validation (negligible)
-   - What's unclear: Impact on 10,000+ file installations
-   - Recommendation: No optimization needed; validation is 10-100x faster than actual file I/O
+3. **Performance impact of defense-in-depth** ✅ RESOLVED
+   - Decision: No optimization needed; implement all 6-8 validation layers
+   - Rationale: Validation (~0.003ms/file) is 10-100x faster than file I/O; negligible overhead
 
-4. **Symlink confirmation UX**
-   - What we know: User must confirm symlink writes in interactive mode
-   - What's unclear: Best prompt wording that's clear but not alarming
-   - Recommendation: Educational tone: "Installation will write to symlink target: /path/to/target. Continue?"
+4. **Symlink confirmation UX** ✅ RESOLVED
+   - Decision: Educational tone prompt
+   - Wording: "Installation will write to symlink target: /path/to/target. Continue?"
+   - Rationale: Clear without being alarming; explains what will happen
 
-5. **Debug log retention policy**
-   - What we know: Debug logs created in `/tmp/gsd-install-debug-{timestamp}.log`
-   - What's unclear: Should they auto-delete after N days? GDPR implications?
-   - Recommendation: Document location in error message, let user/system handle cleanup
+5. **Debug log retention policy** ✅ RESOLVED
+   - Decision: Document location in error message, let user/system handle cleanup
+   - Rationale: Simple approach; avoids GDPR complexity; users can manage /tmp themselves
 
 ## Sources
 
