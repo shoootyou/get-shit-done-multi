@@ -87,6 +87,11 @@ export class CopilotAdapter extends PlatformAdapter {
     // Remove skills field (not supported in Copilot)
     delete data.skills;
     
+    // Transform tools field from string to array
+    if (data.tools && typeof data.tools === 'string') {
+      data.tools = this.transformTools(data.tools);
+    }
+    
     // Use custom serializer for correct format
     const frontmatter = serializeFrontmatter(data, 'copilot');
     

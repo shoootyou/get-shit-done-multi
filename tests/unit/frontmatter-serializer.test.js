@@ -19,7 +19,7 @@ describe('frontmatter-serializer', () => {
       
       // Verify other fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain("description: 'Test agent'");
+      expect(result).toContain("description: Test agent");
     });
     
     test('omits empty skills array from output', () => {
@@ -202,7 +202,7 @@ describe('frontmatter-serializer', () => {
       
       // Verify defined fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain("description: 'Test agent'");
+      expect(result).toContain("description: Test agent");
     });
     
     test('omits undefined nested fields', () => {
@@ -342,8 +342,8 @@ describe('frontmatter-serializer', () => {
       
       const result = serializeFrontmatter(data, 'copilot');
       
-      // Should be quoted
-      expect(result).toContain("description: 'This is a long description'");
+      // Should NOT be quoted (spaces alone don't require quoting in YAML)
+      expect(result).toContain("description: This is a long description");
     });
     
     test('handles strings with special characters', () => {

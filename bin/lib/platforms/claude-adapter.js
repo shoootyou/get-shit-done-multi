@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
+import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 
 /**
  * Platform adapter for Claude Code
@@ -75,8 +76,13 @@ export class ClaudeAdapter extends PlatformAdapter {
       }
     }
     
-    // Use gray-matter to serialize (Claude supports standard YAML)
-    return matter.stringify(body, data);
+    // Transform tools field (keeps as string for Claude, but ensures no quotes added)
+    // No transformation needed - Claude uses comma-separated string format
+    
+    // Use custom serializer for correct format (consistent with Copilot/Codex)
+    const frontmatter = serializeFrontmatter(data, 'claude');
+    
+    return `---\n${frontmatter}\n---\n\n${body}`;
   }
   
   /**

@@ -157,7 +157,7 @@ function formatValue(value) {
     return String(value);
   }
   
-  // String - quote if contains special characters
+  // String handling
   if (typeof value === 'string') {
     // Always quote strings that look like dates or versions to prevent YAML parsing
     // Examples: 2026-01-28, 2026-01-28T12:00:00Z, 2.0.0, 1.2.3
@@ -168,13 +168,17 @@ function formatValue(value) {
       return `'${value}'`;
     }
     
-    // Simple strings don't need quotes in YAML
-    if (/^[a-zA-Z0-9_-]+$/.test(value)) {
+    // Only quote if string contains characters that REQUIRE quoting in YAML
+    // Unquoted strings in YAML can contain: spaces, commas, periods, etc.
+    // Must quote if: starts with special chars, contains: :, {, }, [, ], >, |, *, &, !, %, @, `
+    const needsQuoting = /^[>|*&!%@`#]|[:{}\[\]]/.test(value) || value.startsWith('-');
+    
+    if (!needsQuoting) {
+      // Safe to leave unquoted - YAML will parse correctly
       return value;
     }
     
-    // Strings with special chars, spaces, or colons need quotes
-    // Use single quotes to avoid escaping issues
+    // Needs quoting - use single quotes, escape if needed
     if (value.includes("'")) {
       // If string contains single quotes, use double quotes and escape
       return `"${value.replace(/"/g, '\\"')}"`;
