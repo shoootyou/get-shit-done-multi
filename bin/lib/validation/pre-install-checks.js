@@ -8,6 +8,8 @@ import { homedir } from 'os';
 import { ensureDirectory, pathExists } from '../io/file-operations.js';
 import { insufficientSpace, permissionDenied } from '../errors/install-error.js';
 import { invalidPath } from '../errors/install-error.js';
+import { validatePath, validateAllPaths } from './path-validator.js';
+import { resolveSymlinkSingleLevel, isSymlink } from '../paths/symlink-resolver.js';
 
 const statfsPromise = promisify(statfs);
 
@@ -115,36 +117,42 @@ export async function checkWritePermissions(targetDir) {
 }
 
 /**
- * Validate paths for security (no traversal, correct scope)
+ * Validate paths for security (comprehensive defense-in-depth)
+ * @param {string} targetDir - Target installation directory
+ * @param {boolean} isGlobal - Global vs local installation
+ * @returns {Promise<string>} Resolved target path
+ * @throws {InstallError} If validation fails
  */
 export async function validatePaths(targetDir, isGlobal) {
-  // Normalize to resolve .. and . segments
-  const normalized = normalize(targetDir);
-  const resolved = resolve(normalized);
+  // Check if path is a symlink
+  const symlinkInfo = await resolveSymlinkSingleLevel(targetDir);
   
-  // Check for traversal attempts
-  if (normalized.includes('..')) {
-    throw invalidPath(
-      'Path traversal detected',
-      { path: targetDir, reason: 'Contains ..' }
-    );
+  if (symlinkInfo.isSymlink) {
+    // Symlink confirmation handled by CLI layer
+    // For now, use the resolved target for validation
+    targetDir = symlinkInfo.target;
   }
   
-  // Validate scope matches path
-  const home = homedir();
-  if (isGlobal && !resolved.startsWith(home)) {
-    throw invalidPath(
-      'Global installation must be in home directory',
-      { path: targetDir, home }
-    );
+  // Run comprehensive path validation (8 layers)
+  const { resolved } = validatePath(process.cwd(), targetDir);
+  
+  // Additional scope validation for global installations
+  if (isGlobal) {
+    const home = homedir();
+    if (!resolved.startsWith(home)) {
+      throw invalidPath(
+        'Global installation must be in home directory',
+        { path: targetDir, home, scope: 'global' }
+      );
+    }
   }
   
-  // Block system directories
+  // Block system directories (defense in depth - path-validator has allowlist)
   const systemDirs = ['/etc', '/usr', '/bin', '/sbin', '/var', '/tmp'];
   if (systemDirs.some(dir => resolved.startsWith(dir))) {
     throw invalidPath(
       'Cannot install to system directories',
-      { path: targetDir, blocked: true }
+      { path: targetDir, blocked: systemDirs }
     );
   }
   
