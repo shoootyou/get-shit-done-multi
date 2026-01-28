@@ -3,6 +3,7 @@
 import path from 'path';
 import sanitize from 'sanitize-filename';
 import { invalidPath } from '../errors/install-error.js';
+import { ALLOWED_DIRS, WINDOWS_RESERVED } from '../config/paths.js';
 
 /**
  * PATH SECURITY VALIDATION MODULE
@@ -40,13 +41,6 @@ import { invalidPath } from '../errors/install-error.js';
  * See: bin/lib/orchestration/transaction-manager.js for rollback implementation
  * See: bin/lib/errors/install-error.js for error types
  */
-
-const ALLOWED_DIRS = ['.claude', '.github', '.codex', 'get-shit-done'];
-const WINDOWS_RESERVED = [
-  'CON', 'PRN', 'AUX', 'NUL',
-  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
-];
 
 /**
  * Validate path with defense-in-depth approach (8 layers)

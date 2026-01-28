@@ -15,9 +15,18 @@ export async function resolveSymlinkSingleLevel(filePath) {
   try {
     stats = await lstat(filePath);
   } catch (e) {
+    // If path doesn't exist (ENOENT), it's not a symlink - this is OK for first install
+    if (e.code === 'ENOENT') {
+      return {
+        isSymlink: false,
+        original: filePath,
+        target: filePath
+      };
+    }
+    // Other errors (permission denied, etc) should still throw
     throw invalidPath(
-      `Path does not exist: ${filePath}`,
-      { path: filePath, error: e.message }
+      `Cannot access path: ${filePath}`,
+      { path: filePath, error: e.message, code: e.code }
     );
   }
   
