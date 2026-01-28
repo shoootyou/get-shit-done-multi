@@ -278,7 +278,13 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
 
     // Read, process, write
     const content = await readFile(srcFile, 'utf8');
-    const processed = replaceVariables(content, variables);
+    
+    // Step 1: Replace template variables
+    const withVariables = replaceVariables(content, variables);
+    
+    // Step 2: Transform frontmatter (platform-specific)
+    const processed = adapter.transformFrontmatter(withVariables);
+    
     await writeFile(destFile, processed);
 
     count++;
