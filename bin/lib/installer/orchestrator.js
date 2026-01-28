@@ -118,7 +118,7 @@ export async function install(appVersion, options) {
       displayCompletionLine('Skills', stats.skills, stats.skills);
 
       // Phase 2: Install agents
-      stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
+      stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose, adapter);
       displayCompletionLine('Agents', stats.agents, stats.agents);
 
       // Phase 3: Install shared directory
@@ -135,7 +135,7 @@ export async function install(appVersion, options) {
 
     console.log();
     logger.simpleSubtitle('Installing Agents');
-    stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose);
+    stats.agents = await installAgents(templatesDir, targetDir, templateVars, null, isVerbose, adapter);
 
     console.log();
     logger.simpleSubtitle('Installing Shared Directory');
@@ -225,7 +225,7 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
 /**
  * Install agents from templates
  */
-async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose) {
+async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose, adapter) {
   const agentsTemplateDir = join(templatesDir, 'agents');
   const agentsTargetDir = join(targetDir, 'agents');
 
@@ -233,14 +233,18 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
 
   // Get agent files
   const agentFiles = await readdir(agentsTemplateDir);
-  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
+  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
 
   let count = 0;
   for (const agent of agents) {
-    logger.verboseInProgress(agent, isVerbose);
+    // Strip .agent.md and add platform-specific extension
+    const baseName = agent.replace('.agent.md', '');
+    const targetFile = baseName + adapter.getFileExtension();
+    
+    logger.verboseInProgress(targetFile, isVerbose);
 
     const srcFile = join(agentsTemplateDir, agent);
-    const destFile = join(agentsTargetDir, agent);
+    const destFile = join(agentsTargetDir, targetFile);
 
     // Read, process, write
     const content = await readFile(srcFile, 'utf8');
