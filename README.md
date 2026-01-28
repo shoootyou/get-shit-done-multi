@@ -77,6 +77,103 @@ Then for each phase:
 
 ---
 
+## Upgrading from v1.x
+
+If you have an older v1.x installation of get-shit-done, the v2.0.0 installer will automatically detect it and offer to migrate.
+
+### What Happens
+
+1. **Detection:** The installer detects your v1.x installation automatically
+2. **Warning:** You'll see a clear message about the incompatibility
+3. **Confirmation:** A single prompt asks: "Create backup and upgrade?"
+4. **Backup:** If you confirm, all old files are backed up to `.gsd-backup/YYYY-MM-DD-HHMM/`
+5. **Installation:** v2.0.0 is installed fresh after successful backup
+
+### Example Migration Flow
+
+```bash
+$ npx get-shit-done-multi
+
+⚠ Old Version Detected
+  Version 1.8.0 is incompatible with v2.0.0
+
+What will happen:
+  • Backup v1.8.0 to .gsd-backup/2024-01-28-1400/
+  • Remove old files
+  • Install v2.0.0
+
+? Create backup and upgrade? [Y/n]
+```
+
+### Backup Location
+
+Your old installation is backed up to:
+- **Local installations:** `.gsd-backup/YYYY-MM-DD-HHMM/` in your project directory
+- **Global installations:** `.gsd-backup/YYYY-MM-DD-HHMM/` in your home directory
+
+The backup preserves your complete v1.x installation. You can delete it manually after verifying v2.0.0 works correctly.
+
+### What Changed from v1.x to v2.0
+
+**Structure:**
+- **Old (v1.x):** Monolithic `get-shit-done/` skill with all commands
+- **New (v2.0):** Individual `gsd-*` skills for each command
+
+**Versioning:**
+- **Old (v1.x):** Single `VERSION` file
+- **New (v2.0):** Per-skill `version.json` files
+
+**Claude Hooks:**
+- **Old (v1.x):** Hooks in `.claude/hooks/`
+- **New (v2.0):** No hooks (removed)
+
+**Agent Naming:**
+- **Old (v1.x):** Claude used `gsd-*.md` (no .agent.md suffix)
+- **New (v2.0):** All platforms use `gsd-*.agent.md`
+
+### Troubleshooting
+
+**"Insufficient disk space for backup"**
+- Free up space equal to your current installation size + 10%
+- Or move to a directory with more space
+
+**"Backup failed: Permission denied"**
+- Ensure you have write permissions to create `.gsd-backup/`
+- For global installations, you may need elevated permissions
+
+**Migration declined**
+- Your v1.x installation remains unchanged
+- v1.x and v2.0 cannot coexist - migration is required for upgrade
+
+### Manual Migration (Advanced)
+
+If you prefer to migrate manually:
+
+1. **Backup your v1.x installation:**
+   ```bash
+   cp -r .claude/commands/gsd .gsd-backup-manual/claude-commands
+   cp -r .claude/agents .gsd-backup-manual/claude-agents
+   # Repeat for other platforms
+   ```
+
+2. **Remove old installation:**
+   ```bash
+   rm -rf .claude/commands/gsd
+   rm -rf .claude/agents/gsd-*
+   rm -rf .claude/hooks/gsd-*
+   rm -rf .claude/get-shit-done
+   # Repeat for other platforms
+   ```
+
+3. **Install v2.0:**
+   ```bash
+   npx get-shit-done-multi
+   ```
+
+**Note:** Automatic migration is recommended - it handles all platforms and edge cases correctly.
+
+---
+
 ## About This Version
 
 **Multi-CLI version** maintained by **shoootyou**  
