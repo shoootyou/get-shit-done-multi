@@ -1,9 +1,10 @@
 // bin/lib/io/file-operations.js
 
 import fs from 'fs-extra';
-import { join, dirname } from 'path';
+import { join, dirname, relative } from 'path';
 import { homedir } from 'os';
-import { permissionDenied, insufficientSpace } from '../errors/install-error.js';
+import { permissionDenied, insufficientSpace, invalidPath } from '../errors/install-error.js';
+import { validatePath } from '../validation/path-validator.js';
 
 /**
  * Copy directory recursively with permission preservation
@@ -55,6 +56,37 @@ export async function ensureDirectory(dir) {
  */
 export async function writeFile(filePath, content) {
   try {
+    // SECURITY: Validate path before write (defense in depth)
+    // This catches injection attacks via template variables or path manipulation
+    // Note: We need a base directory to validate against
+    // For installation files, we validate the file is within allowed directories
+    const homeDir = homedir();
+    const relativePath = filePath.startsWith(homeDir) 
+      ? relative(homeDir, filePath)
+      : relative(process.cwd(), filePath);
+    
+    // Only validate if path contains our installation directories
+    // (allows other file writes like temp files, logs, etc.)
+    if (relativePath.startsWith('.claude') || 
+        relativePath.startsWith('.github') || 
+        relativePath.startsWith('.codex') ||
+        relativePath.startsWith('get-shit-done')) {
+      try {
+        const baseDir = filePath.startsWith(homeDir) ? homeDir : process.cwd();
+        validatePath(baseDir, relativePath);
+      } catch (error) {
+        throw invalidPath(
+          'Security validation failed at write time',
+          {
+            filePath,
+            relativePath,
+            error: error.message,
+            hint: 'This could indicate template variable injection or path manipulation'
+          }
+        );
+      }
+    }
+    
     await fs.ensureDir(dirname(filePath));
     await fs.writeFile(filePath, content, 'utf8');
   } catch (error) {
