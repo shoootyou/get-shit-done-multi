@@ -21,8 +21,7 @@ import { showNextSteps } from './lib/cli/next-steps.js';
 import { banner, showTemplatePath } from './lib/cli/banner-manager.js';
 import { executeInstallationLoop } from './lib/cli/install-loop.js';
 import { handleCheckUpdates } from './lib/updater/check-update.js';
-import { detectAllOldVersions } from './lib/version/old-version-detector.js';
-import { performMigration } from './lib/migration/migration-manager.js';
+import { checkAndMigrateOldVersions } from './lib/migration/migration-orchestrator.js';
 
 // Get script directory in ESM (replaces __dirname)
 const __filename = fileURLToPath(import.meta.url);
@@ -84,41 +83,17 @@ async function main() {
   // Show banner with version and context
   banner(pkg.version, true);
 
-  // === NEW: Check for old versions across all platforms (Phase 6.1) ===
-  const oldVersions = await detectAllOldVersions('.');
-
-  if (oldVersions.length > 0) {
-    // Show detected old versions
-    console.log();
-    logger.warnSubtitle('Old Versions Detected', 0, 80, true);
-
-    for (const old of oldVersions) {
-      logger.warn(`${old.platform}: v${old.version} (incompatible with v2.0.0)`, 2);
+  // Check for old versions and migrate if needed (Phase 6.1)
+  const migrationResult = await checkAndMigrateOldVersions('.', { skipPrompts: false });
+  
+  if (!migrationResult.success) {
+    if (migrationResult.cancelled) {
+      logger.info('Installation cancelled by user.');
+      process.exit(0);
+    } else {
+      logger.error(`Migration failed: ${migrationResult.error}`);
+      process.exit(1);
     }
-    console.log();
-
-    // Migrate each platform
-    for (const old of oldVersions) {
-      const migrationResult = await performMigration(
-        old.platform,
-        old.version,
-        '.',
-        { skipPrompts: false }
-      );
-
-      if (!migrationResult.success) {
-        if (migrationResult.error === 'User declined') {
-          p.cancel('Installation cancelled.');
-          process.exit(0);
-        } else {
-          p.cancel(`Migration failed: ${migrationResult.error}`);
-          process.exit(1);
-        }
-      }
-    }
-
-    logger.success('All migrations complete. Continuing with v2.0.0 installation...');
-    console.log();
   }
 
   // Show templates path
