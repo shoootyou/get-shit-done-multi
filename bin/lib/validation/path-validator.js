@@ -4,6 +4,43 @@ import path from 'path';
 import sanitize from 'sanitize-filename';
 import { invalidPath } from '../errors/install-error.js';
 
+/**
+ * PATH SECURITY VALIDATION MODULE
+ * 
+ * Defense-in-depth path validation with 8 security layers.
+ * Integrated with Phase 5 transaction system for atomic rollback.
+ * 
+ * VALIDATION FLOW:
+ * 1. Pre-installation: validatePaths() checks target directory
+ * 2. Batch validation: validateAllPaths() checks all template paths
+ * 3. Per-file validation: validatePath() checks each write after variable substitution
+ * 
+ * ERROR HANDLING:
+ * - All validation errors throw InstallError with type 'invalid_path'
+ * - Errors include detailed context (path, reason, layer that failed)
+ * - Batch validation collects ALL errors before throwing (fail slow for reporting)
+ * - Per-file validation fails fast (stops immediately on first violation)
+ * 
+ * ROLLBACK INTEGRATION (Phase 5):
+ * - If validation fails BEFORE transaction begins: No rollback needed (nothing written)
+ * - If validation fails DURING transaction: Transaction system triggers automatic rollback
+ * - If validation fails AFTER transaction: InstallError triggers cleanup via orchestrator
+ * 
+ * Transaction integration points:
+ * 1. Pre-install checks (BEFORE transaction) - validatePaths()
+ * 2. Batch validation (BEFORE transaction) - validateAllPaths()
+ * 3. Per-file writes (WITHIN transaction) - validatePath()
+ * 
+ * If any validation fails during file writes, Phase 5's transaction system will:
+ * - Stop processing immediately
+ * - Roll back all completed writes
+ * - Restore original state
+ * - Log error via error-logger.js
+ * 
+ * See: bin/lib/orchestration/transaction-manager.js for rollback implementation
+ * See: bin/lib/errors/install-error.js for error types
+ */
+
 const ALLOWED_DIRS = ['.claude', '.github', '.codex', 'get-shit-done'];
 const WINDOWS_RESERVED = [
   'CON', 'PRN', 'AUX', 'NUL',
@@ -12,11 +49,27 @@ const WINDOWS_RESERVED = [
 ];
 
 /**
- * Validate path with defense-in-depth approach
+ * Validate path with defense-in-depth approach (8 layers)
+ * 
+ * VALIDATION LAYERS:
+ * 1. URL decode - catches %2e%2e%2f attacks
+ * 2. Null byte check - catches \x00 injection
+ * 3. Normalize - resolves ., .., //, etc.
+ * 4. Path traversal check - rejects if .. remains after normalize
+ * 5. Containment check - ensures path stays within base directory
+ * 6. Allowlist check - only .claude, .github, .codex, get-shit-done allowed
+ * 7. Length validation - enforces OS limits (260 Windows, 4096 Unix)
+ * 8. Component validation - checks Windows reserved names, 255 char limit
+ * 
+ * ERROR BEHAVIOR:
+ * - Throws InstallError immediately on first violation (fail fast)
+ * - Error includes which layer failed and why
+ * - If called within transaction, triggers automatic rollback
+ * 
  * @param {string} basePath - Base installation directory
  * @param {string} inputPath - Path to validate (may be relative)
  * @returns {Object} { normalized, resolved } if valid
- * @throws {InstallError} If path fails validation
+ * @throws {InstallError} If path fails any validation layer
  */
 export function validatePath(basePath, inputPath) {
   // Layer 1: URL decode
