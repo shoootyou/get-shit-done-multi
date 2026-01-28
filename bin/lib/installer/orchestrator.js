@@ -326,11 +326,13 @@ async function processDirectoryRecursively(dir, variables, isVerbose) {
   const entries = await readdir(dir, { withFileTypes: true, recursive: true });
   
   for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    
     if (entry.isDirectory()) {
       continue; // recursive: true handles subdirectories
     }
+    
+    // In Node.js 20.1+, entry has parentPath property which contains the directory
+    // entry.name is just the filename
+    const fullPath = join(entry.parentPath || dir, entry.name);
     
     // Check if text file by extension
     const ext = entry.name.substring(entry.name.lastIndexOf('.'));
