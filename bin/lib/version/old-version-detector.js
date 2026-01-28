@@ -2,6 +2,7 @@
 
 import { pathExists, readFile } from '../io/file-operations.js';
 import { resolve, join } from 'path';
+import { homedir } from 'os';
 import fs from 'fs-extra';
 
 /**
@@ -208,7 +209,7 @@ export async function detectAllOldVersions(targetDir = '.') {
   
   // Determine scope based on target directory
   const resolvedDir = resolve(targetDir);
-  const homeDir = require('os').homedir();
+  const homeDir = homedir();
   const scope = resolvedDir === homeDir ? 'global' : 'local';
   
   for (const platform of platforms) {
