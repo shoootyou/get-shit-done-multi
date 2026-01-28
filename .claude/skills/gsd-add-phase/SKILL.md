@@ -5,7 +5,7 @@ skill_version: 1.9.1
 requires_version: 1.9.0+
 platforms: [claude, copilot, codex]
 tools: Read, Write, Bash
-argument-hint: [{name: description, type: string, required: true, description: Phase description (all args combined become description)}]
+arguments: [{name: description, type: string, required: true, description: Phase description (all args combined become description)}]
 ---
 
 <objective>
