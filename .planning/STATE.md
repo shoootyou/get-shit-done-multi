@@ -1,7 +1,7 @@
 # Project State
 
-**Last Updated:** 2026-01-27  
-**Updated By:** GSD Executor (Phase 6 Plan 03 Complete - UX Fixes)
+**Last Updated:** 2026-01-28  
+**Updated By:** GSD Executor (Phase 6.1 Plan 01 Complete - Old Version Detector)
 
 ---
 
@@ -11,34 +11,35 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ⚠️ Phase 6.1 Inserted! Old version detection & migration - urgent work discovered during Phase 6. V1.x installations incompatible with v2.0.0 structure. Must implement backup/migration flow before Path Security phase. Ready to plan Phase 6.1.
+**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 1 complete. Detection module ready, proceeding to Wave 2 (Backup Manager).
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🔵 READY TO PLAN  
+**Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🟢 IN PROGRESS  
 **Phase Goal:** Detect old v1.x installations, offer upgrade with automatic backup, install v2.0.0  
-**Status:** Phase 6.1 inserted as urgent work. Incompatibility between v1.x (monolithic) and v2.0.0 (modular) structures discovered. Ready to plan.
+**Status:** Wave 1 complete (Detection Module). Proceeding to Wave 2 (Backup Manager).
 
 ### Plan Status
-**Completed Plans:** 20/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3)  
-**Current Plan:** 06-03 complete - Fix Check-Updates UX and Custom-Path Logic  
-**Status:** Phase 6 complete with UX polish. Ready for Phase 7.
+**Completed Plans:** 21/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 1/4)  
+**Current Plan:** 06.1-01 complete - Old Version Detector Module  
+**Status:** Phase 6.1 Wave 1 complete. Detection module ready for integration.
 
 ### Progress Bar
 ```
 Milestone v2.0: Complete Multi-Platform Installer
-Phase 1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 3: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
-Phase 4: [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
-Phase 5: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
-Phase 6: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
+Phase 1:   [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
+Phase 2:   [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
+Phase 3:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
+Phase 4:   [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
+Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
+Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
+Phase 6.1: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  25% (1/4 plans) 🟢 IN PROGRESS
 
 Overall Progress:
-[████████████████████████████░░░░░░░░░░░░░░░░░░░░] 57% (20/35 total plans)
+[█████████████████████████████░░░░░░░░░░░░░░░░░░░] 54% (21/39 total plans)
 ```
 
 ---
@@ -47,10 +48,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 6 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning)
-- **Phases In Progress:** 0
-- **Plans Completed:** 20/35
+- **Phases In Progress:** 1 (Phase 6.1 - Old Version Detection & Migration, Wave 1/4 complete)
+- **Plans Completed:** 21/39
 - **Days Active:** 2
-- **Plans Today:** 5
+- **Plans Today:** 1 (06.1-01)
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -480,6 +481,30 @@ Overall Progress:
     - Note: Actual preservation logic not yet implemented
     - Rationale: Encourage contribution while informing about customizations per 06-CONTEXT.md 3.1
 
+63. **2026-01-28 (06.1-01):** Graceful detection error handling (MIGRATION-DETECTION-01)
+    - detectOldVersion() returns { isOld: false, version: null, paths: [] } on errors
+    - Never throws exceptions from detection functions
+    - Prevents detection failures from blocking installation
+    - Rationale: Detection is opportunistic - failures shouldn't prevent fresh installs
+
+64. **2026-01-28 (06.1-01):** Platform-specific v1.x markers (MIGRATION-DETECTION-02)
+    - Claude: VERSION file AND (commands/gsd OR hooks/gsd-check-update.js)
+    - Copilot/Codex: SKILL.md AND VERSION in skills/get-shit-done directory
+    - Different marker patterns reflect different v1.x architectures
+    - Rationale: Each platform had unique v1.x structure requiring distinct detection logic
+
+65. **2026-01-28 (06.1-01):** Separate Claude old/new agent detection (MIGRATION-DETECTION-03)
+    - Old v1.x: gsd-*.md files (e.g., gsd-planner.md)
+    - New v2.0: gsd-*.agent.md files (e.g., gsd-planner.agent.md)
+    - Detection filters for .md only, excludes .agent.md
+    - Rationale: Prevents mixing old and new agent formats in backup
+
+66. **2026-01-28 (06.1-01):** Path filtering with existence checks (MIGRATION-DETECTION-04)
+    - getOldInstallationPaths() uses pathExists() to filter paths
+    - Only includes files/directories that actually exist
+    - Prevents backup errors from missing files
+    - Rationale: v1.x installations vary (some have hooks, some don't) - filter dynamically
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -641,22 +666,23 @@ None
 - Phase 3: Multi-Platform Support (✅ Complete - 3/3 plans complete)
 - Phase 4: Interactive CLI with Beautiful UX (✅ Complete - 1/1 plans complete)
 - Phase 5: Atomic Transactions (✅ Complete - 2/2 plans complete)
-- Phase 6: Update Detection (🔄 In Progress - 1/5 plans complete)
+- Phase 6: Update Detection (✅ Complete - 3/3 plans complete)
+- Phase 6.1: Old Version Detection & Migration (🔄 In Progress - 1/4 plans complete)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 6 Plan 01 complete - Core version detection modules. Three independent modules built: installation finder with parallel discovery, manifest reader with auto-repair, and version checker using semver. 22 tests passing. Ready for Plan 02 (Update Detection UI Integration).
+**Current Scope:** Phase 6.1 Plan 01 complete - Old Version Detector Module. Detection module with platform-specific v1.x structure markers, version reading, and path collection. 23 tests passing. Ready for Plan 02 (Backup Manager Module).
 
 ---
 
 ## Session Continuity
 
-**Last session:** 2026-01-27T13:32:04Z  
-**Stopped at:** Completed 06-01-PLAN.md (Core Version Detection Modules)  
+**Last session:** 2026-01-28T10:07:45Z  
+**Stopped at:** Completed 06.1-01-PLAN.md (Old Version Detector Module)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
-**Last updated:** 2026-01-27  
-**Ready for:** Phase 6 Plan 02 - Update Detection UI Integration
+**Last updated:** 2026-01-28  
+**Ready for:** Phase 6.1 Plan 02 - Backup Manager Module
