@@ -161,13 +161,19 @@ export async function createBackup(platform, oldVersion, sourcePaths, targetDir)
     // 1. Create backup directory
     const backupPath = await createBackupDirectory(oldVersion, targetDir);
     
-    // 2. Validate disk space (throws if insufficient)
-    await validateBackupSpace(sourcePaths, backupPath);
+    // 2. Resolve source paths (they may be relative to targetDir)
+    const resolvedPaths = sourcePaths.map(p => {
+      // If already absolute, use as-is; otherwise resolve relative to targetDir
+      return resolve(p.startsWith('/') ? p : join(targetDir, p));
+    });
     
-    // 3. Copy each source path with retry
+    // 3. Validate disk space (throws if insufficient)
+    await validateBackupSpace(resolvedPaths, backupPath);
+    
+    // 4. Copy each source path with retry
     const failed = [];
     
-    for (const sourcePath of sourcePaths) {
+    for (const sourcePath of resolvedPaths) {
       if (!await pathExists(sourcePath)) {
         continue; // Skip non-existent paths
       }
@@ -183,7 +189,7 @@ export async function createBackup(platform, oldVersion, sourcePaths, targetDir)
       }
     }
     
-    // 4. Return result
+    // 5. Return result
     if (failed.length > 0) {
       // Partial backup - keep files, report failures
       return {
