@@ -159,10 +159,20 @@ function formatValue(value) {
   
   // String - quote if contains special characters
   if (typeof value === 'string') {
+    // Always quote strings that look like dates or versions to prevent YAML parsing
+    // Examples: 2026-01-28, 2026-01-28T12:00:00Z, 2.0.0, 1.2.3
+    if (/^\d{4}-\d{2}-\d{2}/.test(value) || /^\d+\.\d+(\.\d+)?$/.test(value)) {
+      if (value.includes("'")) {
+        return `"${value.replace(/"/g, '\\"')}"`;
+      }
+      return `'${value}'`;
+    }
+    
     // Simple strings don't need quotes in YAML
     if (/^[a-zA-Z0-9_-]+$/.test(value)) {
       return value;
     }
+    
     // Strings with special chars, spaces, or colons need quotes
     // Use single quotes to avoid escaping issues
     if (value.includes("'")) {
