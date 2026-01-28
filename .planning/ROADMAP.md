@@ -479,9 +479,9 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Comprehensive integration tests (13 agents × 3 platforms = 39 test cases)
 
 **Plans:**
-- [ ] 06.2-01-PLAN.md — Custom Frontmatter Serializer (Wave 1)
-- [ ] 06.2-02-PLAN.md — Fix Agent Frontmatter Transformation Pipeline (Wave 2)
-- [ ] 06.2-03-PLAN.md — Recursive Variable Replacement & Integration Tests (Wave 3)
+- [x] 06.2-01-PLAN.md — Custom Frontmatter Serializer (Wave 1)
+- [x] 06.2-02-PLAN.md — Fix Agent Frontmatter Transformation Pipeline (Wave 2)
+- [x] 06.2-03-PLAN.md — Recursive Variable Replacement & Integration Tests (Wave 3)
 
 **Notes:**
 - Inserted as urgent work discovered after Phase 6.1 completion
