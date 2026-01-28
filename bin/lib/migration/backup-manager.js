@@ -152,7 +152,7 @@ export async function copyWithRetry(sourcePath, destPath, options = {}) {
  * Create backup of old installation
  * @param {string} platform - Platform name (claude, copilot, codex)
  * @param {string} oldVersion - Version being backed up
- * @param {string[]} sourcePaths - Array of paths to backup
+ * @param {string[]} sourcePaths - Array of relative paths to backup
  * @param {string} targetDir - Base directory
  * @returns {Promise<{success: boolean, backupPath: string, failed?: string[]}>}
  */
@@ -161,7 +161,7 @@ export async function createBackup(platform, oldVersion, sourcePaths, targetDir)
     // 1. Create backup directory
     const backupPath = await createBackupDirectory(oldVersion, targetDir);
     
-    // 2. Resolve source paths (they may be relative to targetDir)
+    // 2. Resolve source paths (they should be relative to targetDir)
     const resolvedPaths = sourcePaths.map(p => {
       // If already absolute, use as-is; otherwise resolve relative to targetDir
       return resolve(p.startsWith('/') ? p : join(targetDir, p));
@@ -170,17 +170,19 @@ export async function createBackup(platform, oldVersion, sourcePaths, targetDir)
     // 3. Validate disk space (throws if insufficient)
     await validateBackupSpace(resolvedPaths, backupPath);
     
-    // 4. Copy each source path with retry
+    // 4. Copy each source path with retry, preserving directory structure
     const failed = [];
     
-    for (const sourcePath of resolvedPaths) {
+    for (let i = 0; i < sourcePaths.length; i++) {
+      const sourcePath = resolvedPaths[i];
+      const relativePath = sourcePaths[i]; // Original relative path
+      
       if (!await pathExists(sourcePath)) {
         continue; // Skip non-existent paths
       }
       
-      // Get relative name for backup
-      const name = basename(sourcePath);
-      const destPath = join(backupPath, name);
+      // Preserve full directory structure in backup
+      const destPath = join(backupPath, relativePath);
       
       const result = await copyWithRetry(sourcePath, destPath);
       

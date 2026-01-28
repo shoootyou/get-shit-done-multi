@@ -5,6 +5,7 @@ import * as logger from '../cli/logger.js';
 import { detectOldVersion } from '../version/old-version-detector.js';
 import { createBackupDirectory, validateBackupSpace, createBackup } from './backup-manager.js';
 import { remove } from 'fs-extra';
+import { resolve } from 'path';
 
 /**
  * Prompt user for migration confirmation
@@ -113,7 +114,9 @@ export async function performMigration(platform, oldVersion, targetDir, options 
       // Remove old files after successful backup
       for (const path of paths) {
         try {
-          await remove(path);
+          // Resolve relative paths against targetDir
+          const fullPath = resolve(targetDir, path);
+          await remove(fullPath);
         } catch (error) {
           // Log but don't fail if removal fails
           logger.warn(`Could not remove ${path}: ${error.message}`, 2);
