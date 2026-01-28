@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Executor (Phase 6.1 Plan 02 Complete - Migration Manager & Backup Operations)
+**Updated By:** GSD Executor (Phase 6.1 Plan 03 Complete - Integration with Installer Flows)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 2 complete. Backup Manager ready, proceeding to Wave 3 (Orchestrator Integration).
+**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 3 complete. Orchestrator, Interactive, and Check-Update integrated. Proceeding to Wave 4 (Testing).
 
 ---
 
@@ -20,12 +20,12 @@
 ### Phase Status
 **Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🟢 IN PROGRESS  
 **Phase Goal:** Detect old v1.x installations, offer upgrade with automatic backup, install v2.0.0  
-**Status:** Wave 2 complete (Backup Manager). Proceeding to Wave 3 (Orchestrator Integration).
+**Status:** Wave 3 complete (Orchestrator Integration). All entry points integrated, proceeding to Wave 4 (Testing).
 
 ### Plan Status
-**Completed Plans:** 22/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 2/4)  
-**Current Plan:** 06.1-02 complete - Migration Manager & Backup Operations  
-**Status:** Phase 6.1 Wave 2 complete. Backup operations ready for orchestrator integration.
+**Completed Plans:** 23/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 3/4)  
+**Current Plan:** 06.1-03 complete - Integration with Installer Flows  
+**Status:** Phase 6.1 Wave 3 complete. All three entry points (orchestrator, interactive, check-update) integrated with migration flow.
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 3:   [██████████████████████�
 Phase 4:   [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
-Phase 6.1: [██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░]  50% (2/4 plans) 🟢 IN PROGRESS
+Phase 6.1: [█████████████████████████████████████░░░░░░░░░░░░░░░]  75% (3/4 plans) 🟢 IN PROGRESS
 
 Overall Progress:
-[██████████████████████████████░░░░░░░░░░░░░░░░░░] 56% (22/39 total plans)
+[███████████████████████████████░░░░░░░░░░░░░░░░░] 59% (23/39 total plans)
 ```
 
 ---
@@ -49,9 +49,9 @@ Overall Progress:
 ### Velocity
 - **Phases Completed:** 6 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning)
 - **Phases In Progress:** 1 (Phase 6.1 - Old Version Detection & Migration, Wave 2/4 complete)
-- **Plans Completed:** 22/39
+- **Plans Completed:** 23/39
 - **Days Active:** 2
-- **Plans Today:** 2 (06.1-01, 06.1-02)
+- **Plans Today:** 3 (06.1-01, 06.1-02, 06.1-03)
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -517,6 +517,38 @@ Overall Progress:
     - User can manually recover from partial backup
     - Rationale: Data loss prevention, debugging aid, clear user messaging per CONTEXT D3.2
 
+69. **2026-01-28 (06.1-03):** Migration timing in orchestrator (INTEGRATION-01)
+    - Old version migration check happens BEFORE validateVersionBeforeInstall
+    - detectOldVersion → performMigration → validateVersionBeforeInstall
+    - Migration must complete before any installation validation
+    - Rationale: Old versions incompatible with v2.0.0; must migrate before new validation runs
+
+70. **2026-01-28 (06.1-03):** Exit code convention for migration (INTEGRATION-02)
+    - User declining migration = exit(0) (not an error, user choice)
+    - Migration failure = exit(1) (error condition)
+    - Successful migration = continue to regular installation
+    - Rationale: User declining is intentional choice, not failure; follows Unix conventions
+
+71. **2026-01-28 (06.1-03):** Interactive mode multi-platform migration (INTEGRATION-03)
+    - Detect ALL old platforms at once with detectAllOldVersions
+    - Show all detected old versions before prompts
+    - Migrate each platform sequentially with individual confirmations
+    - User can decline at first migration (exits for all)
+    - Rationale: Show full scope upfront, per-platform control, early exit prevents wasted migrations
+
+72. **2026-01-28 (06.1-03):** Check-update early return for old versions (INTEGRATION-04)
+    - Old version check happens BEFORE v2.x version comparison
+    - showOldVersionMessage for old versions, then return early
+    - Don't proceed to regular update checks if old version found
+    - Rationale: Old versions need migration not update; prevents confusing "update" messaging
+
+73. **2026-01-28 (06.1-03):** Incompatibility message distinct from update message (INTEGRATION-05)
+    - "Incompatible Version Detected" not "Update Available"
+    - Lists all platforms with old versions
+    - Actionable guidance: run installer (not manual steps)
+    - Explains migration creates backup
+    - Rationale: Clear distinction between old v1.x (incompatible) and v2.x (update available)
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -552,19 +584,20 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 05-02 Complete!** Manifest generation and orchestrator integration: (1) Manifest generator (bin/lib/validation/manifest-generator.js) - generateAndWriteManifest() with two-pass write pattern (include self in file list), collectInstalledFiles() recursive directory scan with sorted output, manifest structure: gsd_version, platform, scope, installed_at, files[]; (2) Orchestrator integration (bin/lib/installer/orchestrator.js) - imported runPreInstallationChecks() from Wave 1, validation runs before validateTemplates, replaced stub generateManifest() with full implementation, enhanced logging with version in warnings; (3) Error logging wrapper (bin/lib/cli/installation-core.js) - wraps all install() calls, logs to .gsd-error.log, validation errors show technical+friendly, runtime errors show friendly only; (4) Test coverage - 7 unit tests (manifest-generator.test.js), 3 integration tests (validation-flow.test.js), all passing. Duration: 5m 59s. Six commits (c54e86a, 9961c9e, 9c5569e, b81e606, cd2a949, 1ea8c24). **Phase 5 Complete!**
+✅ **Plan 06.1-03 Complete!** Integration with Installer Flows: (1) Orchestrator integration (bin/lib/installer/orchestrator.js) - detectOldVersion before validateVersionBeforeInstall, performMigration with skipPrompts support, exit(0) for decline/exit(1) for failure, continues after successful migration; (2) Interactive mode integration (bin/lib/cli/interactive.js) - detectAllOldVersions at start, shows all warnings before prompts, migrates each platform sequentially, user can decline at first migration; (3) Check-update integration (bin/lib/updater/check-update.js) - checks old versions before v2.x comparison, returns early for incompatibility message; (4) Old version message (bin/lib/updater/update-messages.js) - showOldVersionMessage with clear incompatibility messaging, distinct from regular update messages. Duration: 2.6 min. Four commits (d247321, 93f51ce, 36059ec, 67effcc). **Phase 6.1 Wave 3 Complete!**
 
 ### What's Next
-1. **Immediate:** Phase 6.1 - Old Version Detection & Migration (run `/gsd-plan-phase 6.1`)
-2. **Context:** V1.x incompatible with v2.0.0 (monolithic vs modular structure)
-3. **Requirement:** Detect old installations, backup automatically, install v2.0.0
-4. **Research:** See `.planning/phases/06.1-old-version-detection-migration/06.1-RESEARCH.md`
+1. **Immediate:** Phase 6.1 Plan 04 - Testing & Verification (Wave 4 - final wave)
+2. **Context:** All three entry points integrated (orchestrator, interactive, check-update)
+3. **Testing scope:** Migration flow, backup creation, decline/failure scenarios, multi-platform handling
+4. **Final wave:** Comprehensive integration tests before Phase 6.1 completion
 
 ### Context for Next Session
-- **Phase 5 complete:** ✅ Pre-installation validation + manifest generation with complete file list
-- **Validation integration:** ✅ Orchestrator runs checks before any writes (disk space, permissions, paths, existing install)
-- **Manifest tracking:** ✅ Post-installation scan includes all files (two-pass write to include manifest itself)
-- **Error handling:** ✅ Comprehensive logging to .gsd-error.log, split validation (detailed) vs runtime (friendly) messages
+- **Wave 1 complete:** ✅ Old version detection (detectOldVersion, detectAllOldVersions, readOldVersion)
+- **Wave 2 complete:** ✅ Migration manager and backup operations (performMigration, backupOldInstallation)
+- **Wave 3 complete:** ✅ Orchestrator, interactive, and check-update integration
+- **Flow established:** Banner → Migration check → Migration (if old) → Regular installation
+- **Independence maintained:** Migration module doesn't modify core installation logic
 - **Test coverage:** ✅ 13 tests passing (7 unit + 3 integration + 3 existing), full validation + manifest flow coverage
 - **Next action:** Review Phase 6 requirements in ROADMAP.md, plan next phase
 
@@ -683,18 +716,18 @@ None
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 6.1 Plan 02 complete - Migration Manager & Backup Operations. Atomic backup operations with 3-attempt retry, disk space pre-checks, and @clack/prompts user confirmation flow. 15 tests passing. Ready for Plan 03 (Orchestrator Integration).
+**Current Scope:** Phase 6.1 Plan 03 complete - Integration with Installer Flows. Old version migration integrated into orchestrator (before validateVersionBeforeInstall), interactive mode (multi-platform detection and sequential migration), and check-update (incompatibility message). All three entry points follow consistent flow. Ready for Plan 04 (Testing & Verification).
 
 ---
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T10:15:37Z  
-**Stopped at:** Completed 06.1-02-PLAN.md (Migration Manager & Backup Operations)  
+**Last session:** 2026-01-28T10:21:55Z  
+**Stopped at:** Completed 06.1-03-PLAN.md (Integration with Installer Flows)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-28  
-**Ready for:** Phase 6.1 Plan 03 - Orchestrator Integration
+**Ready for:** Phase 6.1 Plan 04 - Testing & Verification (Wave 4)
