@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Executor (Phase 6.1 Plan 01 Complete - Old Version Detector)
+**Updated By:** GSD Executor (Phase 6.1 Plan 02 Complete - Migration Manager & Backup Operations)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 1 complete. Detection module ready, proceeding to Wave 2 (Backup Manager).
+**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 2 complete. Backup Manager ready, proceeding to Wave 3 (Orchestrator Integration).
 
 ---
 
@@ -20,12 +20,12 @@
 ### Phase Status
 **Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🟢 IN PROGRESS  
 **Phase Goal:** Detect old v1.x installations, offer upgrade with automatic backup, install v2.0.0  
-**Status:** Wave 1 complete (Detection Module). Proceeding to Wave 2 (Backup Manager).
+**Status:** Wave 2 complete (Backup Manager). Proceeding to Wave 3 (Orchestrator Integration).
 
 ### Plan Status
-**Completed Plans:** 21/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 1/4)  
-**Current Plan:** 06.1-01 complete - Old Version Detector Module  
-**Status:** Phase 6.1 Wave 1 complete. Detection module ready for integration.
+**Completed Plans:** 22/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 2/4)  
+**Current Plan:** 06.1-02 complete - Migration Manager & Backup Operations  
+**Status:** Phase 6.1 Wave 2 complete. Backup operations ready for orchestrator integration.
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 3:   [██████████████████████�
 Phase 4:   [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
-Phase 6.1: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  25% (1/4 plans) 🟢 IN PROGRESS
+Phase 6.1: [██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░]  50% (2/4 plans) 🟢 IN PROGRESS
 
 Overall Progress:
-[█████████████████████████████░░░░░░░░░░░░░░░░░░░] 54% (21/39 total plans)
+[██████████████████████████████░░░░░░░░░░░░░░░░░░] 56% (22/39 total plans)
 ```
 
 ---
@@ -48,10 +48,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 6 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning)
-- **Phases In Progress:** 1 (Phase 6.1 - Old Version Detection & Migration, Wave 1/4 complete)
-- **Plans Completed:** 21/39
+- **Phases In Progress:** 1 (Phase 6.1 - Old Version Detection & Migration, Wave 2/4 complete)
+- **Plans Completed:** 22/39
 - **Days Active:** 2
-- **Plans Today:** 1 (06.1-01)
+- **Plans Today:** 2 (06.1-01, 06.1-02)
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -505,6 +505,18 @@ Overall Progress:
     - Prevents backup errors from missing files
     - Rationale: v1.x installations vary (some have hooks, some don't) - filter dynamically
 
+67. **2026-01-28 (06.1-02):** Resolve relative paths before backup (MIGRATION-BACKUP-01)
+    - createBackup() resolves relative paths to absolute before processing
+    - Old version detector returns relative paths (e.g., '.claude/commands/gsd')
+    - Must resolve relative to targetDir before pathExists() checks
+    - Rationale: Keeps detector simple and reusable; centralizes path resolution in backup manager
+
+68. **2026-01-28 (06.1-02):** Keep partial backups on failure (MIGRATION-BACKUP-02)
+    - Partial backups preserved when some files fail after 3 retries
+    - Returns success: false with list of failed paths
+    - User can manually recover from partial backup
+    - Rationale: Data loss prevention, debugging aid, clear user messaging per CONTEXT D3.2
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -667,22 +679,22 @@ None
 - Phase 4: Interactive CLI with Beautiful UX (✅ Complete - 1/1 plans complete)
 - Phase 5: Atomic Transactions (✅ Complete - 2/2 plans complete)
 - Phase 6: Update Detection (✅ Complete - 3/3 plans complete)
-- Phase 6.1: Old Version Detection & Migration (🔄 In Progress - 1/4 plans complete)
+- Phase 6.1: Old Version Detection & Migration (🔄 In Progress - 2/4 plans complete)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 6.1 Plan 01 complete - Old Version Detector Module. Detection module with platform-specific v1.x structure markers, version reading, and path collection. 23 tests passing. Ready for Plan 02 (Backup Manager Module).
+**Current Scope:** Phase 6.1 Plan 02 complete - Migration Manager & Backup Operations. Atomic backup operations with 3-attempt retry, disk space pre-checks, and @clack/prompts user confirmation flow. 15 tests passing. Ready for Plan 03 (Orchestrator Integration).
 
 ---
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T10:07:45Z  
-**Stopped at:** Completed 06.1-01-PLAN.md (Old Version Detector Module)  
+**Last session:** 2026-01-28T10:15:37Z  
+**Stopped at:** Completed 06.1-02-PLAN.md (Migration Manager & Backup Operations)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-28  
-**Ready for:** Phase 6.1 Plan 02 - Backup Manager Module
+**Ready for:** Phase 6.1 Plan 03 - Orchestrator Integration
