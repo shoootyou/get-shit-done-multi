@@ -10,6 +10,8 @@ import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
 import { isRepairableError } from '../manifests/schema.js';
 import { compareVersions, formatPlatformOption } from '../version/version-checker.js';
+import { detectAllOldVersions } from '../version/old-version-detector.js';
+import { performMigration } from '../migration/migration-manager.js';
 
 /**
  * Run interactive installation mode with beautiful prompts
@@ -21,6 +23,43 @@ export async function runInteractive(appVersion, options = {}) {
   // Show intro with instructions
   p.intro('Interactive Installer');
   p.log.info('Use ↑/↓ to navigate, Space to select, Enter to continue');
+
+  // === NEW: Check for old versions across all platforms (Phase 6.1) ===
+  const oldVersions = await detectAllOldVersions('.');
+  
+  if (oldVersions.length > 0) {
+    // Show detected old versions
+    console.log();
+    logger.warnSubtitle('Old Versions Detected', 0, 80, true);
+    
+    for (const old of oldVersions) {
+      logger.warn(`${old.platform}: v${old.version} (incompatible with v2.0.0)`, 2);
+    }
+    console.log();
+    
+    // Migrate each platform
+    for (const old of oldVersions) {
+      const migrationResult = await performMigration(
+        old.platform,
+        old.version,
+        '.',
+        { skipPrompts: false }
+      );
+      
+      if (!migrationResult.success) {
+        if (migrationResult.error === 'User declined') {
+          p.cancel('Installation cancelled.');
+          process.exit(0);
+        } else {
+          p.cancel(`Migration failed: ${migrationResult.error}`);
+          process.exit(1);
+        }
+      }
+    }
+    
+    logger.success('All migrations complete. Continuing with v2.0.0 installation...');
+    console.log();
+  }
 
   // Detect platforms
   const detected = await detectBinaries();
