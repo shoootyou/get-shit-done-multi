@@ -11,16 +11,16 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** ✅ Phase 6 Complete! Update detection and versioning fully integrated with UX polish: --check-updates uses logger formatting, custom-path skips scope prompt, custom-path-only checking. All UX issues from user testing resolved. Ready for Phase 7 (Path Security).
+**Current Focus:** ⚠️ Phase 6.1 Inserted! Old version detection & migration - urgent work discovered during Phase 6. V1.x installations incompatible with v2.0.0 structure. Must implement backup/migration flow before Path Security phase. Ready to plan Phase 6.1.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6 of 8 (Update Detection and Versioning) — ✅ COMPLETE  
-**Phase Goal:** User re-runs installer → sees installed version, gets prompted if update available, can upgrade  
-**Status:** Phase 6 complete (Plans 01, 02 & 03). All UX issues fixed. Ready for Phase 7 (Path Security and Validation).
+**Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🔵 READY TO PLAN  
+**Phase Goal:** Detect old v1.x installations, offer upgrade with automatic backup, install v2.0.0  
+**Status:** Phase 6.1 inserted as urgent work. Incompatibility between v1.x (monolithic) and v2.0.0 (modular) structures discovered. Ready to plan.
 
 ### Plan Status
 **Completed Plans:** 20/35 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3)  
@@ -518,10 +518,10 @@ None
 ✅ **Plan 05-02 Complete!** Manifest generation and orchestrator integration: (1) Manifest generator (bin/lib/validation/manifest-generator.js) - generateAndWriteManifest() with two-pass write pattern (include self in file list), collectInstalledFiles() recursive directory scan with sorted output, manifest structure: gsd_version, platform, scope, installed_at, files[]; (2) Orchestrator integration (bin/lib/installer/orchestrator.js) - imported runPreInstallationChecks() from Wave 1, validation runs before validateTemplates, replaced stub generateManifest() with full implementation, enhanced logging with version in warnings; (3) Error logging wrapper (bin/lib/cli/installation-core.js) - wraps all install() calls, logs to .gsd-error.log, validation errors show technical+friendly, runtime errors show friendly only; (4) Test coverage - 7 unit tests (manifest-generator.test.js), 3 integration tests (validation-flow.test.js), all passing. Duration: 5m 59s. Six commits (c54e86a, 9961c9e, 9c5569e, b81e606, cd2a949, 1ea8c24). **Phase 5 Complete!**
 
 ### What's Next
-1. **Immediate:** Phase 6 - Next phase (TBD - check ROADMAP.md)
-2. **Phase 5 Achievement:** Pre-installation validation + manifest generation complete (no rollback per scope decision)
-3. **Phase 5 Summary:** Validation prevents ~80% of failures, manifest tracks all installed files, error logging with clear guidance
-4. **Ready:** Phase 5 complete, installer has full validation and tracking capabilities
+1. **Immediate:** Phase 6.1 - Old Version Detection & Migration (run `/gsd-plan-phase 6.1`)
+2. **Context:** V1.x incompatible with v2.0.0 (monolithic vs modular structure)
+3. **Requirement:** Detect old installations, backup automatically, install v2.0.0
+4. **Research:** See `.planning/phases/06.1-old-version-detection-migration/06.1-RESEARCH.md`
 
 ### Context for Next Session
 - **Phase 5 complete:** ✅ Pre-installation validation + manifest generation with complete file list

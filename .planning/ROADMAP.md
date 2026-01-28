@@ -390,6 +390,53 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
+### Phase 6.1: Old Version Detection & Migration (INSERTED)
+
+**Goal:** Detect old v1.x installations, offer upgrade with automatic backup, and install v2.0.0
+
+**Dependencies:** Phase 6 (needs version detection infrastructure)
+
+**Type:** Urgent work - Discovered incompatibility between v1.x and v2.0.0 structures
+
+**Plans:** 0 plans
+
+**Requirements Mapped:**
+- VERSION-04: Compatibility with older versions (migration path)
+- UX-06: Clear error messages for incompatible installations
+
+**Success Criteria:**
+1. Installer detects old v1.x installations (monolithic `.github/skills/get-shit-done/` structure)
+2. User sees clear warning: "Version X.X detected (incompatible with v2.0.0)"
+3. Single confirmation prompt: "Create backup and upgrade to v2.0.0? [Yes/No]"
+4. If Yes: Automatic backup to `~/.gsd-backup/v{version}-{timestamp}/`
+5. All old files moved to backup directory (commands, agents, hooks, settings)
+6. Clear message shows backup location and manual deletion instructions
+7. v2.0.0 installation proceeds after successful backup
+8. If No: Exit with explanation that v1.x is incompatible
+9. Backup failures preserve old files (no deletion)
+10. Integration tests pass for all migration scenarios
+
+**Key Deliverables:**
+- `/bin/lib/version/old-version-detector.js` (detect v1.x structure)
+- `/bin/lib/migration/migration-manager.js` (backup and migration flow)
+- Integration with orchestrator (pre-installation check)
+- Integration with interactive mode (migration prompt)
+- Updated check-updates flow (incompatibility warnings)
+- Integration tests for migration scenarios
+- README section: "Upgrading from v1.x"
+
+**Plans:**
+- [ ] TBD (run `/gsd-plan-phase 6.1` to break down)
+
+**Notes:**
+- Inserted as urgent work discovered during Phase 6 completion
+- v1.x structure incompatible: monolithic skills vs. modular v2.0
+- Migration is one-way (v1.x → v2.0), no downgrade support
+- Backup directory in home to avoid project conflicts
+- See `06.1-RESEARCH.md` for detailed structural analysis
+
+---
+
 ### Phase 7: Path Security and Validation
 
 **Goal:** Malicious or malformed paths are rejected before any file writes, preventing traversal attacks
