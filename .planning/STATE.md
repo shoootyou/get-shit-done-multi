@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Execute-Phase Agent (06.2-02 Complete)
+**Updated By:** GSD Execute-Phase Agent (06.2-03 Complete)
 
 ---
 
@@ -23,8 +23,8 @@
 **Next Phase:** Phase 6.2 (must plan and execute before Phase 7)
 
 ### Plan Status
-**Completed Plans:** 26/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 2/4)  
-**Next:** Phase 6.2-03 (Recursive Variable Processing)
+**Completed Plans:** 27/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/4)  
+**Next:** Phase 6.2-04 (Final Bug Fixes)
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 4:   [██████████████████████�
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 6.2: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░]  50% (2/4 plans) 🟡 IN PROGRESS
+Phase 6.2: [██████████████████████████████████░░░░░░░░░░░░░░░░]  75% (3/4 plans) 🟡 IN PROGRESS
 
 Overall Progress:
-[██████████████████████████████████░░░░░░░░░░░░░░] 60% (26/43 total plans)
+[███████████████████████████████████░░░░░░░░░░░░░] 63% (27/43 total plans)
 ```
 
 ---
@@ -606,6 +606,30 @@ Overall Progress:
     - Only Claude agents include skills field (Copilot/Codex exclude it)
     - Rationale: Platform-specific frontmatter requirements handled in adapter transformation
 
+83. **2026-01-28 (06.2-03):** Use entry.parentPath for Node.js 20.1+ recursive readdir (RECURSIVE-01)
+    - Node.js 20.1+ adds `entry.parentPath` property when using `{ recursive: true }`
+    - Use `join(entry.parentPath || baseDir, entry.name)` for correct path construction
+    - Avoids ENOENT errors from naive `join(baseDir, entry.name)` approach
+    - Rationale: Node.js behavior changed in 20.1+ to support nested directory traversal
+
+84. **2026-01-28 (06.2-03):** Skip template/ subdirectory in variable replacement (RECURSIVE-02)
+    - Files in get-shit-done/templates/ contain {{PLACEHOLDER}} variables for users
+    - These are user-time placeholders (e.g., {{MILESTONE_NAME}}, {{DATE}})
+    - Only replace install-time variables ({{VERSION}}, {{PLATFORM_ROOT}}, {{COMMAND_PREFIX}}, {{PLATFORM_NAME}})
+    - Rationale: Distinguish between installer variables and user placeholders
+
+85. **2026-01-28 (06.2-03):** Home directory for integration tests (RECURSIVE-03)
+    - Use `~/.gsd-output-test-*` instead of `/tmp/gsd-output-test-*`
+    - Phase 5 validation blocks system directories including /tmp
+    - Tests need real installation paths to verify validation rules
+    - Rationale: Integration tests must work within security constraints
+
+86. **2026-01-28 (06.2-03):** Flexible skills field assertion in tests (RECURSIVE-04)
+    - Check for skills field presence when defined, not strict requirement on all agents
+    - Some agents don't reference any skills, so skills field may be empty/undefined
+    - Test validates that skills field exists when skills are referenced
+    - Rationale: Accurate test expectations matching actual agent content patterns
+
 ### Roadmap Evolution
 
 **Phase Insertions:**
@@ -785,8 +809,8 @@ None
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T10:31:51Z  
-**Stopped at:** Completed 06.1-04-PLAN.md (Integration Tests & Documentation)  
+**Last session:** 2026-01-28T14:47:34Z  
+**Stopped at:** Completed 06.2-03-PLAN.md (Recursive Variable Replacement & Integration Tests)  
 **Resume file:** None
 
 ---
