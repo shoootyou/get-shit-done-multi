@@ -453,7 +453,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Type:** Urgent work - Discovered critical bugs affecting all Copilot installations
 
-**Plans:** 4 plans in 4 waves
+**Plans:** 3 plans in 3 waves
 
 **Requirements Mapped:**
 - PLATFORM-03: Claude adapter frontmatter (skills field required)
@@ -469,24 +469,19 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 5. Copilot/Codex tools serialized as single-line array: `['tool-a', 'tool-b']`
 6. All template variables replaced in get-shit-done/ directory files
 7. Recursive processing handles all file types (.md, .json, .sh)
-8. Manual installation test passes for all three platforms
-9. Documentation updated with expected output formats per platform
-10. All integration tests pass (new + existing)
+8. All integration tests pass (new + existing)
 
 **Key Deliverables:**
-- Integration tests for installation output verification
+- Custom frontmatter serializer for Copilot/Codex (single-line tools format)
 - Fixed `ClaudeAdapter.transformFrontmatter()` - includes skills field
 - Orchestrator calls `adapter.transformFrontmatter()` during agent installation
-- Custom frontmatter serializer for Copilot/Codex (single-line tools format)
-- Recursive template variable processing in `installSharedDirectory()`
-- Platform-specific output format documentation
-- Updated integration tests covering all scenarios
+- Recursive template variable processing in `installShared()`
+- Comprehensive integration tests (13 agents × 3 platforms = 39 test cases)
 
 **Plans:**
-- [ ] 06.2-01-PLAN.md — Integration Tests for Installation Output (Wave 1)
-- [ ] 06.2-02-PLAN.md — Fix Frontmatter Transformation (Wave 2)
-- [ ] 06.2-03-PLAN.md — Fix Template Variable Replacement (Wave 3)
-- [ ] 06.2-04-PLAN.md — Verification & Documentation (Wave 4)
+- [ ] 06.2-01-PLAN.md — Custom Frontmatter Serializer (Wave 1)
+- [ ] 06.2-02-PLAN.md — Fix Agent Frontmatter Transformation Pipeline (Wave 2)
+- [ ] 06.2-03-PLAN.md — Recursive Variable Replacement & Integration Tests (Wave 3)
 
 **Notes:**
 - Inserted as urgent work discovered after Phase 6.1 completion
