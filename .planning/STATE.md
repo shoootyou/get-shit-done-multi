@@ -11,20 +11,20 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 6.1 Complete (Old Version Detection & Migration). Ready for Phase 7 (Path Security and Validation).
+**Current Focus:** Phase 6.1 Complete. Phase 6.2 inserted (URGENT) - Installation Output Verification & Bug Fixes. Must complete before Phase 7.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 6.1 Complete — Ready for Phase 7
+**Current Phase:** Phase 6.2 Inserted (URGENT) — Installation Output Verification & Bug Fixes
 **Completed:** Phase 6.1 (Old Version Detection & Migration) — 10/10 must-haves verified  
-**Next Phase:** Phase 7 (Path Security and Validation)
+**Next Phase:** Phase 6.2 (must plan and execute before Phase 7)
 
 ### Plan Status
-**Completed Plans:** 24/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4)  
-**Next:** Phase 7 planning required (Path Security and Validation)
+**Completed Plans:** 24/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 0/4)  
+**Next:** Phase 6.2 planning required (Installation Output Verification & Bug Fixes) - URGENT
 
 ### Progress Bar
 ```
@@ -36,9 +36,10 @@ Phase 4:   [██████████████████████�
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
+Phase 6.2: [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0% (0/4 plans) 🔴 URGENT
 
 Overall Progress:
-[███████████████████████████████████░░░░░░░░░░░░░] 62% (24/39 total plans)
+[██████████████████████████████████░░░░░░░░░░░░░░] 56% (24/43 total plans)
 ```
 
 ---
@@ -566,6 +567,14 @@ Overall Progress:
     - Users can reference files in original locations
     - Easier to understand what was backed up
     - Rationale: Success criteria requires structure preservation for user reference
+
+### Roadmap Evolution
+
+**Phase Insertions:**
+- **2026-01-28:** Phase 6.2 inserted after Phase 6.1 - Installation Output Verification & Bug Fixes (URGENT)
+  - Reason: Critical bugs discovered affecting all Copilot installations
+  - Impact: Must complete before Phase 7 to ensure security validation works on correct output
+  - Scope: 3 bugs (skills field handling, tools format, template variables)
 
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)

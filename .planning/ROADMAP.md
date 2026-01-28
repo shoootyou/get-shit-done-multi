@@ -445,6 +445,60 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
+### Phase 6.2: Installation Output Verification & Bug Fixes (INSERTED)
+
+**Goal:** Fix critical installation bugs affecting frontmatter transformation and template variable replacement
+
+**Dependencies:** Phase 6.1 (needs version detection infrastructure)
+
+**Type:** Urgent work - Discovered critical bugs affecting all Copilot installations
+
+**Plans:** 4 plans in 4 waves
+
+**Requirements Mapped:**
+- PLATFORM-03: Claude adapter frontmatter (skills field required)
+- PLATFORM-04: Copilot adapter frontmatter (skills field forbidden, tools format)
+- PLATFORM-04B: Codex adapter frontmatter (skills field forbidden)
+- INSTALL-03: Template rendering (variable replacement)
+
+**Success Criteria:**
+1. Integration tests verify actual installation output for all platforms
+2. Claude agents include `skills` field in frontmatter
+3. Copilot agents exclude `skills` field from frontmatter
+4. Codex agents exclude `skills` field from frontmatter
+5. Copilot/Codex tools serialized as single-line array: `['tool-a', 'tool-b']`
+6. All template variables replaced in get-shit-done/ directory files
+7. Recursive processing handles all file types (.md, .json, .sh)
+8. Manual installation test passes for all three platforms
+9. Documentation updated with expected output formats per platform
+10. All integration tests pass (new + existing)
+
+**Key Deliverables:**
+- Integration tests for installation output verification
+- Fixed `ClaudeAdapter.transformFrontmatter()` - includes skills field
+- Orchestrator calls `adapter.transformFrontmatter()` during agent installation
+- Custom frontmatter serializer for Copilot/Codex (single-line tools format)
+- Recursive template variable processing in `installSharedDirectory()`
+- Platform-specific output format documentation
+- Updated integration tests covering all scenarios
+
+**Plans:**
+- [ ] 06.2-01-PLAN.md — Integration Tests for Installation Output (Wave 1)
+- [ ] 06.2-02-PLAN.md — Fix Frontmatter Transformation (Wave 2)
+- [ ] 06.2-03-PLAN.md — Fix Template Variable Replacement (Wave 3)
+- [ ] 06.2-04-PLAN.md — Verification & Documentation (Wave 4)
+
+**Notes:**
+- Inserted as urgent work discovered after Phase 6.1 completion
+- Affects ALL production installations (Claude, Copilot, Codex)
+- Three critical bugs identified:
+  1. Skills field handling (wrong for all platforms)
+  2. Tools serialization format (Copilot/Codex multi-line vs required single-line)
+  3. Template variables not replaced in shared directory files
+- Must complete before Phase 7 to ensure security validation works on correct output
+
+---
+
 ### Phase 7: Path Security and Validation
 
 **Goal:** Malicious or malformed paths are rejected before any file writes, preventing traversal attacks
