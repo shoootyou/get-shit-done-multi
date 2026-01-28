@@ -1,6 +1,7 @@
 // bin/lib/rendering/frontmatter-cleaner.js
 
 import matter from 'gray-matter';
+import { serializeFrontmatter } from './frontmatter-serializer.js';
 
 /**
  * Clean frontmatter by removing empty string fields
@@ -37,8 +38,9 @@ export function cleanFrontmatter(content) {
       }
     }
     
-    // Rebuild content with cleaned frontmatter
-    return matter.stringify(parsed.content, cleanedData);
+    // Rebuild content with cleaned frontmatter using custom serializer
+    const serialized = serializeFrontmatter(cleanedData, 'claude');
+    return `---\n${serialized}\n---\n\n${parsed.content}`;
   } catch (error) {
     // If parsing fails, return original content
     return content;
