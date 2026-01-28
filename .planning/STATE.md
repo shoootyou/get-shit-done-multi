@@ -504,7 +504,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 pending todo:
+- `.planning/todos/pending/2026-01-28-fix-agent-installation-filter.md` - Fix agent installation filter to match .agent.md templates (area: installer)
 
 ### Blockers
 None
