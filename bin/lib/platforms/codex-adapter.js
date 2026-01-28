@@ -1,5 +1,7 @@
+import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
+import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 
 /**
  * Platform adapter for Codex CLI
@@ -84,24 +86,19 @@ export class CodexAdapter extends PlatformAdapter {
   }
   
   /**
-   * Transform frontmatter for Codex
-   * DUPLICATED from CopilotAdapter with different platform value
-   * @param {Object} data - Frontmatter object from template
-   * @returns {Object}
+   * Transform agent frontmatter for Codex platform
+   * @param {string} content - Agent file content with frontmatter
+   * @returns {string} Transformed content with Codex-specific frontmatter
    */
-  transformFrontmatter(data) {
-    // Codex: includes metadata block per PLATFORM-04B
-    return {
-      name: data.name,
-      description: data.description,
-      tools: this.transformTools(data.tools || ''),
-      metadata: {
-        platform: 'codex', // Different from Copilot
-        generated: new Date().toISOString().split('T')[0],
-        templateVersion: '1.0.0',
-        projectVersion: '2.0.0',
-        projectName: 'get-shit-done-multi'
-      }
-    };
+  transformFrontmatter(content) {
+    const { data, content: body } = matter(content);
+    
+    // Remove skills field (not supported in Codex)
+    delete data.skills;
+    
+    // Use custom serializer for correct format
+    const frontmatter = serializeFrontmatter(data, 'codex');
+    
+    return `---\n${frontmatter}\n---\n\n${body}`;
   }
 }

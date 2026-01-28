@@ -1,3 +1,4 @@
+import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
 
@@ -59,16 +60,39 @@ export class ClaudeAdapter extends PlatformAdapter {
   }
   
   /**
-   * Transform frontmatter for Claude
-   * @param {Object} data - Frontmatter object from template
-   * @returns {Object}
+   * Transform agent frontmatter for Claude platform
+   * @param {string} content - Agent file content with frontmatter
+   * @returns {string} Transformed content with Claude-specific frontmatter
    */
-  transformFrontmatter(data) {
-    // Claude: minimal frontmatter, no metadata block
-    return {
-      name: data.name,
-      description: data.description,
-      tools: this.transformTools(data.tools || '')
-    };
+  transformFrontmatter(content) {
+    const { data, content: body } = matter(content);
+    
+    // Extract skills from agent content if not already present
+    if (!data.skills) {
+      const skillReferences = this.extractSkillReferences(body);
+      if (skillReferences.length > 0) {
+        data.skills = skillReferences;
+      }
+    }
+    
+    // Use gray-matter to serialize (Claude supports standard YAML)
+    return matter.stringify(body, data);
+  }
+  
+  /**
+   * Extract skill references from agent content
+   * @param {string} content - Agent body content
+   * @returns {string[]} Array of skill names
+   */
+  extractSkillReferences(content) {
+    const skills = new Set();
+    
+    // Match /gsd-* patterns
+    const matches = content.matchAll(/\/gsd-([a-z-]+)/g);
+    for (const match of matches) {
+      skills.add(`gsd-${match[1]}`);
+    }
+    
+    return Array.from(skills).sort();
   }
 }

@@ -1,5 +1,7 @@
+import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
+import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 
 /**
  * Platform adapter for GitHub Copilot CLI
@@ -75,23 +77,19 @@ export class CopilotAdapter extends PlatformAdapter {
   }
   
   /**
-   * Transform frontmatter for Copilot
-   * @param {Object} data - Frontmatter object from template
-   * @returns {Object}
+   * Transform agent frontmatter for Copilot platform
+   * @param {string} content - Agent file content with frontmatter
+   * @returns {string} Transformed content with Copilot-specific frontmatter
    */
-  transformFrontmatter(data) {
-    // Copilot: includes metadata block per PLATFORM-04
-    return {
-      name: data.name,
-      description: data.description,
-      tools: this.transformTools(data.tools || ''),
-      metadata: {
-        platform: 'copilot',
-        generated: new Date().toISOString().split('T')[0],
-        templateVersion: '1.0.0',
-        projectVersion: '2.0.0',
-        projectName: 'get-shit-done-multi'
-      }
-    };
+  transformFrontmatter(content) {
+    const { data, content: body } = matter(content);
+    
+    // Remove skills field (not supported in Copilot)
+    delete data.skills;
+    
+    // Use custom serializer for correct format
+    const frontmatter = serializeFrontmatter(data, 'copilot');
+    
+    return `---\n${frontmatter}\n---\n\n${body}`;
   }
 }
