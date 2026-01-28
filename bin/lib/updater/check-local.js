@@ -1,7 +1,7 @@
 // bin/lib/updater/check-local.js
 
 import { platformDirs, getManifestPath } from '../platforms/platform-paths.js';
-import { formatStatusLine } from './format-status.js';
+import { getPlatformName } from '../platforms/platform-names.js';
 import { validateInstallation } from './validator.js';
 import * as logger from '../cli/logger.js';
 import fs from 'fs-extra';
@@ -19,32 +19,34 @@ export async function checkLocalInstallations(currentVersion, verbose) {
     let foundAny = false;
 
     for (const platform of platforms) {
-        const manifestPath = getManifestPath(platform, false);
-        const exists = await fs.pathExists(manifestPath);
+        const platformPath = getManifestPath(platform, false); // Set false for local
+        const exists = await fs.pathExists(platformPath);
 
         if (!exists) {
             if (verbose) {
-                logger.verbose(`  ${platform}: not found`, true);
+                logger.error(`Results for ${getPlatformName(platform)}`, 2);
+                logger.error(`Not installed`, 4);
             }
             continue;
         }
 
         foundAny = true;
 
-        if (verbose) {
-            logger.info(`  Found: ${manifestPath}`);
-        }
-
-        const result = await validateInstallation(manifestPath, currentVersion, verbose);
-
+        const result = await validateInstallation(platformPath, currentVersion, verbose);
         if (result.success) {
-            logger.info(`  ${formatStatusLine(result.platform, result.versionStatus, verbose)}`);
+            if (verbose) {
+                logger.success(`Results for ${getPlatformName(platform)}`, 2);
+                logger.success(`Installed version: ${result.version}`, 4);
+                logger.success(`Manifest found: ${platformPath}`, 4);
+            } else {
+                logger.success(`Installed for: ${platformPath} (${result.version})`, 2);
+            }
         } else {
-            logger.warn(`  ✗ ${result.platform}: ${result.reason}`);
+            logger.error(`Installation issue for ${getPlatformName(platform)}`, 2, false);
         }
     }
 
-    if (!foundAny) {
-        logger.info('Local installations: none');
+    if (!foundAny && !verbose) {
+        logger.error('No local installations were found.', 2, false);
     }
 }

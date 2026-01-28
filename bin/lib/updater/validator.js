@@ -31,11 +31,7 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
             reason: manifestResult.error || manifestResult.reason || MANIFEST_ERRORS.UNKNOWN_ERROR
         };
     }
-
-    if (verbose) {
-        logger.success(`Manifest read successfully`, 2);
-    }
-
+    
     const platform = manifestResult.manifest.platform || 'unknown';
     const versionStatus = compareVersions(
         manifestResult.manifest.gsd_version,
@@ -44,6 +40,7 @@ export async function validateInstallation(manifestPath, currentVersion, verbose
 
     return {
         success: true,
+        version: manifestResult.manifest.gsd_version,
         platform,
         versionStatus
     };

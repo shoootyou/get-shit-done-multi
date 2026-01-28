@@ -4,7 +4,6 @@ import { banner } from '../cli/banner-manager.js';
 import { checkGlobalInstallations } from './check-global.js';
 import { checkLocalInstallations } from './check-local.js';
 import { checkCustomPath } from './check-custom-path.js';
-import * as logger from '../cli/logger.js';
 
 /**
  * Handle --check-updates flag
@@ -18,8 +17,6 @@ export async function handleCheckUpdates(options, pkg) {
 
     // Show banner
     banner(currentVersion, false);
-
-    logger.blockTitle('Check for updates', { style: 'double', width: 80 });
 
     // If custom path is provided, ONLY check that path
     if (options.customPath) {

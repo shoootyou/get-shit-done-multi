@@ -1,7 +1,6 @@
 // bin/lib/updater/format-status.js
 
 import { getPlatformName } from '../platforms/platform-names.js';
-import { compareVersions } from '../version/version-checker.js';
 import * as logger from '../cli/logger.js';
 
 /**
