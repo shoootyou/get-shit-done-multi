@@ -500,25 +500,41 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 2-5 (needs file operations and transactions)
 
+**Plans:** 2 plans
+
 **Requirements Mapped:**
 - SAFETY-01: Path traversal prevention
 
 **Success Criteria:**
-1. All output paths validated before write operations
-2. Paths containing `../` rejected with clear error
+1. All output paths validated before write operations using 8-layer defense-in-depth approach
+2. Paths containing `../` and URL-encoded variants (`%2e%2e%2f`) rejected with clear error
 3. Absolute paths outside target directory rejected
-4. Symlinks resolved before validation (prevent symlink bypass)
-5. Validation integrated into transaction system (happens before write, not after)
+4. Windows reserved names (CON, PRN, etc.) blocked on all platforms
+5. Symlinks resolved to single level only before validation (chains rejected)
+6. Path length limits enforced (260 Windows, 4096 Unix)
+7. Allowlist validation (only .claude, .github, .codex, get-shit-done permitted)
+8. Comprehensive security tests covering 10+ attack vectors
+9. Interactive mode prompts for symlink confirmation
+10. Educational error messages for security violations
 
 **Key Deliverables:**
-- `/bin/lib/validation/path-validator.js` (traversal detection)
-- `/bin/lib/paths/symlink-resolver.js` (resolve before validation)
-- Security tests for common attack vectors
-- Integration with InstallTransaction
+- `/bin/lib/validation/path-validator.js` (8-layer validation with URL decoding, null byte check, traversal detection, containment, allowlist, length limits, Windows reserved names)
+- `/bin/lib/paths/symlink-resolver.js` (single-level resolution with chain detection)
+- Enhanced `pre-install-checks.js` integration
+- Symlink confirmation prompts in interactive mode
+- Unit tests for path-validator and symlink-resolver
+- Integration tests for security scenarios
+
+**Plans:**
+- [ ] 07-01-PLAN.md — Path Security Validation Modules (Wave 1)
+- [ ] 07-02-PLAN.md — Integration & Security Testing (Wave 2)
 
 **Notes:**
 - This addresses Critical Risk #2 (path traversal) from research/risks.md
-- Validation must happen atomically (before any writes)
+- Defense-in-depth approach: 8 independent validation layers
+- Research-backed implementation using Node.js built-ins only
+- Cross-platform Windows reserved name validation
+- Validation happens atomically (before any writes)
 
 ---
 
