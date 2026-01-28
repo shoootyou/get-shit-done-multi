@@ -18,6 +18,8 @@ import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
 import { isRepairableError } from '../manifests/schema.js';
 import { confirm } from '@clack/prompts';
+import { detectOldVersion } from '../version/old-version-detector.js';
+import { performMigration } from '../migration/migration-manager.js';
 
 /**
  * Main installation orchestrator
@@ -42,6 +44,34 @@ export async function install(appVersion, options) {
     : targetBase);
 
   const templatesDir = getTemplatesDirectory(scriptDir);
+
+  // === NEW: Old version migration check (Phase 6.1) ===
+  const oldVersionResult = await detectOldVersion(platform, targetDir);
+  
+  if (oldVersionResult.isOld) {
+    const migrationResult = await performMigration(
+      platform, 
+      oldVersionResult.version, 
+      targetDir,
+      { skipPrompts }
+    );
+    
+    if (!migrationResult.success) {
+      // Migration failed or user declined
+      if (migrationResult.error === 'User declined') {
+        logger.info('Installation cancelled. Your v1.x installation remains unchanged.', 2);
+        process.exit(0);
+      } else {
+        logger.error(`Migration failed: ${migrationResult.error}`, 2);
+        logger.warn('Your v1.x installation remains unchanged.', 2);
+        process.exit(1);
+      }
+    }
+    
+    // Migration successful - continue with regular installation
+    logger.success('Migration complete. Proceeding with v2.0.0 installation...');
+    console.log();
+  }
 
   // === NEW: Version validation gate (Phase 6) ===
   await validateVersionBeforeInstall(platform, targetDir, appVersion, { skipPrompts });
