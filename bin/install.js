@@ -85,7 +85,7 @@ async function main() {
 
   // Check for old versions and migrate if needed (Phase 6.1)
   const migrationResult = await checkAndMigrateOldVersions('.', { skipPrompts: false });
-  
+
   if (!migrationResult.success) {
     if (migrationResult.cancelled) {
       logger.info('Installation cancelled by user.');
@@ -97,7 +97,7 @@ async function main() {
   }
 
   // Show templates path
-  showTemplatePath( __dirname);
+  showTemplatePath(__dirname);
 
   // Check for interactive mode
   if (shouldUseInteractiveMode(platforms, isValidTTY())) {
@@ -133,8 +133,8 @@ main().catch(error => {
     }
     process.exit(error.code);
   } else {
-    logger.error(`Unexpected error: ${error.message}`);
-    console.error(error.stack);
+    logger.error(`Unexpected error: ${error.message}`, 2, true);
+    logger.error(error.stack, 2, true);
     process.exit(EXIT_CODES.GENERAL_ERROR);
   }
 });

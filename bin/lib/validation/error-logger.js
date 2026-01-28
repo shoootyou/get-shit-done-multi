@@ -16,7 +16,7 @@ import { ensureDirectory } from '../io/file-operations.js';
 export async function logInstallationError(error, context) {
   const logPath = join(context.targetDir, '.gsd-error.log');
   const logContent = formatErrorLog(error, context);
-  
+
   try {
     await ensureDirectory(context.targetDir);
     await writeFile(logPath, logContent, 'utf8');
@@ -43,7 +43,7 @@ function formatErrorLog(error, context) {
     `  Target: ${context.targetDir}`,
     ''
   ];
-  
+
   // Add error details if available
   if (error.code) {
     lines.push('Error Details:');
@@ -55,7 +55,7 @@ function formatErrorLog(error, context) {
     }
     lines.push('');
   }
-  
+
   // Add stack trace
   if (error.stack) {
     lines.push('Stack Trace:');
@@ -64,7 +64,7 @@ function formatErrorLog(error, context) {
     });
     lines.push('');
   }
-  
+
   return lines.join('\n');
 }
 
@@ -74,10 +74,10 @@ function formatErrorLog(error, context) {
  */
 export function formatValidationError(error) {
   const lines = [];
-  
-  lines.push(`✗ Validation failed: ${error.message}`);
+
+  lines.push(`Validation failed: ${error.message}`);
   lines.push('');
-  
+
   // Add specific guidance based on error type
   if (error.code === 5) { // INSUFFICIENT_SPACE
     const { requiredMB, availableMB, path } = error.details || {};
@@ -86,9 +86,9 @@ export function formatValidationError(error) {
       lines.push(`  Required: ${requiredMB} MB (including 10% buffer)`);
       lines.push(`  Available: ${availableMB} MB`);
       lines.push(`  Location: ${path}`);
-      lines.push('');
-      
+
       const needMB = (parseFloat(requiredMB) - parseFloat(availableMB)).toFixed(2);
+      lines.push('');
       lines.push(`Fix: Free up at least ${needMB} MB and try again`);
     }
   } else if (error.code === 4) { // PERMISSION_DENIED
@@ -110,7 +110,7 @@ export function formatValidationError(error) {
       lines.push('Fix: Use a valid installation path');
     }
   }
-  
+
   return lines.join('\n');
 }
 
@@ -120,10 +120,10 @@ export function formatValidationError(error) {
  */
 export function formatRuntimeError(error, targetDir) {
   const lines = [];
-  
+
   lines.push(`✗ Installation failed: ${error.message}`);
   lines.push('');
-  
+
   if (error.code === 4) { // PERMISSION_DENIED
     const { path } = error.details || {};
     lines.push(`The installer couldn't write to ${path || targetDir}`);
@@ -133,9 +133,9 @@ export function formatRuntimeError(error, targetDir) {
   } else {
     lines.push('An unexpected error occurred during installation');
   }
-  
+
   lines.push('');
   lines.push(`Details saved to: ${join(targetDir, '.gsd-error.log')}`);
-  
+
   return lines.join('\n');
 }

@@ -16,22 +16,41 @@ import { getPlatformName } from '../platforms/platform-names.js';
  */
 function logWithIcon(icon, colorFn, message, indent, fullColor, logFn = console.log, condition = true) {
   if (!condition) return;
-  
+
   const prefix = ' '.repeat(indent);
-  
-  // No color function - plain output
+  const msg = String(message ?? '');
+
+  // Check if message has multiple lines
+  const hasMultipleLines = msg.includes('\n');
+
+  const indentMultiline = (text, indentStr) => {
+    // For multiline messages, add vertical bar prefix to continuation lines
+    if (hasMultipleLines) {
+      return String(text).replace(/\r?\n/g, '\n' + indentStr + `${colorFn('| ')}`);
+    }
+    return String(text).replace(/\r?\n/g, '\n' + indentStr);
+  };
+
+  // Build a single string so multiline messages keep indentation
   if (!colorFn) {
-    logFn(prefix + icon, message);
+    const msgIndent = prefix + ' '.repeat(icon.length - 1);
+    const out = prefix + icon + ' ' + indentMultiline(msg, msgIndent);
+    logFn(out);
     return;
   }
-  
-  // With color function
+
   if (fullColor) {
-    logFn(prefix + colorFn(icon + ' ' + message));
-  } else {
-    logFn(prefix + colorFn(icon), message);
+    const msgIndent = prefix + ' '.repeat(icon.length - 1);
+    const out = prefix + icon + ' ' + indentMultiline(msg, msgIndent);
+    logFn(colorFn(out));
+    return;
   }
+
+  const msgIndent = prefix + ' '.repeat(icon.length - 1);
+  const out = prefix + colorFn(icon) + ' ' + indentMultiline(msg, msgIndent);
+  logFn(out);
 }
+
 
 /**
  * Log list item with optional indentation

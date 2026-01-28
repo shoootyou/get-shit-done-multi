@@ -63,14 +63,14 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
     successes.push({ platform, platformLabel, stats });
   } catch (error) {
     const platformLabel = getPlatformName(platform);
-    
+
     // Determine target directory for error logging
     const adapter = adapterRegistry.get(platform);
     const targetDir = adapter.getTargetDir(isGlobal);
-    
+
     // Determine current phase from error context (if available)
     const phase = error.phase || 'Unknown';
-    
+
     // Log error to file (Phase 5 - decision 4.2)
     await logInstallationError(error, {
       platform: platform,
@@ -78,16 +78,17 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
       phase: phase,
       targetDir: targetDir
     });
-    
+
     // Display user-friendly message (Phase 5 - decisions 2.4, 4.4)
     if (error.name === 'InstallError' && [4, 5, 6].includes(error.code)) {
       // Validation errors: PERMISSION_DENIED(4), INSUFFICIENT_SPACE(5), INVALID_PATH(6)
-      console.error('\n' + formatValidationError(error));
+      console.log();
+      logger.error(formatValidationError(error), 2, true);
     } else {
       // Runtime errors: show friendly only
       console.error('\n' + formatRuntimeError(error, targetDir));
     }
-    
+
     failures.push({ platform, platformLabel, error });
   }
 
@@ -95,8 +96,6 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
   if (multiBar) {
     multiBar.stop();
   }
-
-
 
   // Show failures if any
   if (failures.length === 1) {
