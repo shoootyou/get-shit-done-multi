@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Execute-Phase Agent (06.2-01 Complete)
+**Updated By:** GSD Execute-Phase Agent (06.2-02 Complete)
 
 ---
 
@@ -23,8 +23,8 @@
 **Next Phase:** Phase 6.2 (must plan and execute before Phase 7)
 
 ### Plan Status
-**Completed Plans:** 25/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 1/4)  
-**Next:** Phase 6.2-02 (Adapter Integration)
+**Completed Plans:** 26/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 2/4)  
+**Next:** Phase 6.2-03 (Recursive Variable Processing)
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 4:   [██████████████████████�
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 6.2: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  25% (1/4 plans) 🟡 IN PROGRESS
+Phase 6.2: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░]  50% (2/4 plans) 🟡 IN PROGRESS
 
 Overall Progress:
-[██████████████████████████████████░░░░░░░░░░░░░░] 58% (25/43 total plans)
+[██████████████████████████████████░░░░░░░░░░░░░░] 60% (26/43 total plans)
 ```
 
 ---
@@ -48,10 +48,10 @@ Overall Progress:
 
 ### Velocity
 - **Phases Completed:** 6.1 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning, Phase 6.1 - Old Version Detection & Migration)
-- **Phases In Progress:** 1 (Phase 6.2 - Plan 06.2-01 complete)
-- **Plans Completed:** 25/43
+- **Phases In Progress:** 1 (Phase 6.2 - Plans 06.2-01 and 06.2-02 complete)
+- **Plans Completed:** 26/43
 - **Days Active:** 2
-- **Plans Today:** 1 (06.2-01)
+- **Plans Today:** 2 (06.2-01, 06.2-02)
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
@@ -586,6 +586,26 @@ Overall Progress:
     - Copilot CLI parser correctly handles slashes in quoted strings
     - Rationale: Simpler and more readable than double quotes with escaping
 
+80. **2026-01-28 (06.2-02):** Two-step agent processing pipeline (ADAPTER-INTEGRATION-01)
+    - Variable replacement must happen before frontmatter transformation
+    - Frontmatter may contain template variables like {{PLATFORM_ROOT}}
+    - Orchestrator calls replaceVariables() then adapter.transformFrontmatter()
+    - Rationale: Ensures variables in frontmatter are resolved before platform-specific transformation
+
+81. **2026-01-28 (06.2-02):** ClaudeAdapter uses gray-matter serialization (ADAPTER-INTEGRATION-02)
+    - ClaudeAdapter uses gray-matter's native stringify() for frontmatter
+    - CopilotAdapter/CodexAdapter use custom serializer from 06.2-01
+    - Claude supports standard YAML multi-line arrays
+    - Copilot/Codex require single-line flow style (not supported by gray-matter)
+    - Rationale: Use standard tools when possible, custom only when necessary
+
+82. **2026-01-28 (06.2-02):** Skills extraction via regex pattern (ADAPTER-INTEGRATION-03)
+    - ClaudeAdapter scans body for `/gsd-([a-z-]+)/g` pattern
+    - Extracts all unique skill references and adds to frontmatter
+    - Skills must be declared in frontmatter for Claude skill pre-loading
+    - Only Claude agents include skills field (Copilot/Codex exclude it)
+    - Rationale: Platform-specific frontmatter requirements handled in adapter transformation
+
 ### Roadmap Evolution
 
 **Phase Insertions:**
@@ -629,22 +649,20 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 06.1-03 Complete!** Integration with Installer Flows: (1) Orchestrator integration (bin/lib/installer/orchestrator.js) - detectOldVersion before validateVersionBeforeInstall, performMigration with skipPrompts support, exit(0) for decline/exit(1) for failure, continues after successful migration; (2) Interactive mode integration (bin/lib/cli/interactive.js) - detectAllOldVersions at start, shows all warnings before prompts, migrates each platform sequentially, user can decline at first migration; (3) Check-update integration (bin/lib/updater/check-update.js) - checks old versions before v2.x comparison, returns early for incompatibility message; (4) Old version message (bin/lib/updater/update-messages.js) - showOldVersionMessage with clear incompatibility messaging, distinct from regular update messages. Duration: 2.6 min. Four commits (d247321, 93f51ce, 36059ec, 67effcc). **Phase 6.1 Wave 3 Complete!**
+✅ **Plan 06.2-02 Complete!** Fix Agent Frontmatter Transformation Pipeline: (1) Implemented transformFrontmatter(content) in all three adapters - ClaudeAdapter extracts skills from agent body using regex, CopilotAdapter/CodexAdapter remove skills field and use custom serializer; (2) Orchestrator integration - installAgents() calls adapter.transformFrontmatter() after variable replacement, ensuring two-step pipeline (variables → frontmatter transformation); (3) Platform-specific frontmatter - Claude includes skills field, Copilot/Codex exclude it, correct array formatting via custom serializer. Duration: ~3 min. Two commits (24ea2b0, 96f726f). **Phase 6.2 50% complete (2/4 plans)!**
 
 ### What's Next
-1. **Immediate:** Phase 6.1 Plan 04 - Testing & Verification (Wave 4 - final wave)
-2. **Context:** All three entry points integrated (orchestrator, interactive, check-update)
-3. **Testing scope:** Migration flow, backup creation, decline/failure scenarios, multi-platform handling
-4. **Final wave:** Comprehensive integration tests before Phase 6.1 completion
+1. **Immediate:** Phase 6.2 Plan 03 - Recursive Variable Processing (handles variable-in-variable cases)
+2. **Context:** Agent installation pipeline complete, now needs recursive variable replacement
+3. **Testing scope:** Plan 06.2-04 will add comprehensive integration tests
+4. **Final steps:** Complete 06.2-03 and 06.2-04 to finish Phase 6.2
 
 ### Context for Next Session
-- **Wave 1 complete:** ✅ Old version detection (detectOldVersion, detectAllOldVersions, readOldVersion)
-- **Wave 2 complete:** ✅ Migration manager and backup operations (performMigration, backupOldInstallation)
-- **Wave 3 complete:** ✅ Orchestrator, interactive, and check-update integration
-- **Flow established:** Banner → Migration check → Migration (if old) → Regular installation
-- **Independence maintained:** Migration module doesn't modify core installation logic
-- **Test coverage:** ✅ 13 tests passing (7 unit + 3 integration + 3 existing), full validation + manifest flow coverage
-- **Next action:** Review Phase 6 requirements in ROADMAP.md, plan next phase
+- **Plan 06.2-01 complete:** ✅ Custom YAML serializer with platform-specific array formatting
+- **Plan 06.2-02 complete:** ✅ Agent frontmatter transformation integrated into orchestrator
+- **Bugs fixed:** Claude agents get skills field, Copilot/Codex remove skills field, tools arrays formatted correctly
+- **Pipeline established:** Read → Replace variables → Transform frontmatter → Write
+- **Next action:** Implement recursive template variable processing for edge cases
 
 ### Handoff Notes
 ✅ Phase 5 complete! Validation prevents ~80% of installation failures by checking disk space (fs.statfs + 10% buffer), write permissions (actual temp file test), path security (blocks traversal/system dirs), and existing installations before any file writes. Manifest generation creates complete file list via post-installation scan (two-pass write to include manifest itself). Error logging to .gsd-error.log with user-friendly terminal messages. Validation errors show technical details + actionable guidance, runtime errors show friendly message only. Test suite: 13 passing (7 unit + 3 integration + 3 existing). No rollback implementation per Phase 5 scope decision (simpler, faster, focuses on prevention vs recovery). Phase 5: 2/2 plans complete. Overall: 16/35 plans (46%). See 05-02-SUMMARY.md for details. No blockers.
