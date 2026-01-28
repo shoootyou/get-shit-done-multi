@@ -110,10 +110,10 @@ function formatObject(key, value) {
       lines.push(`  ${subKey}:`);
       for (const [nestedKey, nestedValue] of Object.entries(subValue)) {
         if (nestedValue === undefined) continue;
-        lines.push(`    ${nestedKey}: ${formatValue(nestedValue)}`);
+        lines.push(`    ${nestedKey}: ${formatValue(nestedValue, nestedKey)}`);
       }
     } else {
-      lines.push(`  ${subKey}: ${formatValue(subValue)}`);
+      lines.push(`  ${subKey}: ${formatValue(subValue, subKey)}`);
     }
   }
   
@@ -130,18 +130,19 @@ function formatObject(key, value) {
  * @private
  */
 function formatScalar(key, value) {
-  return `${key}: ${formatValue(value)}`;
+  return `${key}: ${formatValue(value, key)}`;
 }
 
 /**
  * Format a value for YAML output
  * 
  * @param {*} value - Value to format
+ * @param {string} [fieldName] - Optional field name for context-aware formatting
  * @returns {string} Formatted value
  * 
  * @private
  */
-function formatValue(value) {
+function formatValue(value, fieldName) {
   // Null
   if (value === null) {
     return 'null';
@@ -159,6 +160,12 @@ function formatValue(value) {
   
   // String handling
   if (typeof value === 'string') {
+    // Special case: argument-hint field should never be quoted
+    // Example: [version], [domain], [arg1] [arg2]
+    if (fieldName === 'argument-hint') {
+      return value;
+    }
+    
     // Always quote strings that look like dates or versions to prevent YAML parsing
     // Examples: 2026-01-28, 2026-01-28T12:00:00Z, 2.0.0, 1.2.3
     if (/^\d{4}-\d{2}-\d{2}/.test(value) || /^\d+\.\d+(\.\d+)?$/.test(value)) {
