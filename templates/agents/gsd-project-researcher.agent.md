@@ -1,6 +1,6 @@
 ---
 name: gsd-project-researcher
-description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
+description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by {{COMMAND_PREFIX}}new-project or {{COMMAND_PREFIX}}new-milestone orchestrators.
 tools: Read, Edit, Bash, Grep
 skills:
   - gsd-new-milestone

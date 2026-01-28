@@ -6,20 +6,20 @@ description: Structured spec-driven workflow for planning and executing software
 # Get Shit Done (GSD) Skill for Claude Code
 
 ## When to use
-- Use this skill when the user asks for GSD or uses a `/gsd-*` command.
+- Use this skill when the user asks for GSD or uses a `{{COMMAND_PREFIX}}*` command.
 - Use it for structured planning, phase execution, verification, or roadmap work.
 
 
 ## How to run commands
-Claude Code supports custom slash commands. Commands starting with `/gsd-` are custom skills.
+Claude Code supports custom slash commands. Commands starting with `{{COMMAND_PREFIX}}` are custom skills.
 
 Commands are installed as individual skills in `{{PLATFORM_ROOT}}/skills/`. Load the corresponding skill:
 
 `{{PLATFORM_ROOT}}/skills/gsd-<command>/SKILL.md`
 
 Example:
-- `/gsd-new-project` -> `{{PLATFORM_ROOT}}/skills/gsd-new-project/SKILL.md`
-- `/gsd-help` -> `{{PLATFORM_ROOT}}/skills/gsd-help/SKILL.md`
+- `{{COMMAND_PREFIX}}new-project` -> `{{PLATFORM_ROOT}}/skills/gsd-new-project/SKILL.md`
+- `{{COMMAND_PREFIX}}help` -> `{{PLATFORM_ROOT}}/skills/gsd-help/SKILL.md`
 
 
 ## File references

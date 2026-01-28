@@ -1,6 +1,6 @@
 ---
 name: gsd-phase-researcher
-description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd-plan-phase orchestrator.
+description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by {{COMMAND_PREFIX}}plan-phase orchestrator.
 tools: Read, Edit, Bash, Grep
 skills:
   - gsd-discuss-phase
