@@ -398,7 +398,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Type:** Urgent work - Discovered incompatibility between v1.x and v2.0.0 structures
 
-**Plans:** 0 plans
+**Plans:** 4 plans in 3 waves
 
 **Requirements Mapped:**
 - VERSION-04: Compatibility with older versions (migration path)
@@ -408,7 +408,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 1. Installer detects old v1.x installations (monolithic `.github/skills/get-shit-done/` structure)
 2. User sees clear warning: "Version X.X detected (incompatible with v2.0.0)"
 3. Single confirmation prompt: "Create backup and upgrade to v2.0.0? [Yes/No]"
-4. If Yes: Automatic backup to `~/.gsd-backup/v{version}-{timestamp}/`
+4. If Yes: Automatic backup to `[install-dir]/.gsd-backup/YYYY-MM-DD-HHMM/`
 5. All old files moved to backup directory (commands, agents, hooks, settings)
 6. Clear message shows backup location and manual deletion instructions
 7. v2.0.0 installation proceeds after successful backup
@@ -419,6 +419,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 **Key Deliverables:**
 - `/bin/lib/version/old-version-detector.js` (detect v1.x structure)
 - `/bin/lib/migration/migration-manager.js` (backup and migration flow)
+- `/bin/lib/migration/backup-manager.js` (atomic backup operations)
 - Integration with orchestrator (pre-installation check)
 - Integration with interactive mode (migration prompt)
 - Updated check-updates flow (incompatibility warnings)
@@ -426,7 +427,10 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - README section: "Upgrading from v1.x"
 
 **Plans:**
-- [ ] TBD (run `/gsd-plan-phase 6.1` to break down)
+- [ ] 06.1-01-PLAN.md — Old Version Detector Module (Wave 1)
+- [ ] 06.1-02-PLAN.md — Migration Manager & Backup Operations (Wave 1)
+- [ ] 06.1-03-PLAN.md — Integration with Installer Flows (Wave 2)
+- [ ] 06.1-04-PLAN.md — Integration Tests & Documentation (Wave 3)
 
 **Notes:**
 - Inserted as urgent work discovered during Phase 6 completion
