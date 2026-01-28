@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Execute-Phase Agent (Phase 7.1 Complete)
+**Updated By:** GSD Execute-Phase Agent (Phase 7.2 Complete)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 7 In Progress - Path Security and Validation (Plan 07-01 complete).
+**Current Focus:** Phase 7 Complete - Path Security and Validation (2/2 plans complete).
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 7 — Path Security and Validation (1/2 plans complete)
-**Completed:** Phase 6.2 (Installation Output Verification & Bug Fixes) — 8/8 must-haves verified  
-**Next:** Phase 7 Plan 02 (Integration into pre-install-checks)
+**Current Phase:** Phase 7 — Path Security and Validation (2/2 plans complete) ✅ COMPLETE
+**Completed:** Phase 7 Plan 02 (Integration & Security Testing)  
+**Next:** Phase 8 (if exists) or v2.0 release preparation
 
 ### Plan Status
-**Completed Plans:** 28/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 1/2)  
-**Last activity:** 2026-01-28 - Completed 07-01-PLAN.md
-**Next:** Phase 7 Plan 02 (Integration into pre-install-checks)
+**Completed Plans:** 29/43 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2)  
+**Last activity:** 2026-01-28 - Completed 07-02-PLAN.md
+**Next:** Check for Phase 8 or begin release preparation
 
 ### Progress Bar
 ```
@@ -38,10 +38,10 @@ Phase 5:   [██████████████████████�
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 6.2: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
-Phase 7:   [██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░]  50% (1/2 plans) 🔄 IN PROGRESS
+Phase 7:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 
 Overall Progress:
-[███████████████████████████████████░░░░░░░░░░░░░] 65% (28/43 total plans)
+[████████████████████████████████████░░░░░░░░░░] 67% (29/43 total plans)
 ```
 
 ---
@@ -659,6 +659,30 @@ Overall Progress:
     - Prevents issues from platform-specific differences
     - Rationale: Security and portability require consistent validation rules
 
+91. **2026-01-28 (07-02):** Use orchestrator for symlink handling (PATH-SECURITY-05)
+    - Symlink detection in orchestrator.js via skipPrompts flag
+    - Unified approach for both interactive and non-interactive modes
+    - Alternative: Separate handling in interactive.js and non-interactive.js
+    - Rationale: Simpler architecture, single point of control, easier to maintain
+
+92. **2026-01-28 (07-02):** Validate in file-operations.js not template-processor.js (PATH-SECURITY-06)
+    - Add validation to writeFile() in file-operations.js
+    - Template-processor.js doesn't exist in codebase
+    - Alternative: Create template-processor.js, validate in orchestrator
+    - Rationale: Validate at actual write point, no unnecessary abstraction
+
+93. **2026-01-28 (07-02):** Handle absolute vs relative paths in validation (PATH-SECURITY-07)
+    - Use parent directory as base for absolute paths
+    - Use process.cwd() as base for relative paths
+    - Bug discovered during integration testing
+    - Rationale: Support both local and global installations correctly
+
+94. **2026-01-28 (07-02):** Three-layer validation approach (PATH-SECURITY-08)
+    - Layer 1: Pre-installation (target directory)
+    - Layer 2: Batch validation (all template paths)
+    - Layer 3: Per-file write-time (after variable substitution)
+    - Rationale: Defense-in-depth catches attacks at multiple points
+
 ### Roadmap Evolution
 
 **Phase Insertions:**
@@ -702,20 +726,22 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 06.2-02 Complete!** Fix Agent Frontmatter Transformation Pipeline: (1) Implemented transformFrontmatter(content) in all three adapters - ClaudeAdapter extracts skills from agent body using regex, CopilotAdapter/CodexAdapter remove skills field and use custom serializer; (2) Orchestrator integration - installAgents() calls adapter.transformFrontmatter() after variable replacement, ensuring two-step pipeline (variables → frontmatter transformation); (3) Platform-specific frontmatter - Claude includes skills field, Copilot/Codex exclude it, correct array formatting via custom serializer. Duration: ~3 min. Two commits (24ea2b0, 96f726f). **Phase 6.2 50% complete (2/4 plans)!**
+✅ **Plan 07-02 Complete!** Integration & Security Testing: (1) Three-layer path validation integrated - pre-install checks with symlink resolution, batch validation before template processing, write-time validation after variable substitution; (2) Symlink handling unified in orchestrator via skipPrompts flag - interactive mode prompts user, non-interactive mode logs warning; (3) Comprehensive security test coverage - 19 path-validator tests (8 layers + attack vectors), 10 symlink-resolver tests (chains, broken links), 6 integration tests (end-to-end security); (4) Bug fix: absolute vs relative path validation corrected during testing. Duration: 10m 45s. Ten commits (fdee036 through d1ae95c). **Phase 7 COMPLETE (2/2 plans)!**
 
 ### What's Next
-1. **Immediate:** Phase 6.2 Plan 03 - Recursive Variable Processing (handles variable-in-variable cases)
-2. **Context:** Agent installation pipeline complete, now needs recursive variable replacement
-3. **Testing scope:** Plan 06.2-04 will add comprehensive integration tests
-4. **Final steps:** Complete 06.2-03 and 06.2-04 to finish Phase 6.2
+1. **Check Phase 8:** Verify if Phase 8 exists in planning structure
+2. **If no Phase 8:** Begin v2.0 release preparation
+3. **Testing scope:** Run full test suite to ensure no regressions
+4. **Documentation:** Ensure all phases have SUMMARY.md files
+5. **Final steps:** Tag v2.0.0 release when ready
 
 ### Context for Next Session
-- **Plan 06.2-01 complete:** ✅ Custom YAML serializer with platform-specific array formatting
-- **Plan 06.2-02 complete:** ✅ Agent frontmatter transformation integrated into orchestrator
-- **Bugs fixed:** Claude agents get skills field, Copilot/Codex remove skills field, tools arrays formatted correctly
-- **Pipeline established:** Read → Replace variables → Transform frontmatter → Write
-- **Next action:** Implement recursive template variable processing for edge cases
+- **Plan 07-01 complete:** ✅ Path validator with 8-layer defense-in-depth validation
+- **Plan 07-02 complete:** ✅ Three-layer validation integrated, symlink handling, 35 security tests passing
+- **Security hardened:** All 10+ attack vectors from research tested and blocked
+- **Architecture decisions:** Unified orchestrator approach, validation at write point, absolute/relative path handling
+- **Phase 7 complete:** Path security and validation fully implemented and tested
+- **Next action:** Check for additional phases or prepare for v2.0 release
 
 ### Handoff Notes
 ✅ Phase 5 complete! Validation prevents ~80% of installation failures by checking disk space (fs.statfs + 10% buffer), write permissions (actual temp file test), path security (blocks traversal/system dirs), and existing installations before any file writes. Manifest generation creates complete file list via post-installation scan (two-pass write to include manifest itself). Error logging to .gsd-error.log with user-friendly terminal messages. Validation errors show technical details + actionable guidance, runtime errors show friendly message only. Test suite: 13 passing (7 unit + 3 integration + 3 existing). No rollback implementation per Phase 5 scope decision (simpler, faster, focuses on prevention vs recovery). Phase 5: 2/2 plans complete. Overall: 16/35 plans (46%). See 05-02-SUMMARY.md for details. No blockers.
