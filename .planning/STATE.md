@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-28  
-**Updated By:** GSD Executor (Phase 6.1 Plan 03 Complete - Integration with Installer Flows)
+**Updated By:** GSD Executor (Phase 6.1 Plan 04 Complete - Integration Tests & Documentation)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - Wave 3 complete. Orchestrator, Interactive, and Check-Update integrated. Proceeding to Wave 4 (Testing).
+**Current Focus:** Phase 6.1 (Old Version Detection & Migration) - ✅ COMPLETE. All 4 waves complete: Detection, Migration, Integration, and Testing with documentation.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — 🟢 IN PROGRESS  
+**Current Phase:** 6.1 of 8 (Old Version Detection & Migration) — ✅ COMPLETE  
 **Phase Goal:** Detect old v1.x installations, offer upgrade with automatic backup, install v2.0.0  
-**Status:** Wave 3 complete (Orchestrator Integration). All entry points integrated, proceeding to Wave 4 (Testing).
+**Status:** All 4 waves complete. Migration system fully tested and documented.
 
 ### Plan Status
-**Completed Plans:** 23/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 3/4)  
-**Current Plan:** 06.1-03 complete - Integration with Installer Flows  
-**Status:** Phase 6.1 Wave 3 complete. All three entry points (orchestrator, interactive, check-update) integrated with migration flow.
+**Completed Plans:** 24/39 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4)  
+**Current Plan:** 06.1-04 complete - Integration Tests & Documentation  
+**Status:** Phase 6.1 complete. Ready for next phase.
 
 ### Progress Bar
 ```
@@ -36,10 +36,10 @@ Phase 3:   [██████████████████████�
 Phase 4:   [████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 Phase 5:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 6:   [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
-Phase 6.1: [█████████████████████████████████████░░░░░░░░░░░░░░░]  75% (3/4 plans) 🟢 IN PROGRESS
+Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 
 Overall Progress:
-[███████████████████████████████░░░░░░░░░░░░░░░░░] 59% (23/39 total plans)
+[███████████████████████████████████░░░░░░░░░░░░░] 62% (24/39 total plans)
 ```
 
 ---
@@ -47,21 +47,22 @@ Overall Progress:
 ## Performance Metrics
 
 ### Velocity
-- **Phases Completed:** 6 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning)
-- **Phases In Progress:** 1 (Phase 6.1 - Old Version Detection & Migration, Wave 2/4 complete)
-- **Plans Completed:** 23/39
+- **Phases Completed:** 6.1 (Phase 1 - Template Migration, Phase 2 - Core Installer, Phase 3 - Multi-Platform Support, Phase 4 - Interactive CLI UX, Phase 5 - Atomic Transactions, Phase 6 - Update Detection and Versioning, Phase 6.1 - Old Version Detection & Migration)
+- **Phases In Progress:** 0 (Phase 6.1 complete, next phase pending)
+- **Plans Completed:** 24/39
 - **Days Active:** 2
-- **Plans Today:** 3 (06.1-01, 06.1-02, 06.1-03)
+- **Plans Today:** 4 (06.1-01, 06.1-02, 06.1-03, 06.1-04)
 
 ### Quality
 - **Requirements Documented:** 37/37 (100%)
 - **Templates Migrated:** 76 files (28 skills × 2 + 13 agents + 6 platform-specific + shared)
 - **Validation Status:** ✅ All checks passed (0 errors)
 - **Manual Review:** ✅ User approved after 9 corrections applied
+- **Test Coverage:** ✅ 15 integration tests for migration flow
 
 ### Coverage
 - **Requirements Mapped:** 37/37 (100%)
-- **Requirements Completed:** 36/37 (97% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6: 3, Phase 7+: 1 pending)
+- **Requirements Completed:** 37/37 (100% - Phase 1: 8, Phase 2: 6, Phase 3: 9, Phase 4: 5, Phase 5: 5, Phase 6: 3, Phase 6.1: 1)
 
 ---
 
@@ -549,6 +550,24 @@ Overall Progress:
     - Explains migration creates backup
     - Rationale: Clear distinction between old v1.x (incompatible) and v2.x (update available)
 
+74. **2026-01-28 (06.1-04):** Use vitest for integration tests with /tmp isolation (TEST-01)
+    - Existing test framework, consistent with project
+    - Tests execute in unique /tmp directories per TEST-01 requirement
+    - Automatic cleanup in afterEach per TEST-02 requirement
+    - Rationale: Leverage existing infrastructure, ensure test isolation
+
+75. **2026-01-28 (06.1-04):** Place upgrade guide after Quick Start in README (TEST-02)
+    - Users with v1.x need migration info before proceeding
+    - Positioned after installation instructions but before usage details
+    - Comprehensive with troubleshooting and manual options
+    - Rationale: Users see migration path immediately after learning how to install
+
+76. **2026-01-28 (06.1-04):** Preserve full directory structure in backup (TEST-03)
+    - Backup maintains original relative paths: `.gsd-backup/2024-01-28-1400/.claude/commands/gsd/test.md`
+    - Users can reference files in original locations
+    - Easier to understand what was backed up
+    - Rationale: Success criteria requires structure preservation for user reference
+
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
 - Can be referenced if needed for future migrations
@@ -712,22 +731,22 @@ None
 - Phase 4: Interactive CLI with Beautiful UX (✅ Complete - 1/1 plans complete)
 - Phase 5: Atomic Transactions (✅ Complete - 2/2 plans complete)
 - Phase 6: Update Detection (✅ Complete - 3/3 plans complete)
-- Phase 6.1: Old Version Detection & Migration (🔄 In Progress - 2/4 plans complete)
+- Phase 6.1: Old Version Detection & Migration (✅ Complete - 4/4 plans complete)
 - Phase 7: Path Security (Pending)
 - Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 6.1 Plan 03 complete - Integration with Installer Flows. Old version migration integrated into orchestrator (before validateVersionBeforeInstall), interactive mode (multi-platform detection and sequential migration), and check-update (incompatibility message). All three entry points follow consistent flow. Ready for Plan 04 (Testing & Verification).
+**Current Scope:** Phase 6.1 Plan 04 complete - Integration Tests & Documentation. Created comprehensive integration test suite with 15 tests covering all migration scenarios. Added "Upgrading from v1.x" documentation to README. Fixed 2 bugs during test development (backup structure preservation, old file removal). All ROADMAP success criteria validated. Phase 6.1 complete.
 
 ---
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T10:21:55Z  
-**Stopped at:** Completed 06.1-03-PLAN.md (Integration with Installer Flows)  
+**Last session:** 2026-01-28T10:31:51Z  
+**Stopped at:** Completed 06.1-04-PLAN.md (Integration Tests & Documentation)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-28  
-**Ready for:** Phase 6.1 Plan 04 - Testing & Verification (Wave 4)
+**Ready for:** Next phase planning
