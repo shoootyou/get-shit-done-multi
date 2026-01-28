@@ -9,7 +9,7 @@ import { renderTemplate, findUnknownVariables, replaceVariables } from '../rende
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress, displayCompletionLine } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
-import { missingTemplates } from '../errors/install-error.js';
+import { missingTemplates, invalidPath } from '../errors/install-error.js';
 import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
 import yaml from 'js-yaml';
 import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
@@ -21,6 +21,7 @@ import { isRepairableError } from '../manifests/schema.js';
 import { confirm } from '@clack/prompts';
 import { detectOldVersion } from '../version/old-version-detector.js';
 import { performMigration } from '../migration/migration-manager.js';
+import { validateAllPaths } from '../validation/path-validator.js';
 
 /**
  * Main installation orchestrator
@@ -105,6 +106,10 @@ export async function install(appVersion, options) {
 
   // Validate templates exist
   await validateTemplates(templatesDir);
+
+  // === NEW: Batch path validation (Phase 7) ===
+  // Validate all template output paths before any file operations
+  await validateAllTemplateOutputPaths(targetDir, templatesDir, platform);
 
   // Collect all warnings for display
   const allWarnings = [...warnings];
@@ -199,6 +204,78 @@ async function validateTemplates(templatesDir) {
       { skillsExist, agentsExist, sharedExist, path: templatesDir }
     );
   }
+}
+
+/**
+ * Validate all template output paths before processing
+ * @param {string} targetDir - Installation target directory
+ * @param {string} templatesDir - Templates source directory
+ * @param {string} platform - Platform name
+ * @returns {Promise<void>}
+ * @throws {InstallError} If any paths fail validation
+ */
+async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform) {
+  const outputPaths = [];
+  
+  // Collect all output paths from templates
+  
+  // 1. Skills paths
+  const skillsTemplateDir = join(templatesDir, 'skills');
+  const skillDirs = await readdir(skillsTemplateDir, { withFileTypes: true });
+  const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-') && d.name !== 'get-shit-done');
+  
+  for (const skill of skills) {
+    // Each skill creates skills/{name}/* files
+    outputPaths.push(join('skills', skill.name, 'SKILL.md'));
+  }
+  
+  // Platform-specific get-shit-done skill
+  const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
+  if (await pathExists(getShitDoneTemplateDir)) {
+    outputPaths.push(join('skills', 'get-shit-done', 'SKILL.md'));
+  }
+  
+  // 2. Agents paths
+  const agentsTemplateDir = join(templatesDir, 'agents');
+  const agentFiles = await readdir(agentsTemplateDir);
+  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
+  
+  for (const agent of agents) {
+    const baseName = agent.replace('.agent.md', '');
+    outputPaths.push(join('agents', baseName)); // Don't include extension - platform-specific
+  }
+  outputPaths.push(join('agents', 'versions.json'));
+  
+  // 3. Shared directory paths
+  outputPaths.push(join('get-shit-done', '.gsd-install-manifest.json'));
+  outputPaths.push(join('get-shit-done', 'shared', 'config.json'));
+  outputPaths.push(join('get-shit-done', 'shared', 'prompts'));
+  outputPaths.push(join('get-shit-done', 'workflows'));
+  
+  // Run batch validation
+  const results = validateAllPaths(targetDir, outputPaths);
+  
+  if (results.invalid.length > 0) {
+    // Security violation - log all errors
+    console.error('\n🚨 Security Validation Failed\n');
+    
+    for (const failure of results.invalid) {
+      console.error(`  ✗ ${failure.input}`);
+      console.error(`    ${failure.error}`);
+    }
+    
+    throw invalidPath(
+      `${results.invalid.length} template path(s) failed security validation`,
+      {
+        totalPaths: outputPaths.length,
+        invalidCount: results.invalid.length,
+        failures: results.invalid
+      }
+    );
+  }
+  
+  // All paths valid
+  logger.info(`✓ Validated ${results.valid.length} template paths`, 2);
 }
 
 /**
