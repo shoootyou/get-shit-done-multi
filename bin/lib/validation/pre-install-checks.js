@@ -4,6 +4,7 @@ import { statfs } from 'fs';
 import { promisify } from 'util';
 import { readdir, stat, writeFile, unlink, readFile } from 'fs/promises';
 import { join, normalize, resolve } from 'path';
+import path from 'path';
 import { homedir } from 'os';
 import { ensureDirectory, pathExists } from '../io/file-operations.js';
 import { insufficientSpace, permissionDenied } from '../errors/install-error.js';
@@ -134,7 +135,16 @@ export async function validatePaths(targetDir, isGlobal) {
   }
   
   // Run comprehensive path validation (8 layers)
-  const { resolved } = validatePath(process.cwd(), targetDir);
+  // For relative paths, validate against cwd
+  // For absolute paths, validate against parent directory
+  const basePath = path.isAbsolute(targetDir) 
+    ? path.dirname(targetDir)
+    : process.cwd();
+  const inputPath = path.isAbsolute(targetDir)
+    ? path.basename(targetDir)
+    : targetDir;
+    
+  const { resolved } = validatePath(basePath, inputPath);
   
   // Additional scope validation for global installations
   if (isGlobal) {
