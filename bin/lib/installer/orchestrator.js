@@ -1,6 +1,6 @@
 // bin/lib/installer/orchestrator.js
 
-import { join } from 'path';
+import { join, basename, dirname } from 'path';
 import { homedir } from 'os';
 import chalk from 'chalk';
 import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
@@ -221,6 +221,10 @@ async function validateTemplates(templatesDir) {
 async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform) {
   const outputPaths = [];
   
+  // Extract platform directory from targetDir (e.g., '.github', '.claude', '.copilot')
+  // This is needed because path-validator checks the first path segment against allowlist
+  const platformDir = basename(targetDir);
+  
   // Collect all output paths from templates
   
   // 1. Skills paths
@@ -229,14 +233,14 @@ async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform)
   const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-') && d.name !== 'get-shit-done');
   
   for (const skill of skills) {
-    // Each skill creates skills/{name}/* files
-    outputPaths.push(join('skills', skill.name, 'SKILL.md'));
+    // Each skill creates {platformDir}/skills/{name}/* files
+    outputPaths.push(join(platformDir, 'skills', skill.name, 'SKILL.md'));
   }
   
   // Platform-specific get-shit-done skill
   const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
   if (await pathExists(getShitDoneTemplateDir)) {
-    outputPaths.push(join('skills', 'get-shit-done', 'SKILL.md'));
+    outputPaths.push(join(platformDir, 'skills', 'get-shit-done', 'SKILL.md'));
   }
   
   // 2. Agents paths
@@ -246,18 +250,21 @@ async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform)
   
   for (const agent of agents) {
     const baseName = agent.replace('.agent.md', '');
-    outputPaths.push(join('agents', baseName)); // Don't include extension - platform-specific
+    outputPaths.push(join(platformDir, 'agents', baseName)); // Don't include extension - platform-specific
   }
-  outputPaths.push(join('agents', 'versions.json'));
+  outputPaths.push(join(platformDir, 'agents', 'versions.json'));
   
-  // 3. Shared directory paths
+  // 3. Shared directory paths (no platformDir prefix - get-shit-done is already in allowlist)
   outputPaths.push(join('get-shit-done', '.gsd-install-manifest.json'));
   outputPaths.push(join('get-shit-done', 'shared', 'config.json'));
   outputPaths.push(join('get-shit-done', 'shared', 'prompts'));
   outputPaths.push(join('get-shit-done', 'workflows'));
   
   // Run batch validation
-  const results = validateAllPaths(targetDir, outputPaths);
+  // Use parent directory as base since paths now include platformDir
+  const parentDir = dirname(targetDir);
+  const basePath = parentDir === '.' ? process.cwd() : parentDir;
+  const results = validateAllPaths(basePath, outputPaths);
   
   if (results.invalid.length > 0) {
     // Security violation - log all errors
