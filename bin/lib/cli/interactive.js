@@ -10,8 +10,6 @@ import { readManifest } from '../manifests/reader.js';
 import { repairManifest } from '../manifests/repair.js';
 import { isRepairableError } from '../manifests/schema.js';
 import { compareVersions, formatPlatformOption } from '../version/version-checker.js';
-import { detectAllOldVersions } from '../version/old-version-detector.js';
-import { performMigration } from '../migration/migration-manager.js';
 
 /**
  * Run interactive installation mode with beautiful prompts
@@ -20,46 +18,11 @@ import { performMigration } from '../migration/migration-manager.js';
  * @returns {Promise<void>}
  */
 export async function runInteractive(appVersion, options = {}) {
+  
+
   // Show intro with instructions
   p.intro('Interactive Installer');
   p.log.info('Use ↑/↓ to navigate, Space to select, Enter to continue');
-
-  // === NEW: Check for old versions across all platforms (Phase 6.1) ===
-  const oldVersions = await detectAllOldVersions('.');
-  
-  if (oldVersions.length > 0) {
-    // Show detected old versions
-    console.log();
-    logger.warnSubtitle('Old Versions Detected', 0, 80, true);
-    
-    for (const old of oldVersions) {
-      logger.warn(`${old.platform}: v${old.version} (incompatible with v2.0.0)`, 2);
-    }
-    console.log();
-    
-    // Migrate each platform
-    for (const old of oldVersions) {
-      const migrationResult = await performMigration(
-        old.platform,
-        old.version,
-        '.',
-        { skipPrompts: false }
-      );
-      
-      if (!migrationResult.success) {
-        if (migrationResult.error === 'User declined') {
-          p.cancel('Installation cancelled.');
-          process.exit(0);
-        } else {
-          p.cancel(`Migration failed: ${migrationResult.error}`);
-          process.exit(1);
-        }
-      }
-    }
-    
-    logger.success('All migrations complete. Continuing with v2.0.0 installation...');
-    console.log();
-  }
 
   // Detect platforms
   const detected = await detectBinaries();
@@ -134,35 +97,35 @@ async function showGlobalDetectionWarning() {
  */
 async function discoverInstallationsWithStatus(scope, currentVersion, customPaths = []) {
   const found = await findInstallations(scope, customPaths);
-  
+
   const statusMap = new Map();
-  
+
   await Promise.all(
     found.map(async (install) => {
       let manifestResult = await readManifest(install.path);
-      
+
       // If corrupt or invalid schema, try to repair
       if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
         manifestResult = await repairManifest(install.path);
       }
-      
+
       if (!manifestResult.success) {
-        statusMap.set(install.platform, { 
-          status: 'unknown', 
-          reason: manifestResult.reason 
+        statusMap.set(install.platform, {
+          status: 'unknown',
+          reason: manifestResult.reason
         });
         return;
       }
-      
+
       const versionStatus = compareVersions(
         manifestResult.manifest.gsd_version,
         currentVersion
       );
-      
+
       statusMap.set(install.platform, versionStatus);
     })
   );
-  
+
   return statusMap;
 }
 
@@ -176,11 +139,11 @@ async function discoverInstallationsWithStatus(scope, currentVersion, customPath
 async function promptSelections(detected, appVersion, options = {}) {
   // Discover installations for both global and local scopes
   const customPaths = options.customPath ? [options.customPath] : [];
-  
+
   // If custom path is provided, treat it as implicit local scope and skip scope prompt
   if (options.customPath) {
     const localInstallations = await discoverInstallationsWithStatus('local', appVersion, customPaths);
-    
+
     const platforms = await p.group(
       {
         platforms: () => {
@@ -214,15 +177,15 @@ async function promptSelections(detected, appVersion, options = {}) {
         }
       }
     );
-    
+
     // Return with implicit local scope
     return { platforms: platforms.platforms, scope: 'local' };
   }
-  
+
   // Normal flow: prompt for both scope and platforms
   const globalInstallations = await discoverInstallationsWithStatus('global', appVersion, customPaths);
   const localInstallations = await discoverInstallationsWithStatus('local', appVersion, customPaths);
-  
+
   return await p.group(
     {
       scope: () => p.select({
@@ -236,7 +199,7 @@ async function promptSelections(detected, appVersion, options = {}) {
       platforms: ({ results }) => {
         // Use the appropriate installation map based on selected scope
         const installationMap = results.scope === 'global' ? globalInstallations : localInstallations;
-        
+
         return p.multiselect({
           message: 'Select platforms to install GSD:',
           options: [
@@ -291,6 +254,6 @@ function getHintForPlatform(platform, versionStatus, binaryDetected) {
       return 'Installed (version unknown)';
     }
   }
-  
+
   return binaryDetected ? 'Detected' : 'Not detected';
 }

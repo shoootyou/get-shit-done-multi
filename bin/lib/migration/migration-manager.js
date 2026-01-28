@@ -4,6 +4,7 @@ import * as p from '@clack/prompts';
 import * as logger from '../cli/logger.js';
 import { detectOldVersion } from '../version/old-version-detector.js';
 import { createBackupDirectory, validateBackupSpace, createBackup } from './backup-manager.js';
+import { getPlatformName } from '../platforms/platform-names.js';
 import { remove } from 'fs-extra';
 import { resolve } from 'path';
 
@@ -18,10 +19,8 @@ import { resolve } from 'path';
 export async function promptMigration(platform, oldVersion, backupPath, options = {}) {
   // Show warning banner
   console.log();
-  logger.warnSubtitle('Old Version Detected', 0, 80, true);
-  logger.warn(`Version ${oldVersion} is incompatible with v2.0.0`, 2);
-  console.log();
-  
+  logger.warnSubtitle(`${getPlatformName(platform)} Upgrade`, 0, 80, true);
+
   // Show detailed steps (CONTEXT D1.3)
   logger.info('What will happen:', 2);
   logger.listItem(`Backup v${oldVersion} to ${backupPath}`, 4);
@@ -32,7 +31,7 @@ export async function promptMigration(platform, oldVersion, backupPath, options 
   // Simple Yes/No confirmation (CONTEXT D1.2)
   const confirmed = await p.confirm({
     message: 'Create backup and upgrade?',
-    initialValue: false
+    initialValue: true
   });
   
   if (p.isCancel(confirmed)) {
