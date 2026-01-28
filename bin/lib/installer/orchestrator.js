@@ -23,7 +23,6 @@ import { detectOldVersion } from '../version/old-version-detector.js';
 import { performMigration } from '../migration/migration-manager.js';
 import { validateAllPaths } from '../validation/path-validator.js';
 import { isSymlink, resolveSymlinkSingleLevel } from '../paths/symlink-resolver.js';
-import { installError } from '../errors/install-error.js';
 
 /**
  * Main installation orchestrator
