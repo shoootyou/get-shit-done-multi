@@ -10,7 +10,8 @@ import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress, displayCompletionLine } from '../cli/progress.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates } from '../errors/install-error.js';
-import { readdir, readFile } from 'fs/promises';
+import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
+import yaml from 'js-yaml';
 import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
 import { generateManifestData, writeManifest } from '../manifests/writer.js';
 import { compareVersions } from '../version/version-checker.js';
@@ -307,6 +308,72 @@ async function installAgents(templatesDir, targetDir, variables, multiBar, isVer
 }
 
 /**
+ * Text file extensions to process for template variables
+ */
+const TEXT_EXTENSIONS = new Set([
+  '.md', '.json', '.sh', '.bash', '.txt',
+  '.yml', '.yaml', '.config', '.js', '.mjs',
+  '.ts', '.html', '.css', '.xml'
+]);
+
+/**
+ * Recursively process all text files in directory for template variables
+ * @param {string} dir - Directory to process
+ * @param {Object} variables - Template variables to replace
+ * @param {boolean} isVerbose - Verbose logging
+ */
+async function processDirectoryRecursively(dir, variables, isVerbose) {
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+  
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    
+    if (entry.isDirectory()) {
+      continue; // recursive: true handles subdirectories
+    }
+    
+    // Check if text file by extension
+    const ext = entry.name.substring(entry.name.lastIndexOf('.'));
+    if (!TEXT_EXTENSIONS.has(ext)) {
+      if (isVerbose) {
+        logger.verboseInProgress(`Skipping binary: ${entry.name}`, isVerbose);
+      }
+      continue;
+    }
+    
+    // Process text file
+    try {
+      const content = await readFile(fullPath, 'utf8');
+      const processed = replaceVariables(content, variables);
+      
+      // Validate JSON/YAML after replacement
+      if (ext === '.json') {
+        try {
+          JSON.parse(processed);
+        } catch (error) {
+          throw new Error(`Invalid JSON after variable replacement in ${entry.name}: ${error.message}`);
+        }
+      } else if (ext === '.yml' || ext === '.yaml') {
+        try {
+          yaml.load(processed);
+        } catch (error) {
+          throw new Error(`Invalid YAML after variable replacement in ${entry.name}: ${error.message}`);
+        }
+      }
+      
+      await fsWriteFile(fullPath, processed);
+      
+      if (isVerbose) {
+        logger.verboseInProgress(`Processed: ${entry.name}`, isVerbose);
+      }
+    } catch (error) {
+      // Re-throw with context
+      throw new Error(`Failed to process ${entry.name}: ${error.message}`);
+    }
+  }
+}
+
+/**
  * Install shared directory from templates
  */
 async function installShared(templatesDir, targetDir, variables, multiBar, isVerbose) {
@@ -318,11 +385,8 @@ async function installShared(templatesDir, targetDir, variables, multiBar, isVer
   // Copy entire directory
   await copyDirectory(sharedTemplateDir, sharedTargetDir);
 
-  // Process manifest template
-  const manifestFile = join(sharedTargetDir, '.gsd-install-manifest.json');
-  if (await pathExists(manifestFile)) {
-    await processTemplateFile(manifestFile, variables, isVerbose);
-  }
+  // Process all text files recursively for template variables
+  await processDirectoryRecursively(sharedTargetDir, variables, isVerbose);
 
   logger.verboseComplete(isVerbose);
 
