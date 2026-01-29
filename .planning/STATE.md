@@ -764,8 +764,7 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-2 pending todos:
-- `.planning/todos/pending/2026-01-29-add-all-flag-for-installing-all-platforms.md` - Add --all flag for installing all platforms (area: tooling)
+1 pending todo:
 - `.planning/todos/pending/2026-01-29-audit-unused-functions-in-bin.md` - Audit unused functions in /bin directory (area: tooling)
 
 ### Blockers
