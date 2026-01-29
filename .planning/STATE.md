@@ -18,14 +18,14 @@
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 7.1 — Pre-Flight Validation Refactor (IN PROGRESS)
-**Completed:** 1 of 2 plans (Pre-Flight Validation Orchestrator)  
-**Next:** Plan 02 — Integration & Cleanup
+**Current Phase:** Phase 7.1 — Pre-Flight Validation Refactor (COMPLETE ✅)
+**Completed:** 2 of 2 plans  
+**Next:** Ready for next roadmap phase
 
 ### Plan Status
-**Completed Plans:** 30/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 1/2)  
-**Last activity:** 2026-01-29 - Completed 07.1-01-PLAN.md (Pre-Flight Validation Orchestrator)
-**Next:** Phase 7.1 Plan 02 — Integration & Cleanup
+**Completed Plans:** 31/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2)  
+**Last activity:** 2026-01-29 - Completed 07.1-02-PLAN.md (Integration, Cleanup & Testing)
+**Next:** Phase 8 or next roadmap phase
 
 ### Progress Bar
 ```
@@ -39,10 +39,10 @@ Phase 6:   [██████████████████████�
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 6.2: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 7:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
-Phase 7.1: [██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (1/2 plans)
+Phase 7.1: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 
 Overall Progress:
-[████████████████████████████████████░░░░░░░░░░] 67% (30/45 total plans)
+[████████████████████████████████████░░░░░░░░░░] 69% (31/45 total plans)
 ```
 
 ---
@@ -707,6 +707,24 @@ Overall Progress:
     - Symlink detection returns code 0 (warning) not error code
     - User sees warning but installation can proceed
     - Rationale: Symlinks are valid paths, just need user awareness
+
+100. **2026-01-29 (07.1-02):** Bash-based integration tests over JS mocking (INTEG-TEST-BASH)
+     - Integration tests use real filesystem, not mocked fs
+     - Tests copy full project to /tmp for isolation
+     - Execute in isolated directories, never modify source
+     - Rationale: Need real filesystem behavior for validation testing
+
+101. **2026-01-29 (07.1-02):** Validation gate in executeInstallationLoop() (VALIDATION-GATE-LOCATION)
+     - Place validateBeforeInstall() at start of executeInstallationLoop()
+     - Covers both interactive and non-interactive flows
+     - Single point of validation before any installation work
+     - Rationale: Simplest integration point that covers all code paths
+
+102. **2026-01-29 (07.1-02):** Remove all validation from orchestrator (ORCHESTRATOR-CLEANUP)
+     - Single-point validation pattern enforced
+     - Orchestrator only processes files, no validation
+     - Removed 68 lines of redundant batch validation
+     - Rationale: Clear separation of concerns, easier to maintain
 
 ### Roadmap Evolution
 
