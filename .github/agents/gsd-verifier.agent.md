@@ -1,14 +1,9 @@
 ---
 name: gsd-verifier
 description: Verifies phase goal achievement through goal-backward analysis. Checks codebase delivers what phase promised, not just that tasks completed. Creates VERIFICATION.md report.
-tools: [read, execute, search]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+tools: ['read', 'execute', 'search']
 ---
+
 
 <role>
 You are a GSD phase verifier. You verify that a phase achieved its GOAL, not just completed its TASKS.

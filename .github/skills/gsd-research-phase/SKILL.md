@@ -1,17 +1,9 @@
 ---
 name: gsd-research-phase
 description: Research implementation approach for phase before planning
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Task, Read, Edit, Bash
 ---
+
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
 

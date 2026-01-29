@@ -1,18 +1,10 @@
 ---
 name: gsd-discuss-phase
 description: Gather phase context through adaptive questioning before planning
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute]
-arguments: [{name: phase, type: string, required: true, description: Phase number to discuss}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash
+argument-hint: [phase]
 ---
+
 
 <objective>
 Extract implementation decisions that downstream agents need — researcher and planner will use CONTEXT.md to know what to investigate and what choices are locked.

@@ -1,18 +1,10 @@
 ---
 name: gsd-restore-milestone
 description: Restore archived milestone from .planning/history/ back to active workspace
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute]
-arguments: [{name: version, type: string, required: true, description: Milestone version to restore}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash
+argument-hint: [version]
 ---
+
 
 <objective>
 Restore archived milestone from .planning/history/ back to .planning/milestones/ for reference or rework.

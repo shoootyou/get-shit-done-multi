@@ -1,18 +1,9 @@
 ---
 name: gsd-progress
 description: Check project progress, show context, and route to next action (execute or plan)
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, execute, agent]
-arguments: []
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Bash, Task
 ---
+
 
 <objective>
 Check project progress, summarize recent work and what's ahead, then intelligently route to the next action - either executing an existing plan or creating the next one.

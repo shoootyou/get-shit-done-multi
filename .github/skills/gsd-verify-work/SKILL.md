@@ -1,18 +1,10 @@
 ---
 name: gsd-verify-work
 description: Validate built features through conversational UAT
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute, agent]
-arguments: [{name: phase, type: string, required: false, description: 'Phase number to verify (if not provided, checks for active sessions)'}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash, Task
+argument-hint: [phase]
 ---
+
 
 <objective>
 Validate built features through conversational testing with persistent state.

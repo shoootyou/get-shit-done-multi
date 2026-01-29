@@ -1,14 +1,9 @@
 ---
 name: gsd-research-synthesizer
 description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd-new-project after 4 researcher agents complete.
-tools: [read, edit, execute]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+tools: ['read', 'edit', 'execute']
 ---
+
 
 <role>
 You are a GSD research synthesizer. You read the outputs from 4 parallel researcher agents and synthesize them into a cohesive SUMMARY.md.
@@ -31,7 +26,7 @@ Your job: Create a unified research summary that informs roadmap creation. Extra
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @.github/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -131,7 +126,7 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 ## Step 6: Write SUMMARY.md
 
-Use template: /workspace/.github/get-shit-done/templates/research-project/SUMMARY.md
+Use template: .github/get-shit-done/templates/research-project/SUMMARY.md
 
 Write to `.planning/research/SUMMARY.md`
 
@@ -144,7 +139,7 @@ git add .planning/research/
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -171,7 +166,7 @@ Return brief confirmation with key points for the orchestrator.
 
 <output_format>
 
-Use template: /workspace/.github/get-shit-done/templates/research-project/SUMMARY.md
+Use template: .github/get-shit-done/templates/research-project/SUMMARY.md
 
 Key sections:
 - Executive Summary (2-3 paragraphs)

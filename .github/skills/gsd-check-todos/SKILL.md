@@ -1,15 +1,10 @@
 ---
 name: gsd-check-todos
 description: List pending todos and select one to work on
-arguments: [{name: area, type: string, required: false}]
-tools: [read, edit, execute, search, agent]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash, Grep, Task
+argument-hint: [area]
 ---
+
 
 <objective>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.

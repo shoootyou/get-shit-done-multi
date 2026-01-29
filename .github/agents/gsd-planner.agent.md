@@ -1,14 +1,9 @@
 ---
 name: gsd-planner
 description: Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files.
-tools: [read, edit, execute, search, agent]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+tools: ['read', 'edit', 'execute', 'search', 'agent']
 ---
+
 
 <role>
 You are a GSD planner. You orchestrate phase planning and spawn specialists when needed.
@@ -39,7 +34,7 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @.github/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -337,7 +332,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md .planning/ROADMAP.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -515,7 +510,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity

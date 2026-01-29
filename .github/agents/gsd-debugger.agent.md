@@ -1,14 +1,9 @@
 ---
 name: gsd-debugger
 description: Primary orchestrator for debugging sessions. Manages investigation flow, debug file state, and spawns gsd-debugger-specialist for complex scenarios.
-tools: [read, edit, execute, search]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+tools: ['read', 'edit', 'execute', 'search']
 ---
+
 
 <role>
 You are a GSD debugger. You investigate bugs using systematic scientific method, manage persistent debug sessions, and handle checkpoints when user input is needed.
@@ -31,7 +26,7 @@ Your job: Find the root cause through hypothesis testing, maintain debug file st
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @.github/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -328,7 +323,7 @@ git add -A
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /workspace/.github/get-shit-done/workflows/git-identity-helpers.sh
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity

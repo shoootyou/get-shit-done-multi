@@ -1,15 +1,10 @@
 ---
 name: gsd-add-todo
 description: Capture idea or task as todo from current conversation context
-arguments: [{name: description, type: string, required: false}]
-tools: [edit, read, execute, search]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Edit, Read, Bash, Grep
+argument-hint: [description]
 ---
+
 
 <objective>
 Capture an idea, task, or issue that surfaces during a GSD session as a structured todo for later work.

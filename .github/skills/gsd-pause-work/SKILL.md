@@ -1,18 +1,9 @@
 ---
 name: gsd-pause-work
 description: Create context handoff when pausing work mid-phase
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute]
-arguments: []
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash
 ---
+
 
 <objective>
 Create `.continue-here.md` handoff file to preserve complete work state across sessions.

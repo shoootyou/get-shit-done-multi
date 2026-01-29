@@ -1,18 +1,10 @@
 ---
 name: gsd-plan-milestone-gaps
 description: Parse audit gaps, spawn planner to create gap closure phases
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute, agent]
-arguments: [{name: version, type: string, required: true, description: Milestone version to plan gaps for}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash, Task
+argument-hint: [version]
 ---
+
 
 <objective>
 Parse MILESTONE-AUDIT.md gaps, spawn planner to create gap closure phases, append to roadmap.

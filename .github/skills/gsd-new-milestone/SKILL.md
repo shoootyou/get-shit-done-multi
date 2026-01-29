@@ -1,18 +1,10 @@
 ---
 name: gsd-new-milestone
 description: Orchestrate milestone planning with parallel research for subsequent project phases
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, search]
-arguments: [{name: milestone, type: string, required: false, description: Milestone number or description}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Task, Read, Edit, Bash, Grep
+argument-hint: [milestone]
 ---
+
 
 <objective>
 
@@ -272,7 +264,7 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 
 <output>
 Write to: .planning/research/STACK.md
-Use template: /workspace/.github/get-shit-done/templates/research-project/STACK.md
+Use template: .github/get-shit-done/templates/research-project/STACK.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Stack research")
 
@@ -304,7 +296,7 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 
 <output>
 Write to: .planning/research/FEATURES.md
-Use template: /workspace/.github/get-shit-done/templates/research-project/FEATURES.md
+Use template: .github/get-shit-done/templates/research-project/FEATURES.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Features research")
 
@@ -336,7 +328,7 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 
 <output>
 Write to: .planning/research/ARCHITECTURE.md
-Use template: /workspace/.github/get-shit-done/templates/research-project/ARCHITECTURE.md
+Use template: .github/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Architecture research")
 
@@ -368,7 +360,7 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 
 <output>
 Write to: .planning/research/PITFALLS.md
-Use template: /workspace/.github/get-shit-done/templates/research-project/PITFALLS.md
+Use template: .github/get-shit-done/templates/research-project/PITFALLS.md
 </output>
 ", subagent_type="gsd-project-researcher", description="Pitfalls research")
 ```
@@ -391,7 +383,7 @@ Read these files:
 
 <output>
 Write to: .planning/research/SUMMARY.md
-Use template: /workspace/.github/get-shit-done/templates/research-project/SUMMARY.md
+Use template: .github/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
 ", subagent_type="gsd-research-synthesizer", description="Synthesize research")

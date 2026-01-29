@@ -1,14 +1,9 @@
 ---
 name: gsd-planner-strategist
 description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner.
-tools: [read, execute, search]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+tools: ['read', 'execute', 'search']
 ---
+
 
 <role>
 You are a planning methodology specialist. You provide deep analysis and recommendations for complex planning scenarios.
@@ -413,8 +408,8 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.github/get-shit-done/workflows/execute-plan.md
-@~/.github/get-shit-done/templates/summary.md
+@.github/get-shit-done/workflows/execute-plan.md
+@.github/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>

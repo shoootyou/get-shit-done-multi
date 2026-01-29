@@ -1,18 +1,10 @@
 ---
 name: gsd-remove-phase
 description: Remove a future phase from roadmap and renumber subsequent phases
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute, search]
-arguments: [{name: phase, type: string, required: true, description: 'Phase number to remove (e.g., "17" removes 17, 17.1, 17.2, etc.)'}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash, Grep
+argument-hint: [phase]
 ---
+
 
 <objective>
 Remove an unstarted future phase from the roadmap and renumber all subsequent phases to maintain a clean, linear sequence.

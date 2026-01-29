@@ -1,18 +1,9 @@
 ---
 name: gsd-update
 description: Update GSD installation to latest version from npm
-skill_version: 1.9.2
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, execute]
-arguments: []
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Bash
 ---
+
 
 <objective>
 Check current GSD version, compare with latest available on npm, and update if needed.
@@ -22,61 +13,56 @@ Output: Version comparison, changelog, and updated installation.
 </objective>
 
 <execution_context>
-@/workspace/.github/copilot/skills/get-shit-done/VERSION
-@/workspace/.github/copilot/skills/get-shit-done/CHANGELOG.md
+@.github/get-shit-done/.gsd-install-manifest.json
+@.github/get-shit-done/CHANGELOG.md
 </execution_context>
 
 <process>
 
 <step name="detect_platform">
-Detect which platform is being used:
+Detect which platform is being used based on manifest file:
 
 ```bash
-# Detect platform based on installation directory
-if [ -d "${HOME}/.claude/skills" ] || [ -d "./.claude/skills" ]; then
-  PLATFORM="claude"
-  INSTALL_CMD="npx get-shit-done-multi@latest"
-  if [ -f "./.claude/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./.claude/skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/.claude/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/.claude/skills/get-shit-done/VERSION"
-  fi
-elif [ -d "./.github/skills" ] || [ -d "${HOME}/.github/copilot/skills" ]; then
-  PLATFORM="copilot"
-  INSTALL_CMD="npx get-shit-done-multi@latest --copilot"
-  if [ -f "./.github/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./.github/skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/.github/copilot/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/.github/copilot/skills/get-shit-done/VERSION"
-  fi
-elif [ -d "./.codex/skills" ] || [ -d "${HOME}/.codex/skills" ]; then
-  PLATFORM="codex"
-  INSTALL_CMD="npx get-shit-done-multi@latest --codex"
-  if [ -f "./.codex/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="./.codex/skills/get-shit-done/VERSION"
-  elif [ -f "${HOME}/.codex/skills/get-shit-done/VERSION" ]; then
-    VERSION_FILE="${HOME}/.codex/skills/get-shit-done/VERSION"
-  fi
+# Check for manifest file to detect installation
+if [ -f "./.github/get-shit-done/.gsd-install-manifest.json" ]; then
+  MANIFEST_FILE="./.github/get-shit-done/.gsd-install-manifest.json"
+  SCOPE="local"
+elif [ -f "${HOME}/.github/get-shit-done/.gsd-install-manifest.json" ]; then
+  MANIFEST_FILE="${HOME}/.github/get-shit-done/.gsd-install-manifest.json"
+  SCOPE="global"
 else
   echo "Error: GSD installation not found"
-  echo "Run installation first: npx get-shit-done-multi"
+  echo "No manifest file at .github/get-shit-done/.gsd-install-manifest.json"
+  echo ""
+  echo "Run installation first: npx get-shit-done-multi --copilot"
   exit 1
 fi
 
-echo "Platform detected: ${PLATFORM}"
+# Extract platform from manifest
+PLATFORM=$(cat "${MANIFEST_FILE}" | grep -o '"platform"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
+
+# Determine install command
+if [ "${SCOPE}" = "global" ]; then
+  INSTALL_CMD="npx get-shit-done-multi@latest --${PLATFORM} --global"
+else
+  INSTALL_CMD="npx get-shit-done-multi@latest --${PLATFORM} --local"
+fi
+
+echo "Platform detected: ${PLATFORM} (${SCOPE})"
+echo "Manifest file: ${MANIFEST_FILE}"
 ```
 </step>
 
 <step name="check_current_version">
-Read current installed version:
+Read current installed version from manifest:
 
 ```bash
-if [ -f "${VERSION_FILE}" ]; then
-  CURRENT_VERSION=$(cat "${VERSION_FILE}")
+if [ -f "${MANIFEST_FILE}" ]; then
+  CURRENT_VERSION=$(cat "${MANIFEST_FILE}" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
   echo "Current version: ${CURRENT_VERSION}"
 else
-  echo "Warning: VERSION file not found at ${VERSION_FILE}"
-  CURRENT_VERSION="unknown"
+  echo "Error: Manifest file not found at ${MANIFEST_FILE}"
+  exit 1
 fi
 ```
 </step>
@@ -137,8 +123,8 @@ Display recent changes:
 echo "=== Recent Changes ==="
 echo ""
 
-# Try to read CHANGELOG.md from installed location
-CHANGELOG_FILE="${VERSION_FILE%/*}/CHANGELOG.md"
+# CHANGELOG is in get-shit-done directory (same as manifest)
+CHANGELOG_FILE="${MANIFEST_FILE%/*}/CHANGELOG.md"
 
 if [ -f "${CHANGELOG_FILE}" ]; then
   # Show latest version changes (top section)
@@ -205,9 +191,9 @@ Verify the update succeeded:
 echo ""
 echo "Verifying update..."
 
-# Read new version
-if [ -f "${VERSION_FILE}" ]; then
-  NEW_VERSION=$(cat "${VERSION_FILE}")
+# Read new version from manifest
+if [ -f "${MANIFEST_FILE}" ]; then
+  NEW_VERSION=$(cat "${MANIFEST_FILE}" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
   
   if [ "${NEW_VERSION}" = "${LATEST_VERSION}" ]; then
     echo "✓ Successfully updated to ${NEW_VERSION}"
@@ -217,7 +203,7 @@ if [ -f "${VERSION_FILE}" ]; then
     echo "  Installed: ${NEW_VERSION}"
   fi
 else
-  echo "⚠ Could not verify version (VERSION file not found)"
+  echo "⚠ Could not verify version (manifest file not found)"
   NEW_VERSION="${LATEST_VERSION}"
 fi
 ```
@@ -248,8 +234,9 @@ Show update summary:
 ### Resources
 
 - Changelog: ${CHANGELOG_FILE}
+- Manifest: ${MANIFEST_FILE}
 - Issues: https://github.com/shoootyou/get-shit-done-multi/issues
-- Docs: https://github.com/shoootyou/get-shit-done-multi/blob/main/docs/
+- Docs: https://github.com/shoootyou/get-shit-done-multi/blob/main/README.md
 
 ---
 
@@ -261,7 +248,8 @@ Show update summary:
 
 <anti_patterns>
 - Don't try to update via git (use npm package)
-- Don't modify VERSION file manually
+- Don't modify manifest file manually
 - Don't skip version check (always compare first)
 - Don't assume update succeeded without verification
+- Don't mix --global and --local scopes (use same scope as current installation)
 </anti_patterns>

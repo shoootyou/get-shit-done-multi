@@ -1,17 +1,9 @@
 ---
 name: gsd-execute-phase
 description: Execute all plans in a phase with wave-based parallelization
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, search]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Task, Read, Edit, Bash, Grep
 ---
+
 
 <objective>
 Execute all plans in a phase using wave-based parallel execution.

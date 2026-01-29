@@ -1,18 +1,10 @@
 ---
 name: gsd-add-phase
 description: Add new integer phase to end of current milestone in roadmap
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [read, edit, execute]
-arguments: [{name: description, type: string, required: true, description: Phase description (all args combined become description)}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Read, Edit, Bash
+argument-hint: [description]
 ---
+
 
 <objective>
 Add a new integer phase to the end of the current milestone in the roadmap.

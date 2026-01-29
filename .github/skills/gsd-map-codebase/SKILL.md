@@ -1,18 +1,10 @@
 ---
 name: gsd-map-codebase
 description: Analyze codebase with parallel mapper agents to produce structured documentation
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: [agent, read, edit, execute, search]
-arguments: [{name: area, type: string, required: false, description: 'Optional specific area to map (e.g., ''api'', ''auth'')'}]
-metadata:
-  platform: copilot
-  generated: '2026-01-24'
-  templateVersion: 1.0.0
-  projectVersion: 1.9.0
-  projectName: 'get-shit-done-multi'
+allowed-tools: Task, Read, Edit, Bash, Grep
+argument-hint: [area]
 ---
+
 
 <objective>
 Analyze existing codebase using parallel gsd-codebase-mapper agents to produce structured codebase documents.
