@@ -1,5 +1,22 @@
 // bin/lib/validation/error-logger.js
 
+/**
+ * ERROR LOGGING AND FORMATTING MODULE
+ * 
+ * Provides error logging and user-friendly formatting for validation and runtime errors.
+ * 
+ * INTEGRATION WITH PRE-FLIGHT VALIDATION (Phase 7.1):
+ * - Pre-flight validation uses ../preflight/error-formatter.js for grouped error reports
+ * - This module provides base formatting patterns that error-formatter.js follows
+ * - No extensions needed - existing formatValidationError() provides the pattern
+ * 
+ * FORMATTING PATTERNS:
+ * - Error symbol (✗) + message
+ * - Multi-line details with indentation
+ * - "Fix:" suggestions for remediation
+ * - Technical + actionable guidance
+ */
+
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { ensureDirectory } from '../io/file-operations.js';
