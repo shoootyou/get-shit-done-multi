@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-29  
-**Updated By:** GSD Execute-Phase (Phase 7.2 Complete)
+**Updated By:** GSD Execute-Phase (Phase 8 Plan 03 Complete)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 7.2 complete - Package production-ready for npm publish. Next phase: 8 (Documentation and Polish).
+**Current Focus:** Phase 8 in progress - Documentation and Polish. Plan 08-03 complete (platform documentation).
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 7.2 — Codebase Cleanup and Publishing Fixes (COMPLETE ✅)
-**Completed:** 4 of 4 plans  
-**Next:** Phase 8 (Documentation and Polish)
+**Current Phase:** Phase 8 — Documentation and Polish (IN PROGRESS)
+**Completed:** 3 of 5 plans  
+**Next:** Plan 08-04 and 08-05
 
 ### Plan Status
-**Completed Plans:** 35/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4)  
-**Last activity:** 2026-01-29 - Phase 7.2 complete (all 4 plans executed, package verified production-ready)  
-**Next:** Phase 8 — Documentation and Polish
+**Completed Plans:** 38/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 3/5)  
+**Last activity:** 2026-01-29 - Completed 08-03-PLAN.md (platform documentation)  
+**Next:** Plan 08-04 and 08-05 to complete Phase 8
 
 ### Progress Bar
 ```
@@ -41,9 +41,10 @@ Phase 6.2: [██████████████████████�
 Phase 7:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 7.1: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 7.2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
+Phase 8:   [██████████████████████████████░░░░░░░░░░░░░░░░░░░░░] 60% (3/5 plans)
 
 Overall Progress:
-[████████████████████████████████████░░░░░░░░░░] 78% (35/45 total plans)
+[█████████████████████████████████████████░░░░░] 84% (38/45 total plans)
 ```
 
 ---
@@ -788,6 +789,36 @@ Overall Progress:
      - Interactive prompt testing requires human verification (complex terminal UI)
      - Checkpoint confirmed prompts display correctly and user flow works
      - Rationale: Some UX aspects need human validation before publishing
+
+112. **2026-01-29 (08-03):** FAQ format for migration guide (PLATFORM-MIGRATION-01)
+     - Used FAQ format with questions as headers for migration documentation
+     - More user-friendly than procedural documentation
+     - Addresses real user questions directly (switching platforms, multi-platform, .planning/)
+     - Rationale: Users scan for their specific question rather than reading procedural steps
+
+113. **2026-01-29 (08-03):** Side-by-side comparison tables (PLATFORM-COMPARISON-01)
+     - Platform comparison uses tables for Claude/Copilot/Codex side-by-side
+     - Enables quick scanning and platform comparison at a glance
+     - Tables for: installation locations, file formats, tool names, frontmatter fields
+     - Rationale: Visual comparison faster than narrative descriptions
+
+114. **2026-01-29 (08-03):** Real frontmatter examples per platform (PLATFORM-SPECIFICS-01)
+     - Platform-specifics includes concrete frontmatter examples for each platform
+     - Shows exact YAML with proper tool names (Read vs read, Bash vs execute)
+     - Separate examples for skills and agents per platform
+     - Rationale: Concrete examples more helpful than abstract field descriptions
+
+115. **2026-01-29 (08-03):** Emphasized .planning/ directory independence (PLATFORM-MIGRATION-02)
+     - Clearly documented that .planning/ directory is platform-agnostic
+     - Workflow identical across platforms (only installation location changes)
+     - Critical concept: users can switch platforms without affecting project state
+     - Rationale: Common misconception that switching platforms affects project history
+
+116. **2026-01-29 (08-03):** Documented Codex prefix difference prominently (PLATFORM-CODEX-PREFIX)
+     - Codex uses $gsd- command prefix (not /gsd- like Claude/Copilot)
+     - Documented in all three platform docs (comparison, specifics, migration)
+     - Most common confusion point when switching to Codex
+     - Rationale: Prefix difference is critical for usability, needs high visibility
 
 
 ### Roadmap Evolution
