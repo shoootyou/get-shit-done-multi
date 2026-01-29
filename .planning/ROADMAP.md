@@ -542,6 +542,47 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
+### Phase 7.1: Pre-Flight Validation Refactor (INSERTED)
+
+**Goal:** Centralize all validation before installation begins (fail-fast with grouped errors)
+
+**Dependencies:** Phase 7 (uses path-validator and symlink-resolver)
+
+**Plans:** 0 plans
+
+**Requirements Mapped:**
+- None (internal refactoring for better UX and code clarity)
+
+**Success Criteria:**
+1. New `bin/lib/preflight/` module created with `pre-flight-validator.js`
+2. Function `validateBeforeInstall()` orchestrates all upfront validation
+3. `install.js` calls validation at line ~101 (after banner, before installation)
+4. Validation checks: templates exist, paths secure, disk space, permissions, symlinks
+5. Multiple errors collected and displayed together (fail-slow reporting, fail-fast execution)
+6. `orchestrator.js` simplified - batch validation removed (no longer needed)
+7. Per-file validation removed (single-point validation only)
+8. All tests run in `/tmp` with isolated subdirectories
+9. Tests copy full project to `/tmp` (protect real templates)
+10. Tests execute `install.js` directly (integration tests, not mocks)
+
+**Key Deliverables:**
+- `/bin/lib/preflight/pre-flight-validator.js` (orchestrator module)
+- Updated `install.js` with validation gate
+- Simplified `orchestrator.js` (remove redundant validation)
+- Comprehensive tests in `/tmp`
+
+**Plans:**
+- [ ] TBD (run /gsd-plan-phase 7.1 to break down)
+
+**Notes:**
+- **Philosophy:** Single-point validation (no defense-in-depth redundancy)
+- **Trust:** Tests catch bugs, fs operations fail naturally with clear errors
+- **UX:** Fail-fast with all errors grouped (better than scattered errors)
+- **Architecture:** `preflight/` uses transversal modules (`validation/`, `paths/`)
+- **Testing:** Opción A (copy full project) ensures templates are never touched
+
+---
+
 ### Phase 8: Documentation and Polish
 
 **Goal:** Complete documentation exists for installation, architecture, and platform differences
