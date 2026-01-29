@@ -18,9 +18,12 @@ Deep dive into Phase 8 execution strategy covering documentation structure, writ
 - `CONTRIBUTING.md` - How to contribute (development setup)
 - `LICENSE` - MIT license (already exists)
 - `CHANGELOG.md` - Version history (Keep a Changelog format)
-  - Include reference to original project for versions <= 1.6.4
-  - Note: "For versions 1.6.4 and earlier, see https://github.com/glittercowboy/get-shit-done/releases"
-  - Version 2.0.0+ represents GSD Multi fork development
+  - **Header note:** "Forked from v1.6.4 of [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done). For original project history, see the [original releases](https://github.com/glittercowboy/get-shit-done/releases)."
+  - **Version timeline in this fork:**
+    - v1.7.0 (2026-01-19): Multi-CLI support experiments (Codex CLI added)
+    - v1.8.0 (2026-01-20): Milestone archiving and mapping improvements
+    - v2.0.0 (current/upcoming): Full multi-platform + template system achievement
+  - Keep existing CHANGELOG entries as-is (they document fork development journey)
 
 **docs/ structure (question-driven):**
 
@@ -253,9 +256,9 @@ Both projects are MIT licensed. See [LICENSE](LICENSE) for details.
   - Repository: https://github.com/glittercowboy/get-shit-done
   - Original: Claude-only, direct .md files
 - This project: `get-shit-done-multi` (also called "GSD Multi")
-  - Forked from tag v1.6.4: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4
+  - Forked at v1.6.4: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4
+  - Fork development: v1.7.0 (multi-CLI experiments), v1.8.0 (improvements), v2.0.0 (multi-platform + template system achieved)
   - Multi-platform adaptation using templating system
-  - Subsequent versions (>= 2.0.0) developed independently in this fork
 
 **Project Naming:**
 - **Official name:** Get Shit Done Multi (GSD Multi)
@@ -264,15 +267,21 @@ Both projects are MIT licensed. See [LICENSE](LICENSE) for details.
 
 **Attribution Approach:**
 1. Keep original MIT license with Lex Christopherson copyright
-2. Add clear credits section in README explaining relationship and fork point
+2. Add clear credits section in README explaining relationship and fork point (v1.6.4)
 3. Explain key differences (not competing, adapting for multi-platform use case)
-4. Reference original project for versions <= 1.6.4
-5. No confusion about which package does what
+4. Reference original project for pre-fork history (versions <= 1.6.4)
+5. Acknowledge fork development journey: v1.7.0-1.8.0 (transitional), v2.0.0+ (goal achieved)
+6. No confusion about which package does what
 
 **Version History Strategy:**
-- CHANGELOG.md should include note: "For versions <= 1.6.4, see original project: https://github.com/glittercowboy/get-shit-done/releases"
-- Version 2.0.0+ represents multi-platform fork development
-- Clear separation between original development (v1.x) and fork development (v2.x+)
+- **Fork point:** v1.6.4 (when fork was created from original project)
+- **Pre-fork versions:** <= v1.6.4 are from original project: https://github.com/glittercowboy/get-shit-done/releases
+- **Fork development timeline:**
+  - v1.7.0 (2026-01-19): Early attempt at multi-CLI support (Codex CLI added)
+  - v1.8.0 (2026-01-20): Milestone archiving and codebase mapping improvements
+  - v2.0.0 (upcoming): Full achievement of multi-platform + template system goal
+- CHANGELOG.md should include header note: "Forked from v1.6.4 of glittercowboy/get-shit-done. For original project history, see https://github.com/glittercowboy/get-shit-done/releases"
+- All versions >= 1.7.0 are part of this fork's development journey toward the multi-platform goal
 
 **No Risk Assessment:**
 - MIT license explicitly allows modification and redistribution
