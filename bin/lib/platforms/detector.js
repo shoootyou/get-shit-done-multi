@@ -19,8 +19,11 @@ export async function detectInstallations() {
     results[platform].local = await isGSDInstalled(platform, false);
   }
   
-  // TODO: Read version from manifest (Phase 6 - VERSION-02)
-  // For now, just detect presence
+  // Previously TODO: Read version from manifest (Phase 6 - VERSION-02)
+  // Current implementation: Version detection not yet implemented.
+  // Detection only checks for manifest file presence (pathExists check).
+  // Version reading deferred - full version comparison not currently needed.
+  // Manifest structure supports version field, but reading it is future work.
   
   return results;
 }
