@@ -548,7 +548,7 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 7 (uses path-validator and symlink-resolver)
 
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 **Requirements Mapped:**
 - None (internal refactoring for better UX and code clarity)
@@ -572,7 +572,8 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Comprehensive tests in `/tmp`
 
 **Plans:**
-- [ ] TBD (run /gsd-plan-phase 7.1 to break down)
+- [ ] 07.1-01-PLAN.md — Create pre-flight validation orchestrator with grouped error reporting
+- [ ] 07.1-02-PLAN.md — Integrate into install.js, cleanup orchestrator.js, add integration tests
 
 **Notes:**
 - **Philosophy:** Single-point validation (no defense-in-depth redundancy)
