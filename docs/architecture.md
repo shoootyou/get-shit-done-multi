@@ -36,7 +36,7 @@ graph TD
     N --> O[Write Files]
     O --> P[Generate Manifest]
     P --> Q[Success!]
-```plaintext
+```
 
 ## Module Responsibilities
 
