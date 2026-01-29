@@ -31,6 +31,11 @@ GSD transforms vibecoding chaos into reliable, reproducible development:
 
 ## Quick Start
 
+### Requirements
+
+- **Node.js 20+** (Node 16 is EOL, Node 20 LTS active until October 2026)
+- One of: Claude Code, GitHub Copilot CLI, or Codex CLI
+
 ### Install
 
 Pick your AI assistant:
