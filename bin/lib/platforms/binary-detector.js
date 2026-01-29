@@ -18,7 +18,10 @@ async function commandExists(command) {
     // 2-second timeout per RESEARCH-CLARIFICATIONS Q3
     await execAsync(checkCmd, { timeout: 2000 });
     return true;
-  } catch {
+  } catch (error) {
+    // Any error means binary not available - this is expected behavior
+    // Common errors: ENOENT (command not found), timeout (process.killed), EACCES (no permission)
+    // For binary detection, we don't need to distinguish - any error = "not available"
     return false;
   }
 }
