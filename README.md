@@ -1,334 +1,115 @@
-<div align="center">
+# Get Shit Done Multi
 
-# GET SHIT DONE
+**Spec-driven development system for AI coding assistants with multi-platform support**
 
-**Spec-driven development system for AI coding assistants. No enterprise theater. Just ship.**
-
-[![npm version](https://img.shields.io/npm/v/get-shit-done-multi?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-multi)
-[![npm downloads](https://img.shields.io/npm/dm/get-shit-done-multi?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-multi)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/get-shit-done-multi)](https://www.npmjs.com/package/get-shit-done-multi)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Supported Platforms:** Claude Code · GitHub Copilot CLI · Codex CLI
-
-**Original project by:** [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done)
-
-</div>
 
 ---
 
 ## What It Does
 
-GSD transforms vibecoding chaos into reliable, reproducible development:
+Get Shit Done Multi (GSD Multi) is a template-based installer that deploys working AI assistant skills and agents to multiple platforms with a single command. Instead of manually configuring your Claude Code, GitHub Copilot CLI, or Codex CLI environment, GSD Multi installs a complete spec-driven development system.
 
-- **Context Engineering** — Fresh context windows for heavy work, structured files for memory
-- **Multi-Agent Orchestration** — Parallel research, planning, execution with specialized agents  
-- **Atomic Task Execution** — Small plans, clean commits, no context degradation
-- **Human-in-Loop Verification** — AI builds, you verify, system auto-fixes
+This system transforms AI coding into a structured workflow: define your idea, let AI research and plan, then execute with atomic commits and fresh context. You get clean git history, reproducible builds, and human-in-loop verification at key points.
 
-**The result:** Describe your idea, approve the roadmap, walk away. Come back to completed work with clean git history.
+The multi-platform approach means you can use the same workflow across different AI assistants, switching platforms as needed while maintaining project state.
 
 ---
 
 ## Quick Start
 
-### Requirements
-
-- **Node.js 20+** (Node 16 is EOL, Node 20 LTS active until October 2026)
-- One of: Claude Code, GitHub Copilot CLI, or Codex CLI
-
-### Install
-
-Pick your AI assistant:
-
 ```bash
-# Claude Code (original platform)
 npx get-shit-done-multi
-
-# GitHub Copilot CLI
-npx get-shit-done-multi --copilot
-
-# Codex CLI
-npx get-shit-done-multi --codex
 ```
 
-### First Project
+The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 28 skills and 13 agents. After installation, you can start your first project:
 
 ```bash
-# In Claude Code
+# Claude Code
 /gsd:new-project
 
-# In Copilot/Codex (conversational)
+# Copilot/Codex (conversational)
 "Start a new GSD project"
 ```
 
-System will:
-1. Ask questions until it understands your idea
-2. Research the domain (optional)
-3. Extract requirements (v1 vs v2)
-4. Create roadmap with phases
+The system guides you through questioning, research, requirements extraction, and roadmap creation. Then execute phase by phase with atomic task plans and clean commits.
 
-Then for each phase:
+---
 
-```bash
-/gsd:discuss-phase 1   # Shape implementation (optional)
-/gsd:plan-phase 1      # Research + create atomic plans
-/gsd:execute-phase 1   # Build with fresh context per plan
-/gsd:verify-work 1     # Test + auto-fix issues
+## Workflow
+
+```
+User Input → Orchestrator → Specialized Agents → Verification
+     │              │                │                  │
+     │              ├─→ Researcher ──┤                  │
+     │              ├─→ Planner ─────┤                  │
+     │              └─→ Executor ────┤                  │
+     │                                                   │
+     └───────────────── Feedback ←────────────────────┘
+
+Phases:
+┌────────────────┐    ┌────────────────┐    ┌────────────────┐
+│ 1. Discuss     │ →  │ 2. Plan        │ →  │ 3. Execute     │
+│ (Your vision)  │    │ (Atomic tasks) │    │ (Fresh context)│
+└────────────────┘    └────────────────┘    └────────────────┘
+                                                      ↓
+┌────────────────┐    ┌────────────────┐    ┌────────────────┐
+│ 6. Complete    │ ←  │ 5. Iterate     │ ←  │ 4. Verify      │
+│ (Milestone)    │    │ (Next phase)   │    │ (Human check)  │
+└────────────────┘    └────────────────┘    └────────────────┘
 ```
 
-**That's it.** Repeat for each phase, complete milestone, start next version.
-
-📖 **Detailed walkthrough:** [How It Works](docs/how-it-works.md)
+Each phase produces small, focused plans that execute in fresh context windows to avoid degradation. Human verification happens at natural checkpoints.
 
 ---
 
-## Upgrading from v1.x
+## Supported Platforms
 
-If you have an older v1.x installation of get-shit-done, the v2.0.0 installer will automatically detect it and offer to migrate.
+- **Claude Code** - Original platform with slash commands
+- **GitHub Copilot CLI** - Conversational interface with agent support
+- **Codex CLI** - OpenAI's command-line interface
 
-### What Happens
-
-1. **Detection:** The installer detects your v1.x installation automatically
-2. **Warning:** You'll see a clear message about the incompatibility
-3. **Confirmation:** A single prompt asks: "Create backup and upgrade?"
-4. **Backup:** If you confirm, all old files are backed up to `.gsd-backup/YYYY-MM-DD-HHMM/`
-5. **Installation:** v2.0.0 is installed fresh after successful backup
-
-### Example Migration Flow
-
-```bash
-$ npx get-shit-done-multi
-
-⚠ Old Version Detected
-  Version 1.8.0 is incompatible with v2.0.0
-
-What will happen:
-  • Backup v1.8.0 to .gsd-backup/2024-01-28-1400/
-  • Remove old files
-  • Install v2.0.0
-
-? Create backup and upgrade? [Y/n]
-```
-
-### Backup Location
-
-Your old installation is backed up to:
-- **Local installations:** `.gsd-backup/YYYY-MM-DD-HHMM/` in your project directory
-- **Global installations:** `.gsd-backup/YYYY-MM-DD-HHMM/` in your home directory
-
-The backup preserves your complete v1.x installation. You can delete it manually after verifying v2.0.0 works correctly.
-
-### What Changed from v1.x to v2.0
-
-**Structure:**
-- **Old (v1.x):** Monolithic `get-shit-done/` skill with all commands
-- **New (v2.0):** Individual `gsd-*` skills for each command
-
-**Versioning:**
-- **Old (v1.x):** Single `VERSION` file
-- **New (v2.0):** Per-skill `version.json` files
-
-**Claude Hooks:**
-- **Old (v1.x):** Hooks in `.claude/hooks/`
-- **New (v2.0):** No hooks (removed)
-
-**Agent Naming:**
-- **Old (v1.x):** Claude used `gsd-*.md` (no .agent.md suffix)
-- **New (v2.0):** All platforms use `gsd-*.agent.md`
-
-### Troubleshooting
-
-**"Insufficient disk space for backup"**
-- Free up space equal to your current installation size + 10%
-- Or move to a directory with more space
-
-**"Backup failed: Permission denied"**
-- Ensure you have write permissions to create `.gsd-backup/`
-- For global installations, you may need elevated permissions
-
-**Migration declined**
-- Your v1.x installation remains unchanged
-- v1.x and v2.0 cannot coexist - migration is required for upgrade
-
-### Manual Migration (Advanced)
-
-If you prefer to migrate manually:
-
-1. **Backup your v1.x installation:**
-   ```bash
-   cp -r .claude/commands/gsd .gsd-backup-manual/claude-commands
-   cp -r .claude/agents .gsd-backup-manual/claude-agents
-   # Repeat for other platforms
-   ```
-
-2. **Remove old installation:**
-   ```bash
-   rm -rf .claude/commands/gsd
-   rm -rf .claude/agents/gsd-*
-   rm -rf .claude/hooks/gsd-*
-   rm -rf .claude/get-shit-done
-   # Repeat for other platforms
-   ```
-
-3. **Install v2.0:**
-   ```bash
-   npx get-shit-done-multi
-   ```
-
-**Note:** Automatic migration is recommended - it handles all platforms and edge cases correctly.
-
----
-
-## About This Version
-
-**Multi-CLI version** maintained by **shoootyou**  
-**Original creator:** TÂCHES ([glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done))
-
-This version extends the original brilliant work to support three AI platforms while maintaining the same core workflow and philosophy.
-
-**What's the same:**
-- Context engineering principles
-- Multi-agent orchestration
-- Atomic task execution
-- All original commands
-
-**What's new:**
-- GitHub Copilot CLI support
-- Codex CLI support  
-- Skills-based architecture
-- Cross-platform portability
-
-> **Learn more about the original project and full attribution:** [Credits](#credits) · [Full Attribution](docs/attribution.md)
-
----
-
-## Commands
-
-> **Note:** Syntax shown for Claude Code (`/gsd:*`). For Copilot/Codex, use conversational commands.
->
-> 📖 **Complete reference:** [docs/commands/README.md](docs/commands/README.md)
-
-### Core Workflow
-
-| Command | What It Does |
-|---------|--------------|
-| `/gsd:new-project` | Initialize: questions → research → requirements → roadmap |
-| `/gsd:discuss-phase [N]` | Capture your implementation vision (optional) |
-| `/gsd:plan-phase [N]` | Research domain + create atomic task plans |
-| `/gsd:execute-phase <N>` | Build in fresh context, atomic commits |
-| `/gsd:verify-work [N]` | Manual testing + automated fix generation |
-| `/gsd:complete-milestone` | Archive + tag release |
-
-### Management
-
-| Command | What It Does |
-|---------|--------------|
-| `/gsd:progress` | Show current state + next steps |
-| `/gsd:add-phase` | Extend current milestone |
-| `/gsd:map-codebase` | Analyze existing code (brownfield projects) |
-| `/gsd:pause-work` / `/gsd:resume-work` | Session handoff |
-
-### Utilities
-
-| Command | What It Does |
-|---------|--------------|
-| `/gsd:add-todo [desc]` | Capture ideas for later |
-| `/gsd:debug [desc]` | Systematic debugging |
-| `/gsd:help` | List all commands |
-
-**More commands:** Phase insertion, milestone management, todos, and more in [full reference](docs/commands/README.md).
+All platforms share the same workflow and project state. Switch between platforms mid-project as needed.
 
 ---
 
 ## Documentation
 
-### Getting Started
-- **[How It Works](docs/how-it-works.md)** — Complete workflow walkthrough
-- **[Architecture](docs/architecture.md)** — Why it works (context engineering, agents, XML)
-- **[Setup: Claude Code](docs/setup-claude-code.md)** · **[Copilot CLI](docs/setup-copilot-cli.md)** · **[Codex CLI](docs/setup-codex-cli.md)**
+**Getting Started:**
+- [Installation Guide](docs/how-to-install.md)
+- [How GSD Works](docs/how-gsd-works.md)
+- [Platform Comparison](docs/platform-comparison.md)
 
-### Reference
-- **[All Commands](docs/commands/README.md)** — Every command with examples
-- **[CLI Comparison](docs/cli-comparison.md)** — Platform differences
-- **[Agent Capabilities](docs/agent-capabilities.md)** — What each agent does
-- **[Container Environment](docs/containers-readme.md)** — Docker/Podman setup for isolated development
-
-### Help
-- **[Troubleshooting](docs/troubleshooting.md)** — Common issues
-- **[Migration Guide](docs/migration-guide.md)** — Moving from original GSD
+**Reference:**
+- [All Commands](docs/commands/README.md)
+- [Full Documentation](docs/README.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
 ---
 
-## Troubleshooting
+## Requirements
 
-**Installation issues?**
-
-```bash
-# Verify installation
-ls ~/.claude/commands/gsd/           # Claude Code (global)
-ls .github/skills/get-shit-done/     # Copilot CLI
-ls .codex/skills/get-shit-done/      # Codex CLI
-
-# Reinstall
-npx get-shit-done-multi@latest [--copilot|--codex]
-```
-
-**Commands not working?**
-
-- **Claude Code:** Restart to reload slash commands
-- **Copilot/Codex:** Try conversational: "Start a GSD project"
-- Run help command to verify: `/gsd:help` or `"Show GSD help"`
-
-**Docker/Podman containers:**
-
-For isolated development environments with persistent caches:
-
-```bash
-# Using Docker
-make net           # Interactive shell with network
-make nonet         # Isolated shell without network
-
-# Using Podman (rootless alternative)
-make podman-net    # Interactive shell with network
-make podman-nonet  # Isolated shell without network
-```
-
-📖 **Container docs:** [docs/containers-readme.md](docs/containers-readme.md)
-
-**Other issues:**
-
-```bash
-export CLAUDE_CONFIG_DIR=/home/user/.claude
-npx get-shit-done-multi --global
-```
-
-📖 **More help:** [docs/troubleshooting.md](docs/troubleshooting.md)
+- **Node.js 20+** (Node 20 LTS active until October 2026)
+- One of: Claude Code, GitHub Copilot CLI, or Codex CLI
 
 ---
 
-## Credits
+## Credits & License
 
-**Maintained by:** shoootyou  
-**Original creator:** TÂCHES ([github.com/glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done))
+This project (GSD Multi) is a multi-platform fork of the original [get-shit-done](https://github.com/glittercowboy/get-shit-done) framework by Lex Christopherson.
 
-This multi-CLI version extends the original to support Claude Code, GitHub Copilot CLI, and Codex CLI. Core workflow, philosophy, and architecture credit to TÂCHES.
+**Fork Point:** v1.6.4 (https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4)
 
-> *Standing on the shoulders of giants.* The brilliance of Get Shit Done comes from TÂCHES' original vision of eliminating enterprise theater and just building cool stuff that works. This version simply makes that brilliance accessible across multiple AI platforms.
+**Version Timeline:**
+- v1.7.0 (2026-01-19): Multi-CLI support experiments (Codex CLI added)
+- v1.8.0 (2026-01-20): Milestone archiving and mapping improvements
+- v2.0.0 (current): Full multi-platform + template system achievement
 
-📖 **Full attribution and credits:** [docs/attribution.md](docs/attribution.md)
+**Key Differences:**
+- Original: Claude-only with direct .md skills
+- GSD Multi: Multi-platform support (Claude, Copilot, Codex) using templating system
 
----
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-
-**AI coding assistants are powerful. GSD makes them reliable.**
-
-**[Get Started](docs/how-it-works.md)** · **[All Commands](docs/commands/README.md)** · **[Architecture](docs/architecture.md)**
-
-</div>
+Both projects are MIT licensed. See [LICENSE](LICENSE) for details.
