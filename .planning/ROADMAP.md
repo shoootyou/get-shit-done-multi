@@ -3,7 +3,7 @@
 **Project:** get-shit-done-multi  
 **Milestone:** v2.0 — Complete Multi-Platform Installer  
 **Created:** 2025-01-25  
-**Status:** Phase 7 Complete — Ready for Phase 8
+**Status:** Phase 7.1 Complete — Ready for Phase 8
 
 ---
 
@@ -572,8 +572,10 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 - Comprehensive tests in `/tmp`
 
 **Plans:**
-- [ ] 07.1-01-PLAN.md — Create pre-flight validation orchestrator with grouped error reporting
-- [ ] 07.1-02-PLAN.md — Integrate into install.js, cleanup orchestrator.js, add integration tests
+- [x] 07.1-01-PLAN.md — Create pre-flight validation orchestrator with grouped error reporting
+- [x] 07.1-02-PLAN.md — Integrate into install.js, cleanup orchestrator.js, add integration tests
+
+**Status:** ✅ COMPLETE
 
 **Notes:**
 - **Philosophy:** Single-point validation (no defense-in-depth redundancy)
