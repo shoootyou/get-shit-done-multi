@@ -85,6 +85,24 @@ This project uses ESLint and Prettier (when available). The codebase maintains:
 
 While linting and formatting tools are not yet configured, follow the existing code style in the repository.
 
+### Markdown Documentation
+
+We use markdownlint-cli2 for documentation consistency:
+
+```bash
+# Check markdown files
+npm run lint:md
+
+# Auto-fix markdown issues
+npm run lint:md:fix
+```
+
+**Before submitting PR:**
+
+- Run `npm run lint:md` to check documentation
+- All markdown files must pass linting (0 errors)
+- Configuration in `.markdownlint-cli2.jsonc`
+
 ## Pull Request Process
 
 1. **Create a feature branch:**
