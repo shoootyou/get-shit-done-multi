@@ -47,6 +47,9 @@ test-output
 # GSD migration backup (created during upgrade from old structure)
 .old-gsd-system/
 
+# GSD backup folders
+.gsd-backup
+
 # Test coverage output
 coverage/
 *.lcov
