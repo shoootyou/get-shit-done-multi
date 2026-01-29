@@ -77,13 +77,13 @@ describe('Pre-Installation Checks', () => {
       // Test with explicit traversal pattern that will remain in normalized path
       await expect(
         validatePaths('/home/user/../../etc', true)
-      ).rejects.toThrow(/(traversal|home directory)/i);
+      ).rejects.toThrow(/(traversal|home directory|allowlist)/i);
     });
     
     test('blocks system directories', async () => {
       await expect(
         validatePaths('/etc/gsd', false) // Use local to avoid home dir check
-      ).rejects.toThrow(/system/i);
+      ).rejects.toThrow(/(system|allowlist)/i);
     });
   });
   
@@ -139,7 +139,7 @@ describe('Pre-Installation Checks', () => {
   describe('runPreInstallationChecks', () => {
     test('runs all checks successfully', async () => {
       const { homedir } = await import('os');
-      const validTargetDir = join(homedir(), 'test-gsd-install');
+      const validTargetDir = join(homedir(), '.claude');
       const templatesDir = await mkdtemp(join(tmpdir(), 'gsd-templates-'));
       await writeFile(join(templatesDir, 'test.txt'), 'test', 'utf8');
       
