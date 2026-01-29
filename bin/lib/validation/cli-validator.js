@@ -1,5 +1,8 @@
 // bin/lib/validation/cli-validator.js
 
+import { getPlatformName } from '../platforms/platform-names.js';
+import { getPathReference } from '../platforms/platform-paths.js';
+
 /**
  * CLI argument validation functions
  * Validates combinations of CLI flags and arguments before installation begins
@@ -22,20 +25,32 @@
 export function validateCustomPathWithPlatforms(platforms, customPath) {
   if (customPath && platforms.length > 1) {
     const platformList = platforms.map(p => `--${p}`).join(' ');
-    
+    const basePath = String(customPath).replace(/\/+$/, '');
+    const perPlatformExamples = platforms
+      .map(p => {
+        const subdir = getPathReference(p);
+        return `  npx get-shit-done-multi --${p} --custom-path ${basePath}/${subdir}`;
+      })
+      .join('\n');
+    const perPlatformDirs = platforms
+      .map(p => `  ${getPathReference(p)}/  (${getPlatformName(p)})`)
+      .join('\n');
+
     throw new Error(
-      'Cannot use --custom-path with multiple platforms.\n' +
+      'Invalid flags: --custom-path cannot be used with multiple platforms.\n' +
       '\n' +
-      'The --custom-path option is designed to install a SINGLE platform to a custom location.\n' +
-      'When multiple platforms are specified, each platform installs to its own subdirectory\n' +
-      '(.github/, .claude/, .codex/), but --custom-path replaces this entire path, causing\n' +
-      'all platforms to overwrite the same directory.\n' +
+      '--custom-path installs exactly ONE platform into ONE directory.\n' +
+      'When you select multiple platforms, each platform needs its own directory:\n' +
+      `${perPlatformDirs}\n` +
       '\n' +
-      'Solution: Run separate commands for each platform:\n' +
-      `  npx get-shit-done-multi --${platforms[0]} --custom-path ${customPath}\n` +
-      `  npx get-shit-done-multi --${platforms[1]} --custom-path <other-path>\n` +
+      'Using --custom-path would force all platforms into the same folder and they would overwrite each other.\n' +
       '\n' +
-      'Or use default paths (each platform gets its own directory):\n' +
+      'Fix:\n' +
+      '  # Run one command per platform\n' +
+      `${perPlatformExamples}\n` +
+      '\n' +
+      'Or:\n' +
+      '  # Let the installer create the default subdirectories\n' +
       `  cd ${customPath}\n` +
       `  npx get-shit-done-multi ${platformList} --local`
     );
