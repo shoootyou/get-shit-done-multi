@@ -34,7 +34,7 @@ GSD follows a **four-stage workflow** for every project phase:
        │                   │
        └────────┬──────────┘
                 ↓
-       ┌─────────────────┐
+       ┌──────────────────┐
        │   User: Review   │
        │   & Approve      │
        └────────┬─────────┘
@@ -42,12 +42,12 @@ GSD follows a **four-stage workflow** for every project phase:
        ┌─────────────────┐
        │ /gsd-execute-   │
        │    phase 1      │
-       └────────┬─────────┘
+       └────────┬────────┘
                 ↓
        ┌─────────────────┐
        │    Executor     │
        │  (Atomic Task)  │
-       └────────┬─────────┘
+       └────────┬────────┘
                 │
                 │   SUMMARY.md
                 │
@@ -55,12 +55,12 @@ GSD follows a **four-stage workflow** for every project phase:
        ┌─────────────────┐
        │ /gsd-verify-    │
        │    phase 1      │
-       └────────┬─────────┘
+       └────────┬────────┘
                 ↓
        ┌─────────────────┐
        │    Verifier     │
        │ (Goal-Backward) │
-       └────────┬─────────┘
+       └────────┬────────┘
                 │
                 │   VERIFICATION.md
                 │
