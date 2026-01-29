@@ -34,6 +34,14 @@
     ".planning/**",
     "templates/**",
     ".git/**",
-    "coverage/**"
+    "coverage/**",
+    ".claude/**",
+    ".codex/**",
+    ".github/agents/**",
+    ".github/get-shit-done/**",
+    ".github/skills/**",
+    ".gsd-backup/**",
+    "get-shit-done/**",
+    "GSD-STYLE.md"
   ]
 }
