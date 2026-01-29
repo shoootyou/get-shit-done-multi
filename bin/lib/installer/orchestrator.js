@@ -8,6 +8,7 @@ import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/fil
 import { renderTemplate, findUnknownVariables, replaceVariables } from '../rendering/template-renderer.js';
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import { createMultiBar, createProgressBar, updateProgress, stopAllProgress, displayCompletionLine } from '../cli/progress.js';
+import { installAgents } from './install-agents.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates, invalidPath } from '../errors/install-error.js';
 import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
@@ -53,15 +54,15 @@ export async function install(appVersion, options) {
 
   // === NEW: Old version migration check (Phase 6.1) ===
   const oldVersionResult = await detectOldVersion(platform, targetDir);
-  
+
   if (oldVersionResult.isOld) {
     const migrationResult = await performMigration(
-      platform, 
-      oldVersionResult.version, 
+      platform,
+      oldVersionResult.version,
       targetDir,
       { skipPrompts }
     );
-    
+
     if (!migrationResult.success) {
       // Migration failed or user declined
       if (migrationResult.error === 'User declined') {
@@ -73,7 +74,7 @@ export async function install(appVersion, options) {
         process.exit(1);
       }
     }
-    
+
     // Migration successful - continue with regular installation
     logger.success('Migration complete. Proceeding with v2.0.0 installation...');
     console.log();
@@ -132,7 +133,7 @@ export async function install(appVersion, options) {
     } else {
       // Verbose: subtitle + list items
       console.log();
-      logger.warnSubtitle('Warnings',0, 80, true);
+      logger.warnSubtitle('Warnings', 0, 80, true);
       allWarnings.forEach(warning => logger.listItem(warning, 2));
     }
   } else if (isVerbose) {
@@ -220,61 +221,61 @@ async function validateTemplates(templatesDir) {
  */
 async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform) {
   const outputPaths = [];
-  
+
   // Extract platform directory from targetDir (e.g., '.github', '.claude', '.copilot')
   // This is needed because path-validator checks the first path segment against allowlist
   const platformDir = basename(targetDir);
-  
+
   // Collect all output paths from templates
-  
+
   // 1. Skills paths
   const skillsTemplateDir = join(templatesDir, 'skills');
   const skillDirs = await readdir(skillsTemplateDir, { withFileTypes: true });
   const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-') && d.name !== 'get-shit-done');
-  
+
   for (const skill of skills) {
     // Each skill creates {platformDir}/skills/{name}/* files
     outputPaths.push(join(platformDir, 'skills', skill.name, 'SKILL.md'));
   }
-  
+
   // Platform-specific get-shit-done skill
   const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
   if (await pathExists(getShitDoneTemplateDir)) {
     outputPaths.push(join(platformDir, 'skills', 'get-shit-done', 'SKILL.md'));
   }
-  
+
   // 2. Agents paths
   const agentsTemplateDir = join(templatesDir, 'agents');
   const agentFiles = await readdir(agentsTemplateDir);
   const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
-  
+
   for (const agent of agents) {
     const baseName = agent.replace('.agent.md', '');
     outputPaths.push(join(platformDir, 'agents', baseName)); // Don't include extension - platform-specific
   }
   outputPaths.push(join(platformDir, 'agents', 'versions.json'));
-  
+
   // 3. Shared directory paths (no platformDir prefix - get-shit-done is already in allowlist)
   outputPaths.push(join('get-shit-done', '.gsd-install-manifest.json'));
   outputPaths.push(join('get-shit-done', 'shared', 'config.json'));
   outputPaths.push(join('get-shit-done', 'shared', 'prompts'));
   outputPaths.push(join('get-shit-done', 'workflows'));
-  
+
   // Run batch validation
   // Use parent directory as base since paths now include platformDir
   const parentDir = dirname(targetDir);
   const basePath = parentDir === '.' ? process.cwd() : parentDir;
   const results = validateAllPaths(basePath, outputPaths);
-  
+
   if (results.invalid.length > 0) {
     // Security violation - log all errors
     console.error('\n🚨 Security Validation Failed\n');
-    
+
     for (const failure of results.invalid) {
       console.error(`  ✗ ${failure.input}`);
       console.error(`    ${failure.error}`);
     }
-    
+
     throw invalidPath(
       `${results.invalid.length} template path(s) failed security validation`,
       {
@@ -284,7 +285,7 @@ async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform)
       }
     );
   }
-  
+
   // All paths valid
   logger.info(`✓ Validated ${results.valid.length} template paths`, 2);
 }
@@ -342,60 +343,6 @@ async function installSkills(templatesDir, targetDir, variables, multiBar, isVer
 }
 
 /**
- * Install agents from templates
- */
-async function installAgents(templatesDir, targetDir, variables, multiBar, isVerbose, adapter) {
-  const agentsTemplateDir = join(templatesDir, 'agents');
-  const agentsTargetDir = join(targetDir, 'agents');
-
-  await ensureDirectory(agentsTargetDir);
-
-  // Get agent files
-  const agentFiles = await readdir(agentsTemplateDir);
-  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
-
-  let count = 0;
-  for (const agent of agents) {
-    // Strip .agent.md and add platform-specific extension
-    const baseName = agent.replace('.agent.md', '');
-    const targetFile = baseName + adapter.getFileExtension();
-    
-    logger.verboseInProgress(targetFile, isVerbose);
-
-    const srcFile = join(agentsTemplateDir, agent);
-    const destFile = join(agentsTargetDir, targetFile);
-
-    // Read, process, write
-    const content = await readFile(srcFile, 'utf8');
-    
-    // Step 1: Replace template variables
-    const withVariables = replaceVariables(content, variables);
-    
-    // Step 2: Transform frontmatter (platform-specific)
-    const processed = adapter.transformFrontmatter(withVariables);
-    
-    await writeFile(destFile, processed);
-
-    count++;
-    logger.verboseComplete(isVerbose);
-  }
-
-  // Copy versions.json (don't update progress - not counted as agent)
-  const versionsFile = join(agentsTemplateDir, 'versions.json');
-  if (await pathExists(versionsFile)) {
-    logger.verboseInProgress('versions.json', isVerbose);
-
-    const content = await readFile(versionsFile, 'utf8');
-    const processed = replaceVariables(content, variables);
-    await writeFile(join(agentsTargetDir, 'versions.json'), processed);
-    // Don't increment count - versions.json is metadata, not an agent
-    logger.verboseComplete(isVerbose);
-  }
-
-  return agents.length; // Don't count versions.json in agent count
-}
-
-/**
  * Text file extensions to process for template variables
  */
 const TEXT_EXTENSIONS = new Set([
@@ -412,16 +359,16 @@ const TEXT_EXTENSIONS = new Set([
  */
 async function processDirectoryRecursively(dir, variables, isVerbose) {
   const entries = await readdir(dir, { withFileTypes: true, recursive: true });
-  
+
   for (const entry of entries) {
     if (entry.isDirectory()) {
       continue; // recursive: true handles subdirectories
     }
-    
+
     // In Node.js 20.1+, entry has parentPath property which contains the directory
     // entry.name is just the filename
     const fullPath = join(entry.parentPath || dir, entry.name);
-    
+
     // Check if text file by extension
     const ext = entry.name.substring(entry.name.lastIndexOf('.'));
     if (!TEXT_EXTENSIONS.has(ext)) {
@@ -430,12 +377,12 @@ async function processDirectoryRecursively(dir, variables, isVerbose) {
       }
       continue;
     }
-    
+
     // Process text file
     try {
       const content = await readFile(fullPath, 'utf8');
       const processed = replaceVariables(content, variables);
-      
+
       // Validate JSON/YAML after replacement
       if (ext === '.json') {
         try {
@@ -450,9 +397,9 @@ async function processDirectoryRecursively(dir, variables, isVerbose) {
           throw new Error(`Invalid YAML after variable replacement in ${entry.name}: ${error.message}`);
         }
       }
-      
+
       await fsWriteFile(fullPath, processed);
-      
+
       if (isVerbose) {
         logger.verboseInProgress(`Processed: ${entry.name}`, isVerbose);
       }
@@ -514,10 +461,10 @@ async function processTemplateFile(filePath, variables, isVerbose) {
 async function checkSymlinkAndConfirm(targetDir, skipPrompts = false) {
   if (await isSymlink(targetDir)) {
     const symlinkInfo = await resolveSymlinkSingleLevel(targetDir);
-    
+
     // Check if we're in non-interactive mode (skipPrompts = true or ALLOW_SYMLINKS env var)
     const allowSymlinks = skipPrompts || process.env.ALLOW_SYMLINKS === 'true';
-    
+
     if (!allowSymlinks) {
       // Interactive mode - prompt for confirmation
       console.log(''); // blank line
@@ -525,12 +472,12 @@ async function checkSymlinkAndConfirm(targetDir, skipPrompts = false) {
       console.log(`  Path: ${targetDir}`);
       console.log(`  Points to: ${symlinkInfo.target}`);
       console.log('');
-      
+
       const confirmed = await confirm({
         message: 'Installation will write files to the symlink target. Continue?',
         initialValue: false
       });
-      
+
       if (!confirmed) {
         logger.info('Installation cancelled.', 2);
         process.exit(0);
@@ -557,7 +504,7 @@ async function validateVersionBeforeInstall(platform, targetDir, currentVersion,
 
   // Try to read existing manifest
   let manifestResult = await readManifest(manifestPath);
-  
+
   // If corrupt or invalid schema, try to repair
   if (!manifestResult.success && isRepairableError(manifestResult.reason)) {
     manifestResult = await repairManifest(manifestPath);
