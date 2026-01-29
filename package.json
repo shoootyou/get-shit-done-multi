@@ -67,6 +67,8 @@
     "semver": "^7.7.3"
   },
   "devDependencies": {
+    "@babel/parser": "^7.28.6",
+    "@babel/traverse": "^7.28.6",
     "@inquirer/prompts": "^8.2.0",
     "@vitest/ui": "^4.0.18",
     "gray-matter": "^4.0.3",
