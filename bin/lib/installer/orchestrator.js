@@ -1,5 +1,21 @@
 // bin/lib/installer/orchestrator.js
 
+/**
+ * File Orchestrator
+ * 
+ * Responsibilities:
+ * - Load templates based on platform/scope
+ * - Process files (copy, modify, generate)
+ * - Create installation manifests
+ * - Manage file transactions
+ * 
+ * Non-responsibilities (handled in pre-flight):
+ * - Path validation (see preflight/pre-flight-validator.js)
+ * - Disk space checks
+ * - Permission verification
+ * - Template existence checks
+ */
+
 import { join, basename, dirname } from 'path';
 import { homedir } from 'os';
 import chalk from 'chalk';
@@ -24,7 +40,6 @@ import { isRepairableError } from '../manifests/schema.js';
 import { confirm } from '@clack/prompts';
 import { detectOldVersion } from '../version/old-version-detector.js';
 import { performMigration } from '../migration/migration-manager.js';
-import { validateAllPaths } from '../validation/path-validator.js';
 import { isSymlink, resolveSymlinkSingleLevel } from '../paths/symlink-resolver.js';
 
 /**
@@ -113,10 +128,6 @@ export async function install(appVersion, options) {
 
   // Validate templates exist
   await validateTemplates(templatesDir);
-
-  // === NEW: Batch path validation (Phase 7) ===
-  // Validate all template output paths before any file operations
-  await validateAllTemplateOutputPaths(targetDir, templatesDir, platform);
 
   // Collect all warnings for display
   const allWarnings = [...warnings];
@@ -211,85 +222,6 @@ async function validateTemplates(templatesDir) {
       { skillsExist, agentsExist, sharedExist, path: templatesDir }
     );
   }
-}
-
-/**
- * Validate all template output paths before processing
- * @param {string} targetDir - Installation target directory
- * @param {string} templatesDir - Templates source directory
- * @param {string} platform - Platform name
- * @returns {Promise<void>}
- * @throws {InstallError} If any paths fail validation
- */
-async function validateAllTemplateOutputPaths(targetDir, templatesDir, platform) {
-  const outputPaths = [];
-
-  // Extract platform directory from targetDir (e.g., '.github', '.claude', '.copilot')
-  // This is needed because path-validator checks the first path segment against allowlist
-  const platformDir = basename(targetDir);
-
-  // Collect all output paths from templates
-
-  // 1. Skills paths
-  const skillsTemplateDir = join(templatesDir, 'skills');
-  const skillDirs = await readdir(skillsTemplateDir, { withFileTypes: true });
-  const skills = skillDirs.filter(d => d.isDirectory() && d.name.startsWith('gsd-') && d.name !== 'get-shit-done');
-
-  for (const skill of skills) {
-    // Each skill creates {platformDir}/skills/{name}/* files
-    outputPaths.push(join(platformDir, 'skills', skill.name, 'SKILL.md'));
-  }
-
-  // Platform-specific get-shit-done skill
-  const getShitDoneTemplateDir = join(skillsTemplateDir, 'get-shit-done', platform);
-  if (await pathExists(getShitDoneTemplateDir)) {
-    outputPaths.push(join(platformDir, 'skills', 'get-shit-done', 'SKILL.md'));
-  }
-
-  // 2. Agents paths
-  const agentsTemplateDir = join(templatesDir, 'agents');
-  const agentFiles = await readdir(agentsTemplateDir);
-  const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
-
-  for (const agent of agents) {
-    const baseName = agent.replace('.agent.md', '');
-    outputPaths.push(join(platformDir, 'agents', baseName)); // Don't include extension - platform-specific
-  }
-  outputPaths.push(join(platformDir, 'agents', 'versions.json'));
-
-  // 3. Shared directory paths (no platformDir prefix - get-shit-done is already in allowlist)
-  outputPaths.push(join('get-shit-done', '.gsd-install-manifest.json'));
-  outputPaths.push(join('get-shit-done', 'shared', 'config.json'));
-  outputPaths.push(join('get-shit-done', 'shared', 'prompts'));
-  outputPaths.push(join('get-shit-done', 'workflows'));
-
-  // Run batch validation
-  // Use parent directory as base since paths now include platformDir
-  const parentDir = dirname(targetDir);
-  const basePath = parentDir === '.' ? process.cwd() : parentDir;
-  const results = validateAllPaths(basePath, outputPaths);
-
-  if (results.invalid.length > 0) {
-    // Security violation - log all errors
-    console.error('\n🚨 Security Validation Failed\n');
-
-    for (const failure of results.invalid) {
-      console.error(`  ✗ ${failure.input}`);
-      console.error(`    ${failure.error}`);
-    }
-
-    throw invalidPath(
-      `${results.invalid.length} template path(s) failed security validation`,
-      {
-        totalPaths: outputPaths.length,
-        invalidCount: results.invalid.length,
-        failures: results.invalid
-      }
-    );
-  }
-
-  // All paths valid
-  logger.info(`✓ Validated ${results.valid.length} template paths`, 2);
 }
 
 /**
