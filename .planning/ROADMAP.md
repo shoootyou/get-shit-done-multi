@@ -586,6 +586,55 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 ---
 
+
+### Phase 7.2: Codebase Cleanup and Publishing Fixes (INSERTED)
+
+**Goal:** Fix npm publishing configuration, remove obsolete code/tests, update to Node 20, and resolve map-codebase concerns
+
+**Dependencies:** Phase 7.1 (validation and testing infrastructure complete)
+
+**Plans:** 0 plans
+
+**Requirements Mapped:**
+- None (technical debt cleanup and publishing preparation)
+
+**Success Criteria:**
+1. **npm Publishing Config:** package.json includes templates/ and bin/ folders in published package
+2. **npm Publishing Config:** Analyze root folders (github/, hooks/, etc.) and remove/include as needed for minimal published package
+3. **Broken Template Renderer:** Remove obsolete template renderer code from early phases
+4. **Path Validation Tests:** Update tests to match current correct implementation
+5. **Version Detection:** Analyze TODO comments in version detection code - update or remove orphaned code
+6. **Large Files Cleanup:** Delete audit-functions.json, audit-functions.md, and audit-functions.* from root
+7. **Large Files Cleanup:** Remove scripts and tests related to deleted audit files
+8. **Empty Catch Blocks:** Prioritize checking specific error codes over generic catch blocks
+9. **Environment Variables:** Analyze ALLOW_SYMLINKS usage - remove if test code, keep minimal production usage
+10. **Node.js Version:** Update project minimum to Node 20 in package.json and documentation
+11. **Template Phase Reference:** Ensure Phase 1 template generation doesn't appear as a risk in future map-codebase reports
+
+**Key Deliverables:**
+- Updated package.json with correct files/folders for npm publish
+- Removed obsolete template renderer code
+- Updated path validation tests
+- Cleaned up version detection TODOs
+- Deleted audit-functions.* files from root
+- Removed related scripts and tests
+- Improved error handling in catch blocks
+- Cleaned ALLOW_SYMLINKS environment variable usage
+- Node 20 minimum version requirement
+- Verified bin/install.js works with minimal dependencies post-publish
+
+**Plans:**
+- [ ] TBD (run /gsd-plan-phase 7.2 to break down)
+
+**Details:**
+[To be added during planning]
+
+**Testing Strategy:**
+- All tests run in /tmp with isolated directories
+- Test npm pack locally before publishing
+- Verify bin/install.js executes correctly after pack/extract
+
+---
 ### Phase 8: Documentation and Polish
 
 **Goal:** Complete documentation exists for installation, architecture, and platform differences

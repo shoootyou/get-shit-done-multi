@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-29  
-**Updated By:** GSD Execute-Phase (Phase 7.1 Complete)
+**Updated By:** GSD Insert-Phase (Phase 7.2 Inserted)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 7.1 complete - Pre-flight validation centralized with fail-fast execution and grouped error reporting. Ready for Phase 8.
+**Current Focus:** Phase 7.1 complete - Pre-flight validation centralized. Phase 7.2 inserted for codebase cleanup and publishing fixes before Phase 8.
 
 ---
 
@@ -20,12 +20,12 @@
 ### Phase Status
 **Current Phase:** Phase 7.1 — Pre-Flight Validation Refactor (COMPLETE ✅)
 **Completed:** 2 of 2 plans  
-**Next:** Ready for next roadmap phase
+**Next:** Ready for Phase 7.2 (Codebase Cleanup and Publishing Fixes)
 
 ### Plan Status
 **Completed Plans:** 31/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2)  
-**Last activity:** 2026-01-29 - Completed 07.1-02-PLAN.md (Integration, Cleanup & Testing)
-**Next:** Phase 8 or next roadmap phase
+**Last activity:** 2026-01-29 - Phase 7.2 inserted for codebase cleanup and publishing fixes  
+**Next:** Phase 7.2 (plan with /gsd-plan-phase 7.2)
 
 ### Progress Bar
 ```
@@ -739,6 +739,12 @@ Overall Progress:
   - Impact: Better fail-fast UX, cleaner code (single-point validation), simpler orchestrator
   - Scope: Centralize all validation before installation, remove redundant checks, comprehensive testing
   - Philosophy: Trust tests + natural errors, single validation point, grouped error reporting
+
+- **2026-01-29:** Phase 7.2 inserted after Phase 7.1 - Codebase Cleanup and Publishing Fixes (URGENT)
+  - Reason: Map-codebase audit revealed publishing issues, obsolete code, and technical debt before final release
+  - Impact: Ensures npm publish works correctly, removes confusion from obsolete code, Node 20 minimum
+  - Scope: npm config, remove template renderer, cleanup audit files, update tests, fix error handling, Node 20
+  - Key concerns: Publishing (templates/bin), large files (audit-functions.*), version detection TODOs, ALLOW_SYMLINKS cleanup
 
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)
