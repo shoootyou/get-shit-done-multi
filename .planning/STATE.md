@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-29  
-**Updated By:** GSD Insert-Phase (Phase 7.2 Inserted)
+**Updated By:** GSD Execute-Plan (07.2-01 Complete)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 7.1 complete - Pre-flight validation centralized. Phase 7.2 inserted for codebase cleanup and publishing fixes before Phase 8.
+**Current Focus:** Phase 7.2 in progress - Critical publishing fixes complete (07.2-01). Next: Plan 02 for code cleanup and error handling.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 7.1 — Pre-Flight Validation Refactor (COMPLETE ✅)
-**Completed:** 2 of 2 plans  
-**Next:** Ready for Phase 7.2 (Codebase Cleanup and Publishing Fixes)
+**Current Phase:** Phase 7.2 — Codebase Cleanup and Publishing Fixes (IN PROGRESS 🔄)
+**Completed:** 1 of 4 plans  
+**Next:** Continue with Plan 02 (Code Cleanup and Error Handling)
 
 ### Plan Status
-**Completed Plans:** 31/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2)  
-**Last activity:** 2026-01-29 - Phase 7.2 inserted for codebase cleanup and publishing fixes  
-**Next:** Phase 7.2 (plan with /gsd-plan-phase 7.2)
+**Completed Plans:** 32/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 1/4)  
+**Last activity:** 2026-01-29 - Completed 07.2-01-PLAN.md (Critical Publishing Fixes)  
+**Next:** Phase 7.2 Plan 02 (execute with /gsd-execute-phase 7.2)
 
 ### Progress Bar
 ```
@@ -39,10 +39,10 @@ Phase 6:   [██████████████████████�
 Phase 6.1: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 6.2: [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
 Phase 7:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
-Phase 7.1: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
+Phase 7.2: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans) 🔄 IN PROGRESS
 
 Overall Progress:
-[████████████████████████████████████░░░░░░░░░░] 69% (31/45 total plans)
+[████████████████████████████████████░░░░░░░░░░] 71% (32/45 total plans)
 ```
 
 ---
@@ -726,6 +726,17 @@ Overall Progress:
      - Removed 68 lines of redundant batch validation
      - Rationale: Clear separation of concerns, easier to maintain
 
+103. **2026-01-29 (07.2-01):** Use npm default behavior for common files (PUBLISH-FILES)
+     - Only specify non-standard directories (bin/, templates/) in files array
+     - npm auto-includes: package.json, README, LICENSE, CHANGELOG
+     - Rationale: Simpler maintenance, follows npm conventions
+
+104. **2026-01-29 (07.2-01):** Update to Node 20 (current LTS) (NODE-VERSION)
+     - Node 16 is EOL (no security updates since September 2023)
+     - Node 20 is Active LTS until October 2026
+     - All project APIs stable in both versions (no code changes needed)
+     - Rationale: Security updates, better long-term support
+
 ### Roadmap Evolution
 
 **Phase Insertions:**
@@ -781,21 +792,20 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Plan 07.1-01 Complete!** Pre-Flight Validation Orchestrator: (1) Created centralized validation orchestrator at bin/lib/preflight/pre-flight-validator.js with validateBeforeInstall() function; (2) Dependency-ordered validation: cheap-first (disk → templates → permissions → paths → symlinks); (3) Fail-fast on prerequisite failures (templates missing → skip path validation); (4) Fail-slow for independent errors (collect all, show grouped report); (5) Grouped error formatter with category headers (Templates → Disk → Permissions → Paths → Symlinks) and fix suggestions; (6) Increased disk space buffer to 50% per CONTEXT.md; (7) Symlinks as warnings not fatal errors. Duration: 4min. Three commits (509efda, 2d10cf7, 51e604c). **Phase 7.1: 1/2 plans complete!**
+✅ **Plan 07.2-01 Complete!** Critical Publishing Fixes: (1) Fixed package.json files array - added CRITICAL missing templates/ directory and removed 7 wrong entries (commands, get-shit-done, agents, hooks, lib-ghcc, docs, github); (2) Removed broken prepublishOnly script referencing non-existent scripts/build-templates.js; (3) Updated Node requirement from EOL 16.7.0 to LTS 20.0.0; (4) Added Requirements section to README with Node 20+ requirement. Duration: 2min. Four commits (96f85a3, a6f46e5, cab8404, 3b0dc5a). **Phase 7.2: 1/4 plans complete!** Published package will now be functional (templates/ included).
 
 ### What's Next
-1. **Phase 7.1 Plan 02:** Integration & Cleanup - wire validateBeforeInstall() into install.js, remove redundant validation from orchestrator.js
-2. **Integration points:** Call at start of install.js before any work begins, catch InstallError and display formatted report
-3. **Cleanup:** Remove duplicate validation calls after integration confirmed
-4. **Testing:** Verify all validators work together, test error grouping and display
+1. **Phase 7.2 Plan 02:** Code Cleanup and Error Handling - analyze and improve error handling patterns, remove empty catch blocks
+2. **Plan 03:** Large Files Cleanup - remove audit-functions.* files and related scripts/tests
+3. **Plan 04:** Version Detection & Environment Variables - analyze TODO comments and ALLOW_SYMLINKS usage
 
 ### Context for Next Session
-- **Plan 07.1-01 complete:** ✅ Pre-flight orchestrator with fail-fast prerequisites and fail-slow reporting
-- **Validation order:** disk → templates → permissions → paths (8-layer × N) → symlinks (cheap-first strategy)
-- **Error collection:** Independent errors grouped by category, prerequisites block dependent checks
-- **Disk buffer:** 50% (increased from 10% for safety)
-- **Ready for integration:** validateBeforeInstall() exported and tested, error-formatter produces grouped reports
-- **Next action:** Wire into install.js as first validation step
+- **Plan 07.2-01 complete:** ✅ Critical publishing bugs fixed (templates/ missing, prepublishOnly broken, Node 16 EOL)
+- **CRITICAL fix:** templates/ was missing from files array - published package would have been non-functional
+- **Node version:** Updated to 20.0.0 (LTS until October 2026)
+- **Files array:** Now contains only ["bin", "templates"] - npm auto-includes other common files
+- **Ready for publishing:** npm pack --dry-run succeeds, templates/ appears in output (127+ files)
+- **Next action:** Continue with Plan 02 for code cleanup and error handling improvements
 
 ### Handoff Notes
 ✅ Phase 7.1 Plan 01 complete! Pre-flight validation orchestrator created with dependency-ordered checks (cheap-first), fail-fast on prerequisites (templates missing → skip paths), fail-slow for independent errors (grouped display). Error formatter groups by category with user-friendly messages and fix instructions. Reuses existing validators (checkDiskSpace, checkWritePermissions, validateAllPaths, resolveSymlinkSingleLevel) with no duplication. Disk space buffer increased to 50% per CONTEXT.md. Symlinks are warnings (code 0) not fatal. Test suite: all syntax checks passing, imports resolve cleanly. Phase 7.1: 1/2 plans complete. Overall: 30/45 plans (67%). See 07.1-01-SUMMARY.md for details. Ready for integration into install.js. No blockers.
