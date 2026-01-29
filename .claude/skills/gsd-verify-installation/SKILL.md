@@ -1,12 +1,9 @@
 ---
 name: gsd-verify-installation
 description: Run diagnostic checks on GSD installation and report status
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Bash, Read
-arguments: []
+allowed-tools: Bash, Read
 ---
+
 
 # Verify Installation
 

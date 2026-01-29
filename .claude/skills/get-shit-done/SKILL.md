@@ -3,6 +3,7 @@ name: get-shit-done
 description: Structured spec-driven workflow for planning and executing software projects with Claude Code.
 ---
 
+
 # Get Shit Done (GSD) Skill for Claude Code
 
 ## When to use
@@ -11,29 +12,29 @@ description: Structured spec-driven workflow for planning and executing software
 
 
 ## How to run commands
-Commands are invoked with `/gsd-<command>` syntax.
+Claude Code supports custom slash commands. Commands starting with `/gsd-` are custom skills.
 
-Commands are installed as individual skills in `/home/sandbox/Library/Application Support/Claude/skills/`. Load the corresponding skill:
+Commands are installed as individual skills in `.claude/skills/`. Load the corresponding skill:
 
-`/home/sandbox/Library/Application Support/Claude/skills/gsd-<command>/SKILL.md`
+`.claude/skills/gsd-<command>/SKILL.md`
 
 Example:
-- `/gsd-new-project` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-new-project/SKILL.md`
-- `/gsd-help` -> `/home/sandbox/Library/Application Support/Claude/skills/gsd-help/SKILL.md`
+- `/gsd-new-project` -> `.claude/skills/gsd-new-project/SKILL.md`
+- `/gsd-help` -> `.claude/skills/gsd-help/SKILL.md`
 
 
 ## File references
-Command files and workflows include `@path` references. These are mandatory context. Use the read tool to load each referenced file before proceeding.
+Command files and workflows include `@path` references. These are mandatory context. Use the Read tool to load each referenced file before proceeding.
 
 ## Tool mapping
-- "Bash tool" → use the execute tool
-- "Read/Write" → use read/edit tools
+- "Bash tool" → use the Bash tool
+- "Read/Write" → use Read/Write tools
 - "AskUserQuestion" → ask directly in chat and provide explicit numbered options
-- "Task/subagent" → prefer a matching custom agent from `/home/sandbox/Library/Application Support/Claude/agents` when available; otherwise adopt that role in-place
+- "Task/subagent" → prefer a matching custom agent from `.claude/agents` when available; otherwise adopt that role in-place
 
 
 ## Output expectations
 Follow the XML or markdown formats defined in the command and template files exactly. These files are operational prompts, not documentation.
 
 ## Paths
-Resources are installed under `/home/sandbox/Library/Application Support/Claude/get-shit-done`. Individual skills are under `/home/sandbox/Library/Application Support/Claude/skills/gsd-*/`. Use those paths when command content references files.
+Resources are installed under `.claude/get-shit-done`. Individual skills are under `.claude/skills/gsd-*/`. Use those paths when command content references platform paths.

@@ -19,8 +19,8 @@ Then verify each level against the actual codebase.
 
 <required_reading>
 **Load these references:**
-- ~/.claude/get-shit-done/references/verification-patterns.md (detection patterns)
-- ~/.claude/get-shit-done/templates/verification-report.md (output format)
+- .claude/get-shit-done/references/verification-patterns.md (detection patterns)
+- .claude/get-shit-done/templates/verification-report.md (output format)
 </required_reading>
 
 <process>
@@ -565,7 +565,7 @@ Fill template sections:
 9. **Recommended Fix Plans:** If gaps_found
 10. **Verification Metadata:** Approach, timing, counts
 
-See ~/.claude/get-shit-done/templates/verification-report.md for complete template.
+See .claude/get-shit-done/templates/verification-report.md for complete template.
 </step>
 
 <step name="return_to_orchestrator">
@@ -586,8 +586,8 @@ All must-haves verified. Phase goal achieved. Ready to proceed.
 ### Next Steps
 
 With phase complete, consider:
-1. `/gsd-verify-milestone` - Verify entire milestone is complete
-2. `/gsd-archive-milestone` - Archive completed milestone for clean slate
+1. `/gsd:verify-milestone` - Verify entire milestone is complete
+2. `/gsd:archive-milestone` - Archive completed milestone for clean slate
 
 {If gaps_found:}
 ### Gaps Found

@@ -4,7 +4,7 @@ Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.
 
 Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 
-NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd-research-phase instead, which produces RESEARCH.md.
+NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd:research-phase instead, which produces RESEARCH.md.
 </purpose>
 
 <depth_levels>
@@ -28,7 +28,7 @@ Claude's training data is 6-18 months stale. Always verify.
 2. **Official docs** - When Context7 lacks coverage
 3. **WebSearch LAST** - For comparisons and trends only
 
-See ~/.claude/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
+See .claude/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -109,7 +109,7 @@ For: Choosing between options, new external integration.
 
 6. **Quality check:** Before finalizing findings, consult the gsd-researcher agent's verification protocols to avoid common research gaps.
 
-7. **Create DISCOVERY.md** using ~/.claude/get-shit-done/templates/discovery.md structure:
+7. **Create DISCOVERY.md** using .claude/get-shit-done/templates/discovery.md structure:
 
    - Summary with recommendation
    - Key findings per option
@@ -128,7 +128,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the discovery** using ~/.claude/get-shit-done/templates/discovery.md:
+1. **Scope the discovery** using .claude/get-shit-done/templates/discovery.md:
 
    - Define clear scope
    - Define include/exclude boundaries
@@ -164,7 +164,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 7. **Create comprehensive DISCOVERY.md:**
 
-   - Full structure from ~/.claude/get-shit-done/templates/discovery.md
+   - Full structure from .claude/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -188,7 +188,7 @@ Ask: What do we need to learn before we can plan this phase?
   </step>
 
 <step name="create_discovery_scope">
-Use ~/.claude/get-shit-done/templates/discovery.md.
+Use .claude/get-shit-done/templates/discovery.md.
 
 Include:
 
@@ -256,8 +256,8 @@ Confidence: [level]
 
 What's next?
 
-1. Discuss phase context (/gsd-discuss-phase [current-phase])
-2. Create phase plan (/gsd-plan-phase [current-phase])
+1. Discuss phase context (/gsd:discuss-phase [current-phase])
+2. Create phase plan (/gsd:plan-phase [current-phase])
 3. Refine discovery (dig deeper)
 4. Review discovery
 

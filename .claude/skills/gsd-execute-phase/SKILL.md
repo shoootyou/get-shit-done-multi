@@ -1,11 +1,9 @@
 ---
 name: gsd-execute-phase
 description: Execute all plans in a phase with wave-based parallelization
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Task, Read, Write, Bash, Edit, Glob, Grep, TodoWrite, AskUserQuestion
+allowed-tools: Task, Read, Edit, Bash, Grep
 ---
+
 
 <objective>
 Execute all plans in a phase using wave-based parallel execution.
@@ -16,8 +14,8 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/references/ui-brand.md
-@~/.claude/get-shit-done/workflows/execute-phase.md
+@.claude/get-shit-done/references/ui-brand.md
+@.claude/get-shit-done/workflows/execute-phase.md
 </execution_context>
 
 <context>
@@ -240,7 +238,7 @@ Plans with `autonomous: false` have checkpoints. The execute-phase.md workflow h
 - Orchestrator presents to user, collects response
 - Spawns fresh continuation agent (not resume)
 
-See `@~/.claude/get-shit-done/workflows/execute-phase.md` step `checkpoint_handling` for complete details.
+See `@.claude/get-shit-done/workflows/execute-phase.md` step `checkpoint_handling` for complete details.
 </checkpoint_handling>
 
 <deviation_rules>

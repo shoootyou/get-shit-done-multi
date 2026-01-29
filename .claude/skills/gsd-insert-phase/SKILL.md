@@ -1,11 +1,8 @@
 ---
 name: gsd-insert-phase
 description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash
-arguments: [{name: after_phase, type: string, required: true, description: 'Phase number to insert after (e.g., "72" inserts as 72.1)'}, {name: description, type: string, required: true, description: Phase description for inserted phase}]
+allowed-tools: Read, Edit, Bash
+argument-hint: [after_phase] [description]
 ---
 
 <objective>

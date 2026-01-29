@@ -1,11 +1,9 @@
 ---
 name: gsd-research-phase
 description: Research implementation approach for phase before planning
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Task, Read, Write, Bash
+allowed-tools: Task, Read, Edit, Bash
 ---
+
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
 

@@ -1,9 +1,10 @@
 ---
 name: gsd-check-todos
 description: List pending todos and select one to work on
-arguments: [{name: area, type: string, required: false}]
-tools: Read, Write, Bash, Glob, Task
+allowed-tools: Read, Edit, Bash, Grep, Task
+argument-hint: [area]
 ---
+
 
 <objective>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.

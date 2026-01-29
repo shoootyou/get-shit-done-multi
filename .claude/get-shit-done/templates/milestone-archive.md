@@ -6,7 +6,7 @@ This template is used by the complete-milestone workflow to create archive files
 
 ## File Template
 
-# Milestone v{{VERSION}}: {{MILESTONE_NAME}}
+# Milestone v2.0.0: {{MILESTONE_NAME}}
 
 **Status:** ✅ SHIPPED {{DATE}}
 **Phases:** {{PHASE_START}}-{{PHASE_END}}

@@ -1,9 +1,10 @@
 ---
 name: gsd-add-todo
 description: Capture idea or task as todo from current conversation context
-arguments: [{name: description, type: string, required: false}]
-tools: Write, Read, Bash, Glob
+allowed-tools: Edit, Read, Bash, Grep
+argument-hint: [description]
 ---
+
 
 <objective>
 Capture an idea, task, or issue that surfaces during a GSD session as a structured todo for later work.

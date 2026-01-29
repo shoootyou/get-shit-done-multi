@@ -1,12 +1,10 @@
 ---
 name: gsd-list-phase-assumptions
 description: Surface Claude's assumptions about a phase approach before planning
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Bash
-arguments: [{name: phase, type: string, required: true, description: Phase number or name to analyze assumptions for}]
+allowed-tools: Read, Bash
+argument-hint: [phase]
 ---
+
 
 <objective>
 Analyze a phase and present Claude's assumptions about technical approach, implementation order, scope boundaries, risk areas, and dependencies.
@@ -16,7 +14,7 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/list-phase-assumptions.md
+@.claude/get-shit-done/workflows/list-phase-assumptions.md
 </execution_context>
 
 <context>

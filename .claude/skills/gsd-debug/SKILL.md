@@ -1,12 +1,10 @@
 ---
 name: gsd-debug
 description: Structured debugging workflow with session persistence and investigation tracking
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Task, Read, Write, Bash, AskUserQuestion
-arguments: [{name: issue, type: string, required: false, description: 'Issue description (if omitted, shows active sessions for resume)'}]
+allowed-tools: Task, Read, Edit, Bash
+argument-hint: [issue]
 ---
+
 
 <objective>
 Debug issues using scientific method with subagent isolation.

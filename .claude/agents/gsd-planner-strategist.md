@@ -1,9 +1,11 @@
 ---
 name: gsd-planner-strategist
 description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner.
-tools: Read, Bash, Glob, Grep
-model: sonnet
+tools: Read, Bash, Grep
+skills:
+  - gsd-research-phase
 ---
+
 
 <role>
 You are a planning methodology specialist. You provide deep analysis and recommendations for complex planning scenarios.
@@ -408,8 +410,8 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
+@.claude/get-shit-done/workflows/execute-plan.md
+@.claude/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>

@@ -1,12 +1,10 @@
 ---
 name: gsd-complete-milestone
 description: Mark milestone complete, archive to milestones/, update PROJECT and MILESTONES registry
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash
-arguments: [{name: version, type: string, required: true, description: 'Milestone version to complete (e.g., "v1.0.0")'}]
+allowed-tools: Read, Edit, Bash
+argument-hint: [version]
 ---
+
 
 <objective>
 Mark milestone complete (version provided as argument), archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.

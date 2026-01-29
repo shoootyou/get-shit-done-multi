@@ -1,12 +1,10 @@
 ---
 name: gsd-archive-milestone
 description: Move completed milestone files to .planning/history/ for long-term storage
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash
-arguments: [{name: version, type: string, required: true, description: Milestone version to archive}]
+allowed-tools: Read, Edit, Bash
+argument-hint: [version]
 ---
+
 
 <objective>
 Move completed milestone from .planning/milestones/ to .planning/history/ for long-term archival.

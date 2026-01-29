@@ -1,12 +1,9 @@
 ---
 name: gsd-whats-new
 description: See what's new in GSD since your installed version
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Bash
-arguments: []
+allowed-tools: Read, Bash
 ---
+
 
 <objective>
 Display changes between installed version and latest available version.
@@ -17,13 +14,13 @@ Shows version comparison, changelog entries for missed versions, and update inst
 <process>
 
 <step name="get_installed_version">
-Read installed version from VERSION file:
+Read installed version from manifest file:
 
 ```bash
-cat /home/sandbox/Library/Application Support/Claude/get-shit-done/VERSION 2>/dev/null
+cat .claude/get-shit-done/.gsd-install-manifest.json 2>/dev/null | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4
 ```
 
-**If VERSION file missing:**
+**If manifest file missing:**
 ```
 ## GSD What's New
 
@@ -31,25 +28,25 @@ cat /home/sandbox/Library/Application Support/Claude/get-shit-done/VERSION 2>/de
 
 Your installation doesn't include version tracking.
 
-**To fix:** `npx get-shit-done-multi --global`
+**To fix:** `npx get-shit-done-multi --claude`
 
 This will reinstall with version tracking enabled.
 ```
 
-STOP here if no VERSION file.
+STOP here if no manifest file.
 </step>
 
 <step name="fetch_remote_changelog">
 Fetch latest CHANGELOG.md from GitHub:
 
 Use WebFetch tool with:
-- URL: `https://raw.githubusercontent.com/glittercowboy/get-shit-done/main/CHANGELOG.md`
+- URL: `https://raw.githubusercontent.com/shoootyou/get-shit-done-multi/main/CHANGELOG.md`
 - Prompt: "Extract all version entries with their dates and changes. Return in Keep-a-Changelog format."
 
 **If fetch fails:**
 Fall back to local changelog:
 ```bash
-cat /home/sandbox/Library/Application Support/Claude/get-shit-done/CHANGELOG.md 2>/dev/null
+cat .claude/get-shit-done/CHANGELOG.md 2>/dev/null
 ```
 
 Note to user: "Couldn't check for updates (offline or GitHub unavailable). Showing local changelog."
@@ -80,7 +77,7 @@ Format output clearly:
 
 You're on the latest version.
 
-[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/shoootyou/get-shit-done-multi/blob/main/CHANGELOG.md)
 ```
 
 **If updates available:**
@@ -110,7 +107,7 @@ You're on the latest version.
 
 ---
 
-[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/shoootyou/get-shit-done-multi/blob/main/CHANGELOG.md)
 
 **To update:** `npx get-shit-done-multi --global`
 ```
@@ -121,7 +118,7 @@ You're on the latest version.
 </process>
 
 <success_criteria>
-- [ ] Installed version read from VERSION file
+- [ ] Installed version read from .gsd-install-manifest.json
 - [ ] Remote changelog fetched (or graceful fallback to local)
 - [ ] Version comparison displayed clearly
 - [ ] Changes since installed version shown (if any)

@@ -1,12 +1,10 @@
 ---
 name: gsd-map-codebase
 description: Analyze codebase with parallel mapper agents to produce structured documentation
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Task, Read, Write, Bash, Glob, Grep
-arguments: [{name: area, type: string, required: false, description: 'Optional specific area to map (e.g., ''api'', ''auth'')'}]
+allowed-tools: Task, Read, Edit, Bash, Grep
+argument-hint: [area]
 ---
+
 
 <objective>
 Analyze existing codebase using parallel gsd-codebase-mapper agents to produce structured codebase documents.
@@ -17,7 +15,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@.claude/get-shit-done/workflows/map-codebase.md
 </execution_context>
 
 <context>
@@ -68,7 +66,7 @@ Map codebase technology stack and integrations
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@.claude/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -92,7 +90,7 @@ Map codebase architecture and structure
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@.claude/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -116,7 +114,7 @@ Map codebase conventions and testing practices
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@.claude/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",
@@ -139,7 +137,7 @@ Identify codebase concerns and issues
 </writes>
 
 <workflow>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@.claude/get-shit-done/workflows/map-codebase.md
 </workflow>
   `,
   agent_type: "gsd-codebase-mapper",

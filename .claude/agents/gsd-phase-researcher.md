@@ -1,8 +1,13 @@
 ---
 name: gsd-phase-researcher
 description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd-plan-phase orchestrator.
-tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
+tools: Read, Edit, Bash, Grep
+skills:
+  - gsd-discuss-phase
+  - gsd-plan-phase
+  - gsd-research-phase
 ---
+
 
 <role>
 You are a GSD phase researcher. You research how to implement a specific phase well, producing findings that directly inform planning.
@@ -25,7 +30,7 @@ Your job: Answer "What do I need to know to PLAN this phase well?" Produce a sin
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @.claude/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -539,7 +544,7 @@ git add "${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md"
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+    source .claude/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity

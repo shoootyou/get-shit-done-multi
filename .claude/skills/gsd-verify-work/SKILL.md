@@ -1,12 +1,10 @@
 ---
 name: gsd-verify-work
 description: Validate built features through conversational UAT
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash, Task
-arguments: [{name: phase, type: string, required: false, description: 'Phase number to verify (if not provided, checks for active sessions)'}]
+allowed-tools: Read, Edit, Bash, Task
+argument-hint: [phase]
 ---
+
 
 <objective>
 Validate built features through conversational testing with persistent state.
@@ -17,8 +15,8 @@ Output: {phase}-UAT.md tracking all test results. If issues found: diagnosed gap
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/verify-work.md
-@~/.claude/get-shit-done/templates/UAT.md
+@.claude/get-shit-done/workflows/verify-work.md
+@.claude/get-shit-done/templates/UAT.md
 </execution_context>
 
 <context>

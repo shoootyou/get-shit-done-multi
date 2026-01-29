@@ -1,12 +1,9 @@
 ---
 name: gsd-progress
 description: Check project progress, show context, and route to next action (execute or plan)
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Bash, Task
-arguments: []
+allowed-tools: Read, Bash, Task
 ---
+
 
 <objective>
 Check project progress, summarize recent work and what's ahead, then intelligently route to the next action - either executing an existing plan or creating the next one.

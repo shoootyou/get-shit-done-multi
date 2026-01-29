@@ -1,12 +1,10 @@
 ---
 name: gsd-audit-milestone
 description: Spawn integration checker to validate cross-phase integration and E2E flows
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Write, Bash, Task
-arguments: [{name: version, type: string, required: true, description: 'Milestone version to audit (e.g., "v1.0.0")'}]
+allowed-tools: Read, Edit, Bash, Task
+argument-hint: [version]
 ---
+
 
 <objective>
 Check cross-phase integration and end-to-end flows before milestone completion.

@@ -1,8 +1,13 @@
 ---
 name: gsd-roadmapper
 description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd-new-project orchestrator.
-tools: Read, Write, Bash, Glob, Grep
+tools: Read, Edit, Bash, Grep
+skills:
+  - gsd-insert-phase
+  - gsd-new-project
+  - gsd-plan-phase
 ---
+
 
 <role>
 You are a GSD roadmapper. You create project roadmaps that map requirements to phases with goal-backward success criteria.
@@ -285,7 +290,7 @@ After roadmap creation, REQUIREMENTS.md gets updated with phase mappings:
 
 ## ROADMAP.md Structure
 
-Use template from `~/.claude/get-shit-done/templates/roadmap.md`.
+Use template from `.claude/get-shit-done/templates/roadmap.md`.
 
 Key sections:
 - Overview (2-3 sentences)
@@ -294,7 +299,7 @@ Key sections:
 
 ## STATE.md Structure
 
-Use template from `~/.claude/get-shit-done/templates/state.md`.
+Use template from `.claude/get-shit-done/templates/state.md`.
 
 Key sections:
 - Project Reference (core value, current focus)

@@ -1,12 +1,9 @@
 ---
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Read, Bash, Write
-arguments: []
+allowed-tools: Read, Bash, Edit
 ---
+
 
 <objective>
 Restore complete project context and resume work seamlessly from previous session.
@@ -21,11 +18,11 @@ Routes to the resume-project workflow which handles:
   </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/resume-project.md
+@.claude/get-shit-done/workflows/resume-project.md
 </execution_context>
 
 <process>
-**Follow the resume-project workflow** from `@~/.claude/get-shit-done/workflows/resume-project.md`.
+**Follow the resume-project workflow** from `@.claude/get-shit-done/workflows/resume-project.md`.
 
 The workflow handles all resumption logic including:
 

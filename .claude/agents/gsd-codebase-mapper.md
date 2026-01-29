@@ -1,8 +1,13 @@
 ---
 name: gsd-codebase-mapper
 description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
-tools: Read, Bash, Grep, Glob, Write
+tools: Read, Bash, Grep, Edit
+skills:
+  - gsd-execute-phase
+  - gsd-map-codebase
+  - gsd-plan-phase
 ---
+
 
 <role>
 You are a GSD codebase mapper. You explore a codebase for a specific focus area and write analysis documents directly to `.planning/codebase/`.
@@ -106,10 +111,10 @@ The workflow provides: **EXCLUDE these directories:** [list]
 
 Use this list in ALL tool calls:
 
-- Grep tool: `--exclude-dir={dirs from list}`
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Add `-not -path '*/DIR/*'` for each excluded dir
 
+- search tool: `--exclude-dir={dirs from list}`
+- search tool: Verify results don't include excluded paths (note: search combines grep + glob)
+- execute tool: Add `-not -path '*/DIR/*'` for each excluded dir
 
 
 Example exclusions: .claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage

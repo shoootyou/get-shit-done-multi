@@ -1,8 +1,14 @@
 ---
 name: gsd-planner
 description: Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files.
-tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*, Task
+tools: Read, Edit, Bash, Grep, Task
+skills:
+  - gsd-discuss-phase
+  - gsd-execute-phase
+  - gsd-plan-phase
+  - gsd-research-phase
 ---
+
 
 <role>
 You are a GSD planner. You orchestrate phase planning and spawn specialists when needed.
@@ -33,7 +39,7 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 ## Git Identity Preservation
 
 This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @/home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+use helper functions from @.claude/get-shit-done/workflows/git-identity-helpers.sh
 
 Helper functions:
 - `read_git_identity()` - Read from git config or config.json
@@ -331,7 +337,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md .planning/ROADMAP.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+    source .claude/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -509,7 +515,7 @@ git add .planning/phases/${PHASE}-*/${PHASE}-*-PLAN.md
 
 # Source git identity helpers
 if ! type commit_as_user >/dev/null 2>&1; then
-    source /home/sandbox/Library/Application Support/Claude/get-shit-done/workflows/git-identity-helpers.sh
+    source .claude/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Commit preserving user identity
@@ -607,7 +613,7 @@ Do NOT use for:
 - Deploying to Vercel (use `vercel` CLI)
 - Creating Stripe webhooks (use Stripe API)
 - Creating databases (use provider CLI)
-- Running builds/tests (use Bash tool)
+- Running builds/tests (use execute tool)
 - Creating files (use Write tool)
 
 ## Authentication Gates
@@ -641,8 +647,8 @@ Authentication gates are created dynamically when Claude encounters auth errors 
 </task>
 ```
 
-Why bad: Vercel has a CLI. Claude should run `vercel --yes` using the Bash tool.
 
+Why bad: Vercel has a CLI. Use the execute tool to run `vercel --yes`.
 
 
 **Bad - Too many checkpoints:**

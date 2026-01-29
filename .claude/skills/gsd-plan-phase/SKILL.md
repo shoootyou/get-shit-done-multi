@@ -1,15 +1,12 @@
 ---
 name: gsd-plan-phase
 description: Orchestrate phase planning with research, planning, and verification loop
-skill_version: 1.9.1
-requires_version: 1.9.0+
-platforms: [claude, copilot, codex]
-tools: Task, Read, Write, Bash, AskUserQuestion
-arguments: [{name: phase, type: string, required: true, description: Phase number or name to plan}, {name: '--research', type: flag, required: false, description: Force re-research (ignore existing RESEARCH.md)}, {name: '--skip-research', type: flag, required: false, description: Skip research entirely (go straight to planning)}, {name: '--gaps', type: flag, required: false, description: Gap closure mode (plan from VERIFICATION.md/UAT.md failures)}, {name: '--skip-verify', type: flag, required: false, description: Skip verification loop (trust planner output)}]
+allowed-tools: Task, Read, Edit, Bash
+argument-hint: [phase] [--research] [--skip-research] [--gaps] [--skip-verify]
 ---
 
 <execution_context>
-@~/.claude/get-shit-done/references/ui-brand.md
+@.claude/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <objective>
