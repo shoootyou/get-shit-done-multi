@@ -165,14 +165,14 @@ function formatValue(value, fieldName, platform) {
   if (typeof value === 'string') {
     // Codex-specific: Always quote argument-hint and description with double quotes
     if (platform === 'codex' && (fieldName === 'argument-hint' || fieldName === 'description')) {
-      return `"${value.replace(/"/g, '\\"')}"`;
+      return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
     
     // Always quote strings that look like dates or versions to prevent YAML parsing
     // Examples: 2026-01-28, 2026-01-28T12:00:00Z, 2.0.0, 1.2.3
     if (/^\d{4}-\d{2}-\d{2}/.test(value) || /^\d+\.\d+(\.\d+)?$/.test(value)) {
       if (value.includes("'")) {
-        return `"${value.replace(/"/g, '\\"')}"`;
+        return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
       }
       return `'${value}'`;
     }
@@ -190,7 +190,7 @@ function formatValue(value, fieldName, platform) {
     // Needs quoting - use single quotes, escape if needed
     if (value.includes("'")) {
       // If string contains single quotes, use double quotes and escape
-      return `"${value.replace(/"/g, '\\"')}"`;
+      return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     }
     return `'${value}'`;
   }
