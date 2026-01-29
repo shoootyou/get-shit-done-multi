@@ -6,9 +6,10 @@ import { serializeFrontmatter } from './frontmatter-serializer.js';
 /**
  * Clean frontmatter by removing empty string fields
  * @param {string} content - Markdown file content with frontmatter
+ * @param {string} [platform='claude'] - Platform name for serialization
  * @returns {string} Content with cleaned frontmatter
  */
-export function cleanFrontmatter(content) {
+export function cleanFrontmatter(content, platform = 'claude') {
   try {
     const parsed = matter(content);
     const data = parsed.data;
@@ -39,7 +40,7 @@ export function cleanFrontmatter(content) {
     }
     
     // Rebuild content with cleaned frontmatter using custom serializer
-    const serialized = serializeFrontmatter(cleanedData, 'claude');
+    const serialized = serializeFrontmatter(cleanedData, platform);
     return `---\n${serialized}\n---\n\n${parsed.content}`;
   } catch (error) {
     // If parsing fails, return original content

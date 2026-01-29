@@ -63,3 +63,18 @@ Test with:
 - Claude: No change (current behavior preserved)
 
 Test in /tmp isolated directory.
+
+---
+completed: 2026-01-29T11:30
+notes: |
+  Successfully implemented Codex-specific frontmatter quoting:
+  - Updated frontmatter-serializer.js to add platform parameter throughout chain
+  - Added Codex-specific logic: double-quote argument-hint and description fields
+  - Updated frontmatter-cleaner.js to accept platform parameter (defaults to 'claude')
+  - Updated install-skills.js to pass platform to processTemplateFile
+  - Tested all three platforms in /tmp isolated directories:
+    * Codex: argument-hint and description use double quotes ✓
+    * Copilot: No change, backward compatible ✓
+    * Claude: No change, backward compatible ✓
+  - Fixes Codex CLI error with unquoted argument-hint field
+  - Adds consistency for description field (nice to have)

@@ -56,9 +56,9 @@ export function serializeFrontmatter(data, platform) {
     if (Array.isArray(value)) {
       lines.push(formatArray(key, value, platform));
     } else if (typeof value === 'object' && value !== null) {
-      lines.push(formatObject(key, value));
+      lines.push(formatObject(key, value, platform));
     } else {
-      lines.push(formatScalar(key, value));
+      lines.push(formatScalar(key, value, platform));
     }
   }
   
@@ -93,11 +93,12 @@ function formatArray(key, value, platform) {
  * 
  * @param {string} key - Field name
  * @param {Object} value - Object value
+ * @param {string} platform - Platform name
  * @returns {string} Formatted YAML
  * 
  * @private
  */
-function formatObject(key, value) {
+function formatObject(key, value, platform) {
   const lines = [`${key}:`];
   
   for (const [subKey, subValue] of Object.entries(value)) {
@@ -110,10 +111,10 @@ function formatObject(key, value) {
       lines.push(`  ${subKey}:`);
       for (const [nestedKey, nestedValue] of Object.entries(subValue)) {
         if (nestedValue === undefined) continue;
-        lines.push(`    ${nestedKey}: ${formatValue(nestedValue, nestedKey)}`);
+        lines.push(`    ${nestedKey}: ${formatValue(nestedValue, nestedKey, platform)}`);
       }
     } else {
-      lines.push(`  ${subKey}: ${formatValue(subValue, subKey)}`);
+      lines.push(`  ${subKey}: ${formatValue(subValue, subKey, platform)}`);
     }
   }
   
@@ -125,12 +126,13 @@ function formatObject(key, value) {
  * 
  * @param {string} key - Field name
  * @param {*} value - Scalar value
+ * @param {string} platform - Platform name
  * @returns {string} Formatted YAML
  * 
  * @private
  */
-function formatScalar(key, value) {
-  return `${key}: ${formatValue(value, key)}`;
+function formatScalar(key, value, platform) {
+  return `${key}: ${formatValue(value, key, platform)}`;
 }
 
 /**
@@ -138,11 +140,12 @@ function formatScalar(key, value) {
  * 
  * @param {*} value - Value to format
  * @param {string} [fieldName] - Optional field name for context-aware formatting
+ * @param {string} [platform] - Optional platform name for platform-specific formatting
  * @returns {string} Formatted value
  * 
  * @private
  */
-function formatValue(value, fieldName) {
+function formatValue(value, fieldName, platform) {
   // Null
   if (value === null) {
     return 'null';
@@ -160,10 +163,9 @@ function formatValue(value, fieldName) {
   
   // String handling
   if (typeof value === 'string') {
-    // Special case: argument-hint field should never be quoted
-    // Example: [version], [domain], [arg1] [arg2]
-    if (fieldName === 'argument-hint') {
-      return value;
+    // Codex-specific: Always quote argument-hint and description with double quotes
+    if (platform === 'codex' && (fieldName === 'argument-hint' || fieldName === 'description')) {
+      return `"${value.replace(/"/g, '\\"')}"`;
     }
     
     // Always quote strings that look like dates or versions to prevent YAML parsing

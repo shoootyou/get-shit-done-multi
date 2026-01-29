@@ -34,7 +34,7 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
 
     // Process SKILL.md file
     const skillFile = join(destDir, 'SKILL.md');
-    await processTemplateFile(skillFile, variables, isVerbose);
+    await processTemplateFile(skillFile, variables, isVerbose, platform);
 
     count++;
     logger.verboseComplete(isVerbose);
@@ -48,7 +48,7 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
     await copyDirectory(getShitDoneTemplateDir, destDir);
 
     const skillFile = join(destDir, 'SKILL.md');
-    await processTemplateFile(skillFile, variables, isVerbose);
+    await processTemplateFile(skillFile, variables, isVerbose, platform);
 
     count++;
     logger.verboseComplete(isVerbose);
@@ -60,7 +60,7 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
 /**
  * Process template file (read, replace variables, write)
  */
-async function processTemplateFile(filePath, variables, isVerbose) {
+async function processTemplateFile(filePath, variables, isVerbose, platform) {
   const content = await readFile(filePath, 'utf8');
 
   // Find unknown variables and warn
@@ -72,8 +72,8 @@ async function processTemplateFile(filePath, variables, isVerbose) {
   // Replace template variables
   const processed = replaceVariables(content, variables);
 
-  // Clean frontmatter (remove empty fields)
-  const cleaned = cleanFrontmatter(processed);
+  // Clean frontmatter (remove empty fields) with platform-specific formatting
+  const cleaned = cleanFrontmatter(processed, platform);
 
   await writeFile(filePath, cleaned);
 }
