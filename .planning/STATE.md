@@ -765,8 +765,8 @@ Overall Progress:
 
 ### Pending Todos
 2 pending todos:
-- `.planning/todos/pending/2026-01-28-fix-agent-installation-filter.md` - Fix agent installation filter to match .agent.md templates (area: installer)
-- `.planning/todos/pending/2026-01-29-codex-frontmatter-quoting.md` - Add quoting for Codex frontmatter fields (area: installer)
+- `.planning/todos/pending/2026-01-29-add-all-flag-for-installing-all-platforms.md` - Add --all flag for installing all platforms (area: tooling)
+- `.planning/todos/pending/2026-01-29-audit-unused-functions-in-bin.md` - Audit unused functions in /bin directory (area: tooling)
 
 ### Blockers
 None
