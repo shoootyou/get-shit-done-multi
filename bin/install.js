@@ -11,6 +11,7 @@ import { resolve, dirname } from 'path';
 import { readFile } from "fs/promises";
 import { InstallError, EXIT_CODES } from './lib/errors/install-error.js';
 import { multipleDirectoryErrors } from './lib/errors/directory-error.js';
+import { validateCustomPathWithPlatforms } from './lib/validation/cli-validator.js';
 import * as logger from './lib/cli/logger.js';
 import { adapterRegistry } from './lib/platforms/registry.js';
 import { runInteractive } from './lib/cli/interactive.js';
@@ -72,14 +73,22 @@ async function main() {
     process.exit(1);
   }
 
+  // Parse platforms (needed for validation)
+  const platforms = parsePlatformFlags(options, adapterRegistry);
+
+  // Validate custom-path with multiple platforms (prevent data loss)
+  try {
+    validateCustomPathWithPlatforms(platforms, options.customPath);
+  } catch (error) {
+    logger.error(error.message, 2, true);
+    process.exit(EXIT_CODES.INVALID_ARGS);
+  }
+
   // Handle --check-updates flag
   if (options.checkUpdates) {
     await handleCheckUpdates(options, pkg);
     process.exit(0);
   }
-
-  // Parse platforms
-  const platforms = parsePlatformFlags(options, adapterRegistry);
 
   // After parsing flags, start the flow starting with the banner
   banner(pkg.version, true);
