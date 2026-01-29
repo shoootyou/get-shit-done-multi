@@ -1,11 +1,16 @@
+<div align="center">
+
 # Get Shit Done Multi
 
 **Spec-driven development system for AI coding assistants with multi-platform support**
 
 [![npm version](https://img.shields.io/npm/v/get-shit-done-multi)](https://www.npmjs.com/package/get-shit-done-multi)
+[![npm downloads](https://img.shields.io/npm/dm/get-shit-done-multi)](https://www.npmjs.com/package/get-shit-done-multi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Supported Platforms:** Claude Code · GitHub Copilot CLI · Codex CLI
+
+</div>
 
 ---
 
@@ -50,11 +55,11 @@ by phase with atomic task plans and clean commits.
 ```text
 User Input → Orchestrator → Specialized Agents → Verification
      │              │                │                  │
-     │              ├─→ Researcher ──┤                  │
-     │              ├─→ Planner ─────┤                  │
-     │              └─→ Executor ────┤                  │
-     │                                                   │
-     └───────────────── Feedback ←────────────────────┘
+     │              ├──→ Researcher ─┤                  │
+     │              ├──→ Planner ────┤                  │
+     │              └──→ Executor ───┘                  │
+     │                                                  │
+     └────────────────── Feedback ←─────────────────────┘
 
 Phases:
 ┌────────────────┐    ┌────────────────┐    ┌────────────────┐
