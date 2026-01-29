@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-30  
-**Updated By:** GSD Execute-Phase (Phase 8 Plan 04 Complete)
+**Updated By:** GSD Execute-Phase (Phase 8 Plan 05 Complete - Phase 8 COMPLETE)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 8 in progress - Documentation and Polish. Plans 08-01 through 08-04 complete (root docs, installation docs, platform docs, advanced docs).
+**Current Focus:** Phase 8 COMPLETE - All documentation and polish work finished. Ready for v2.0 release preparation.
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 8 — Documentation and Polish (IN PROGRESS)
-**Completed:** 4 of 5 plans  
-**Next:** Plan 08-05 (final plan)
+**Current Phase:** Phase 8 — Documentation and Polish (COMPLETE ✅)
+**Completed:** 5 of 5 plans  
+**Next:** v2.0 release preparation
 
 ### Plan Status
-**Completed Plans:** 40/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 4/5)  
-**Last activity:** 2026-01-30 - Completed 08-04-PLAN.md (architecture and advanced documentation)  
-**Next:** Plan 08-05 to complete Phase 8
+**Completed Plans:** 41/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5)  
+**Last activity:** 2026-01-30 - Completed 08-05-PLAN.md (markdown quality validation)  
+**Next:** Release preparation or Phase 9 (if defined)
 
 ### Progress Bar
 ```
@@ -41,10 +41,10 @@ Phase 6.2: [██████████████████████�
 Phase 7:   [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 7.1: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 7.2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 8:   [████████████████████████████████████████░░░░░░░░░░░░] 80% (4/5 plans)
+Phase 8:   [████████████████████████████████████████████████████] 100% (5/5 plans) ✅ COMPLETE
 
 Overall Progress:
-[█████████████████████████████████████████░░░░░] 89% (40/45 total plans)
+[█████████████████████████████████████████████░░░] 91% (41/45 total plans)
 ```
 
 ---
@@ -856,6 +856,27 @@ Overall Progress:
      - Partial installation (v2.1+) documented with manual workaround
      - Rationale: Set user expectations, provide solutions for current version
 
+123. **2026-01-30 (08-05):** Markdown line length: 120 characters (DOC-LINE-LENGTH)
+     - Relaxed from default 80 to 120 for modern displays
+     - Excludes code blocks, tables, and headings
+     - Rationale: 80 too restrictive for technical documentation with long URLs/paths
+
+124. **2026-01-30 (08-05):** Disable strict heading/structure rules (DOC-HEADING-RULES)
+     - Disabled MD001 (heading increment), MD024 (duplicate headings), MD025 (multiple H1s), MD036 (emphasis as heading)
+     - Allow flexible documentation structure over blog-style conventions
+     - Rationale: Technical docs need structural flexibility, duplicate headings in sections are normal
+
+125. **2026-01-30 (08-05):** Exclude GSD infrastructure from markdown linting (DOC-LINT-SCOPE)
+     - Exclude .planning/, .claude/, .codex/, .github/agents/, .github/get-shit-done/, etc.
+     - Focus linting on user-facing project documentation only
+     - Rationale: GSD internal files follow different format conventions (XML tasks, template variables)
+
+126. **2026-01-30 (08-05):** Code fence language strategy (DOC-CODE-FENCES)
+     - ASCII diagrams (box-drawing chars): `text`
+     - Output/plaintext content: `plaintext`
+     - Python script to automatically detect and tag
+     - Rationale: Improves syntax highlighting, clarifies content type
+
 
 ### Roadmap Evolution
 
@@ -1104,12 +1125,12 @@ Then continue with remaining phases from ROADMAP.md.
 
 ## Session Continuity
 
-**Last session:** 2026-01-30T00:00:22Z  
-**Stopped at:** Completed 08-02-PLAN.md (Installation Documentation)  
+**Last session:** 2026-01-30T23:16:33Z  
+**Stopped at:** Completed 08-05-PLAN.md (Quality Validation) - Phase 8 COMPLETE  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
-**Last updated:** 2026-01-28  
-**Ready for:** Next phase planning
+**Last updated:** 2026-01-30  
+**Ready for:** v2.0 release preparation or Phase 9 (if defined)
