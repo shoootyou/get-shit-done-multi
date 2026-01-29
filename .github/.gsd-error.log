@@ -1,0 +1,27 @@
+GSD Installation Error Log
+Generated: 2026-01-29T01:24:56.999Z
+
+ERROR: Path not in allowlist: gsd-install-test
+
+Installation Details:
+  Platform: copilot
+  Scope: local
+  Phase: Unknown
+  Target: .github
+
+Error Details:
+  Code: 6
+  path: gsd-install-test
+  firstSegment: gsd-install-test
+  allowlist: .claude,.github,.codex,get-shit-done
+
+Stack Trace:
+  InstallError: Path not in allowlist: gsd-install-test
+      at invalidPath (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/errors/install-error.js:53:10)
+      at validatePath (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/validation/path-validator.js:108:11)
+      at validatePaths (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/validation/pre-install-checks.js:147:24)
+      at async runPreInstallationChecks (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/validation/pre-install-checks.js:30:3)
+      at async install (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/installer/orchestrator.js:104:29)
+      at async installPlatforms (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/cli/installation-core.js:53:13)
+      at async executeInstallationLoop (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/lib/cli/install-loop.js:36:5)
+      at async main (file:///Users/rodolfo/croonix-github/gsd/get-shit-done-multi/bin/install.js:117:5)

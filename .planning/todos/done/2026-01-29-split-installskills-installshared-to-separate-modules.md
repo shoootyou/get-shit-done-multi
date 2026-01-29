@@ -33,3 +33,13 @@ Extract both functions following the same pattern used for `installAgents`:
 5. Ensure all function signatures match original behavior
 
 Reference pattern: See `install-agents.js` for module structure.
+
+---
+completed: 2026-01-29T02:27
+notes: |
+  Successfully extracted installSkills and installShared to separate modules:
+  - Created bin/lib/installer/install-skills.js
+  - Created bin/lib/installer/install-shared.js
+  - Updated orchestrator.js to import from new modules
+  - Tested installation in /tmp/gsd-test-1769649994
+  - All 29 skills, 13 agents, and shared directory installed successfully
