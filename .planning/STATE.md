@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-29  
-**Updated By:** GSD Execute-Phase (Phase 8 Plan 03 Complete)
+**Updated By:** GSD Execute-Phase (Phase 8 Plan 01 Complete)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 8 in progress - Documentation and Polish. Plan 08-03 complete (platform documentation).
+**Current Focus:** Phase 8 in progress - Documentation and Polish. Plan 08-01 complete (root documentation files).
 
 ---
 
@@ -24,7 +24,7 @@
 
 ### Plan Status
 **Completed Plans:** 38/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 3/5)  
-**Last activity:** 2026-01-29 - Completed 08-03-PLAN.md (platform documentation)  
+**Last activity:** 2026-01-29 - Completed 08-01-PLAN.md (root documentation files)  
 **Next:** Plan 08-04 and 08-05 to complete Phase 8
 
 ### Progress Bar
@@ -820,6 +820,25 @@ Overall Progress:
      - Most common confusion point when switching to Codex
      - Rationale: Prefix difference is critical for usability, needs high visibility
 
+117. **2026-01-29 (08-01):** README hub format with ASCII diagrams (DOC-README-HUB)
+     - Brief hub format (50-150 lines) with links to docs/ folder
+     - ASCII diagrams only (Mermaid doesn't render on npmjs.com)
+     - Proper attribution to fork point v1.6.4 and Lex Christopherson
+     - Version timeline showing fork development journey
+     - Rationale: npm package pages benefit from concise overview, ASCII is universally compatible
+
+118. **2026-01-29 (08-01):** CHANGELOG documents fork from v1.6.4 (DOC-CHANGELOG-FORK)
+     - Header note directs to original project for pre-fork history
+     - Version timeline: v1.7.0 (experiments), v1.8.0 (improvements), v2.0.0 (achievement)
+     - Keep a Changelog format for consistency
+     - Rationale: Clear attribution and fork transparency
+
+119. **2026-01-29 (08-01):** No emojis in documentation (DOC-NO-EMOJIS)
+     - Professional tone appropriate for development tools
+     - Better accessibility (screen readers)
+     - npm package page compatibility
+     - Rationale: Professional, accessible documentation consistent across all files
+
 
 ### Roadmap Evolution
 
@@ -1068,8 +1087,8 @@ Then continue with remaining phases from ROADMAP.md.
 
 ## Session Continuity
 
-**Last session:** 2026-01-29T18:12:43Z  
-**Stopped at:** Completed 07.2-02-PLAN.md (Code Cleanup and Error Handling)  
+**Last session:** 2026-01-29T22:58:14Z  
+**Stopped at:** Completed 08-01-PLAN.md (Root Documentation Files)  
 **Resume file:** None
 
 ---
