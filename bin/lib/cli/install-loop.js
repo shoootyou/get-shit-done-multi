@@ -3,6 +3,7 @@
 import * as logger from './logger.js';
 import { getPlatformName } from '../platforms/platform-names.js';
 import { installPlatforms } from './installation-core.js';
+import { validateBeforeInstall } from '../preflight/pre-flight-validator.js';
 
 /**
  * Execute installation loop for multiple platforms
@@ -17,6 +18,20 @@ import { installPlatforms } from './installation-core.js';
  * @returns {Promise<void>}
  */
 export async function executeInstallationLoop(platforms, scope, appVersion, options) {
+  // Pre-flight validation gate
+  // Validates all requirements before installation begins
+  // Throws with grouped errors if validation fails
+  try {
+    await validateBeforeInstall(platforms, scope, {
+      scriptDir: options.scriptDir,
+      verbose: options.verbose || false,
+      customPath: options.customPath || null
+    });
+  } catch (error) {
+    logger.error(error.message);
+    process.exit(1);
+  }
+
   const count = platforms.length;
 
   for (const platform of platforms) {
