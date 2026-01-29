@@ -204,8 +204,8 @@ async function checkSymlinkAndConfirm(targetDir, skipPrompts = false) {
   if (await isSymlink(targetDir)) {
     const symlinkInfo = await resolveSymlinkSingleLevel(targetDir);
 
-    // Check if we're in non-interactive mode (skipPrompts = true or ALLOW_SYMLINKS env var)
-    const allowSymlinks = skipPrompts || process.env.ALLOW_SYMLINKS === 'true';
+    // Non-interactive mode skips all prompts including symlink confirmations
+    const allowSymlinks = skipPrompts;
 
     if (!allowSymlinks) {
       // Interactive mode - prompt for confirmation
