@@ -593,41 +593,50 @@ This roadmap delivers a **complete template-based installer** that deploys AI CL
 
 **Dependencies:** Phase 7.1 (validation and testing infrastructure complete)
 
-**Plans:** 0 plans
+**Plans:** 4 plans in 4 waves
 
 **Requirements Mapped:**
 - None (technical debt cleanup and publishing preparation)
 
 **Success Criteria:**
-1. **npm Publishing Config:** package.json includes templates/ and bin/ folders in published package
-2. **npm Publishing Config:** Analyze root folders (github/, hooks/, etc.) and remove/include as needed for minimal published package
-3. **Broken Template Renderer:** Remove obsolete template renderer code from early phases
-4. **Path Validation Tests:** Update tests to match current correct implementation
-5. **Version Detection:** Analyze TODO comments in version detection code - update or remove orphaned code
-6. **Large Files Cleanup:** Delete audit-functions.json, audit-functions.md, and audit-functions.* from root
-7. **Large Files Cleanup:** Remove scripts and tests related to deleted audit files
-8. **Empty Catch Blocks:** Prioritize checking specific error codes over generic catch blocks
-9. **Environment Variables:** Analyze ALLOW_SYMLINKS usage - remove if test code, keep minimal production usage
-10. **Node.js Version:** Update project minimum to Node 20 in package.json and documentation
-11. **Template Phase Reference:** Ensure Phase 1 template generation doesn't appear as a risk in future map-codebase reports
+1. **npm Publishing Config:** package.json includes templates/ and bin/ folders in published package ✓
+2. **npm Publishing Config:** Analyze root folders (github/, hooks/, etc.) and remove/include as needed for minimal published package ✓
+3. **Broken Template Renderer:** Remove obsolete prepublishOnly script reference (scripts/build-templates.js doesn't exist) ✓
+4. **Path Validation Tests:** Update tests to match current correct implementation - N/A (tests already correct)
+5. **Version Detection:** Analyze TODO comments in version detection code - update or remove orphaned code ✓
+6. **Large Files Cleanup:** Delete audit-functions.json, audit-functions.md, and audit-functions.* from root ✓
+7. **Large Files Cleanup:** Remove scripts and tests related to deleted audit files ✓
+8. **Empty Catch Blocks:** Prioritize checking specific error codes over generic catch blocks ✓
+9. **Environment Variables:** Analyze ALLOW_SYMLINKS usage - remove if test code, keep minimal production usage ✓
+10. **Node.js Version:** Update project minimum to Node 20 in package.json and documentation ✓
+11. **Template Phase Reference:** Ensure Phase 1 template generation doesn't appear as a risk in future map-codebase reports ✓
 
 **Key Deliverables:**
 - Updated package.json with correct files/folders for npm publish
-- Removed obsolete template renderer code
-- Updated path validation tests
+- Removed obsolete prepublishOnly script (scripts/build-templates.js never existed)
 - Cleaned up version detection TODOs
-- Deleted audit-functions.* files from root
-- Removed related scripts and tests
-- Improved error handling in catch blocks
-- Cleaned ALLOW_SYMLINKS environment variable usage
+- Deleted audit-functions.* files from root (5MB+)
+- Removed scripts/ directory (only contained audit-functions.js)
+- Improved error handling in catch blocks (added error parameter and comment)
+- Removed ALLOW_SYMLINKS environment variable (redundant with skipPrompts)
 - Node 20 minimum version requirement
+- Deleted development tooling (hooks/, coverage/, docker files)
 - Verified bin/install.js works with minimal dependencies post-publish
 
-**Plans:**
-- [ ] TBD (run /gsd-plan-phase 7.2 to break down)
+Plans:
+- [ ] 07.2-01-PLAN.md — Critical publishing fixes (files array, prepublishOnly, Node 20)
+- [ ] 07.2-02-PLAN.md — Code cleanup and error handling (audit files, catch block, env vars, TODOs)
+- [ ] 07.2-03-PLAN.md — Development tooling cleanup (hooks, coverage, docker)
+- [ ] 07.2-04-PLAN.md — Publishing verification (npm pack workflow with human checkpoint)
+
+**Wave Structure:**
+- Wave 1: Plan 01 (blocking - package.json must be fixed first)
+- Wave 2: Plan 02 (parallel cleanup after package.json fixed)
+- Wave 3: Plan 03 (dev tooling cleanup after tests pass)
+- Wave 4: Plan 04 (verification checkpoint - final quality gate)
 
 **Details:**
-[To be added during planning]
+Plans break down into 4 waves for efficient parallel execution. Wave 1 fixes critical publishing bugs (3 one-line changes with HIGH IMPACT). Waves 2-3 clean up obsolete code and development tooling. Wave 4 verifies with npm pack → extract → test workflow.
 
 **Testing Strategy:**
 - All tests run in /tmp with isolated directories
