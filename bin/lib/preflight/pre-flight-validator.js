@@ -40,6 +40,28 @@ const statfsPromise = promisify(statfs);
 export async function validateBeforeInstall(platforms, scope, config) {
   const errors = [];
   
+  // ===== VALIDATION 0: Custom path validation (prerequisite) =====
+  // Validate custom path itself for security issues (traversal, special chars)
+  if (config.customPath) {
+    // Only check for traversal and dangerous patterns, not base directory escape
+    // (custom paths can be absolute or outside cwd)
+    if (config.customPath.includes('..')) {
+      errors.push({
+        category: 'Paths',
+        error: new InstallError(
+          `Invalid custom path: ${config.customPath}`,
+          6,
+          {
+            path: config.customPath,
+            reason: 'Path traversal detected (..)'
+          }
+        )
+      });
+      // If custom path is invalid, fail fast
+      throw new Error(formatPreflightReport(errors));
+    }
+  }
+  
   // Determine target directory
   const targetDir = config.customPath || process.cwd();
   const templatesDir = join(config.scriptDir, '..', 'templates');
@@ -249,12 +271,8 @@ function determineRequiredTemplates(scope) {
     dirs.push('agents');
   }
   
-  if (scope === 'workflows' || scope === 'all') {
-    dirs.push('workflows');
-  }
-  
-  // Shared templates always required
-  dirs.push('shared');
+  // get-shit-done directory always required (contains shared content, workflows, references)
+  dirs.push('get-shit-done');
   
   return dirs;
 }
