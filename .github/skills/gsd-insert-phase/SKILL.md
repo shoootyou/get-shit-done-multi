@@ -2,7 +2,7 @@
 name: gsd-insert-phase
 description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
 allowed-tools: Read, Edit, Bash
-argument-hint: [after_phase] [description]
+argument-hint: '[after_phase] [description]'
 ---
 
 <objective>
