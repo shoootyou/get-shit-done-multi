@@ -17,7 +17,10 @@ Deep dive into Phase 8 execution strategy covering documentation structure, writ
 - `README.md` - Project overview + credits + documentation index
 - `CONTRIBUTING.md` - How to contribute (development setup)
 - `LICENSE` - MIT license (already exists)
-- `CHANGELOG.md` - Version history
+- `CHANGELOG.md` - Version history (Keep a Changelog format)
+  - Include reference to original project for versions <= 1.6.4
+  - Note: "For versions 1.6.4 and earlier, see https://github.com/glittercowboy/get-shit-done/releases"
+  - Version 2.0.0+ represents GSD Multi fork development
 
 **docs/ structure (question-driven):**
 
@@ -186,9 +189,11 @@ When you run the installer, it copies skill and agent definitions...
 
 **Structure:**
 ```markdown
-# get-shit-done-multi
+# Get Shit Done Multi
 
-[2-3 paragraph description of what GSD is]
+**Spec-driven development system for AI coding assistants. Multi-platform support.**
+
+[2-3 paragraph description of what GSD Multi is]
 - Spec-driven development for AI assistants
 - Multi-platform: Claude, Copilot, Codex
 - Template-based skill/agent installation
@@ -216,13 +221,15 @@ npx get-shit-done-multi
 - One of: Claude Code, GitHub Copilot CLI, or Codex CLI
 
 ## Credits & License
-This project is a multi-platform adaptation of the original 
+This project (GSD Multi) is a multi-platform fork of the original 
 [get-shit-done](https://github.com/glittercowboy/get-shit-done) 
 framework by Lex Christopherson.
 
+**Fork Point:** v1.6.4 (https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4)
+
 **Key differences:**
 - Original: Claude-only with direct .md skills
-- This version: Multi-platform support using templating system
+- GSD Multi: Multi-platform support (Claude, Copilot, Codex) using templating system
 
 Both projects are MIT licensed. See [LICENSE](LICENSE) for details.
 ```
@@ -240,23 +247,39 @@ Both projects are MIT licensed. See [LICENSE](LICENSE) for details.
 
 ## Attribution & License Strategy
 
-### Decision: Proper MIT License Attribution
+### Decision: Proper MIT License Attribution with Version History
 **Background:**
-- Original: `get-shit-done-cc` by Lex Christopherson (MIT)
-- Original: Claude-only, direct .md files
-- This: Multi-platform, template-based adaptation
+- Original project: `get-shit-done` by Lex Christopherson (MIT)
+  - Repository: https://github.com/glittercowboy/get-shit-done
+  - Original: Claude-only, direct .md files
+- This project: `get-shit-done-multi` (also called "GSD Multi")
+  - Forked from tag v1.6.4: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4
+  - Multi-platform adaptation using templating system
+  - Subsequent versions (>= 2.0.0) developed independently in this fork
+
+**Project Naming:**
+- **Official name:** Get Shit Done Multi (GSD Multi)
+- **npm package:** get-shit-done-multi
+- **Rationale:** "Multi" emphasizes multi-platform support (Claude, Copilot, Codex)
 
 **Attribution Approach:**
 1. Keep original MIT license with Lex Christopherson copyright
-2. Add clear credits section in README explaining relationship
-3. Explain key differences (not competing, adapting for new use case)
-4. No confusion about which package does what
+2. Add clear credits section in README explaining relationship and fork point
+3. Explain key differences (not competing, adapting for multi-platform use case)
+4. Reference original project for versions <= 1.6.4
+5. No confusion about which package does what
+
+**Version History Strategy:**
+- CHANGELOG.md should include note: "For versions <= 1.6.4, see original project: https://github.com/glittercowboy/get-shit-done/releases"
+- Version 2.0.0+ represents multi-platform fork development
+- Clear separation between original development (v1.x) and fork development (v2.x+)
 
 **No Risk Assessment:**
 - MIT license explicitly allows modification and redistribution
 - Proper attribution given in README and LICENSE
 - Different package name (get-shit-done-multi vs get-shit-done-cc)
 - Different use case (multi-platform vs Claude-only)
+- Clear fork point documented (v1.6.4)
 - Both projects can coexist
 
 ---
