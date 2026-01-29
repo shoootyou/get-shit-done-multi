@@ -168,11 +168,3 @@ export const FIELDS = Object.keys(FIELD_DEFINITIONS);
 export const REQUIRED_FIELDS = Object.entries(FIELD_DEFINITIONS)
   .filter(([, def]) => def.required)
   .map(([field]) => field);
-
-/**
- * Get field definitions for documentation or tooling
- * @returns {Object} Field definitions with metadata
- */
-export function getFieldDefinitions() {
-  return { ...FIELD_DEFINITIONS };
-}

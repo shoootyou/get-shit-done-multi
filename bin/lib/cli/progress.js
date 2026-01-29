@@ -19,41 +19,6 @@ export function createMultiBar() {
 }
 
 /**
- * Create single progress bar
- * @param {string} phase - Phase name
- * @param {number} total - Total items
- * @returns {Object} Progress bar instance
- */
-export function createProgressBar(multiBar, phase, total) {
-  return multiBar.create(total, 0, { phase });
-}
-
-/**
- * Update progress
- * @param {Object} bar - Progress bar instance
- * @param {number} value - Current value
- */
-export function updateProgress(bar, value) {
-  bar.update(value);
-}
-
-/**
- * Complete progress
- * @param {Object} bar - Progress bar instance
- */
-export function completeProgress(bar) {
-  bar.stop();
-}
-
-/**
- * Stop all progress bars
- * @param {Object} multiBar - Multi-bar instance
- */
-export function stopAllProgress(multiBar) {
-  multiBar.stop();
-}
-
-/**
  * Display completion line with checkmark
  * @param {string} phase - Phase name (e.g., 'Skills', 'Agents', 'Shared')
  * @param {number} count - Total count

@@ -140,21 +140,6 @@ export function verboseComplete(isVerbose) {
  * Print section header
  * @param {string} title - Section title
  */
-export function header(title) {
-  console.log();
-  console.log(' ' + chalk.bold.cyan(title));
-  console.log(' ' + chalk.cyan('─'.repeat(title.length)));
-}
-
-/**
- * Print big block title (for separating major processes)
- * @param {string} title - Block title
- * @param {object} [opts]
- * @param {'double'|'single'} [opts.style='single'] - Border style
- * @param {number} [opts.width=0] - If 0, auto-fit to title length (with padding)
- * @param {number} [opts.pad=2] - Spaces around the title inside the block
- * @param {'left'|'center'} [opts.align='left'] - Title alignment inside the block
- */
 export function blockTitle(title, opts = {}) {
   const {
     style = 'single',
@@ -229,25 +214,6 @@ export function summary(stats, platform) {
   console.log();
   success(`${stats.skills} skills, ${stats.agents} agents installed to ${stats.target}`, 1);
   info(`Open ${cliName} and run '/gsd-help' to get started`, 1);
-}
-
-/**
- * Print section title (for progress phases)
- * @param {string} title - Section title
- */
-export function sectionTitle(title) {
-  console.log();
-  console.log(' ' + chalk.bold.cyan(title));
-  console.log(' ' + chalk.cyan('─'.repeat(title.length)));
-}
-
-/**
- * Print section title (for progress phases)
- * @param {string} title - Section title
- */
-export function simpleTitle(title) {
-  console.log();
-  console.log(' ' + chalk.cyan(title));
 }
 
 /**

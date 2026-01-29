@@ -1,44 +1,58 @@
 # Function Usage Audit Report
 
-**Generated:** 2026-01-29T15:51:28.773Z
+**Generated:** 2026-01-29T16:01:39.176Z  
+**Last Updated:** 2026-01-29T16:03:00.000Z
 
 **Analysis Scope:**
 - Functions analyzed: `bin/**/*.js`
 - Usage searched in: Entire project
 
+## 📊 Execution Status
+
+### Phase 1: Remove Unused Functions
+
+| Function Name | File | Status | Notes |
+|--------------|------|--------|-------|
+| `completeProgress` | `bin/lib/cli/progress.js` | ✅ Removed | Unused progress bar function |
+| `createProgressBar` | `bin/lib/cli/progress.js` | ✅ Removed | Unused progress bar function |
+| `updateProgress` | `bin/lib/cli/progress.js` | ✅ Removed | Unused progress bar function |
+| `stopAllProgress` | `bin/lib/cli/progress.js` | ✅ Removed | Unused progress bar function |
+| `header` | `bin/lib/cli/logger.js` | ✅ Removed | Unused UI helper |
+| `sectionTitle` | `bin/lib/cli/logger.js` | ✅ Removed | Unused UI helper |
+| `simpleTitle` | `bin/lib/cli/logger.js` | ✅ Removed | Unused UI helper |
+| `showCheckUpdatesSummary` | `bin/lib/updater/update-messages.js` | ✅ Removed | Unused update message |
+| `showUpdateAvailableMessage` | `bin/lib/updater/update-messages.js` | ✅ Removed | Unused update message |
+| `getInstalledPlatforms` | `bin/lib/platforms/detector.js` | ✅ Removed | Unused platform detection |
+| `getInstalledVersion` | `bin/lib/platforms/detector.js` | ✅ Removed | Unused platform detection |
+| `getRecommendedPlatforms` | `bin/lib/platforms/binary-detector.js` | ✅ Removed | Unused binary detection |
+| `getAvailableSpace` | `bin/lib/io/file-operations.js` | ✅ Removed | Unused disk space check |
+| `getHomeDirectory` | `bin/lib/io/file-operations.js` | ✅ Removed | Unused home dir resolver |
+| `getFieldDefinitions` | `bin/lib/manifests/schema.js` | ✅ Removed | Unused schema helper |
+
+**Result:** 14/15 functions removed successfully (93.3% reduction)  
+**Remaining:** 1 function (`detectInstallations`) - Kept as it's used by removed functions
+
+---
+
 ## Summary
 
 | Category | Count | Percentage |
 |----------|-------|------------|
-| **Total Functions** | 205 | 100% |
-| Unused (0 calls) | 15 | 7.3% |
-| Low Usage (1-5 calls) | 124 | 60.5% |
-| Potential Inline (1 call) | 55 | 26.8% |
-| Normal Usage (>5 calls) | 66 | 32.2% |
+| **Total Functions** | 190 | 100% |
+| Unused (0 calls) | 1 | 0.5% |
+| Low Usage (1-5 calls) | 124 | 65.3% |
+| Potential Inline (1 call) | 56 | 29.5% |
+| Normal Usage (>5 calls) | 65 | 34.2% |
 
 ---
 
-## ❌ Unused Functions (15)
+## ❌ Unused Functions (1)
 
 Functions that are **not called anywhere** in the codebase.
 
 | Function Name | Type | File | Line | Exported |
 |---------------|------|------|------|----------|
-| `completeProgress` | function | `bin/lib/cli/progress.js` | 44 | ✅ |
-| `createProgressBar` | function | `bin/lib/cli/progress.js` | 27 | ✅ |
-| `getAvailableSpace` | function | `bin/lib/io/file-operations.js` | 123 | ✅ |
-| `getFieldDefinitions` | function | `bin/lib/manifests/schema.js` | 176 | ✅ |
-| `getHomeDirectory` | function | `bin/lib/io/file-operations.js` | 138 | ✅ |
-| `getInstalledPlatforms` | function | `bin/lib/platforms/detector.js` | 43 | ✅ |
-| `getInstalledVersion` | function | `bin/lib/platforms/detector.js` | 61 | ✅ |
-| `getRecommendedPlatforms` | function | `bin/lib/platforms/binary-detector.js` | 42 | ✅ |
-| `header` | function | `bin/lib/cli/logger.js` | 143 | ✅ |
-| `sectionTitle` | function | `bin/lib/cli/logger.js` | 238 | ✅ |
-| `showCheckUpdatesSummary` | function | `bin/lib/updater/update-messages.js` | 85 | ✅ |
-| `showUpdateAvailableMessage` | function | `bin/lib/updater/update-messages.js` | 68 | ✅ |
-| `simpleTitle` | function | `bin/lib/cli/logger.js` | 248 | ✅ |
-| `stopAllProgress` | function | `bin/lib/cli/progress.js` | 52 | ✅ |
-| `updateProgress` | function | `bin/lib/cli/progress.js` | 36 | ✅ |
+| `detectInstallations` | function | `bin/lib/platforms/detector.js` | 9 | ✅ |
 
 ---
 
@@ -56,8 +70,8 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `runInteractive` | function | `bin/lib/cli/interactive.js` | 20 | **1** | `bin/install.js:119` |
 | `showGlobalDetectionWarning` | function | `bin/lib/cli/interactive.js` | 65 | **1** | `bin/lib/cli/interactive.js:33` |
 | `promptSelections` | function | `bin/lib/cli/interactive.js` | 139 | **1** | `bin/lib/cli/interactive.js:37` |
-| `errorSubtitle` | function | `bin/lib/cli/logger.js` | 304 | **1** | `bin/lib/errors/directory-error.js:5` |
-| `infoSubtitle` | function | `bin/lib/cli/logger.js` | 326 | **1** | `bin/lib/installer/orchestrator.js:144` |
+| `errorSubtitle` | function | `bin/lib/cli/logger.js` | 270 | **1** | `bin/lib/errors/directory-error.js:5` |
+| `infoSubtitle` | function | `bin/lib/cli/logger.js` | 292 | **1** | `bin/lib/installer/orchestrator.js:144` |
 | `shouldUseInteractiveMode` | function | `bin/lib/cli/mode-detector.js` | 11 | **1** | `bin/install.js:115` |
 | `showNextSteps` | function | `bin/lib/cli/next-steps.js` | 17 | **1** | `bin/install.js:142` |
 | `createMultiBar` | function | `bin/lib/cli/progress.js` | 10 | **1** | `bin/lib/cli/installation-core.js:38` |
@@ -72,6 +86,7 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `showBackupSuccess` | function | `bin/lib/migration/migration-manager.js` | 50 | **1** | `bin/lib/migration/migration-manager.js:111` |
 | `checkAndMigrateOldVersions` | function | `bin/lib/migration/migration-orchestrator.js` | 20 | **1** | `bin/install.js:98` |
 | `joinPaths` | function | `bin/lib/paths/path-resolver.js` | 62 | **1** | `tests/unit/path-resolver.test.js:48` |
+| `detectBinaries` | function | `bin/lib/platforms/binary-detector.js` | 30 | **1** | `bin/lib/cli/interactive.js:28` |
 | `extractSkillReferences` | method | `bin/lib/platforms/claude-adapter.js` | 93 | **1** | `bin/lib/platforms/claude-adapter.js:73` |
 | `isGSDInstalled` | function | `bin/lib/platforms/detector.js` | 34 | **1** | `bin/lib/platforms/detector.js:18` |
 | `getCliName` | function | `bin/lib/platforms/platform-names.js` | 27 | **1** | `bin/lib/cli/next-steps.js:24` |
@@ -105,7 +120,7 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `extractVersion` | function | `bin/lib/version/version-detector.js` | 140 | **1** | `bin/lib/version/version-detector.js:40` |
 | `executeInstallationLoop` | function | `bin/lib/cli/install-loop.js` | 20 | **2** | `bin/install.js:135`<br>`bin/lib/cli/interactive.js:48` |
 | `discoverInstallationsWithStatus` | function | `bin/lib/cli/interactive.js` | 98 | **2** | `bin/lib/cli/interactive.js:145`<br>`bin/lib/cli/interactive.js:186` |
-| `summary` | function | `bin/lib/cli/logger.js` | 226 | **2** | `node_modules/commander/lib/command.js:2234`<br>`node_modules/commander/lib/help.js:315` |
+| `summary` | function | `bin/lib/cli/logger.js` | 211 | **2** | `node_modules/commander/lib/command.js:2234`<br>`node_modules/commander/lib/help.js:315` |
 | `isValidTTY` | function | `bin/lib/cli/mode-detector.js` | 19 | **2** | `bin/install.js:115`<br>`bin/install.js:128` |
 | `invalidArgs` | function | `bin/lib/errors/install-error.js` | 33 | **2** | `bin/lib/paths/path-resolver.js:33`<br>`bin/lib/paths/path-resolver.js:41` |
 | `installAgents` | function | `bin/lib/installer/install-agents.js` | 10 | **2** | `bin/lib/installer/orchestrator.js:164`<br>`bin/lib/installer/orchestrator.js:181` |
@@ -117,8 +132,6 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `resolveTargetDirectory` | function | `bin/lib/paths/path-resolver.js` | 13 | **2** | `tests/unit/path-resolver.test.js:11`<br>`tests/unit/path-resolver.test.js:16` |
 | `getTemplatesDirectory` | function | `bin/lib/paths/path-resolver.js` | 71 | **2** | `bin/lib/cli/banner-manager.js:38`<br>`bin/lib/installer/orchestrator.js:67` |
 | `commandExists` | function | `bin/lib/platforms/binary-detector.js` | 13 | **2** | `bin/lib/platforms/binary-detector.js:32`<br>`bin/lib/platforms/binary-detector.js:34` |
-| `detectBinaries` | function | `bin/lib/platforms/binary-detector.js` | 30 | **2** | `bin/lib/cli/interactive.js:28`<br>`bin/lib/platforms/binary-detector.js:43` |
-| `detectInstallations` | function | `bin/lib/platforms/detector.js` | 9 | **2** | `bin/lib/platforms/detector.js:44`<br>`bin/lib/platforms/detector.js:62` |
 | `derivePlatformFromPath` | function | `bin/lib/platforms/platform-paths.js` | 93 | **2** | `bin/lib/manifests/repair.js:22`<br>`bin/lib/version/installation-finder.js:44` |
 | `_initialize` | method | `bin/lib/platforms/registry.js` | 19 | **2** | `bin/lib/platforms/registry.js:12`<br>`node_modules/vitest/dist/chunks/coverage.AVPTjMgw.js:2876` |
 | `formatPreflightReport` | function | `bin/lib/preflight/error-formatter.js` | 17 | **2** | `bin/lib/preflight/pre-flight-validator.js:61`<br>`bin/lib/preflight/pre-flight-validator.js:239` |
@@ -126,7 +139,7 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `formatValidationError` | function | `bin/lib/validation/error-logger.js` | 92 | **2** | `bin/lib/cli/installation-core.js:86`<br>`bin/lib/validation/error-logger.js:11` |
 | `checkDiskSpace` | function | `bin/lib/validation/pre-install-checks.js` | 52 | **2** | `bin/lib/validation/pre-install-checks.js:36`<br>`tests/validation/pre-install-checks.test.js:30` |
 | `indentMultiline` | arrow | `bin/lib/cli/logger.js` | 26 | **3** | `bin/lib/cli/logger.js:37`<br>`bin/lib/cli/logger.js:44`<br>`bin/lib/cli/logger.js:50` |
-| `displayCompletionLine` | function | `bin/lib/cli/progress.js` | 62 | **3** | `bin/lib/installer/orchestrator.js:161`<br>`bin/lib/installer/orchestrator.js:165`<br>`bin/lib/installer/orchestrator.js:169` |
+| `displayCompletionLine` | function | `bin/lib/cli/progress.js` | 27 | **3** | `bin/lib/installer/orchestrator.js:161`<br>`bin/lib/installer/orchestrator.js:165`<br>`bin/lib/installer/orchestrator.js:169` |
 | `insufficientSpace` | function | `bin/lib/errors/install-error.js` | 45 | **3** | `bin/lib/io/file-operations.js:29`<br>`bin/lib/migration/backup-manager.js:100`<br>`bin/lib/validation/pre-install-checks.js:67` |
 | `validateBackupSpace` | function | `bin/lib/migration/backup-manager.js` | 78 | **3** | `bin/lib/migration/backup-manager.js:171`<br>`tests/unit/migration-manager.test.js:79`<br>`tests/unit/migration-manager.test.js:91` |
 | `showBackupFailure` | function | `bin/lib/migration/migration-manager.js` | 63 | **3** | `bin/lib/migration/migration-manager.js:127`<br>`bin/lib/migration/migration-manager.js:133`<br>`bin/lib/migration/migration-manager.js:138` |
@@ -137,8 +150,9 @@ Functions called **1-5 times**. Consider if they're truly needed.
 | `validateCustomPathWithPlatforms` | function | `bin/lib/validation/cli-validator.js` | 25 | **3** | `bin/install.js:82`<br>`bin/lib/validation/cli-validator.js:20`<br>`bin/lib/validation/cli-validator.js:23` |
 | `main` | function | `bin/install.js` | 35 | **4** | `bin/install.js:146`<br>`node_modules/semver/bin/semver.js:191`<br>`scripts/audit-functions.js:374`<br>`scripts/audit-functions.js:408` |
 | `banner` | function | `bin/lib/cli/banner-manager.js` | 12 | **4** | `bin/install.js:95`<br>`bin/lib/updater/check-update.js:21`<br>`node_modules/rollup/dist/es/shared/node-entry.js:17806`<br>`node_modules/rollup/dist/shared/rollup.js:19409` |
-| `subtitle` | function | `bin/lib/cli/logger.js` | 262 | **4** | `bin/lib/cli/logger.js:305`<br>`bin/lib/cli/logger.js:316`<br>`bin/lib/cli/logger.js:327`<br>`bin/lib/cli/logger.js:337` |
-| `warnSubtitle` | function | `bin/lib/cli/logger.js` | 315 | **4** | `bin/lib/installer/orchestrator.js:138`<br>`bin/lib/migration/migration-manager.js:22`<br>`bin/lib/migration/migration-orchestrator.js:38`<br>`bin/lib/updater/update-messages.js:12` |
+| `blockTitle` | function | `bin/lib/cli/logger.js` | 143 | **4** | `bin/lib/cli/install-loop.js:40`<br>`bin/lib/cli/install-loop.js:45`<br>`bin/lib/cli/next-steps.js:27`<br>`bin/lib/updater/update-messages.js:39` |
+| `subtitle` | function | `bin/lib/cli/logger.js` | 228 | **4** | `bin/lib/cli/logger.js:271`<br>`bin/lib/cli/logger.js:282`<br>`bin/lib/cli/logger.js:293`<br>`bin/lib/cli/logger.js:303` |
+| `warnSubtitle` | function | `bin/lib/cli/logger.js` | 281 | **4** | `bin/lib/installer/orchestrator.js:138`<br>`bin/lib/migration/migration-manager.js:22`<br>`bin/lib/migration/migration-orchestrator.js:38`<br>`bin/lib/updater/update-messages.js:12` |
 | `permissionDenied` | function | `bin/lib/errors/install-error.js` | 41 | **4** | `bin/lib/io/file-operations.js:26`<br>`bin/lib/io/file-operations.js:45`<br>`bin/lib/io/file-operations.js:94`<br>`bin/lib/validation/pre-install-checks.js:109` |
 | `copyDirectory` | function | `bin/lib/io/file-operations.js` | 16 | **4** | `bin/lib/installer/install-shared.js:18`<br>`bin/lib/installer/install-skills.js:33`<br>`bin/lib/installer/install-skills.js:48`<br>`bin/lib/migration/backup-manager.js:129` |
 | `copyWithRetry` | function | `bin/lib/migration/backup-manager.js` | 124 | **4** | `bin/lib/migration/backup-manager.js:187`<br>`tests/unit/migration-manager.test.js:99`<br>`tests/unit/migration-manager.test.js:108`<br>`tests/unit/migration-manager.test.js:122` |
@@ -175,7 +189,7 @@ Functions called **1-5 times**. Consider if they're truly needed.
 
 ---
 
-## 🔍 Potential Inline Candidates (55)
+## 🔍 Potential Inline Candidates (56)
 
 Functions called **exactly once**. Consider inlining at call site.
 
@@ -192,7 +206,8 @@ Functions called **exactly once**. Consider inlining at call site.
 | `collectTemplatePaths` | function | `bin/lib/preflight/pre-flight-validator.js` | 332 | `bin/lib/preflight/pre-flight-validator.js:171` |
 | `createMultiBar` | function | `bin/lib/cli/progress.js` | 10 | `bin/lib/cli/installation-core.js:38` |
 | `deriveScope` | function | `bin/lib/version/installation-finder.js` | 65 | `bin/lib/version/installation-finder.js:43` |
-| `errorSubtitle` | function | `bin/lib/cli/logger.js` | 304 | `bin/lib/errors/directory-error.js:5` |
+| `detectBinaries` | function | `bin/lib/platforms/binary-detector.js` | 30 | `bin/lib/cli/interactive.js:28` |
+| `errorSubtitle` | function | `bin/lib/cli/logger.js` | 270 | `bin/lib/errors/directory-error.js:5` |
 | `extractSkillReferences` | method | `bin/lib/platforms/claude-adapter.js` | 93 | `bin/lib/platforms/claude-adapter.js:73` |
 | `extractVersion` | function | `bin/lib/version/version-detector.js` | 140 | `bin/lib/version/version-detector.js:40` |
 | `findVersionFiles` | function | `bin/lib/version/version-detector.js` | 75 | `bin/lib/version/version-detector.js:26` |
@@ -212,7 +227,7 @@ Functions called **exactly once**. Consider inlining at call site.
 | `getScriptDir` | function | `bin/lib/cli/installation-core.js` | 126 | `bin/lib/cli/interactive.js:40` |
 | `groupErrorsByCategory` | function | `bin/lib/preflight/error-formatter.js` | 51 | `bin/lib/preflight/error-formatter.js:26` |
 | `handleCheckUpdates` | function | `bin/lib/updater/check-update.js` | 17 | `bin/install.js:90` |
-| `infoSubtitle` | function | `bin/lib/cli/logger.js` | 326 | `bin/lib/installer/orchestrator.js:144` |
+| `infoSubtitle` | function | `bin/lib/cli/logger.js` | 292 | `bin/lib/installer/orchestrator.js:144` |
 | `installPlatforms` | function | `bin/lib/cli/installation-core.js` | 28 | `bin/lib/cli/install-loop.js:51` |
 | `isGSDInstalled` | function | `bin/lib/platforms/detector.js` | 34 | `bin/lib/platforms/detector.js:18` |
 | `joinPaths` | function | `bin/lib/paths/path-resolver.js` | 62 | `tests/unit/path-resolver.test.js:48` |
@@ -239,7 +254,7 @@ Functions called **exactly once**. Consider inlining at call site.
 
 ---
 
-## ✅ Normal Usage Functions (66)
+## ✅ Normal Usage Functions (65)
 
 Functions called **more than 5 times**. These are likely core functionality.
 
@@ -256,7 +271,7 @@ Functions called **more than 5 times**. These are likely core functionality.
 | `constructor` | method | `bin/lib/platforms/copilot-adapter.js` | **593** |
 | `constructor` | method | `bin/lib/platforms/registry.js` | **593** |
 | `error` | function | `bin/lib/cli/logger.js` | **489** |
-| `warn` | function | `bin/lib/cli/logger.js` | **171** |
+| `warn` | function | `bin/lib/cli/logger.js` | **170** |
 
 ---
 
@@ -264,14 +279,14 @@ Functions called **more than 5 times**. These are likely core functionality.
 
 ### Phase 1: Quick Wins (Low Risk)
 
-1. **Remove unused functions** (15 functions)
+1. **Remove unused functions** (1 functions)
    - Priority: Exported functions that are unused (dead exports)
    - Action: Delete or comment out, commit, and test
    - Risk: Low (not called anywhere)
 
 ### Phase 2: Inline Candidates (Medium Risk)
 
-2. **Inline single-use functions** (55 functions)
+2. **Inline single-use functions** (56 functions)
    - Priority: Small utility functions (<10 lines)
    - Action: Move code to call site, remove function
    - Risk: Medium (changes code structure)

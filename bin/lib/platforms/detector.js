@@ -35,37 +35,3 @@ async function isGSDInstalled(platform, isGlobal) {
   const manifestPath = getManifestPath(platform, isGlobal);
   return await pathExists(manifestPath);
 }
-
-/**
- * Get installed platforms
- * @returns {Promise<string[]>} Array of platform names
- */
-export async function getInstalledPlatforms() {
-  const detections = await detectInstallations();
-  const installed = [];
-  
-  for (const [platform, locations] of Object.entries(detections)) {
-    if (locations.global || locations.local) {
-      installed.push(platform);
-    }
-  }
-  
-  return installed;
-}
-
-/**
- * Get installed version for a platform
- * @param {string} platform - Platform name (claude, copilot, codex)
- * @returns {Promise<string|null>} Version string or null if not installed
- */
-export async function getInstalledVersion(platform) {
-  const detections = await detectInstallations();
-  const detection = detections[platform];
-  
-  if (!detection) {
-    return null;
-  }
-  
-  // Return version from detection (currently always null until Phase 6)
-  return detection.version;
-}

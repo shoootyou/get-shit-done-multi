@@ -114,27 +114,3 @@ export async function readFile(filePath) {
 export async function pathExists(path) {
   return fs.pathExists(path);
 }
-
-/**
- * Get available disk space in bytes
- * @param {string} path - Path to check
- * @returns {Promise<number>}
- */
-export async function getAvailableSpace(path) {
-  // Simplified check - use fs.stat for basic validation
-  // Full disk space checking can be added with child_process (df/PowerShell)
-  try {
-    await fs.access(path);
-    return Infinity; // Assume sufficient space for now
-  } catch {
-    return 0;
-  }
-}
-
-/**
- * Resolve home directory
- * @returns {string}
- */
-export function getHomeDirectory() {
-  return homedir();
-}

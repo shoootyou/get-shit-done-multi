@@ -34,14 +34,3 @@ export async function detectBinaries() {
     codex: await commandExists('codex')
   };
 }
-
-/**
- * Get recommended platforms based on installed binaries
- * @returns {Promise<string[]>} Array of platform names
- */
-export async function getRecommendedPlatforms() {
-  const binaries = await detectBinaries();
-  return Object.entries(binaries)
-    .filter(([_, exists]) => exists)
-    .map(([platform, _]) => platform);
-}
