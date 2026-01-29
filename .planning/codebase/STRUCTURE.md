@@ -5,14 +5,14 @@
 ## Codebase Metrics
 
 **Files Analyzed:**
-- Total files: 85 files
-- Source files: 64 files (JavaScript)
+- Total files: 81 files
+- Source files: 60 files (JavaScript)
 - Test files: 21 files
-- Config files: 3 files (package.json, vitest.config.js, Dockerfile)
+- Config files: 2 files (package.json, vitest.config.js)
 
 **Lines of Code:**
-- Total: 10,494 lines
-- Source: ~8,500 lines (excluding tests)
+- Total: 9,740 lines
+- Source: ~7,740 lines (excluding tests)
 - Tests: ~2,000 lines
 
 **Excluded from analysis:**
@@ -71,27 +71,21 @@ get-shit-done-multi/
 │   ├── unit/                           # Unit tests
 │   ├── integration/                    # Integration tests
 │   ├── version/                        # Version-specific tests
+│   ├── validation/                     # Validation tests
 │   └── helpers/                        # Test utilities
-├── hooks/                              # Hooks for IDE integration
-│   ├── gsd-check-update.js             # Update checker hook
-│   └── statusline.js                   # Statusline hook
-├── scripts/                            # Build and utility scripts
-│   └── audit-functions.js              # Function auditor
 ├── get-shit-done/                      # GSD workflow templates (source)
 │   ├── references/                     # Reference documents
 │   ├── templates/                      # Project templates
 │   └── workflows/                      # Workflow definitions
 ├── .gsd-backup/                        # Migration backups (generated)
 ├── assets/                             # Assets (logo, etc.)
-├── github/                             # GitHub issue templates
 ├── package.json                        # NPM package definition
 ├── vitest.config.js                    # Vitest configuration
 ├── README.md                           # User-facing README
 ├── GSD-STYLE.md                        # GSD style guide
 ├── CHANGELOG.md                        # Version changelog
 ├── LICENSE                             # MIT license
-├── Makefile                            # Build commands
-└── Dockerfile                          # Docker support
+└── Makefile                            # Build commands
 ```
 
 ## Directory Purposes
@@ -174,38 +168,28 @@ get-shit-done-multi/
 
 **`templates/`:**
 - Purpose: Universal templates (SOURCE OF TRUTH)
-- Contains: Skills (29), agents (13), shared directory
+- Contains: Skills (29), agents (14), shared directory
 - Key structure:
   - `agents/*.agent.md` - Agent templates with template variables
   - `agents/versions.json` - Consolidated agent versions
-  - `skills/gsd-*/SKILL.md` - Skill templates
-  - `skills/gsd-*/version.json` - Per-skill versions
-  - `skills/get-shit-done/{claude|copilot|codex}/` - Platform-specific skills
-  - `get-shit-done/.gsd-install-manifest.json` - Manifest template
+  - `skills/gsd-*/` - 29 skill directories with SKILL.md and version.json
+  - `skills/get-shit-done/{claude|copilot|codex}/` - Platform-specific get-shit-done skills
+  - `get-shit-done/` - Shared workflow references and templates
 
 **`tests/`:**
 - Purpose: Test suite (Vitest)
-- Contains: Unit tests, integration tests, version-specific tests, helpers
+- Contains: Unit tests, integration tests, version-specific tests, validation tests, helpers
 - Key files:
   - `unit/old-version-detector.test.js` (326 LOC)
   - `unit/migration-manager.test.js` (318 LOC)
   - `integration/migration-flow.test.js` (405 LOC)
   - `unit/frontmatter-serializer.test.js` (395 LOC)
 
-**`hooks/`:**
-- Purpose: Hooks for IDE integration
-- Contains: Update checker hook, statusline hook
-- Key files: `gsd-check-update.js`, `statusline.js`
-
-**`scripts/`:**
-- Purpose: Build and utility scripts
-- Contains: Function auditor
-- Key files: `audit-functions.js` (408 LOC)
-
 **`get-shit-done/`:**
 - Purpose: GSD workflow templates (source)
-- Contains: References, templates, workflows
+- Contains: References (8 files), templates (2 subdirs), workflows (17 files)
 - Copied to installation directory by installer
+- Key files: `workflows/execute-plan.md`, `references/checkpoints.md`, `references/ui-brand.md`
 
 **`.gsd-backup/`:**
 - Purpose: Migration backups (auto-generated)
@@ -295,6 +279,7 @@ get-shit-done-multi/
 - Skill: Create `templates/skills/gsd-{name}/SKILL.md` + `version.json`
 - Agent: Create `templates/agents/gsd-{name}.agent.md`, update `versions.json`
 - Platform-specific: Create subdirectories in `templates/skills/get-shit-done/{platform}/`
+- Shared content: Add to `get-shit-done/references/` or `get-shit-done/workflows/`
 
 **New Error Type:**
 - Definition: Add to `bin/lib/errors/install-error.js`
@@ -335,15 +320,9 @@ get-shit-done-multi/
 
 **`templates/`:**
 - Purpose: Universal templates (permanent source of truth)
-- Generated: No (migrated once in Phase 1, then permanent)
+- Generated: No (source-controlled content)
 - Committed: Yes (tracked in git)
 - Distributed: Yes (included in npm package)
-
-**`get-shit-done/`:**
-- Purpose: GSD workflow templates (source)
-- Generated: No (manually created)
-- Committed: Yes (tracked in git)
-- Distributed: Yes (included in npm package, copied to installations)
 
 ## NPM Package Structure
 
@@ -351,18 +330,21 @@ get-shit-done-multi/
 
 **Included files** (from `package.json` `files` field):
 - `bin/` - Executable and library code
-- `get-shit-done/` - GSD workflow templates
-- `hooks/` - IDE integration hooks
-- `github/` - GitHub issue templates
-- `docs/` - Documentation (if exists)
+- `templates/` - Universal templates (skills, agents, shared)
 
-**Excluded files** (`.npmignore`):
+**Excluded files** (automatically excluded or in `.gitignore`):
 - `.planning/` - Planning documents
 - `tests/` - Test suite
 - `.gsd-backup/` - Backup directory
 - `coverage/` - Coverage reports
 - `node_modules/` - Dependencies
 - `.git/`, `.github/`, `.claude/`, `.codex/` - Version control and IDE dirs
+
+**`get-shit-done/`:**
+- Purpose: GSD workflow templates (source)
+- Generated: No (manually created)
+- Committed: Yes (tracked in git)
+- Distributed: Yes (included in npm package, copied to installations)
 
 **Entry point:** `bin: { "get-shit-done-multi": "bin/install.js" }`
 
@@ -371,7 +353,6 @@ get-shit-done-multi/
 ## File Size Distribution
 
 **Largest source files:**
-- `scripts/audit-functions.js`: 408 LOC
 - `bin/lib/preflight/pre-flight-validator.js`: 369 LOC
 - `bin/lib/installer/orchestrator.js`: 332 LOC
 - `bin/lib/cli/logger.js`: 303 LOC
@@ -416,31 +397,50 @@ get-shit-done-multi/
 │   │   └── SKILL.md
 │   ├── gsd-add-phase/
 │   │   └── SKILL.md
-│   └── ... (28 skills)
+│   ├── get-shit-done/
+│   │   └── SKILL.md (platform-specific)
+│   └── ... (29 skills total)
 ├── agents/
-│   ├── gsd-planner.agent.md
+│   ├── gsd-planner.agent.md (or .md for Claude)
 │   ├── gsd-executor.agent.md
-│   └── ... (13 agents)
+│   └── ... (14 agents total)
 └── get-shit-done/
     ├── references/
+    │   ├── checkpoints.md
+    │   ├── ui-brand.md
+    │   ├── git-integration.md
+    │   └── ... (8 files)
     ├── templates/
+    │   ├── codebase/
+    │   └── research-project/
     ├── workflows/
+    │   ├── execute-plan.md
+    │   ├── map-codebase.md
+    │   └── ... (17 files)
     └── .gsd-install-manifest.json  # Version tracking
 ```
 
 ## Migration Strategy
 
-**Phase 1 (Complete):**
+**Phase 1 (Complete - January 2026):**
 - ONE-TIME migration from `.github/` → `/templates/`
 - Frontmatter corrections applied
 - Version tracking added
-- Migration code deleted after completion (preserved in git history)
+- Migration code preserved for v1.x → v2.0 migrations
 
-**Post-Phase 1:**
+**Phase 7.2 (Complete - January 2026):**
+- Removed audit-functions.* files (5MB+ cleanup)
+- Deleted scripts/, hooks/, .scripts/ directories
+- Removed Docker files (Dockerfile, docker-compose.yml)
+- Fixed package.json (files array, Node 20 requirement)
+- Moved gray-matter from devDependencies to dependencies
+- Repository ~320KB smaller
+
+**Current State:**
 - `/templates/` is permanent source of truth
 - Installation always reads from `/templates/`
-- `.github/` preserved as historical reference only
-- No ongoing conversion logic
+- All installations track version via manifest files
+- Migration system handles v1.x → v2.0.0 upgrades automatically
 
 ---
 

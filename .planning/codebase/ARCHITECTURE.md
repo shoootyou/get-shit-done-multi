@@ -3,10 +3,10 @@
 **Analysis Date:** 2026-01-29
 
 **Scope:**
-- Source files: 85 files
+- Source files: 81 files
 - Primary language: JavaScript (100% of codebase)
-- LOC: 10,494 lines
-- Test files: 21 files
+- LOC: 9,740 lines
+- Test coverage: 21 test files
 
 ## Pattern Overview
 
@@ -365,4 +365,71 @@
 
 ---
 
-*Architecture analysis: 2026-01-29*
+## Architecture Decision Records
+
+### ADR 1: Platform Adapter Isolation Over DRY (2026-01-26)
+
+**Status:** ✅ APPROVED | **Impact:** HIGH
+
+**Decision:** Each platform MUST have its own complete adapter implementation. NO inheritance between platform adapters (ClaudeAdapter, CopilotAdapter, CodexAdapter).
+
+**Rationale:**
+- **Platform Isolation:** Changes to Copilot specs only affect CopilotAdapter
+- **Maintainability:** Clear boundaries, no inheritance surprises
+- **Debugging:** No parent class tracing needed
+- **Future-Proofing:** Platform specs may diverge over time
+- **Trade-off:** 200 lines of duplication is acceptable vs coupling
+
+**Implementation:**
+```
+PlatformAdapter (base)
+    ├─ ClaudeAdapter (complete, isolated)
+    ├─ CopilotAdapter (complete, isolated)
+    └─ CodexAdapter (complete, isolated)
+```
+
+**Consequences:**
+- ✅ Platform changes confined to single file
+- ✅ Self-contained adapters (easier testing/debugging)
+- ⚠️ ~200 LOC duplicated across 3 adapters
+- ⚠️ Bug fixes may need changes in multiple files
+
+**References:** REQUIREMENTS.md (PLATFORM-02), phases/03-*/03-RESEARCH.md
+
+---
+
+### ADR 2: Centralized Path Management (2026-01-27)
+
+**Status:** ✅ IMPLEMENTED | **Impact:** MEDIUM
+
+**Decision:** Create `bin/lib/platforms/platform-paths.js` as single source of truth for all GSD path definitions.
+
+**Problem:** Platform paths hardcoded across ~10 files, making maintenance error-prone.
+
+**Implementation:**
+```javascript
+// Platform directory mappings
+platformDirs = {
+  claude: { global: '.claude', local: '.claude' },
+  copilot: { global: '.copilot', local: '.github' },
+  codex: { global: '.codex', local: '.codex' }
+};
+
+// Helper functions
+getPlatformDir(platform, isGlobal)
+getInstallPath(platform, isGlobal)
+getManifestPath(platform, isGlobal)
+derivePlatformFromPath(manifestPath)
+```
+
+**Benefits:**
+- Single source of truth for all paths
+- Consistent with platform-names.js pattern
+- Easier to add new platforms
+- Reduced duplication
+
+**Files Refactored:** 7 files (claude/copilot/codex adapters, detector, installation-finder, check-update)
+
+---
+
+*Architecture analysis: 2026-01-29 (includes ADRs from project history)*

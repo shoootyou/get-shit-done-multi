@@ -99,6 +99,15 @@ Overall Progress:
    - All work happens in templates/ directory
    - Source files preserved as reference and backup
    - Rationale: Prevent accidental corruption of working files
+   - **Protection Mechanisms:**
+     - Documentation (this constraint, SOURCE-PROTECTION.md archived)
+     - Git tracking - all three directories tracked and can be restored
+     - Phase 2 incident: .claude/ accidentally deleted, immediately restored via `git checkout HEAD -- .claude/`
+   - **Why Protected:**
+     - Historical reference (original working implementations)
+     - Migration source (Phase 1 read from these for templates/)
+     - Development use (project uses GSD skills from .claude/)
+     - Backup (authoritative source if templates have issues)
 
 5. **2026-01-26:** Templates are source of truth for installation
    - templates/ directory is what gets copied during install
@@ -800,6 +809,35 @@ Overall Progress:
   - Impact: Ensures npm publish works correctly, removes confusion from obsolete code, Node 20 minimum
   - Scope: npm config, remove template renderer, cleanup audit files, update tests, fix error handling, Node 20
   - Key concerns: Publishing (templates/bin), large files (audit-functions.*), version detection TODOs, ALLOW_SYMLINKS cleanup
+
+### Critical Constraints
+
+**Active Constraints (MUST be followed):**
+
+1. **Source Directory Protection** (2026-01-26, reaffirmed 2026-01-29)
+   - `.github/`, `.claude/`, `.codex/` are READ-ONLY
+   - All installer work happens in `templates/` directory
+   - These directories contain the working implementation this project uses
+   - Violation: Phase 2 accidentally deleted `.claude/`, restored immediately
+   - Enforcement: Git tracking, documentation, code reviews
+
+2. **Template Isolation** (2026-01-26)
+   - `templates/` is the source of truth for npm package distribution
+   - Installer copies FROM templates/, never FROM source directories
+   - Source directories only used for initial template generation in Phase 1
+   - Changes to source directories do NOT affect published package
+
+3. **Test Isolation** (2026-01-29)
+   - All tests MUST run in `/tmp` with isolated subdirectories
+   - Tests MUST copy full project to `/tmp` before running
+   - Tests NEVER modify real templates/ or source directories
+   - Prevents accidental corruption during test execution
+
+4. **npm Publishing Structure** (2026-01-29)
+   - `files` array must include ONLY: `["bin", "templates"]`
+   - npm auto-includes: package.json, README, LICENSE, CHANGELOG
+   - All other directories excluded from published package
+   - Package verified production-ready at 339KB (<1MB target)
 
 ### Technical Debt
 - Migration scripts preserved in git history (committed before deletion)

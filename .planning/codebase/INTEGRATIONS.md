@@ -38,9 +38,7 @@
 
 **Caching:**
 - None (no caching layer)
-- Docker volumes for development:
-  - `.sandbox-cache/` - Persistent cache for pip, npm in container
-  - `.sandbox-home/` - Persistent home directory in container
+- Note: Docker sandbox volumes removed in Phase 7.2
 
 ## Authentication & Identity
 
@@ -87,7 +85,7 @@
 
 **Deployment:**
 - Manual publish to npm via `npm publish`
-- Triggered by `prepublishOnly` script: `node scripts/build-templates.js`
+- No prepublishOnly script (Phase 7.2 cleanup)
 - No automated deployment pipeline detected
 
 ## Environment Configuration
@@ -96,7 +94,7 @@
 - None required for installation or operation
 
 **Optional env vars:**
-- `CONTAINER_RUNTIME` - Docker/Podman selection in Makefile (dev only)
+- None (CONTAINER_RUNTIME removed with Docker files in Phase 7.2)
 
 **Secrets location:**
 - No secrets required
@@ -125,8 +123,7 @@
 - Tools: Capitalized comma-separated (Read, Write, Bash, Grep, Glob, Task)
 - Adapter: `bin/lib/platforms/claude-adapter.js`
 - Detection: Checks for `.claude/get-shit-done/` path
-- Hooks: SessionStart hook for update checking (`hooks/gsd-check-update.js`)
-- Status line: Custom status display (`hooks/statusline.js`)
+- Note: SessionStart hooks removed in Phase 7.2 cleanup
 
 **GitHub Copilot CLI:**
 - Platform: GitHub Copilot (OpenAI-powered)
@@ -195,35 +192,15 @@
 ## Docker Integration
 
 **Development Environment:**
-- Docker Compose orchestration: `docker-compose.yml`
-- Base image: Ubuntu 24.04
-- Services:
-  - `ia` - Interactive with network (profile: net)
-  - `ia-nonet` - Isolated without network (profile: nonet)
-- Container name: `ubuntu-ia-env`
+- Note: Docker files removed in Phase 7.2 cleanup
+- `Dockerfile` - Removed (was: Ubuntu 24.04 base with AI CLIs)
+- `docker-compose.yml` - Removed (was: orchestration for development)
+- `Makefile` - Still present (Docker commands commented, but file retained for future use)
 
-**Pre-installed Tools:**
-- Node.js 20 (via NodeSource)
-- GitHub CLI (`gh`)
-- Claude Code CLI (via curl install script)
-- GitHub Copilot CLI (via curl install script)
-- OpenAI Codex CLI (via npm global install)
-- Python 3 with pip and venv
-- Git, curl, wget, gnupg
-
-**Security:**
-- Non-root user: `sandbox` (UID: 9999, GID: 9999)
-- Passwordless sudo
-- Resource limits: 8GB RAM, 4 CPUs
-- PID limit: 512
-- Capabilities: SETUID, SETGID, AUDIT_WRITE
-- Tmpfs mounts: `/tmp` (1GB), `/run` (64MB)
-
-**Volumes:**
-- Workspace: `.` → `/workspace` (read-write)
-- Sandbox writes: `.sandbox-rw/` → `/workspace-rw`
-- Persistent home: `.sandbox-home/` → `/home/sandbox`
-- Cache: `.sandbox-cache/` → `/home/sandbox/.cache`
+**Historical Context:**
+- Previously: Full Docker development environment with all 3 AI platforms
+- Removed: 5MB+ Docker-related files (Dockerfile, docker-compose.yml)
+- Reason: Simplification, reduced maintenance burden
 
 ## Migration & Updates
 
@@ -261,10 +238,11 @@
 - Workflow helper: `get-shit-done/workflows/git-identity-helpers.sh`
 - Used by GSD workflows for atomic commits
 - No direct git library dependencies (uses CLI via Bash)
+- Note: Scripts directory removed in Phase 7.2 cleanup
 
 **Version Control:**
 - `.gitignore` - Excludes node_modules, coverage, sandbox dirs, .planning/config.json
-- Hooks directory: `hooks/` (local git hooks)
+- Note: Hooks directory removed in Phase 7.2 cleanup
 - No git hosting API integration (no Octokit or similar)
 
 ---
