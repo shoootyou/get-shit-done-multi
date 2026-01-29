@@ -1,10 +1,12 @@
 # Platform Specifics
 
-Deep dive into platform-specific formats, frontmatter examples, and conventions for Claude Code, GitHub Copilot CLI, and Codex CLI.
+Deep dive into platform-specific formats, frontmatter examples, and conventions for Claude Code, GitHub Copilot CLI,
+and Codex CLI.
 
 ## Claude Code
 
 ### Overview
+
 - **Target Directory:** `.claude/skills/`, `.claude/agents/`, `.claude/get-shit-done/`
 - **Global Directory:** `~/.claude/skills/`, `~/.claude/agents/`, `~/.claude/get-shit-done/`
 - **Command Prefix:** `/gsd-...`
@@ -24,6 +26,7 @@ user-invocable: true
 ```
 
 **Official Supported Fields (Skills):**
+
 - `name` (optional): Display name
 - `description` (recommended): What the skill does
 - `argument-hint` (optional): Expected arguments (e.g., `[phase-number]`)
@@ -54,6 +57,7 @@ permissionMode: default
 ```
 
 **Official Supported Fields (Agents):**
+
 - `name` (required): Unique identifier
 - `description` (required): When to delegate to subagent
 - `tools` (optional): Comma-separated string
@@ -68,6 +72,7 @@ See official docs: https://code.claude.com/docs/en/sub-agents
 ### Path References
 
 Skills and agents reference shared resources:
+
 ```markdown
 See @.claude/get-shit-done/references/commit-guidelines.md for details.
 ```
@@ -81,6 +86,7 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 ## GitHub Copilot CLI
 
 ### Overview
+
 - **Target Directory:** `.github/skills/`, `.github/agents/`, `.github/get-shit-done/`
 - **Global Directory:** `~/.copilot/skills/`, `~/.copilot/agents/`, `~/.copilot/get-shit-done/`
 - **Command Prefix:** `/gsd-...`
@@ -103,6 +109,7 @@ templateVersion: 2.0.0
 ```
 
 **Supported Fields (Skills):**
+
 - `name` (optional): Display name
 - `description` (recommended): What the skill does
 - `argument-hint` (optional): Expected arguments
@@ -112,6 +119,7 @@ templateVersion: 2.0.0
 - `templateVersion` (required): Template version (e.g., "2.0.0")
 
 **Tool Name Mappings:**
+
 - `read` (not Read)
 - `write` (not Write)
 - `edit` (not Edit)
@@ -132,6 +140,7 @@ target: github-copilot
 ```
 
 **Supported Fields (Agents):**
+
 - `name` (optional): Display name
 - `description` (required): Purpose and capabilities
 - `tools` (optional): Comma-separated string (lowercase)
@@ -158,6 +167,7 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 ## Codex CLI
 
 ### Overview
+
 - **Target Directory:** `.codex/skills/`, `.codex/agents/`, `.codex/get-shit-done/`
 - **Global Directory:** `~/.codex/skills/`, `~/.codex/agents/`, `~/.codex/get-shit-done/`
 - **Command Prefix:** `$gsd-...` (NOT `/gsd-...`)
@@ -180,6 +190,7 @@ templateVersion: 2.0.0
 ```
 
 **Key Difference from Copilot:**
+
 - Command prefix is `$gsd-` (not `/gsd-`)
 - All skill content replaces `/gsd-` with `$gsd-`
 - Platform field is "codex" (not "copilot")

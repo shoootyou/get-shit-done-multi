@@ -3,6 +3,7 @@
 ## Overview
 
 The `get-shit-done-multi` installer supports two modes:
+
 1. **CLI Mode** - Direct installation via command-line flags
 2. **Interactive Mode** - Beautiful prompts using @clack/prompts
 
@@ -15,6 +16,7 @@ Both modes share the same underlying installation logic to ensure consistency.
 > "CLI mode and Interactive mode are ADAPTERS that gather parameters differently, then call the SAME installation core."
 
 This pattern ensures:
+
 - ✅ No duplicate code between modes
 - ✅ Consistent behavior and messaging
 - ✅ Single source of truth for installation logic
@@ -23,7 +25,7 @@ This pattern ensures:
 
 ### Flow Diagram
 
-```
+```text
 ┌─────────────────┐         ┌──────────────────┐
 │   CLI Mode      │         │ Interactive Mode │
 │  (bin/install)  │         │  (interactive.js)│
@@ -53,7 +55,7 @@ This pattern ensures:
 
 ## File Structure
 
-```
+```text
 bin/
 ├── install.js                      # Entry point - CLI mode adapter
 └── lib/
@@ -70,11 +72,13 @@ bin/
 ## Key Functions
 
 ### `installPlatforms(platforms, scope, options)`
+
 **Location:** `bin/lib/cli/installation-core.js`
 
 The core installation function shared by both modes.
 
 **Parameters:**
+
 - `platforms: string[]` - Array of platforms to install (e.g., `['claude', 'copilot']`)
 - `scope: string` - Installation scope: `'global'` or `'local'`
 - `options: Object` - Additional options
@@ -86,6 +90,7 @@ The core installation function shared by both modes.
 **Returns:** `Promise<Object>` with installation results
 
 **Usage:**
+
 ```javascript
 import { installPlatforms } from './lib/cli/installation-core.js';
 
@@ -101,23 +106,27 @@ await installPlatforms(platforms, scope, {
   scriptDir: getScriptDir(import.meta.url),
   showBanner: false // Already showed banner
 });
-```
+```plaintext
 
 ### `showNextSteps(platforms, indent)`
+
 **Location:** `bin/lib/cli/next-steps.js`
 
 Displays next steps after installation with correct command prefix.
 
 **Command Prefix Rules:**
+
 - **Codex CLI (solo):** Uses `$gsd-` prefix
 - **Claude Code / GitHub Copilot CLI:** Uses `/gsd-` prefix
 - **Multiple platforms:** Uses `/gsd-` prefix (common denominator)
 
 **Parameters:**
+
 - `platforms: string[]` - Installed platforms
 - `indent: number` - Number of spaces to indent (default: 0)
 
 **Usage:**
+
 ```javascript
 import { showNextSteps } from './lib/cli/next-steps.js';
 
@@ -131,12 +140,14 @@ showNextSteps(['claude', 'codex']); // Shows /gsd- commands
 ### CLI Mode (bin/install.js)
 
 **Responsibilities:**
+
 1. Parse command-line flags with commander
 2. Validate platform flags
 3. Determine scope (--global or --local)
 4. Call `installPlatforms()` with parameters
 
 **Does NOT:**
+
 - ❌ Implement installation logic
 - ❌ Show next steps directly
 - ❌ Handle progress bars directly
@@ -144,6 +155,7 @@ showNextSteps(['claude', 'codex']); // Shows /gsd- commands
 ### Interactive Mode (bin/lib/cli/interactive.js)
 
 **Responsibilities:**
+
 1. Show banner and intro
 2. Detect installed CLIs
 3. Show warning if no CLIs detected
@@ -152,6 +164,7 @@ showNextSteps(['claude', 'codex']); // Shows /gsd- commands
 6. Call `installPlatforms()` with selections
 
 **Does NOT:**
+
 - ❌ Implement installation logic
 - ❌ Show next steps directly
 - ❌ Handle progress bars directly
@@ -171,6 +184,7 @@ The adapter pattern provides:
 ### Why Not Class-Based?
 
 We use functional composition instead of class inheritance because:
+
 - Simpler to understand and maintain
 - No hidden state or complex hierarchies
 - Functions are easier to test in isolation
@@ -179,6 +193,7 @@ We use functional composition instead of class inheritance because:
 ### Why Separate next-steps.js?
 
 Command prefix handling (`/gsd-` vs `$gsd-`) is a cross-cutting concern that:
+
 - Appears in multiple places (CLI messages, interactive messages)
 - Has specific business rules (Codex solo uses $, others use /)
 - Should be centralized to prevent drift
@@ -211,7 +226,7 @@ prefix = '/gsd-'
 platforms = ['claude', 'codex']
 prefix = '/gsd-'  // Use common denominator
 // Shows: "Run /gsd-help to see available commands"
-```
+```plaintext
 
 ### Success Messages
 
@@ -228,13 +243,14 @@ logger.success(`${names} installation complete`, 1);
 ```javascript
 logger.header('Next Steps');  // Shows header with underline
 showNextSteps(platforms);     // Shows 3 command lines with correct prefix
-```
+```plaintext
 
 ## Testing Strategy
 
 ### Test the Core
 
 Focus tests on `installation-core.js`:
+
 - ✅ Correct platform installation
 - ✅ Error handling (partial failures, total failures)
 - ✅ Success/failure tracking
@@ -243,6 +259,7 @@ Focus tests on `installation-core.js`:
 ### Test the Adapters Lightly
 
 CLI and Interactive modes just need:
+
 - ✅ Correct parameter extraction
 - ✅ Correct core function calls
 - ✅ Error propagation
@@ -250,6 +267,7 @@ CLI and Interactive modes just need:
 ### Integration Tests
 
 End-to-end tests for both modes:
+
 - ✅ CLI mode with various flags
 - ✅ Interactive mode with different selections
 - ✅ Both produce same results for same parameters
@@ -266,6 +284,7 @@ To add a new mode (e.g., web-based installer):
 4. Done! All installation logic is reused.
 
 Example:
+
 ```javascript
 import { installPlatforms } from '../cli/installation-core.js';
 
@@ -306,7 +325,7 @@ await installPlatforms(platforms, scope, {
     }
   }
 });
-```
+```plaintext
 
 ## Anti-Patterns to Avoid
 
@@ -332,7 +351,7 @@ function installPlatforms(platforms, scope, options) {
     // Show CLI messages
   }
 }
-```
+```plaintext
 
 ### ❌ Tight Coupling Between Modes
 

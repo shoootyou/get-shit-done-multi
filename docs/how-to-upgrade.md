@@ -4,7 +4,7 @@ Upgrading is the same as installing:
 
 ```bash
 npx get-shit-done-multi
-```
+```plaintext
 
 The installer detects existing installations and prompts you to upgrade if outdated.
 
@@ -47,7 +47,7 @@ npx get-shit-done-multi --version
 
 Example output:
 
-```
+```text
 GSD Installer v2.0.1
 
 Installed versions:
@@ -60,6 +60,7 @@ Installed versions:
 ```
 
 This helps you:
+
 - See which installations exist
 - Identify outdated versions
 - Plan upgrades strategically
@@ -69,7 +70,8 @@ This helps you:
 If you have GSD installed across multiple platforms or scopes, the installer handles each independently:
 
 **Example scenario:**
-```
+
+```text
 Found installations:
 1. Claude (global): v2.0.0 → v2.0.1 available
 2. Copilot (local): v2.0.0 → v2.0.1 available
@@ -83,6 +85,7 @@ Press Space to select, Enter to confirm
 ```
 
 You can:
+
 - Upgrade all platforms at once
 - Upgrade specific platforms only
 - Skip upgrades for certain installations
@@ -97,6 +100,7 @@ When you confirm an upgrade, the installer follows these steps:
 ### 1. Pre-flight Validation
 
 Before upgrading, the installer checks:
+
 - **Disk space:** Ensures sufficient space for new files
 - **Permissions:** Verifies write access to installation directory
 - **File conflicts:** Checks for custom modifications (warns if found)
@@ -104,11 +108,13 @@ Before upgrading, the installer checks:
 ### 2. File Replacement
 
 The installer **does not create backups** because:
+
 - All GSD files are templates (read-only reference material)
 - Your project's `.planning/` directory is never touched
 - Custom modifications should not exist (templates are reference-only)
 
 The upgrade process:
+
 1. Overwrites existing skill files
 2. Overwrites existing agent files
 3. Replaces shared directory contents
@@ -119,15 +125,17 @@ The upgrade process:
 After successful upgrade, the manifest is updated:
 
 **Before:**
+
 ```json
 {
   "gsd_version": "2.0.0",
   "installed_at": "2026-01-15T10:30:00Z",
   ...
 }
-```
+```plaintext
 
 **After:**
+
 ```json
 {
   "gsd_version": "2.0.1",
@@ -139,7 +147,8 @@ After successful upgrade, the manifest is updated:
 ### 4. Confirmation
 
 The installer confirms success:
-```
+
+```plaintext
 ✓ Upgraded Claude (global) from v2.0.0 to v2.0.1
 ✓ Upgraded Copilot (local) from v2.0.0 to v2.0.1
 
@@ -163,10 +172,12 @@ GSD follows semantic versioning (semver):
 When upgrading across major versions (e.g., v2.x → v3.x):
 
 1. **Read the CHANGELOG:**
+
    ```bash
    npx get-shit-done-multi --changelog
    # or visit: https://github.com/your-org/gsd/blob/main/CHANGELOG.md
-   ```
+
+```plaintext
 
 2. **Check breaking changes:**
    - Skill name changes
@@ -180,6 +191,7 @@ When upgrading across major versions (e.g., v2.x → v3.x):
    - Test on a non-critical project first
 
 4. **Proceed with upgrade:**
+
    ```bash
    npx get-shit-done-multi --yes
    ```
@@ -187,12 +199,14 @@ When upgrading across major versions (e.g., v2.x → v3.x):
 ### Safe Upgrades
 
 **Patch and minor version updates are always safe:**
+
 - No breaking changes
 - Skills maintain same names
 - Agents maintain same interfaces
 - Your existing `.planning/` directories continue working
 
 **You can upgrade confidently for:**
+
 - v2.0.0 → v2.0.1 (patch)
 - v2.0.x → v2.1.0 (minor)
 - v2.x.x → v2.y.z (same major)
@@ -214,15 +228,17 @@ Downgrading to an older version is **not directly supported**.
 If you need to use an older GSD version:
 
 **Option 1: Install specific version (if available)**
+
 ```bash
 # Uninstall current version first
 # (see docs/how-to-uninstall.md)
 
 # Install specific older version
 npx get-shit-done-multi@2.0.0
-```
+```plaintext
 
 **Option 2: Use npm install for pinned version**
+
 ```bash
 npm install get-shit-done-multi@2.0.0
 node_modules/.bin/get-shit-done-multi
@@ -245,9 +261,10 @@ npx get-shit-done-multi --claude --yes
 
 # Upgrade to global location
 npx get-shit-done-multi --global --yes
-```
+```plaintext
 
 The `--yes` flag:
+
 - Skips all confirmation prompts
 - Automatically upgrades outdated installations
 - Uses default options (local scope if not specified)
@@ -261,6 +278,7 @@ The `--yes` flag:
 **Problem:** `Error: EACCES: permission denied`
 
 **Solution:**
+
 ```bash
 # Use --local flag to install in current directory
 npx get-shit-done-multi --local --yes
@@ -274,11 +292,13 @@ chmod -R u+w ~/.claude/
 **Problem:** `--version` shows old version after upgrade
 
 **Causes:**
+
 - Manifest file not updated (file write failed)
 - Wrong installation location
 - Multiple installations (checking wrong one)
 
 **Solution:**
+
 ```bash
 # Check manifest directly
 cat ~/.claude/get-shit-done/.gsd-install-manifest.json
@@ -286,7 +306,7 @@ cat ~/.claude/get-shit-done/.gsd-install-manifest.json
 # Look for gsd_version field
 # If incorrect, try reinstalling:
 npx get-shit-done-multi --claude --global --yes
-```
+```plaintext
 
 ### Upgrade Succeeds but Skills Not Updated
 
@@ -295,6 +315,7 @@ npx get-shit-done-multi --claude --global --yes
 **Cause:** AI platform hasn't reloaded skills from disk
 
 **Solution:**
+
 1. Restart your AI platform (Claude Desktop, VS Code, etc.)
 2. Reload skill cache (platform-specific)
 3. Verify files updated: `ls -la ~/.claude/skills/gsd-*/`
@@ -304,13 +325,16 @@ npx get-shit-done-multi --claude --global --yes
 **Problem:** Pre-flight validation fails with "Insufficient disk space"
 
 **Solution:**
+
 1. Free up disk space (need ~2MB)
 2. Install to different location:
+
    ```bash
    # Switch from global to local
    npx get-shit-done-multi --local --yes
    ```
-3. Remove unused installations first
+
+1. Remove unused installations first
 
 ---
 

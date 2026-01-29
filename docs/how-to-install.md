@@ -4,9 +4,10 @@ Run this command to install GSD skills to your AI assistant:
 
 ```bash
 npx get-shit-done-multi
-```
+```plaintext
 
 The installer will:
+
 1. Detect your platform (Claude, Copilot, or Codex)
 2. Ask which skills/agents to install
 3. Install to the appropriate location
@@ -27,6 +28,7 @@ npx get-shit-done-multi
 ```
 
 Features:
+
 - Auto-detects installed platforms (Claude Code, GitHub Copilot CLI, Codex CLI)
 - Multi-select interface for choosing skills/agents
 - Prompts for installation location (local vs. global)
@@ -50,7 +52,7 @@ npx get-shit-done-multi --codex --global --yes
 
 # Install to multiple platforms at once
 npx get-shit-done-multi --claude --copilot --yes
-```
+```plaintext
 
 ### Platform Selection
 
@@ -77,6 +79,7 @@ Control whether to install locally (project-specific) or globally (user-wide):
 - `--global`: Install globally (`~/.claude/`, `~/.copilot/`, `~/.codex/`)
 
 **Default behavior:**
+
 - Interactive mode: Prompts you to choose
 - Non-interactive mode: Defaults to `--local`
 
@@ -86,11 +89,12 @@ npx get-shit-done-multi --claude --global --yes
 
 # Install locally to current project (Copilot)
 npx get-shit-done-multi --copilot --local --yes
-```
+```plaintext
 
 ### Other Flags
 
 **Skip Confirmation Prompts:**
+
 ```bash
 npx get-shit-done-multi --yes
 # or
@@ -98,13 +102,15 @@ npx get-shit-done-multi -y
 ```
 
 **Show Help:**
+
 ```bash
 npx get-shit-done-multi --help
 # or
 npx get-shit-done-multi -h
-```
+```plaintext
 
 **Show Version:**
+
 ```bash
 npx get-shit-done-multi --version
 # or
@@ -124,6 +130,7 @@ When you run the installer, it copies three types of files to your platform dire
 Skills are slash commands you invoke directly. Each skill has a specific purpose in the GSD workflow.
 
 **Core Workflow Skills:**
+
 - `/gsd-new-project` - Start new project with research and roadmap
 - `/gsd-new-milestone` - Add new milestone to existing project
 - `/gsd-plan-phase` - Create execution plans for a phase
@@ -131,11 +138,13 @@ Skills are slash commands you invoke directly. Each skill has a specific purpose
 - `/gsd-verify-phase` - Verify phase goals achieved
 
 **Planning Skills:**
+
 - `/gsd-create-plan` - Create detailed execution plan
 - `/gsd-continue-plan` - Resume paused plan execution
 - `/gsd-review-plan` - Review plan quality before execution
 
 **Research Skills:**
+
 - `/gsd-research-domain` - Research technical domain
 - `/gsd-research-library` - Research specific library
 - `/gsd-analyze-codebase` - Analyze existing code
@@ -143,7 +152,8 @@ Skills are slash commands you invoke directly. Each skill has a specific purpose
 **And 19 more specialized skills...**
 
 **File Location:**
-```
+
+```plaintext
 [platform]/skills/gsd-new-project/SKILL.md
 [platform]/skills/gsd-plan-phase/SKILL.md
 [platform]/skills/gsd-execute-phase/SKILL.md
@@ -151,6 +161,7 @@ Skills are slash commands you invoke directly. Each skill has a specific purpose
 ```
 
 Each `SKILL.md` file contains:
+
 - `name`: Display name shown in UI
 - `description`: What the skill does
 - `allowed-tools`: Tools the skill can use (e.g., Bash, Edit, View)
@@ -162,6 +173,7 @@ Each `SKILL.md` file contains:
 Agents are specialized sub-agents that skills delegate to for complex tasks.
 
 **Available Agents:**
+
 - `gsd-executor` - Executes plans with atomic commits per task
 - `gsd-planner` - Creates detailed phase plans from requirements
 - `gsd-verifier` - Verifies goal achievement and quality standards
@@ -177,7 +189,8 @@ Agents are specialized sub-agents that skills delegate to for complex tasks.
 - `gsd-troubleshooter` - Diagnoses and resolves problems
 
 **File Location:**
-```
+
+```plaintext
 [platform]/agents/gsd-executor.agent.md
 [platform]/agents/gsd-planner.agent.md
 [platform]/agents/gsd-verifier.agent.md
@@ -185,6 +198,7 @@ Agents are specialized sub-agents that skills delegate to for complex tasks.
 ```
 
 Each agent file contains:
+
 - `name`: Unique identifier
 - `description`: When to delegate to this agent
 - `tools`: Comma-separated list of allowed tools
@@ -195,7 +209,7 @@ Each agent file contains:
 
 The shared directory contains references, templates, and tracking files:
 
-```
+```text
 [platform]/get-shit-done/
 ├── references/
 │   ├── commit-guidelines.md
@@ -228,9 +242,10 @@ The `.gsd-install-manifest.json` file tracks your installation:
     "..."
   ]
 }
-```
+```plaintext
 
 This manifest is used for:
+
 - Update detection (checking if newer version available)
 - Version tracking (showing installed versions)
 - Uninstall operations (knowing what to remove)
@@ -240,7 +255,7 @@ This manifest is used for:
 Where files are installed depends on the platform and scope:
 
 | Platform | Local Installation | Global Installation |
-|----------|-------------------|---------------------|
+ |----------   |-------------------   |---------------------  |
 | **Claude Code** | `.claude/skills/`<br>`.claude/agents/`<br>`.claude/get-shit-done/` | `~/.claude/skills/`<br>`~/.claude/agents/`<br>`~/.claude/get-shit-done/` |
 | **GitHub Copilot CLI** | `.github/skills/`<br>`.github/agents/`<br>`.github/get-shit-done/` | `~/.copilot/skills/`<br>`~/.copilot/agents/`<br>`~/.copilot/get-shit-done/` |
 | **Codex CLI** | `.codex/skills/`<br>`.codex/agents/`<br>`.codex/get-shit-done/` | `~/.codex/skills/`<br>`~/.codex/agents/`<br>`~/.codex/get-shit-done/` |
@@ -252,6 +267,7 @@ Where files are installed depends on the platform and scope:
 ### Total Installation Size
 
 Approximately 2MB total:
+
 - 29 skills: ~1.2MB
 - 13 agents: ~600KB
 - Shared directory: ~200KB
@@ -263,19 +279,20 @@ Approximately 2MB total:
 Before installing GSD, ensure you have:
 
 1. **Node.js 20 or higher**
+
    ```bash
    node --version  # Should show v20.0.0 or higher
    ```
 
-2. **One of the following AI platforms:**
+1. **One of the following AI platforms:**
    - Claude Code (Claude Desktop with Code integration)
    - GitHub Copilot CLI (`gh copilot` command)
    - Codex CLI (OpenAI Codex integration)
 
-3. **Sufficient disk space:**
+2. **Sufficient disk space:**
    - At least 2MB available on target disk
 
-4. **Write permissions:**
+3. **Write permissions:**
    - For local install: Write access to current directory
    - For global install: Write access to home directory
 

@@ -38,6 +38,7 @@ Choose and configure your AI platform:
 ## Contributing
 
 Want to contribute? See [CONTRIBUTING.md](../CONTRIBUTING.md) for:
+
 - Development setup
 - Running tests
 - PR process
@@ -56,7 +57,7 @@ See [CHANGELOG.md](../CHANGELOG.md) for version history and release notes.
 ## Quick Links
 
 | Documentation | Description |
-|---------------|-------------|
+ |---------------   |-------------  |
 | [What is GSD](what-is-gsd.md) | Concept overview |
 | [How GSD Works](how-gsd-works.md) | Workflow explanation |
 | [How to Install](how-to-install.md) | Installation guide |

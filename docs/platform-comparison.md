@@ -5,16 +5,19 @@ Quick reference guide for differences between Claude Code, GitHub Copilot CLI, a
 ## Quick Decision Guide
 
 **Choose Claude if:**
+
 - You use VS Code with Claude Code extension
 - You prefer YAML frontmatter
 - You want official tool names (Read, Write, Bash)
 
 **Choose Copilot if:**
+
 - You use GitHub Copilot CLI
 - You're already in GitHub ecosystem
 - You need enterprise GitHub integration
 
 **Choose Codex if:**
+
 - You use Codex CLI
 - You prefer `$` command prefix (not `/`)
 - You want Codex-specific features
@@ -24,7 +27,7 @@ Quick reference guide for differences between Claude Code, GitHub Copilot CLI, a
 ## Installation Locations
 
 | Aspect | Claude | Copilot | Codex |
-|--------|--------|---------|-------|
+ |--------   |--------   |---------   |-------  |
 | Local skills | `.claude/skills/` | `.github/skills/` | `.codex/skills/` |
 | Local agents | `.claude/agents/` | `.github/agents/` | `.codex/agents/` |
 | Shared directory | `.claude/get-shit-done/` | `.github/get-shit-done/` | `.codex/get-shit-done/` |
@@ -34,7 +37,7 @@ Quick reference guide for differences between Claude Code, GitHub Copilot CLI, a
 ## File Formats
 
 | Aspect | Claude | Copilot | Codex |
-|--------|--------|---------|-------|
+ |--------   |--------   |---------   |-------  |
 | Skill extension | `.md` | `.md` | `.md` |
 | Agent extension | `.md` | `.agent.md` | `.agent.md` |
 | Frontmatter format | YAML | YAML | YAML |
@@ -44,7 +47,7 @@ Quick reference guide for differences between Claude Code, GitHub Copilot CLI, a
 ## Tool Names
 
 | Claude Official | Copilot Mapping | Codex Mapping |
-|-----------------|-----------------|---------------|
+ |-----------------   |-----------------   |---------------  |
 | Read | read | read |
 | Write | write | write |
 | Edit | edit | edit |
@@ -56,7 +59,7 @@ Quick reference guide for differences between Claude Code, GitHub Copilot CLI, a
 ## Frontmatter Fields
 
 | Field | Claude | Copilot | Codex |
-|-------|--------|---------|-------|
+ |-------   |--------   |---------   |-------  |
 | name | Optional | Optional | Optional |
 | description | Recommended | Required | Required |
 | allowed-tools (skills) | Optional | Optional | Optional |

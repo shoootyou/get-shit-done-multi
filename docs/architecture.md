@@ -4,7 +4,8 @@ Technical architecture documentation for contributors and developers.
 
 ## System Overview
 
-GSD Multi is a **template-based installer** that transforms universal skill/agent templates into platform-specific files. The system follows a clean separation of concerns:
+GSD Multi is a **template-based installer** that transforms universal skill/agent templates into platform-specific
+files. The system follows a clean separation of concerns:
 
 - **Templates** (`/templates/`) - Universal source of truth
 - **Adapters** (`/bin/lib/adapters/`) - Platform-specific transformations
@@ -35,7 +36,7 @@ graph TD
     N --> O[Write Files]
     O --> P[Generate Manifest]
     P --> Q[Success!]
-```
+```plaintext
 
 ## Module Responsibilities
 
@@ -44,7 +45,9 @@ graph TD
 **Purpose:** Universal skill and agent definitions with template variables
 
 **Structure:**
+
 ```
+
 templates/
 ├── skills/
 │   └── gsd-*/
@@ -57,15 +60,18 @@ templates/
     ├── references/
     ├── templates/
     └── .gsd-install-manifest.json
-```
+
+```text
 
 **Template Variables:**
+
 - `{{PLATFORM_ROOT}}` → `.claude/`, `.github/`, `.codex/`
 - `{{COMMAND_PREFIX}}` → `/gsd-`, `$gsd-`
 - `{{VERSION}}` → Current version (e.g., "2.0.0")
 - `{{PLATFORM_NAME}}` → "claude", "copilot", "codex"
 
 **Frontmatter:**
+
 - Skills: Corrected format (allowed-tools, argument-hint, no unsupported fields)
 - Agents: Corrected format (tools string, skills auto-generated, no metadata block)
 
@@ -74,17 +80,20 @@ templates/
 **Purpose:** Platform-specific transformations (one adapter per platform)
 
 **Files:**
+
 - `base-adapter.js` - Abstract base class
 - `claude-adapter.js` - Claude Code transformations
 - `copilot-adapter.js` - GitHub Copilot CLI transformations
 - `codex-adapter.js` - Codex CLI transformations
 
 **Architecture Rule (PLATFORM-02):**
+
 - Each adapter is ISOLATED - no inheritance between platform adapters
 - Code duplication is ACCEPTABLE over coupling
 - Changes to one platform should NOT affect others
 
 **Adapter Methods:**
+
 ```javascript
 class PlatformAdapter {
   transformFrontmatter(frontmatter, type)  // Transform metadata
@@ -96,6 +105,7 @@ class PlatformAdapter {
 ```
 
 **Tool Name Mappings:**
+
 - Claude: Read, Write, Edit, Bash, Grep, Glob, Task
 - Copilot/Codex: read, write, edit, execute, search, glob, agent
 
@@ -104,6 +114,7 @@ class PlatformAdapter {
 **Purpose:** Coordinate installation phases
 
 **Phases:**
+
 1. Template validation (check templates exist and parse correctly)
 2. Skill installation (transform and write skill files)
 3. Agent installation (transform and write agent files)
@@ -111,6 +122,7 @@ class PlatformAdapter {
 5. Manifest generation (scan installed files, write manifest)
 
 **Key Functions:**
+
 - `installSkills(adapter, scope)` - Install all 29 skills
 - `installAgents(adapter, scope)` - Install all 13 agents
 - `installShared(adapter, scope)` - Copy shared directory with variable replacement
@@ -121,9 +133,11 @@ class PlatformAdapter {
 **Purpose:** Single-point validation before installation
 
 **Files:**
+
 - `pre-flight-validator.js` - Orchestrates all validation
 
 **Validation Checks:**
+
 1. Templates exist (`/templates/skills/`, `/templates/agents/`)
 2. Disk space (2MB + 10% buffer)
 3. Write permissions (actual write test)
@@ -132,6 +146,7 @@ class PlatformAdapter {
 6. Existing installation detection
 
 **Validation Flow:**
+
 ```javascript
 validateBeforeInstall(targetDir, platform)
   → checks.push(...diskSpaceCheck())
@@ -140,17 +155,19 @@ validateBeforeInstall(targetDir, platform)
   → checks.push(...symlinkCheck())
   → checks.push(...existingInstallCheck())
   → return { valid: true/false, errors: [], warnings: [] }
-```
+```text
 
 ### `/bin/lib/validation/`
 
 **Purpose:** Transversal validation modules (used by preflight)
 
 **Files:**
+
 - `path-validator.js` - 8-layer path security validation
 - `template-validator.js` - Template structure verification
 
 **Path Validation Layers:**
+
 1. Null byte check (`\0`)
 2. URL decoding (detect `%2e%2e%2f`)
 3. Traversal detection (`../`, `..\`, absolute paths)
@@ -165,6 +182,7 @@ validateBeforeInstall(targetDir, platform)
 **Purpose:** Path utilities (used by validation and orchestrator)
 
 **Files:**
+
 - `path-resolver.js` - Path resolution and normalization
 - `symlink-resolver.js` - Single-level symlink resolution with chain detection
 
@@ -272,6 +290,7 @@ const testDir = `/tmp/gsd-test-${Date.now()}`;
 ## Contributing
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for:
+
 - Development setup
 - Test commands
 - PR process

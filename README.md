@@ -11,11 +11,16 @@
 
 ## What It Does
 
-Get Shit Done Multi (GSD Multi) is a template-based installer that deploys working AI assistant skills and agents to multiple platforms with a single command. Instead of manually configuring your Claude Code, GitHub Copilot CLI, or Codex CLI environment, GSD Multi installs a complete spec-driven development system.
+Get Shit Done Multi (GSD Multi) is a template-based installer that deploys working AI assistant skills and agents to
+multiple platforms with a single command. Instead of manually configuring your Claude Code, GitHub Copilot CLI, or
+Codex CLI environment, GSD Multi installs a complete spec-driven development system.
 
-This system transforms AI coding into a structured workflow: define your idea, let AI research and plan, then execute with atomic commits and fresh context. You get clean git history, reproducible builds, and human-in-loop verification at key points.
+This system transforms AI coding into a structured workflow: define your idea, let AI research and plan, then execute
+with atomic commits and fresh context. You get clean git history, reproducible builds, and human-in-loop verification
+at key points.
 
-The multi-platform approach means you can use the same workflow across different AI assistants, switching platforms as needed while maintaining project state.
+The multi-platform approach means you can use the same workflow across different AI assistants, switching platforms as
+needed while maintaining project state.
 
 ---
 
@@ -23,7 +28,7 @@ The multi-platform approach means you can use the same workflow across different
 
 ```bash
 npx get-shit-done-multi
-```
+```plaintext
 
 The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 28 skills and 13 agents. After installation, you can start your first project:
 
@@ -35,13 +40,14 @@ The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex C
 "Start a new GSD project"
 ```
 
-The system guides you through questioning, research, requirements extraction, and roadmap creation. Then execute phase by phase with atomic task plans and clean commits.
+The system guides you through questioning, research, requirements extraction, and roadmap creation. Then execute phase
+by phase with atomic task plans and clean commits.
 
 ---
 
 ## Workflow
 
-```
+```text
 User Input → Orchestrator → Specialized Agents → Verification
      │              │                │                  │
      │              ├─→ Researcher ──┤                  │
@@ -62,7 +68,8 @@ Phases:
 └────────────────┘    └────────────────┘    └────────────────┘
 ```
 
-Each phase produces small, focused plans that execute in fresh context windows to avoid degradation. Human verification happens at natural checkpoints.
+Each phase produces small, focused plans that execute in fresh context windows to avoid degradation. Human verification
+happens at natural checkpoints.
 
 ---
 
@@ -79,11 +86,13 @@ All platforms share the same workflow and project state. Switch between platform
 ## Documentation
 
 **Getting Started:**
+
 - [Installation Guide](docs/how-to-install.md)
 - [How GSD Works](docs/how-gsd-works.md)
 - [Platform Comparison](docs/platform-comparison.md)
 
 **Reference:**
+
 - [All Commands](docs/commands/README.md)
 - [Full Documentation](docs/README.md)
 - [Troubleshooting](docs/troubleshooting.md)
@@ -99,16 +108,19 @@ All platforms share the same workflow and project state. Switch between platform
 
 ## Credits & License
 
-This project (GSD Multi) is a multi-platform fork of the original [get-shit-done](https://github.com/glittercowboy/get-shit-done) framework by Lex Christopherson.
+This project (GSD Multi) is a multi-platform fork of the original
+[get-shit-done](https://github.com/glittercowboy/get-shit-done) framework by Lex Christopherson.
 
 **Fork Point:** v1.6.4 (https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4)
 
 **Version Timeline:**
+
 - v1.7.0 (2026-01-19): Multi-CLI support experiments (Codex CLI added)
 - v1.8.0 (2026-01-20): Milestone archiving and mapping improvements
 - v2.0.0 (current): Full multi-platform + template system achievement
 
 **Key Differences:**
+
 - Original: Claude-only with direct .md skills
 - GSD Multi: Multi-platform support (Claude, Copilot, Codex) using templating system
 

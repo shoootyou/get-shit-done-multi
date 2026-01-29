@@ -1,10 +1,12 @@
 # What is GSD?
 
-**Get Shit Done (GSD)** is a spec-driven development workflow for AI coding assistants. It provides structured skills and agents that guide AI through project planning, implementation, and verification.
+**Get Shit Done (GSD)** is a spec-driven development workflow for AI coding assistants. It provides structured skills
+and agents that guide AI through project planning, implementation, and verification.
 
 ## The Problem
 
 AI coding assistants are powerful but can be chaotic:
+
 - Jump between tasks without finishing
 - Skip planning and verification steps
 - Make changes without documentation
@@ -28,6 +30,7 @@ GSD installs **skills** (commands you invoke) and **agents** (specialized sub-ag
 - Agents: gsd-planner, gsd-executor, gsd-verifier
 
 When you run a skill, the AI assistant:
+
 1. Loads the skill definition
 2. Follows the structured workflow
 3. Spawns specialized agents for complex tasks
@@ -37,20 +40,26 @@ When you run a skill, the AI assistant:
 ## Key Concepts
 
 ### Phases
+
 Logical groupings of work (e.g., "Phase 1: Setup", "Phase 2: Core Features")
 
 ### Plans
+
 Executable task lists within a phase (e.g., "01-01-PLAN.md", "01-02-PLAN.md")
 
 ### Summaries
+
 Post-execution documentation of what was built (e.g., "01-01-SUMMARY.md")
 
 ### Verification
+
 Goal-backward analysis ensuring phase objectives were achieved
 
 ### .planning/ Directory
+
 Central repository for all project artifacts:
-```
+
+```text
 .planning/
 ├── ROADMAP.md        # Project phases and goals
 ├── REQUIREMENTS.md   # Requirements traceability
@@ -65,18 +74,21 @@ Central repository for all project artifacts:
 ## Benefits
 
 **For Solo Developers:**
+
 - Systematic approach to large projects
 - Documentation generated automatically
 - Clear progress tracking
 - AI stays focused on goals
 
 **For Teams:**
+
 - Consistent development workflow
 - Clear project history in git
 - Easy onboarding (read .planning/)
 - Traceability from requirements to code
 
 **For AI Assistants:**
+
 - Structured prompts reduce hallucination
 - Goal-backward verification ensures correctness
 - Specialized agents handle complex tasks
@@ -85,6 +97,7 @@ Central repository for all project artifacts:
 ## Multi-Platform Support
 
 GSD Multi supports three AI platforms:
+
 - **Claude Code** - VS Code extension
 - **GitHub Copilot CLI** - Command-line tool
 - **Codex CLI** - OpenAI Codex interface

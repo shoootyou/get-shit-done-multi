@@ -1,10 +1,12 @@
 # Contributing to Get Shit Done Multi
 
-Thank you for considering contributing to GSD Multi! This document provides guidelines for development setup, testing, and the pull request process.
+Thank you for considering contributing to GSD Multi! This document provides guidelines for development setup, testing,
+and the pull request process.
 
 ## Types of Contributions
 
 We welcome:
+
 - Bug fixes and error handling improvements
 - Documentation improvements
 - Test coverage additions
@@ -27,11 +29,12 @@ We welcome:
 git clone https://github.com/shoootyou/get-shit-done-multi.git
 cd get-shit-done-multi
 npm install
-```
+```plaintext
 
 ### Project Structure
 
 ```
+
 get-shit-done-multi/
 ├── bin/                    # CLI entry point
 │   └── install.js
@@ -41,7 +44,8 @@ get-shit-done-multi/
 │   └── shared/           # Platform-specific configuration
 ├── tests/                # Integration tests
 └── docs/                 # Documentation
-```
+
+```plaintext
 
 ## Running Tests
 
@@ -64,6 +68,7 @@ npm test -- tests/integration/installer.test.js
 ### Test Environment
 
 Tests use Vitest and run in isolated temporary directories:
+
 - Each test creates a fresh `/tmp/gsd-test-*` directory
 - Installation manifests are validated
 - Platform-specific files are verified
@@ -72,6 +77,7 @@ Tests use Vitest and run in isolated temporary directories:
 ## Code Style
 
 This project uses ESLint and Prettier (when available). The codebase maintains:
+
 - ES modules (`import`/`export`)
 - Async/await for asynchronous operations
 - Descriptive variable names
@@ -82,11 +88,13 @@ While linting and formatting tools are not yet configured, follow the existing c
 ## Pull Request Process
 
 1. **Create a feature branch:**
+
    ```bash
    git checkout -b fix/your-bug-fix
    # or
    git checkout -b feat/your-feature
-   ```
+
+```plaintext
 
 2. **Make changes with tests:**
    - Write or update tests for your changes
@@ -94,16 +102,17 @@ While linting and formatting tools are not yet configured, follow the existing c
    - Verify no regressions
 
 3. **Run linting and tests:**
+
    ```bash
    npm test
    ```
 
-4. **Update documentation:**
+1. **Update documentation:**
    - Update relevant docs/ files if changing behavior
    - Update README.md if adding major features
    - Update CHANGELOG.md following Keep a Changelog format
 
-5. **Submit PR with clear description:**
+2. **Submit PR with clear description:**
    - Describe what changed and why
    - Reference any related issues
    - Include test results
@@ -113,13 +122,14 @@ While linting and formatting tools are not yet configured, follow the existing c
 
 Follow Conventional Commits:
 
-```
+```plaintext
 <type>(<scope>): <subject>
 
 <body>
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -129,7 +139,8 @@ Follow Conventional Commits:
 - `chore`: Maintenance tasks (dependencies, tooling)
 
 **Examples:**
-```
+
+```plaintext
 feat(installer): add automatic backup before migration
 
 fix(copilot): correct tools field serialization format
@@ -144,6 +155,7 @@ test(installer): add test for symlink validation
 ### Bug Reports
 
 Include:
+
 - Description of the issue
 - Steps to reproduce
 - Expected behavior
@@ -154,6 +166,7 @@ Include:
 ### Feature Requests
 
 Include:
+
 - Use case description
 - Proposed solution or approach
 - Why this benefits GSD Multi users
@@ -161,11 +174,13 @@ Include:
 
 ### Security Issues
 
-For security vulnerabilities, please email the maintainer privately rather than opening a public issue. This allows us to address the issue before public disclosure.
+For security vulnerabilities, please email the maintainer privately rather than opening a public issue. This allows us
+to address the issue before public disclosure.
 
 ## Code of Conduct
 
 Be respectful and constructive:
+
 - Assume good intentions
 - Provide actionable feedback
 - Focus on the work, not the person

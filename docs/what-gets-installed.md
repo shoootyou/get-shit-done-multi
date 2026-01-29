@@ -12,11 +12,13 @@ When you run `npx get-shit-done-multi`, the installer copies three types of file
 
 ## Skills (29 total)
 
-Skills are slash commands that you invoke directly in your AI assistant. Each skill provides a specific capability in the GSD workflow.
+Skills are slash commands that you invoke directly in your AI assistant. Each skill provides a specific capability in
+the GSD workflow.
 
 ### Core Workflow Skills
 
 **Project & Milestone Management:**
+
 - `/gsd-new-project` - Start new project with research and roadmap
 - `/gsd-new-milestone` - Add new milestone to existing project
 - `/gsd-complete-milestone` - Mark milestone as done
@@ -26,6 +28,7 @@ Skills are slash commands that you invoke directly in your AI assistant. Each sk
 - `/gsd-audit-milestone` - Review milestone progress and issues
 
 **Phase Planning & Execution:**
+
 - `/gsd-plan-phase` - Create execution plans for a phase
 - `/gsd-execute-phase` - Execute plans with atomic commits
 - `/gsd-verify-work` - Verify phase goals achieved
@@ -33,6 +36,7 @@ Skills are slash commands that you invoke directly in your AI assistant. Each sk
 - `/gsd-discuss-phase` - Discuss phase approach before planning
 
 **Phase Structure Management:**
+
 - `/gsd-add-phase` - Add new phase to roadmap
 - `/gsd-insert-phase` - Insert phase between existing phases
 - `/gsd-remove-phase` - Remove phase from roadmap
@@ -40,6 +44,7 @@ Skills are slash commands that you invoke directly in your AI assistant. Each sk
 - `/gsd-list-phase-assumptions` - Show assumptions for phase
 
 **Work Management:**
+
 - `/gsd-pause-work` - Pause current work and save state
 - `/gsd-resume-work` - Resume paused work from checkpoint
 - `/gsd-progress` - Show overall project progress
@@ -47,10 +52,12 @@ Skills are slash commands that you invoke directly in your AI assistant. Each sk
 - `/gsd-check-todos` - Review and update todo items
 
 **Analysis & Debugging:**
+
 - `/gsd-map-codebase` - Analyze existing codebase structure
 - `/gsd-debug` - Debug and fix issues in current phase
 
 **Utilities:**
+
 - `/gsd-help` - Show GSD command reference
 - `/gsd-verify-installation` - Verify GSD installed correctly
 - `/gsd-update` - Check for and install updates
@@ -61,7 +68,7 @@ Skills are slash commands that you invoke directly in your AI assistant. Each sk
 
 Skills are organized in subdirectories:
 
-```
+```text
 [platform]/skills/
 ├── gsd-new-project/
 │   └── SKILL.md
@@ -87,9 +94,10 @@ argument-hint: Phase number or name
 # Phase Planning Skill
 
 [Detailed instructions for how to plan a phase...]
-```
+```plaintext
 
 **Frontmatter fields:**
+
 - `name` - Unique identifier (used for invocation)
 - `description` - What the skill does (shown in UI)
 - `allowed-tools` - Which tools Claude can use
@@ -104,26 +112,31 @@ Agents are specialized sub-agents that skills delegate to for complex tasks. You
 ### Available Agents
 
 **Planning & Strategy:**
+
 - `gsd-planner` - Creates detailed phase plans from requirements
 - `gsd-planner-strategist` - Strategic planning for complex phases
 - `gsd-roadmapper` - Generates project roadmaps with phases
 
 **Execution & Verification:**
+
 - `gsd-executor` - Executes plans with atomic commits per task
 - `gsd-verifier` - Verifies goal achievement and quality standards
 - `gsd-integration-checker` - Checks integration and compatibility
 
 **Research & Analysis:**
+
 - `gsd-project-researcher` - Researches project domains and requirements
 - `gsd-phase-researcher` - Researches specific phase requirements
 - `gsd-research-synthesizer` - Synthesizes research into actionable insights
 - `gsd-codebase-mapper` - Maps and analyzes existing codebases
 
 **Problem Solving:**
+
 - `gsd-debugger` - Diagnoses and fixes issues
 - `gsd-debugger-specialist` - Specialized debugging for complex problems
 
 **Quality Assurance:**
+
 - `gsd-plan-checker` - Reviews plan quality before execution
 
 ### File Structure
@@ -131,13 +144,15 @@ Agents are specialized sub-agents that skills delegate to for complex tasks. You
 Agents are individual files (not in subdirectories):
 
 ```
+
 [platform]/agents/
 ├── gsd-executor.agent.md
 ├── gsd-planner.agent.md
 ├── gsd-verifier.agent.md
 ├── gsd-debugger.agent.md
 └── ... (9 more)
-```
+
+```plaintext
 
 ### Agent File Format
 
@@ -157,12 +172,14 @@ skills: gsd-plan-phase, gsd-verify-work
 ```
 
 **Frontmatter fields:**
+
 - `name` - Unique identifier
 - `description` - When to delegate to this agent
 - `tools` - Comma-separated list of allowed tools
 - `skills` - Pre-loaded skills (Claude only, auto-generated)
 
-**Note:** The `skills` field is automatically generated for Claude by scanning agent content for skill references. Other platforms don't use this field.
+**Note:** The `skills` field is automatically generated for Claude by scanning agent content for skill references.
+Other platforms don't use this field.
 
 ---
 
@@ -170,7 +187,7 @@ skills: gsd-plan-phase, gsd-verify-work
 
 The shared directory contains supporting files used by skills and agents:
 
-```
+```text
 [platform]/get-shit-done/
 ├── references/
 │   ├── commit-guidelines.md
@@ -240,9 +257,10 @@ The `.gsd-install-manifest.json` file tracks your installation:
     "... (all installed files)"
   ]
 }
-```
+```plaintext
 
 **Manifest fields:**
+
 - `gsd_version` - Installed version (e.g., "2.0.0")
 - `platform` - Platform name ("claude", "copilot", or "codex")
 - `scope` - Installation scope ("global" or "local")
@@ -250,6 +268,7 @@ The `.gsd-install-manifest.json` file tracks your installation:
 - `files` - Sorted array of all installed file paths
 
 **Used for:**
+
 - Update detection (is newer version available?)
 - Version tracking (what versions are installed where?)
 - Uninstall operations (what files to remove?)
@@ -264,7 +283,7 @@ Where files are installed depends on the platform and scope you choose.
 ### Directory Structure by Platform
 
 | Platform | Local Installation | Global Installation |
-|----------|-------------------|---------------------|
+ |----------   |-------------------   |---------------------  |
 | **Claude Code** | `.claude/skills/`<br>`.claude/agents/`<br>`.claude/get-shit-done/` | `~/.claude/skills/`<br>`~/.claude/agents/`<br>`~/.claude/get-shit-done/` |
 | **GitHub Copilot CLI** | `.github/skills/`<br>`.github/agents/`<br>`.github/get-shit-done/` | `~/.copilot/skills/`<br>`~/.copilot/agents/`<br>`~/.copilot/get-shit-done/` |
 | **Codex CLI** | `.codex/skills/`<br>`.codex/agents/`<br>`.codex/get-shit-done/` | `~/.codex/skills/`<br>`~/.codex/agents/`<br>`~/.codex/get-shit-done/` |
@@ -272,6 +291,7 @@ Where files are installed depends on the platform and scope you choose.
 ### Local vs. Global
 
 **Local installation (`.claude/`, `.github/`, `.codex/`):**
+
 - Project-specific
 - Only available in current directory
 - Good for per-project customization
@@ -279,6 +299,7 @@ Where files are installed depends on the platform and scope you choose.
 - Requires write permission to current directory
 
 **Global installation (`~/.claude/`, `~/.copilot/`, `~/.codex/`):**
+
 - User-wide
 - Available in all projects
 - Good for consistent workflow across projects
@@ -288,6 +309,7 @@ Where files are installed depends on the platform and scope you choose.
 ### Full Example: Claude Global Installation
 
 ```
+
 ~/.claude/
 ├── skills/
 │   ├── gsd-new-project/
@@ -307,7 +329,6 @@ Where files are installed depends on the platform and scope you choose.
     ├── templates/
     ├── workflows/
     └── .gsd-install-manifest.json
-```
 
 ---
 
@@ -316,7 +337,7 @@ Where files are installed depends on the platform and scope you choose.
 Approximate sizes for each component:
 
 | Component | Size | Files |
-|-----------|------|-------|
+ |-----------   |------   |-------  |
 | **Skills** | ~1.2 MB | 29 SKILL.md files |
 | **Agents** | ~600 KB | 13 .agent.md files |
 | **Shared Directory** | ~200 KB | References, templates, workflows |
@@ -363,11 +384,13 @@ While GSD works across all platforms, there are subtle differences:
 ### Frontmatter Variations
 
 **Skills:**
+
 - All platforms: Use `allowed-tools` field
 - All platforms: Use `argument-hint` field
 - Format is identical across platforms
 
 **Agents:**
+
 - All platforms: Use `tools` field (comma-separated)
 - Claude only: Has `skills` field (auto-generated)
 - Copilot/Codex: No `skills` field
@@ -377,7 +400,7 @@ While GSD works across all platforms, there are subtle differences:
 Tool names are normalized to Claude's canonical names:
 
 | Capability | Claude | Copilot Alias | Codex Alias |
-|------------|--------|---------------|-------------|
+ |------------   |--------   |---------------   |-------------  |
 | Execute shell | Bash | execute | shell |
 | Search files | Grep | search | find |
 | Stream edit | Sed | replace | modify |
