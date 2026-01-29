@@ -4,7 +4,7 @@ import { statfs } from 'fs';
 import { promisify } from 'util';
 import { readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
-import { checkDiskSpace, checkWritePermissions } from '../validation/pre-install-checks.js';
+import { checkWritePermissions } from '../validation/pre-install-checks.js';
 import { validateAllPaths } from '../validation/path-validator.js';
 import { resolveSymlinkSingleLevel } from '../paths/symlink-resolver.js';
 import { formatPreflightReport } from './error-formatter.js';

@@ -31,7 +31,7 @@ import * as logger from '../cli/logger.js';
 import { missingTemplates, invalidPath } from '../errors/install-error.js';
 import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
 import yaml from 'js-yaml';
-import { runPreInstallationChecks } from '../validation/pre-install-checks.js';
+import { detectExistingInstallation } from '../validation/pre-install-checks.js';
 import { generateManifestData, writeManifest } from '../manifests/writer.js';
 import { compareVersions } from '../version/version-checker.js';
 import { readManifest } from '../manifests/reader.js';
@@ -115,22 +115,11 @@ export async function install(appVersion, options) {
   logger.info(`Target directory: ${targetDir}`, 2);
   logger.info(`Command prefix: ${commandPrefix}`, 2);
 
-  // === NEW: Pre-installation validation gate (Phase 5) ===
-  const validationResults = await runPreInstallationChecks(
-    targetDir,
-    templatesDir,
-    isGlobal,
-    platform
-  );
+  // Detect existing installation (info only, doesn't fail)
+  const existingInstall = await detectExistingInstallation(targetDir);
 
-  // Use validation results to enhance existing installation detection
-  const { existingInstall, warnings } = validationResults;
-
-  // Validate templates exist
-  await validateTemplates(templatesDir);
-
-  // Collect all warnings for display
-  const allWarnings = [...warnings];
+  // Collect warnings for display
+  const allWarnings = [];
 
   // Add existing installation warnings
   if (existingInstall) {
@@ -202,26 +191,6 @@ export async function install(appVersion, options) {
   await writeManifest(manifestPath, manifestData);
 
   return stats;
-}
-
-/**
- * Validate templates directory exists
- */
-async function validateTemplates(templatesDir) {
-  const skillsDir = join(templatesDir, 'skills');
-  const agentsDir = join(templatesDir, 'agents');
-  const sharedDir = join(templatesDir, 'get-shit-done');
-
-  const skillsExist = await pathExists(skillsDir);
-  const agentsExist = await pathExists(agentsDir);
-  const sharedExist = await pathExists(sharedDir);
-
-  if (!skillsExist || !agentsExist || !sharedExist) {
-    throw missingTemplates(
-      'Templates directory incomplete',
-      { skillsExist, agentsExist, sharedExist, path: templatesDir }
-    );
-  }
 }
 
 /**
