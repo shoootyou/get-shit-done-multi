@@ -951,13 +951,13 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 todo captured (see .planning/todos/pending/):
-- 2026-01-30-review-package-configuration-decisions.md — Investigate .markdownlint-cli2.jsonc and docs/ in
-  package.json files
+None
 
 ### Completed Todos
 - 2026-01-30-fix-readme-documentation-post-phase-8.md — Fixed command prefixes, code blocks, added workflow section,
   documented commands→skills migration
+- 2026-01-30-review-package-configuration-decisions.md — Investigated markdownlint config (dev-only, keep as-is) and
+  added docs/ to package.json files (offline documentation, 366KB total package size)
 
 ### Blockers
 None

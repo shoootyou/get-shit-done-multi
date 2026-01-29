@@ -46,7 +46,8 @@
   },
   "files": [
     "bin",
-    "templates"
+    "templates",
+    "docs"
   ],
   "engines": {
     "node": ">=20.0.0"
