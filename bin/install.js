@@ -39,13 +39,14 @@ async function main() {
     .name('get-shit-done-multi')
     .version(pkg.version)
     .description('Install get-shit-done skills and agents to AI coding assistants')
-    .addHelpText('after', '\nRun without flags for interactive mode with beautiful prompts.');
+    .addHelpText('after', '\nRun without flags for interactive mode with beautiful prompts.\nUse --all to install to all platforms at once.');
 
   // Platform flags
   program
     .option('--claude', 'Install to Claude Code')
     .option('--copilot', 'Install to GitHub Copilot CLI')
-    .option('--codex', 'Install to Codex CLI');
+    .option('--codex', 'Install to Codex CLI')
+    .option('--all', 'Install to all platforms (claude, copilot, codex)');
 
   // Scope flags
   program

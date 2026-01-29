@@ -9,9 +9,23 @@ import { InstallError, EXIT_CODES } from '../errors/install-error.js';
  * @param {Object} options - Commander options object
  * @param {Object} adapterRegistry - Platform adapter registry
  * @returns {string[]} Array of platform names
- * @throws {InstallError} If unknown platform specified
+ * @throws {InstallError} If unknown platform specified or conflicting flags
  */
 export function parsePlatformFlags(options, adapterRegistry) {
+  // Handle --all flag (shorthand for all platforms)
+  if (options.all) {
+    // Check for conflicting individual platform flags
+    if (options.claude || options.copilot || options.codex) {
+      throw new InstallError(
+        'Cannot use --all with individual platform flags (--claude, --copilot, --codex)',
+        EXIT_CODES.INVALID_ARGS
+      );
+    }
+    
+    return adapterRegistry.getSupportedPlatforms();
+  }
+  
+  // Individual platform selection
   const platforms = [];
   if (options.claude) platforms.push('claude');
   if (options.copilot) platforms.push('copilot');
