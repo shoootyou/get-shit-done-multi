@@ -45,13 +45,7 @@
   },
   "files": [
     "bin",
-    "commands",
-    "get-shit-done",
-    "agents",
-    "hooks",
-    "lib-ghcc",
-    "docs",
-    "github"
+    "templates"
   ],
   "engines": {
     "node": ">=16.7.0"
