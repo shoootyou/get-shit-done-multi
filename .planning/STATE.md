@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-30  
-**Updated By:** GSD Execute-Phase (Phase 8 Plan 02 Complete)
+**Updated By:** GSD Execute-Phase (Phase 8 Plan 04 Complete)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 8 in progress - Documentation and Polish. Plans 08-01 and 08-02 complete (root docs and installation docs).
+**Current Focus:** Phase 8 in progress - Documentation and Polish. Plans 08-01 through 08-04 complete (root docs, installation docs, platform docs, advanced docs).
 
 ---
 
@@ -23,8 +23,8 @@
 **Next:** Plan 08-05 (final plan)
 
 ### Plan Status
-**Completed Plans:** 39/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 4/5)  
-**Last activity:** 2026-01-30 - Completed 08-02-PLAN.md (installation documentation)  
+**Completed Plans:** 40/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 4/5)  
+**Last activity:** 2026-01-30 - Completed 08-04-PLAN.md (architecture and advanced documentation)  
 **Next:** Plan 08-05 to complete Phase 8
 
 ### Progress Bar
@@ -44,7 +44,7 @@ Phase 7.2: [██████████████████████�
 Phase 8:   [████████████████████████████████████████░░░░░░░░░░░░] 80% (4/5 plans)
 
 Overall Progress:
-[█████████████████████████████████████████░░░░░] 87% (39/45 total plans)
+[█████████████████████████████████████████░░░░░] 89% (40/45 total plans)
 ```
 
 ---
@@ -838,6 +838,23 @@ Overall Progress:
      - Better accessibility (screen readers)
      - npm package page compatibility
      - Rationale: Professional, accessible documentation consistent across all files
+
+120. **2026-01-30 (08-04):** ASCII diagrams in user-facing docs, Mermaid in technical docs (DOC-DIAGRAM-STRATEGY)
+     - ASCII diagrams for user docs (what-is-gsd.md, how-gsd-works.md) render everywhere (npm, terminals, browsers)
+     - Mermaid diagrams for developer docs (architecture.md) provide better visual clarity
+     - User docs prioritize accessibility; developer docs prioritize clarity
+     - Rationale: npm registry doesn't render Mermaid; ASCII ensures universal compatibility
+
+121. **2026-01-30 (08-04):** Documentation split by audience (DOC-AUDIENCE-SEGMENTATION)
+     - User docs: what-is-gsd.md, how-gsd-works.md, how-to-customize.md
+     - Developer docs: architecture.md
+     - Navigation hub: docs/README.md serves both audiences
+     - Rationale: Users need workflow understanding; developers need technical architecture
+
+122. **2026-01-30 (08-04):** Document future features with workarounds (DOC-FUTURE-FEATURES)
+     - Custom paths (v2.1+) documented in how-to-customize.md with current workaround
+     - Partial installation (v2.1+) documented with manual workaround
+     - Rationale: Set user expectations, provide solutions for current version
 
 
 ### Roadmap Evolution
