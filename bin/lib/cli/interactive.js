@@ -1,6 +1,5 @@
 import * as p from '@clack/prompts';
 import { detectBinaries } from '../platforms/binary-detector.js';
-import { getInstalledVersion } from '../platforms/detector.js';
 import { getScriptDir } from './installation-core.js';
 import * as logger from './logger.js';
 import { platformNames } from '../platforms/platform-names.js';
