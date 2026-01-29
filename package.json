@@ -34,7 +34,6 @@
     "get-shit-done-multi": "bin/install.js"
   },
   "scripts": {
-    "prepublishOnly": "node scripts/build-templates.js",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
