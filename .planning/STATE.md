@@ -863,8 +863,9 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 pending todo:
+2 pending todos:
 - `.planning/todos/pending/2026-01-29-audit-unused-functions-in-bin.md` - Audit unused functions in /bin directory (area: tooling)
+- `.planning/todos/pending/2026-01-29-fix-string-escaping-security-issues.md` - Fix string escaping security issues in frontmatter serializer (area: security)
 
 ### Blockers
 None
