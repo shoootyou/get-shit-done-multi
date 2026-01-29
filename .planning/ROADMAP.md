@@ -664,24 +664,41 @@ Plans break down into 4 waves for efficient parallel execution. Wave 1 fixes cri
 - DOCS-03: Platform comparison
 
 **Success Criteria:**
-1. `/docs/installation.md` explains interactive and non-interactive modes with examples for all three platforms
-2. `/docs/architecture.md` documents adapter pattern and module structure
-3. `/docs/platform-differences.md` shows tool mapping table and frontmatter differences for Claude, Copilot, and Codex
-4. Troubleshooting section covers common errors with solutions
-5. README.md updated with quick start and links to detailed docs
-6. All docs use lowercase filenames and English only
+1. README.md brief hub (50-150 lines), ASCII diagram, links to docs/, proper attribution
+2. CONTRIBUTING.md development setup, PR process, test commands
+3. CHANGELOG.md Keep a Changelog format, v2.0.0 documented
+4. 12 docs/ files covering installation, platforms, concepts, architecture
+5. Markdown linting setup with markdownlint-cli2
+6. All documentation passes lint validation
+
+**Plans:** 5 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Root documentation (README, CONTRIBUTING, CHANGELOG)
+- [ ] 08-02-PLAN.md — Installation docs (how-to-install, upgrade, uninstall, what-gets-installed, troubleshooting)
+- [ ] 08-03-PLAN.md — Platform docs (comparison, specifics, migration)
+- [ ] 08-04-PLAN.md — Architecture & advanced (what-is-gsd, how-gsd-works, customize, architecture, docs/README)
+- [ ] 08-05-PLAN.md — Quality validation (markdownlint setup, all docs passing lint)
+
+**Wave Structure:**
+- Wave 1 (Parallel): 08-01, 08-02, 08-03 (independent documentation groups)
+- Wave 2: 08-04 (depends on Wave 1 for links in docs/README)
+- Wave 3: 08-05 (depends on all docs existing for lint validation)
 
 **Key Deliverables:**
-- `/docs/installation.md` (usage guide)
-- `/docs/architecture.md` (design documentation)
-- `/docs/platform-differences.md` (platform comparison)
-- Updated README.md
-- Inline code comments for public APIs
+- Root: README.md, CONTRIBUTING.md, CHANGELOG.md
+- Installation: how-to-install, how-to-upgrade, how-to-uninstall, what-gets-installed, troubleshooting
+- Platform: platform-comparison, platform-specifics, platform-migration
+- Concepts: what-is-gsd, how-gsd-works, how-to-customize
+- Technical: architecture, docs/README (documentation index)
+- Quality: .markdownlint-cli2.jsonc configuration
 
 **Notes:**
-- Documentation uses lowercase filenames (English only) per project constraints
-- Focus on user-facing docs (not internal implementation details)
-- Root directory contains only README.md and CHANGELOG.md
+- Question-driven file names (how-to-install.md not installation.md)
+- Layered structure (Quick Start → Details → Troubleshooting)
+- No emojis, natural human writing
+- ASCII diagrams in README (npm compatible), Mermaid in architecture.md (GitHub renders)
+- Real examples from templates/ directory
 
 ---
 
