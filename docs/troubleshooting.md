@@ -39,8 +39,7 @@ Error: EACCES: permission denied, mkdir '~/.claude/skills'
 
    ```bash
    npx get-shit-done-multi --local --yes
-
-```plaintext
+   ```
 
    This installs to current directory where you likely have permissions.
 
@@ -68,7 +67,7 @@ Error: EACCES: permission denied, mkdir '~/.claude/skills'
    # Then install
    npx get-shit-done-multi --claude --global
 
-```plaintext
+   ```
 
 4. **Use sudo (not recommended):**
 
@@ -114,7 +113,7 @@ Required: 2MB, Available: 0.5MB
    
    # Remove unnecessary files
 
-```plaintext
+   ```
 
 2. **Install to different location with more space:**
 
@@ -133,8 +132,7 @@ Required: 2MB, Available: 0.5MB
    
    # Then install normally
    npx get-shit-done-multi --claude --global
-
-```plaintext
+   ```
 
 ---
 
@@ -147,7 +145,7 @@ Required: 2MB, Available: 0.5MB
 Error: No AI platforms detected
 Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
 
-```plaintext
+```
 
 **Symptoms:**
 
@@ -185,8 +183,7 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
    
    # Then install with explicit flag
    npx get-shit-done-multi --claude --global --yes
-
-```plaintext
+   ```
 
 ---
 
@@ -194,13 +191,13 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
 
 **Problem:**
 
-```
+```plaintext
 
 Warning: Existing GSD installation found at ~/.claude/get-shit-done/
 Current version: v2.0.0
 This installation will overwrite existing files.
 
-```plaintext
+```
 
 **Symptoms:**
 
@@ -232,8 +229,7 @@ This installation will overwrite existing files.
    
    # Fresh install
    npx get-shit-done-multi
-
-```plaintext
+   ```
 
    See [How to Uninstall](how-to-uninstall.md) for complete removal instructions.
 
@@ -274,8 +270,7 @@ Path contains reserved name or invalid characters
    ```bash
    # Windows accepts forward slashes
    npx get-shit-done-multi --local
-
-```plaintext
+   ```
 
 2. **Avoid Windows reserved names:**
    - Don't name folders: CON, PRN, AUX, NUL, COM1-9, LPT1-9
@@ -296,8 +291,7 @@ Path contains reserved name or invalid characters
    # Use shorter installation path
    cd C:\code\project
    npx get-shit-done-multi --local
-
-```plaintext
+   ```
 
 ---
 
@@ -305,12 +299,10 @@ Path contains reserved name or invalid characters
 
 **Problem:**
 
-```
-
+```plaintext
 Warning: Target path contains symlink: ~/.claude -> /external/.claude
 Continue installation? (y/n)
-
-```plaintext
+```
 
 **Symptoms:**
 
@@ -340,7 +332,7 @@ Continue installation? (y/n)
    # Then install to direct path:
    npx get-shit-done-multi --local --yes
 
-```plaintext
+   ```
 
 3. **Use `--yes` to auto-approve:**
 
@@ -396,8 +388,7 @@ Error: Command not recognized
    # Claude: ~/.claude/skills/ or .claude/skills/
    # Copilot: ~/.copilot/skills/ or .github/skills/
    # Codex: ~/.codex/skills/ or .codex/skills/
-
-```plaintext
+   ```
 
 3. **Verify files exist:**
 
@@ -451,8 +442,7 @@ No installations found.
    cat ~/.claude/get-shit-done/.gsd-install-manifest.json
    cat .github/get-shit-done/.gsd-install-manifest.json
    cat ~/.codex/get-shit-done/.gsd-install-manifest.json
-
-```plaintext
+   ```
 
 2. **Verify manifest format:**
 
@@ -468,8 +458,7 @@ No installations found.
    ```bash
    # Reinstall (overwrites and creates new manifest)
    npx get-shit-done-multi --claude --global --yes
-
-```plaintext
+   ```
 
 4. **Check file permissions:**
 
@@ -516,8 +505,7 @@ Installation may be incomplete
    # Make sure no process is using GSD files
    # Then retry upgrade
    npx get-shit-done-multi --yes
-
-```plaintext
+   ```
 
 2. **Force reinstall:**
 
@@ -536,8 +524,7 @@ Installation may be incomplete
    lsof | grep get-shit-done
    
    # Kill any processes holding locks
-
-```plaintext
+   ```
 
 ---
 
@@ -545,14 +532,13 @@ Installation may be incomplete
 
 **Problem:**
 
-```
+```pl
 
 # After upgrading to v3.0.0
 
 Error: /gsd-plan-milestone no longer exists
 Use /gsd-plan-phase instead
-
-```plaintext
+```
 
 **Symptoms:**
 
@@ -589,8 +575,7 @@ Use /gsd-plan-phase instead
    
    # Install specific older version
    npx get-shit-done-multi@2.5.0
-
-```plaintext
+   ```
 
    See [How to Upgrade](how-to-upgrade.md) for downgrade details.
 
@@ -602,14 +587,14 @@ Use /gsd-plan-phase instead
 
 **Problem:**
 
-```
+```plaintext
 
 # After GSD makes commits
 
 git log --oneline
 a1b2c3d GSD Agent <noreply@gsd.dev>
 
-```plaintext
+```
 
 **Symptoms:**
 
@@ -638,8 +623,7 @@ a1b2c3d GSD Agent <noreply@gsd.dev>
    cd /path/to/project
    git config user.name "Your Name"
    git config user.email "your.email@example.com"
-
-```plaintext
+   ```
 
 3. **Verify git identity helpers are working:**
 
@@ -656,8 +640,7 @@ a1b2c3d GSD Agent <noreply@gsd.dev>
    
    # Fix last N commits
    git rebase -i HEAD~N -x "git commit --amend --author='Your Name <your.email@example.com>' --no-edit"
-
-```plaintext
+   ```
 
 ---
 
@@ -665,12 +648,11 @@ a1b2c3d GSD Agent <noreply@gsd.dev>
 
 **Problem:**
 
-```
+```plaintext
 
 Error: .planning/phases/01-phase-name/01-01-PLAN.md not found
 Cannot execute plan
-
-```plaintext
+```
 
 **Symptoms:**
 
@@ -701,8 +683,7 @@ Cannot execute plan
    ```bash
    # Check structure matches expected format
    tree .planning/
-
-```plaintext
+   ```
 
    Should show:
 
@@ -717,8 +698,7 @@ Cannot execute plan
            ├── 01-01-PLAN.md
            ├── 01-01-SUMMARY.md
            └── 01-01-CONTEXT.md
-
-```plaintext
+   ```
 
 3. **Regenerate from roadmap:**
 
@@ -765,8 +745,7 @@ npm ERR! 404 Not Found - GET https://registry.npmjs.org/get-shit-done-multi
    # get-shit-done (without -multi)
    # gsd-multi
    # get-shit-done-cli
-
-```plaintext
+   ```
 
 2. **Check npm registry connection:**
 
@@ -786,8 +765,7 @@ npm ERR! 404 Not Found - GET https://registry.npmjs.org/get-shit-done-multi
    
    # Then retry
    npx get-shit-done-multi
-
-```plaintext
+   ```
 
 ---
 
@@ -795,12 +773,11 @@ npm ERR! 404 Not Found - GET https://registry.npmjs.org/get-shit-done-multi
 
 **Problem:**
 
-```
+```plaintext
 
 Error: This package requires Node.js version 20 or higher
 Current version: v18.12.0
-
-```plaintext
+```
 
 **Symptoms:**
 
@@ -834,8 +811,7 @@ Current version: v18.12.0
 
    ```bash
    node --version  # Should show v20.0.0 or higher
-
-```plaintext
+   ```
 
 3. **Use npx with specific Node version (nvm):**
 
@@ -857,7 +833,7 @@ GSD creates an error log when installation fails:
 # Check for error log
 cat .gsd-error.log
 cat ~/.gsd-error.log
-```plaintext
+```
 
 This contains detailed error information.
 

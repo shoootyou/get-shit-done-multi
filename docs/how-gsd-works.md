@@ -129,7 +129,7 @@ autonomous: true
   <verify>...</verify>
   <done>...</done>
 </task>
-```plaintext
+```
 
 ## Stage 3: Execution
 
@@ -181,8 +181,7 @@ autonomous: true
 
 Projects proceed phase-by-phase:
 
-```
-
+```text
 Phase 1: Plan → Execute → Verify → Complete
 Phase 2: Plan → Execute → Verify → Complete
 Phase 3: Plan → Execute → Verify → Complete

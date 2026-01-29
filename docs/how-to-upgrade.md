@@ -4,7 +4,7 @@ Upgrading is the same as installing:
 
 ```bash
 npx get-shit-done-multi
-```plaintext
+```
 
 The installer detects existing installations and prompts you to upgrade if outdated.
 
@@ -132,7 +132,7 @@ After successful upgrade, the manifest is updated:
   "installed_at": "2026-01-15T10:30:00Z",
   ...
 }
-```plaintext
+```
 
 **After:**
 
@@ -176,8 +176,7 @@ When upgrading across major versions (e.g., v2.x → v3.x):
    ```bash
    npx get-shit-done-multi --changelog
    # or visit: https://github.com/your-org/gsd/blob/main/CHANGELOG.md
-
-```plaintext
+   ```
 
 2. **Check breaking changes:**
    - Skill name changes
@@ -235,7 +234,7 @@ If you need to use an older GSD version:
 
 # Install specific older version
 npx get-shit-done-multi@2.0.0
-```plaintext
+```
 
 **Option 2: Use npm install for pinned version**
 
@@ -261,7 +260,7 @@ npx get-shit-done-multi --claude --yes
 
 # Upgrade to global location
 npx get-shit-done-multi --global --yes
-```plaintext
+```
 
 The `--yes` flag:
 
@@ -306,7 +305,7 @@ cat ~/.claude/get-shit-done/.gsd-install-manifest.json
 # Look for gsd_version field
 # If incorrect, try reinstalling:
 npx get-shit-done-multi --claude --global --yes
-```plaintext
+```
 
 ### Upgrade Succeeds but Skills Not Updated
 

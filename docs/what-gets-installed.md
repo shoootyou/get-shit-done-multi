@@ -94,7 +94,7 @@ argument-hint: Phase number or name
 # Phase Planning Skill
 
 [Detailed instructions for how to plan a phase...]
-```plaintext
+```
 
 **Frontmatter fields:**
 
@@ -144,15 +144,13 @@ Agents are specialized sub-agents that skills delegate to for complex tasks. You
 Agents are individual files (not in subdirectories):
 
 ```
-
 [platform]/agents/
 ├── gsd-executor.agent.md
 ├── gsd-planner.agent.md
 ├── gsd-verifier.agent.md
 ├── gsd-debugger.agent.md
 └── ... (9 more)
-
-```plaintext
+```
 
 ### Agent File Format
 
@@ -257,7 +255,7 @@ The `.gsd-install-manifest.json` file tracks your installation:
     "... (all installed files)"
   ]
 }
-```plaintext
+```
 
 **Manifest fields:**
 
@@ -308,8 +306,7 @@ Where files are installed depends on the platform and scope you choose.
 
 ### Full Example: Claude Global Installation
 
-```
-
+```plaintext
 ~/.claude/
 ├── skills/
 │   ├── gsd-new-project/
@@ -329,7 +326,7 @@ Where files are installed depends on the platform and scope you choose.
     ├── templates/
     ├── workflows/
     └── .gsd-install-manifest.json
-
+```
 ---
 
 ## Installation Sizes

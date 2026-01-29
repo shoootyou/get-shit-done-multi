@@ -4,7 +4,7 @@ Run this command to install GSD skills to your AI assistant:
 
 ```bash
 npx get-shit-done-multi
-```plaintext
+```
 
 The installer will:
 
@@ -52,7 +52,7 @@ npx get-shit-done-multi --codex --global --yes
 
 # Install to multiple platforms at once
 npx get-shit-done-multi --claude --copilot --yes
-```plaintext
+```
 
 ### Platform Selection
 
@@ -89,7 +89,7 @@ npx get-shit-done-multi --claude --global --yes
 
 # Install locally to current project (Copilot)
 npx get-shit-done-multi --copilot --local --yes
-```plaintext
+```
 
 ### Other Flags
 
@@ -107,7 +107,7 @@ npx get-shit-done-multi -y
 npx get-shit-done-multi --help
 # or
 npx get-shit-done-multi -h
-```plaintext
+```
 
 **Show Version:**
 
@@ -242,7 +242,7 @@ The `.gsd-install-manifest.json` file tracks your installation:
     "..."
   ]
 }
-```plaintext
+```
 
 This manifest is used for:
 

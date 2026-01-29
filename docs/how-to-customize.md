@@ -10,7 +10,7 @@ Install GSD skills once for all projects:
 
 ```bash
 npx get-shit-done-multi --global
-```plaintext
+```
 
 **Installs to:**
 
@@ -56,7 +56,7 @@ npx get-shit-done-multi --global
 # Local installation for specific project
 cd ~/special-project/
 npx get-shit-done-multi --local
-```plaintext
+```
 
 **Priority:** Local installation takes precedence over global if both exist.
 
@@ -79,7 +79,7 @@ Install to multiple platforms simultaneously:
 ```bash
 npx get-shit-done-multi --claude --copilot
 npx get-shit-done-multi --claude --copilot --codex
-```plaintext
+```
 
 Each platform gets its own installation. Your `.planning/` directory works with all platforms.
 
@@ -103,18 +103,17 @@ Useful for:
 
 ```bash
 npx get-shit-done-multi --version
-```plaintext
+```
 
 Shows ALL installations (global + local, all platforms):
 
-```
-
+```plaintext
 Installed versions:
 
 - Claude (global): v2.0.0 at ~/.claude/get-shit-done/
 - Copilot (local): v2.0.0 at .github/get-shit-done/
 
-```plaintext
+```
 
 ### Upgrade All Installations
 
@@ -128,7 +127,7 @@ Installer detects outdated installations and prompts for upgrade.
 
 ```bash
 npx get-shit-done-multi --claude --yes
-```plaintext
+```
 
 ## Custom Paths (Not Yet Implemented)
 
@@ -152,7 +151,7 @@ Select specific skills/agents to install:
 
 ```bash
 npx get-shit-done-multi --skills gsd-plan-phase,gsd-execute-phase
-```plaintext
+```
 
 **Workaround for now:**
 
@@ -176,8 +175,7 @@ You can manually edit installed skills:
 
    ```bash
    vim .claude/skills/gsd-plan-phase/SKILL.md
-
-```plaintext
+   ```
 
 3. Changes persist until reinstall
 

@@ -12,7 +12,7 @@ Remove GSD by deleting the installation directories.
 
 ```bash
 rm -rf .claude/skills/gsd-* .claude/agents/gsd-* .claude/get-shit-done/
-```plaintext
+```
 
 **Global installation:**
 
@@ -26,7 +26,7 @@ rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
 
 ```bash
 rm -rf .github/skills/gsd-* .github/agents/gsd-* .github/get-shit-done/
-```plaintext
+```
 
 **Global installation:**
 
@@ -40,7 +40,7 @@ rm -rf ~/.copilot/skills/gsd-* ~/.copilot/agents/gsd-* ~/.copilot/get-shit-done/
 
 ```bash
 rm -rf .codex/skills/gsd-* .codex/agents/gsd-* .codex/get-shit-done/
-```plaintext
+```
 
 **Global installation:**
 
@@ -105,7 +105,7 @@ After running the removal commands, verify GSD is completely gone:
 ```bash
 ls ~/.claude/get-shit-done/ 2>/dev/null || echo "Removed successfully"
 ls .claude/get-shit-done/ 2>/dev/null || echo "Removed successfully"
-```plaintext
+```
 
 ### Check Copilot Installation
 
@@ -119,7 +119,7 @@ ls .github/get-shit-done/ 2>/dev/null || echo "Removed successfully"
 ```bash
 ls ~/.codex/get-shit-done/ 2>/dev/null || echo "Removed successfully"
 ls .codex/get-shit-done/ 2>/dev/null || echo "Removed successfully"
-```plaintext
+```
 
 If you see "Removed successfully" for all checks, GSD is completely uninstalled.
 
@@ -147,7 +147,7 @@ You don't have to remove all GSD installations. You can remove specific platform
 ```bash
 rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
 rm -rf .claude/skills/gsd-* .claude/agents/gsd-* .claude/get-shit-done/
-```plaintext
+```
 
 **Remove only Copilot installation:**
 
@@ -161,7 +161,7 @@ rm -rf .github/skills/gsd-* .github/agents/gsd-* .github/get-shit-done/
 ```bash
 rm -rf ~/.codex/skills/gsd-* ~/.codex/agents/gsd-* ~/.codex/get-shit-done/
 rm -rf .codex/skills/gsd-* .codex/agents/gsd-* .codex/get-shit-done/
-```plaintext
+```
 
 ### Remove Specific Scope Only
 
@@ -179,7 +179,7 @@ rm -rf ~/.codex/skills/gsd-* ~/.codex/agents/gsd-* ~/.codex/get-shit-done/
 rm -rf .claude/skills/gsd-* .claude/agents/gsd-* .claude/get-shit-done/
 rm -rf .github/skills/gsd-* .github/agents/gsd-* .github/get-shit-done/
 rm -rf .codex/skills/gsd-* .codex/agents/gsd-* .codex/get-shit-done/
-```plaintext
+```
 
 ---
 
@@ -191,7 +191,7 @@ Uninstalling GSD does **not** affect:
 
 Your `.planning/` directory remains intact:
 
-```
+```plaintext
 
 your-project/
 ├── .planning/
@@ -204,7 +204,7 @@ your-project/
 │   │       └── SUMMARY.md
 │   └── research/
 
-```plaintext
+```
 
 GSD only removes the template files it installed. All your project-specific planning and execution history remains untouched.
 
@@ -252,7 +252,7 @@ Planned for v2.1+:
 ```bash
 # Planned feature (not yet available)
 npx get-shit-done-multi --uninstall
-```plaintext
+```
 
 This will:
 
@@ -305,7 +305,7 @@ rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
 rm -rf /path/to/project/.github/skills/gsd-* \
        /path/to/project/.github/agents/gsd-* \
        /path/to/project/.github/get-shit-done/
-```plaintext
+```
 
 ---
 

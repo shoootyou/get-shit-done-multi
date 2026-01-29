@@ -46,8 +46,7 @@ graph TD
 
 **Structure:**
 
-```
-
+```text
 templates/
 ├── skills/
 │   └── gsd-*/
@@ -60,8 +59,7 @@ templates/
     ├── references/
     ├── templates/
     └── .gsd-install-manifest.json
-
-```text
+```
 
 **Template Variables:**
 
@@ -155,7 +153,7 @@ validateBeforeInstall(targetDir, platform)
   → checks.push(...symlinkCheck())
   → checks.push(...existingInstallCheck())
   → return { valid: true/false, errors: [], warnings: [] }
-```text
+```
 
 ### `/bin/lib/validation/`
 

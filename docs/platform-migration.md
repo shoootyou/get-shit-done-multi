@@ -8,7 +8,7 @@ Frequently asked questions about switching platforms, using multiple platforms, 
 
 ```bash
 npx get-shit-done-multi --claude --copilot --codex
-```plaintext
+```
 
 Each platform gets its own installation:
 
@@ -59,7 +59,7 @@ rm -rf ~/.copilot/skills/gsd-* ~/.copilot/agents/gsd-* ~/.copilot/get-shit-done/
 
 # Install Codex
 npx get-shit-done-multi --codex
-```plaintext
+```
 
 **Note:** Codex uses `$gsd-` command prefix (not `/gsd-`). After switching, use:
 
