@@ -2,7 +2,7 @@
 name: gsd-list-phase-assumptions
 description: Surface Claude's assumptions about a phase approach before planning
 allowed-tools: Read, Bash
-argument-hint: [phase]
+argument-hint: '[phase]'
 ---
 
 

@@ -2,7 +2,7 @@
 name: gsd-check-todos
 description: List pending todos and select one to work on
 allowed-tools: Read, Edit, Bash, Grep, Task
-argument-hint: [area]
+argument-hint: '[area]'
 ---
 
 

@@ -2,7 +2,7 @@
 name: gsd-new-project
 description: Orchestrate project initialization with parallel research and roadmap creation
 allowed-tools: Task, Read, Edit, Bash
-argument-hint: [domain]
+argument-hint: '[domain]'
 ---
 
 

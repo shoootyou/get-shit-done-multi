@@ -5,6 +5,7 @@ allowed-tools: Read, Edit, Bash
 argument-hint: '[after_phase] [description]'
 ---
 
+
 <objective>
 Insert a decimal phase for urgent work discovered mid-milestone that must be completed between existing integer phases.
 

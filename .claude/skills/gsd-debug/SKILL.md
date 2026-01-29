@@ -2,7 +2,7 @@
 name: gsd-debug
 description: Structured debugging workflow with session persistence and investigation tracking
 allowed-tools: Task, Read, Edit, Bash
-argument-hint: [issue]
+argument-hint: '[issue]'
 ---
 
 

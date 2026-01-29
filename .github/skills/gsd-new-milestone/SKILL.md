@@ -2,7 +2,7 @@
 name: gsd-new-milestone
 description: Orchestrate milestone planning with parallel research for subsequent project phases
 allowed-tools: Task, Read, Edit, Bash, Grep
-argument-hint: [milestone]
+argument-hint: '[milestone]'
 ---
 
 

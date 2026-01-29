@@ -2,7 +2,7 @@
 name: gsd-remove-phase
 description: Remove a future phase from roadmap and renumber subsequent phases
 allowed-tools: Read, Edit, Bash, Grep
-argument-hint: [phase]
+argument-hint: '[phase]'
 ---
 
 
