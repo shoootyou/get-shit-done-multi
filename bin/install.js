@@ -66,6 +66,7 @@ async function main() {
     arg.startsWith('--custom-path')
   );
 
+  // Error if --custom-path is specified more than once
   if (customPathArgs.length > 1) {
     multipleDirectoryErrors();
     process.exit(1);
@@ -80,12 +81,13 @@ async function main() {
   // Parse platforms
   const platforms = parsePlatformFlags(options, adapterRegistry);
 
-  // Show banner with version and context
+  // After parsing flags, start the flow starting with the banner
   banner(pkg.version, true);
 
   // Check for old versions and migrate if needed (Phase 6.1)
   const migrationResult = await checkAndMigrateOldVersions('.', { skipPrompts: false });
 
+  // Handle migration result
   if (!migrationResult.success) {
     if (migrationResult.cancelled) {
       logger.info('Installation cancelled by user.');
@@ -96,17 +98,23 @@ async function main() {
     }
   }
 
-  // Show templates path
+  // Continue with the regular flow after migration
   showTemplatePath(__dirname);
 
   // Check for interactive mode
-  if (shouldUseInteractiveMode(platforms, isValidTTY())) {
+  let isInteractive = shouldUseInteractiveMode(platforms, isValidTTY())
+
+  // Execute interactive mode
+  if (isInteractive) {
     await runInteractive(pkg.version, {
       verbose: options.verbose || false,
       customPath: options.customPath || null
     });
-  } else {
-    // Non-interactive without flags - show usage
+  }
+
+  // Execute non-interactive mode
+  if (!isInteractive) {
+    // Validate that at least one platform is specified
     if (platforms.length === 0 && !isValidTTY()) {
       showUsageError();
       process.exit(EXIT_CODES.INVALID_ARGS);
