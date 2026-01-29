@@ -764,8 +764,9 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 pending todo:
+2 pending todos:
 - `.planning/todos/pending/2026-01-28-fix-agent-installation-filter.md` - Fix agent installation filter to match .agent.md templates (area: installer)
+- `.planning/todos/pending/2026-01-29-actualizar-validatecustompathwithplatforms-con-librerias.md` - Actualizar validateCustomPathWithPlatforms con librerias (area: general)
 
 ### Blockers
 None
