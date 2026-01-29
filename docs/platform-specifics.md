@@ -13,6 +13,24 @@ and Codex CLI.
 - **File Extensions:** `.md` for both skills and agents
 - **Frontmatter:** YAML with optional metadata block
 
+### Historical Context: Commands → Skills Migration
+
+Claude deprecated the `.claude/commands/` directory in favor of `.claude/skills/` in 2025. According to the
+[official documentation](https://code.claude.com/docs/en/slash-commands#control-who-invokes-a-skill):
+
+> "Custom slash commands have been merged into skills. A file at `.claude/commands/review.md` and a skill at
+> `.claude/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.claude/commands/`
+> files keep working. Skills add optional features: a directory for supporting files, frontmatter to control whether
+> you or Claude invokes them, and the ability for Claude to load them automatically when relevant."
+
+**Key differences:**
+
+- **Commands (legacy):** Single `.md` file, basic frontmatter, always user-invoked
+- **Skills (current):** Directory-based, rich frontmatter with `user-invocable` control, auto-loading support
+
+GSD Multi uses the skills system exclusively. If you see references to "commands" in older documentation, these now
+refer to skills.
+
 ### Skill Frontmatter Example
 
 ```yaml

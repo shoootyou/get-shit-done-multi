@@ -33,20 +33,39 @@ needed while maintaining project state.
 
 ```bash
 npx get-shit-done-multi
-```plaintext
-
-The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 28 skills and 13 agents. After installation, you can start your first project:
-
-```bash
-# Claude Code
-/gsd:new-project
-
-# Copilot/Codex (conversational)
-"Start a new GSD project"
 ```
 
-The system guides you through questioning, research, requirements extraction, and roadmap creation. Then execute phase
-by phase with atomic task plans and clean commits.
+The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 28 skills and 13
+agents. After installation, start your first project with platform-specific commands:
+
+```bash
+# Claude Code / GitHub Copilot CLI
+/gsd-new-project
+
+# Codex CLI
+$gsd-new-project
+```
+
+The system guides you through questioning, research, requirements extraction, and roadmap creation. Then execute
+phase by phase with atomic task plans and clean commits.
+
+**Note:** Use `/gsd-` prefix for Claude and Copilot, `$gsd-` prefix for Codex.
+
+---
+
+## GSD Workflow Commands
+
+The complete workflow cycle uses these commands:
+
+- **`/gsd-new-project`** or **`$gsd-new-project`** — Start new project with guided setup
+- **`/gsd-discuss-phase <N>`** — Explore phase approach through questions
+- **`/gsd-research-phase <N>`** — Research implementation patterns
+- **`/gsd-plan-phase <N>`** — Create atomic execution plans
+- **`/gsd-execute-phase <N>`** — Execute all plans with fresh context
+- **`/gsd-verify-work`** — Manual acceptance testing
+- **`/gsd-complete-milestone`** — Archive and prepare next milestone
+
+See [How GSD Works](docs/how-gsd-works.md) for detailed workflow explanation.
 
 ---
 
@@ -80,11 +99,16 @@ happens at natural checkpoints.
 
 ## Supported Platforms
 
-- **Claude Code** - Original platform with slash commands
+- **Claude Code** - Skills-based system with slash commands (replaces legacy `.claude/commands/`)
 - **GitHub Copilot CLI** - Conversational interface with agent support
 - **Codex CLI** - OpenAI's command-line interface
 
 All platforms share the same workflow and project state. Switch between platforms mid-project as needed.
+
+**Note for Claude users:** GSD Multi uses Claude's skills system (`.claude/skills/`). The legacy commands directory
+(`.claude/commands/`) has been deprecated by Claude in favor of skills, which provide the same slash command interface
+with additional features like frontmatter control and automatic loading. See
+[Platform Specifics](docs/platform-specifics.md) for details.
 
 ---
 

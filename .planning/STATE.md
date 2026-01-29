@@ -951,9 +951,13 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-2 todos captured (see .planning/todos/pending/):
-- 2026-01-30-fix-readme-documentation-post-phase-8.md — Fix command prefixes, code blocks, document commands→skills migration
-- 2026-01-30-review-package-configuration-decisions.md — Investigate .markdownlint-cli2.jsonc and docs/ in package.json files
+1 todo captured (see .planning/todos/pending/):
+- 2026-01-30-review-package-configuration-decisions.md — Investigate .markdownlint-cli2.jsonc and docs/ in
+  package.json files
+
+### Completed Todos
+- 2026-01-30-fix-readme-documentation-post-phase-8.md — Fixed command prefixes, code blocks, added workflow section,
+  documented commands→skills migration
 
 ### Blockers
 None
