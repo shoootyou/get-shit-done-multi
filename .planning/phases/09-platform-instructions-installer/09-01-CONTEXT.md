@@ -1,8 +1,9 @@
 ---
 phase: 9
 discussed: 2026-01-30T02:55:00Z
-areas: [marcadores-de-bloque, merge-behavior, template-structure, error-handling, documentación]
-decisions_count: 18
+updated: 2026-01-30T03:10:00Z
+areas: [marcadores-de-bloque, merge-behavior, template-structure, error-handling, documentación, path-handling]
+decisions_count: 23
 ---
 
 # Phase 9 Context: Platform Instructions Installer
@@ -11,10 +12,15 @@ decisions_count: 18
 
 **Smart Merge Installation:**
 - Install `templates/AGENTS.md` to platform-specific instruction files
-- Platform targets:
-  - Codex: `[root]/AGENTS.md`
-  - Claude: `[root]/CLAUDE.md`
-  - Copilot: `.github/copilot-instructions.md`
+- Platform targets (scope-aware):
+  - **Local installations:**
+    - Claude: `[cwd]/CLAUDE.md` (project root)
+    - Codex: `[cwd]/AGENTS.md` (project root)
+    - Copilot: `[cwd]/.github/copilot-instructions.md` (inside .github/)
+  - **Global installations:**
+    - Claude: `~/.claude/CLAUDE.md` (inside platform dir)
+    - Codex: `~/.codex/AGENTS.md` (inside platform dir)
+    - Copilot: `~/.copilot/copilot-instructions.md` (inside platform dir)
 - Dynamic block detection using first and last lines as markers
 - Three merge scenarios: create new, append, or replace with intelligent insertion
 
@@ -52,9 +58,20 @@ decisions_count: 18
 - Use existing template-renderer for variable replacement
 - Function signature matches pattern: `(templatesDir, targetDir, variables, multiBar, isVerbose, adapter)`
 
-**Adapter Method:**
-- Add `getInstructionsFilename()` to each adapter
-- Returns platform-specific filename (no path logic, just filename)
+**Path Resolution:**
+- Create new file: `bin/lib/platforms/instruction-paths.js`
+- Define `instructionFiles` constant (similar to `platformDirs` in platform-paths.js)
+- Implement `getInstructionPath(platform, isGlobal)` → returns absolute path
+- Structure:
+  ```javascript
+  instructionFiles = {
+    claude: { global: '.claude/CLAUDE.md', local: 'CLAUDE.md' },
+    copilot: { global: '.copilot/copilot-instructions.md', local: '.github/copilot-instructions.md' },
+    codex: { global: '.codex/AGENTS.md', local: 'AGENTS.md' }
+  }
+  ```
+- Each adapter's `getInstructionsPath(isGlobal)` calls this utility function
+- Returns absolute path: joins with `os.homedir()` (global) or `process.cwd()` (local)
 
 ## Scope Limits
 
@@ -79,6 +96,13 @@ decisions_count: 18
 - Are there edge cases with different line endings (CRLF vs LF)?
 
 ## Implementation Decisions
+
+**Path Resolution Architecture:**
+- New centralized path utility: `bin/lib/platforms/instruction-paths.js`
+- Follows same pattern as `platform-paths.js` for consistency
+- Handles scope-aware path differences (local root vs platform dir for global)
+- Adapters delegate to utility function rather than hard-coding paths
+- Returns absolute paths ready for file operations
 
 **Block Insertion Logic:**
 When replacing block and another markdown title is found:
@@ -123,13 +147,16 @@ When replacing block and another markdown title is found:
 
 ## Success Criteria
 
+- [ ] New file `bin/lib/platforms/instruction-paths.js` created with `instructionFiles` constant
+- [ ] `getInstructionPath(platform, isGlobal)` utility function implemented
 - [ ] Block detection works with dynamic first/last line extraction
 - [ ] Variable replacement happens before marker extraction
 - [ ] All 3 merge scenarios (create/append/replace) work correctly
 - [ ] Exact line-by-line comparison implemented
 - [ ] Title interruption handled (insert full block before new title)
 - [ ] Permission errors fail installation gracefully
-- [ ] All 3 platforms use correct filename via adapter method
+- [ ] All 3 platforms use correct paths (local root vs global platform dir)
+- [ ] Adapter method `getInstructionsPath(isGlobal)` delegates to utility
 - [ ] Verbose and non-verbose modes integrated in orchestrator
 - [ ] Documentation updated in 3 identified files
-- [ ] Integration tests cover all merge scenarios and platforms
+- [ ] Integration tests cover all merge scenarios, platforms, and scopes (local/global)
