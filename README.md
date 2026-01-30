@@ -12,8 +12,6 @@
 
 </div>
 
----
-
 ## What It Does
 
 Get Shit Done Multi (GSD Multi) is a template-based installer that deploys working AI assistant skills and agents to
@@ -26,8 +24,6 @@ at key points.
 
 The multi-platform approach means you can use the same workflow across different AI assistants, switching platforms as
 needed while maintaining project state.
-
----
 
 ## Quick Start
 
@@ -50,24 +46,6 @@ The system guides you through questioning, research, requirements extraction, an
 phase by phase with atomic task plans and clean commits.
 
 **Note:** Use `/gsd-` prefix for Claude and Copilot, `$gsd-` prefix for Codex.
-
----
-
-## GSD Workflow Commands
-
-The complete workflow cycle uses these commands:
-
-- **`/gsd-new-project`** or **`$gsd-new-project`** — Start new project with guided setup
-- **`/gsd-discuss-phase <N>`** — Explore phase approach through questions
-- **`/gsd-research-phase <N>`** — Research implementation patterns
-- **`/gsd-plan-phase <N>`** — Create atomic execution plans
-- **`/gsd-execute-phase <N>`** — Execute all plans with fresh context
-- **`/gsd-verify-work`** — Manual acceptance testing
-- **`/gsd-complete-milestone`** — Archive and prepare next milestone
-
-See [How GSD Works](docs/how-gsd-works.md) for detailed workflow explanation.
-
----
 
 ## Workflow
 
@@ -95,7 +73,19 @@ Phases:
 Each phase produces small, focused plans that execute in fresh context windows to avoid degradation. Human verification
 happens at natural checkpoints.
 
----
+## GSD Workflow Commands
+
+The complete workflow cycle uses these commands:
+
+- **`/gsd-new-project`** or **`$gsd-new-project`** — Start new project with guided setup
+- **`/gsd-discuss-phase <N>`** — Explore phase approach through questions
+- **`/gsd-research-phase <N>`** — Research implementation patterns
+- **`/gsd-plan-phase <N>`** — Create atomic execution plans
+- **`/gsd-execute-phase <N>`** — Execute all plans with fresh context
+- **`/gsd-verify-work`** — Manual acceptance testing
+- **`/gsd-complete-milestone`** — Archive and prepare next milestone
+
+See [How GSD Works](docs/how-gsd-works.md) for detailed workflow explanation.
 
 ## Supported Platforms
 
@@ -109,8 +99,6 @@ All platforms share the same workflow and project state. Switch between platform
 (`.claude/commands/`) has been deprecated by Claude in favor of skills, which provide the same slash command interface
 with additional features like frontmatter control and automatic loading. See
 [Platform Specifics](docs/platform-specifics.md) for details.
-
----
 
 ## Documentation
 
@@ -126,14 +114,10 @@ with additional features like frontmatter control and automatic loading. See
 - [Full Documentation](docs/README.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
----
-
 ## Requirements
 
 - **Node.js 20+** (Node 20 LTS active until October 2026)
 - One of: Claude Code, GitHub Copilot CLI, or Codex CLI
-
----
 
 ## Credits & License
 

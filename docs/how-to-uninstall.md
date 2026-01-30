@@ -2,8 +2,6 @@
 
 Remove GSD by deleting the installation directories.
 
----
-
 ## Quick Removal
 
 ### Claude
@@ -50,8 +48,6 @@ rm -rf ~/.codex/skills/gsd-* ~/.codex/agents/gsd-* ~/.codex/get-shit-done/
 
 Done. GSD is completely removed.
 
----
-
 ## What Gets Removed
 
 When you delete GSD directories, you remove:
@@ -94,8 +90,6 @@ The entire `get-shit-done/` folder:
 
 **Total removal:** Approximately 2MB of files.
 
----
-
 ## Verifying Removal
 
 After running the removal commands, verify GSD is completely gone:
@@ -133,8 +127,6 @@ find ~/.claude ~/.copilot ~/.codex .claude .github .codex -name "gsd-*" 2>/dev/n
 ```
 
 Empty output means successful removal.
-
----
 
 ## Partial Removal
 
@@ -181,8 +173,6 @@ rm -rf .github/skills/gsd-* .github/agents/gsd-* .github/get-shit-done/
 rm -rf .codex/skills/gsd-* .codex/agents/gsd-* .codex/get-shit-done/
 ```
 
----
-
 ## What Is NOT Removed
 
 Uninstalling GSD does **not** affect:
@@ -222,8 +212,6 @@ Only files matching `gsd-*` are removed.
 
 Your git commits made by GSD remain in git history. The uninstall only removes template files from your working directory.
 
----
-
 ## Reinstalling After Removal
 
 To reinstall GSD after removal:
@@ -240,8 +228,6 @@ The installer treats it as a fresh installation:
 4. Creates new `.gsd-install-manifest.json`
 
 Your previous installation settings (scope, platforms) are not remembered. You'll need to choose again.
-
----
 
 ## Uninstall Script (Future)
 
@@ -263,8 +249,6 @@ This will:
 
 Until then, use the manual `rm -rf` commands above.
 
----
-
 ## Why Manual Removal is Safe
 
 Deleting GSD directories is completely safe because:
@@ -276,8 +260,6 @@ Deleting GSD directories is completely safe because:
 5. **Project files untouched:** Your `.planning/` data is separate
 
 The `rm -rf` commands only remove what the installer created. Nothing more.
-
----
 
 ## Removing Without Knowing Installation Location
 
@@ -306,8 +288,6 @@ rm -rf /path/to/project/.github/skills/gsd-* \
        /path/to/project/.github/agents/gsd-* \
        /path/to/project/.github/get-shit-done/
 ```
-
----
 
 ## Troubleshooting Removal
 
@@ -356,8 +336,6 @@ ls -la .codex/get-shit-done/ 2>/dev/null
 ```
 
 If all return "No such file or directory", GSD is not installed.
-
----
 
 ## Next Steps
 

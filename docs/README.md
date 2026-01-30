@@ -65,7 +65,5 @@ See [CHANGELOG.md](../CHANGELOG.md) for version history and release notes.
 | [Troubleshooting](troubleshooting.md) | Common issues |
 | [Architecture](architecture.md) | Technical details |
 
----
-
 **Last Updated:** 2026-01-30  
 **Version:** 2.0.0

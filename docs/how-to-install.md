@@ -15,8 +15,6 @@ The installer will:
 
 Done. Your AI assistant now has GSD capabilities.
 
----
-
 ## Installation Options
 
 ### Interactive Mode (Default)
@@ -118,8 +116,6 @@ npx get-shit-done-multi -v
 ```
 
 The `--version` command shows all installed GSD versions across platforms and scopes.
-
----
 
 ## Understanding What Gets Installed
 
@@ -272,8 +268,6 @@ Approximately 2MB total:
 - 13 agents: ~600KB
 - Shared directory: ~200KB
 
----
-
 ## Requirements
 
 Before installing GSD, ensure you have:
@@ -295,8 +289,6 @@ Before installing GSD, ensure you have:
 3. **Write permissions:**
    - For local install: Write access to current directory
    - For global install: Write access to home directory
-
----
 
 ## Next Steps
 

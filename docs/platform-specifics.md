@@ -99,8 +99,6 @@ See @.claude/get-shit-done/references/commit-guidelines.md for details.
 
 Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 
----
-
 ## GitHub Copilot CLI
 
 ### Overview
@@ -180,8 +178,6 @@ See @.github/get-shit-done/references/commit-guidelines.md for details.
 
 Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 
----
-
 ## Codex CLI
 
 ### Overview
@@ -237,8 +233,6 @@ See @.codex/get-shit-done/references/commit-guidelines.md for details.
 ### Template Source
 
 Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
-
----
 
 ## Next Steps
 

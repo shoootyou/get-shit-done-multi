@@ -9,8 +9,6 @@ Each issue includes:
 - **Cause:** Why it happens
 - **Solutions:** Ranked from best to worst
 
----
-
 ## Installation Issues
 
 ### 1. Error: Permission denied (EACCES)
@@ -77,8 +75,6 @@ Error: EACCES: permission denied, mkdir '~/.claude/skills'
 
    This can create permission issues later. Avoid unless necessary.
 
----
-
 ### 2. Error: Insufficient disk space
 
 **Problem:**
@@ -134,8 +130,6 @@ Required: 2MB, Available: 0.5MB
    npx get-shit-done-multi --claude --global
    ```
 
----
-
 ### 3. Error: Platform not detected
 
 **Problem:**
@@ -184,8 +178,6 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
    # Then install with explicit flag
    npx get-shit-done-multi --claude --global --yes
    ```
-
----
 
 ### 4. Error: Existing installation conflict
 
@@ -240,8 +232,6 @@ This installation will overwrite existing files.
    npx get-shit-done-multi --local --yes
    ```
 
----
-
 ### 5. Error: Path resolution failed (Windows)
 
 **Problem:**
@@ -293,8 +283,6 @@ Path contains reserved name or invalid characters
    npx get-shit-done-multi --local
    ```
 
----
-
 ### 6. Error: Symlink permission prompt
 
 **Problem:**
@@ -342,8 +330,6 @@ Continue installation? (y/n)
    ```
 
    Only use if you trust the symlink.
-
----
 
 ## Post-Installation Issues
 
@@ -405,8 +391,6 @@ Error: Command not recognized
    - **Claude:** Ensure Claude Code integration is enabled
    - **Copilot:** Ensure `gh copilot` command works
    - **Codex:** Ensure Codex CLI is configured
-
----
 
 ### 8. Update detection not working
 
@@ -470,8 +454,6 @@ No installations found.
    chmod 644 ~/.claude/get-shit-done/.gsd-install-manifest.json
    ```
 
----
-
 ## Upgrade Issues
 
 ### 9. Upgrade fails but installation still works
@@ -526,8 +508,6 @@ Installation may be incomplete
    # Kill any processes holding locks
    ```
 
----
-
 ### 10. Upgrade changes break my workflow
 
 **Problem:**
@@ -578,8 +558,6 @@ Use /gsd-plan-phase instead
    ```
 
    See [How to Upgrade](how-to-upgrade.md) for downgrade details.
-
----
 
 ## Runtime Issues
 
@@ -641,8 +619,6 @@ a1b2c3d GSD Agent <noreply@gsd.dev>
    # Fix last N commits
    git rebase -i HEAD~N -x "git commit --amend --author='Your Name <your.email@example.com>' --no-edit"
    ```
-
----
 
 ### 12. Error: Planning directory structure issues
 
@@ -707,8 +683,6 @@ Cannot execute plan
    /gsd-new-project
    ```
 
----
-
 ## Network and Package Issues
 
 ### 13. Error: npm package not found
@@ -767,8 +741,6 @@ npm ERR! 404 Not Found - GET https://registry.npmjs.org/get-shit-done-multi
    npx get-shit-done-multi
    ```
 
----
-
 ### 14. Error: Node.js version too old
 
 **Problem:**
@@ -818,8 +790,6 @@ Current version: v18.12.0
    ```bash
    nvm exec 20 npx get-shit-done-multi
    ```
-
----
 
 ## Getting Help
 
@@ -874,8 +844,6 @@ Before opening new issue, search existing issues:
 
 - Someone may have already reported the same problem
 - Solution may already exist in comments
-
----
 
 ## Next Steps
 

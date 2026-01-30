@@ -8,8 +8,6 @@ npx get-shit-done-multi
 
 The installer detects existing installations and prompts you to upgrade if outdated.
 
----
-
 ## How Update Detection Works
 
 GSD uses a manifest-based approach to detect and manage updates across all platforms.
@@ -91,8 +89,6 @@ You can:
 - Skip upgrades for certain installations
 - Choose different scopes (local vs. global)
 
----
-
 ## Upgrade Process
 
 When you confirm an upgrade, the installer follows these steps:
@@ -155,8 +151,6 @@ The installer confirms success:
 All upgrades complete.
 ```
 
----
-
 ## Breaking Changes
 
 ### Understanding Version Numbers
@@ -210,8 +204,6 @@ When upgrading across major versions (e.g., v2.x → v3.x):
 - v2.0.x → v2.1.0 (minor)
 - v2.x.x → v2.y.z (same major)
 
----
-
 ## Downgrading
 
 Downgrading to an older version is **not directly supported**.
@@ -245,8 +237,6 @@ node_modules/.bin/get-shit-done-multi
 
 **Important:** Older versions may not be available if removed from NPM.
 
----
-
 ## Non-Interactive Upgrade
 
 For CI/CD or automation, upgrade non-interactively:
@@ -267,8 +257,6 @@ The `--yes` flag:
 - Skips all confirmation prompts
 - Automatically upgrades outdated installations
 - Uses default options (local scope if not specified)
-
----
 
 ## Troubleshooting Upgrades
 
@@ -334,8 +322,6 @@ npx get-shit-done-multi --claude --global --yes
    ```
 
 1. Remove unused installations first
-
----
 
 ## Next Steps
 

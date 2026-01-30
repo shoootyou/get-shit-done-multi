@@ -8,8 +8,6 @@ When you run `npx get-shit-done-multi`, the installer copies three types of file
 
 **Total size:** Approximately 2MB
 
----
-
 ## Skills (29 total)
 
 Skills are slash commands that you invoke directly in your AI assistant. Each skill provides a specific capability in
@@ -103,8 +101,6 @@ argument-hint: Phase number or name
 - `allowed-tools` - Which tools Claude can use
 - `argument-hint` - Expected arguments or usage pattern
 
----
-
 ## Agents (13 total)
 
 Agents are specialized sub-agents that skills delegate to for complex tasks. You don't invoke agents directly - skills use them behind the scenes.
@@ -178,8 +174,6 @@ skills: gsd-plan-phase, gsd-verify-work
 
 **Note:** The `skills` field is automatically generated for Claude by scanning agent content for skill references.
 Other platforms don't use this field.
-
----
 
 ## Shared Directory
 
@@ -272,8 +266,6 @@ The `.gsd-install-manifest.json` file tracks your installation:
 - Uninstall operations (what files to remove?)
 - Integrity checking (are all files present?)
 
----
-
 ## Platform-Specific Locations
 
 Where files are installed depends on the platform and scope you choose.
@@ -327,8 +319,6 @@ Where files are installed depends on the platform and scope you choose.
     ├── workflows/
     └── .gsd-install-manifest.json
 ```
----
-
 ## Installation Sizes
 
 Approximate sizes for each component:
@@ -341,8 +331,6 @@ Approximate sizes for each component:
 | **Total** | **~2 MB** | **42+ files** |
 
 These are template files (plain text Markdown), so they compress well and load quickly.
-
----
 
 ## What Is NOT Installed
 
@@ -371,8 +359,6 @@ GSD installation does **not** include:
 - No credentials or secrets
 
 GSD is purely template files that your AI assistant reads. The installer copies files and that's it.
-
----
 
 ## Platform-Specific Differences
 
@@ -404,8 +390,6 @@ Tool names are normalized to Claude's canonical names:
 | Delegate task | Task | agent | delegate |
 
 The installer handles these mappings automatically, so skills work identically across platforms.
-
----
 
 ## Next Steps
 
