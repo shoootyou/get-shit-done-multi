@@ -718,19 +718,19 @@ Plans:
 
 **Success Criteria:**
 1. New function `installPlatformInstructions()` created with merge logic
-2. Smart merge: create new, append without tags, or replace content between `<gsd_instructions>` tags
-3. All 3 adapters return correct filenames (CLAUDE.md, copilot-instructions.md, AGENTS.md)
+2. Smart merge: create new, append without markers, or replace content between first/last line markers
+3. All 3 adapters return correct paths via getInstructionsPath(isGlobal) method
 4. Orchestrator integration in both verbose and non-verbose modes
 5. Template variables (PLATFORM_ROOT, COMMAND_PREFIX) replaced correctly
 6. Integration tests pass for all platforms and merge scenarios
 7. No duplicate content when installing multiple times
 8. User content preserved when replacing GSD section
 
-**Plans:** 4/4 plans pending
+**Plans:** 4 plans
 
 Plans:
 - [ ] 09-01-PLAN.md — Implement install-platform-instructions.js with merge logic
-- [ ] 09-02-PLAN.md — Add getInstructionsFilename() method to all adapters
+- [ ] 09-02-PLAN.md — Add getInstructionsPath() method to all adapters
 - [ ] 09-03-PLAN.md — Integrate into orchestrator.js (both verbose modes)
 - [ ] 09-04-PLAN.md — Create integration tests for all platforms and merge scenarios
 
@@ -741,7 +741,8 @@ Plans:
 
 **Key Deliverables:**
 - `bin/lib/installer/install-platform-instructions.js` (new file)
-- Updated adapters with `getInstructionsFilename()` method
+- `bin/lib/platforms/instruction-paths.js` (new file)
+- Updated adapters with `getInstructionsPath(isGlobal)` method
 - Orchestrator integration after `installShared()`
 - Integration tests for merge logic
 
@@ -749,8 +750,9 @@ Plans:
 - Post-v2.0 feature (backward compatible)
 - Template file `templates/AGENTS.md` already exists
 - Similar pattern to `install-shared.js` for consistency
-- Tag-based deduplication prevents content duplication on reinstall
+- Dynamic block markers (first/last line) prevent content duplication on reinstall
 - Preserves user's custom instructions when updating GSD section
+- Line ending normalization (CRLF → LF) for cross-platform compatibility
 
 ---
 
