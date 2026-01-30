@@ -1,6 +1,6 @@
 ---
 name: gsd-whats-new
-description: See what's new in GSD since your installed version
+description: "See what's new in GSD since your installed version"
 allowed-tools: Read, Bash
 ---
 

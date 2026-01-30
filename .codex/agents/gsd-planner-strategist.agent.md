@@ -1,6 +1,6 @@
 ---
 name: gsd-planner-strategist
-description: Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner.
+description: "Planning methodology specialist. Provides deep analysis and recommendations for complex planning scenarios. Spawned by gsd-planner."
 tools: ['read', 'execute', 'search']
 ---
 

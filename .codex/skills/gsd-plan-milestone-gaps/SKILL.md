@@ -1,8 +1,8 @@
 ---
 name: gsd-plan-milestone-gaps
-description: Parse audit gaps, spawn planner to create gap closure phases
+description: "Parse audit gaps, spawn planner to create gap closure phases"
 allowed-tools: Read, Edit, Bash, Task
-argument-hint: [version]
+argument-hint: "[version]"
 ---
 
 

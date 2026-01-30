@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "claude",
   "scope": "local",
-  "installed_at": "2026-01-29T15:30:08.996Z",
+  "installed_at": "2026-01-30T14:28:15.411Z",
   "files": [
     "agents/gsd-codebase-mapper.md",
     "agents/gsd-debugger-specialist.md",
