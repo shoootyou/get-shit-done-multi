@@ -951,7 +951,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 todo captured:
+- 2026-01-30-remove-yes-flag.md — Remove unused --yes flag from CLI and all documentation
 
 ### Completed Todos
 - 2026-01-30-fix-readme-documentation-post-phase-8.md — Fixed command prefixes, code blocks, added workflow section,
