@@ -27,6 +27,7 @@ import { createMultiBar, displayCompletionLine } from '../cli/progress.js';
 import { installAgents } from './install-agents.js';
 import { installSkills } from './install-skills.js';
 import { installShared } from './install-shared.js';
+import { installPlatformInstructions } from './install-platform-instructions.js';
 import * as logger from '../cli/logger.js';
 import { missingTemplates, invalidPath } from '../errors/install-error.js';
 import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
