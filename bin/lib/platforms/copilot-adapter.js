@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
+import { getInstructionPath } from './instruction-paths.js';
 import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 
 /**
@@ -59,6 +60,15 @@ export class CopilotAdapter extends PlatformAdapter {
    */
   getPathReference() {
     return getPathReference('copilot');
+  }
+  
+  /**
+   * Get path to platform instruction file
+   * @param {boolean} isGlobal - Global or local installation
+   * @returns {string} Absolute path to copilot-instructions.md
+   */
+  getInstructionsPath(isGlobal) {
+    return getInstructionPath('copilot', isGlobal);
   }
   
   /**
