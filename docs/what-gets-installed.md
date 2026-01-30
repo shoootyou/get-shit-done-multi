@@ -60,7 +60,10 @@ the GSD workflow.
 - `/gsd-verify-installation` - Verify GSD installed correctly
 - `/gsd-update` - Check for and install updates
 - `/gsd-whats-new` - Show recent changes and features
-- `/get-shit-done` - Alias for main workflow command
+
+**Entry Point:**
+
+- `/get-shit-done` - Generic skill dispatcher that loads and executes other gsd-* command skills (main entry point for GSD workflow)
 
 ### File Structure
 

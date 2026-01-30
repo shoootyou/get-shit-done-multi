@@ -31,7 +31,7 @@ needed while maintaining project state.
 npx get-shit-done-multi
 ```
 
-The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 28 skills and 13
+The installer detects your platform (Claude Code, GitHub Copilot CLI, or Codex CLI) and deploys 29 skills and 13
 agents. After installation, start your first project with platform-specific commands:
 
 ```bash
