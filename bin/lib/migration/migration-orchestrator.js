@@ -43,14 +43,20 @@ export async function checkAndMigrateOldVersions(cwd, options = {}) {
 
   // Migrate each platform sequentially
   let migrationsPerformed = 0;
+  let sharedBackupDir = null;
 
   for (const old of oldVersions) {
     const migrationResult = await performMigration(
       old.platform,
       old.version,
       cwd,
-      { skipPrompts }
+      { skipPrompts, sharedBackupDir }
     );
+
+    // Capture the shared backup directory from the first migration
+    if (migrationResult.success && migrationResult.backupDir && !sharedBackupDir) {
+      sharedBackupDir = migrationResult.backupDir;
+    }
 
     // Handle migration failure
     if (!migrationResult.success) {
