@@ -50,3 +50,6 @@ test-output
 # Test coverage output
 coverage/
 *.lcov
+
+# Local packs
+*.tgz
