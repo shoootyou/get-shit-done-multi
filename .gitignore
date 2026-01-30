@@ -9,6 +9,7 @@ TO-DOS.md
 .planning/config.json
 .planning/debug
 .planning/VERIFICATION.md
+.planning
 
 # Docker sandbox directories
 .sandbox-home/
