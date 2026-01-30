@@ -233,35 +233,40 @@ EOF
 
 ## Phase 5: Workflow Preferences
 
-**Ask workflow preferences one at a time (better UX):**
+Ask all workflow preferences in a single AskUserQuestion call (3 questions):
 
-### Question 1: Mode
-
-Use AskUserQuestion:
-- header: "Mode"
-- question: "How do you want to work?"
-- options:
-  - "YOLO (Recommended)" — Auto-approve, just execute
-  - "Interactive" — Confirm at each step
-
-### Question 2: Depth
-
-Use AskUserQuestion:
-- header: "Depth"
-- question: "How thorough should planning be?"
-- options:
-  - "Quick" — Ship fast (3-5 phases, 1-3 plans each)
-  - "Standard" — Balanced scope and speed (5-8 phases, 3-5 plans each)
-  - "Comprehensive" — Thorough coverage (8-12 phases, 5-10 plans each)
-
-### Question 3: Execution
-
-Use AskUserQuestion:
-- header: "Execution"
-- question: "Run plans in parallel?"
-- options:
-  - "Parallel (Recommended)" — Independent plans run simultaneously
-  - "Sequential" — One plan at a time
+```
+questions: [
+  {
+    header: "Mode",
+    question: "How do you want to work?",
+    multiSelect: false,
+    options: [
+      { label: "YOLO (Recommended)", description: "Auto-approve, just execute" },
+      { label: "Interactive", description: "Confirm at each step" }
+    ]
+  },
+  {
+    header: "Depth",
+    question: "How thorough should planning be?",
+    multiSelect: false,
+    options: [
+      { label: "Quick", description: "Ship fast (3-5 phases, 1-3 plans each)" },
+      { label: "Standard", description: "Balanced scope and speed (5-8 phases, 3-5 plans each)" },
+      { label: "Comprehensive", description: "Thorough coverage (8-12 phases, 5-10 plans each)" }
+    ]
+  },
+  {
+    header: "Execution",
+    question: "Run plans in parallel?",
+    multiSelect: false,
+    options: [
+      { label: "Parallel (Recommended)", description: "Independent plans run simultaneously" },
+      { label: "Sequential", description: "One plan at a time" }
+    ]
+  }
+]
+```
 
 Create `.planning/config.json` with chosen mode, depth, and parallelization.
 
