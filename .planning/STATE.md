@@ -951,7 +951,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 todo captured:
+- 2026-01-30-update-platform-binary-requirements.md — Update binary requirements and installation links for Claude, Copilot, and Codex across all documentation
 
 ### Completed Todos
 - 2026-01-30-remove-yes-flag.md — Removed unused --yes flag from bin/install.js and all user-facing documentation (5 files updated)
