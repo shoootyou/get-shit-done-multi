@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
+import { getInstructionPath } from './instruction-paths.js';
 import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 
 /**
@@ -47,6 +48,15 @@ export class ClaudeAdapter extends PlatformAdapter {
    */
   getPathReference() {
     return getPathReference('claude');
+  }
+  
+  /**
+   * Get path to platform instruction file
+   * @param {boolean} isGlobal - Global or local installation
+   * @returns {string} Absolute path to CLAUDE.md
+   */
+  getInstructionsPath(isGlobal) {
+    return getInstructionPath('claude', isGlobal);
   }
   
   /**
