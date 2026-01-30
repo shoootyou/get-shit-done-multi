@@ -1,7 +1,7 @@
 {
   "name": "get-shit-done-multi",
   "version": "2.0.0",
-  "description": "Structured workflow system for AI coding assistants. Transforms AI coding into spec-driven development with planning, execution, debugging, and verification workflows. Supports Claude, Copilot, and Codex.",
+  "description": "Multi-platform workflow system for AI-assisted development. Structured planning, execution, and verification across Claude, Copilot, and Codex.",
   "keywords": [
     "claude",
     "codex",
