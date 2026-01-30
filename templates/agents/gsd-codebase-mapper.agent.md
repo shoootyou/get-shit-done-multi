@@ -608,10 +608,11 @@ Ready for orchestrator summary.
 ## Directory Layout
 
 ```plaintext
-[Insert tree command output here]
+[project-root]/
+├── [dir]/          # [Purpose]
+├── [dir]/          # [Purpose]
+└── [file]          # [Purpose]
 ```
-
-Generated with: `tree -L 3 -I 'node_modules|.git|...' --charset ascii` or `find` command fallback
 
 ## Directory Purposes
 
