@@ -107,41 +107,39 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 - **Global Directory:** `~/.copilot/skills/`, `~/.copilot/agents/`, `~/.copilot/get-shit-done/`
 - **Command Prefix:** `/gsd-...`
 - **File Extensions:** `.md` for skills, `.agent.md` for agents
-- **Frontmatter:** YAML with required metadata fields
 - **Binary Detection:** `copilot` command
+
+**Key difference from Claude:** Uses standard [Agent Skills format](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) (open standard shared across platforms)
 
 ### Skill Frontmatter Example
 
 ```yaml
 ---
-name: /gsd-plan-phase
+name: gsd-plan-phase
 description: Create execution plans for a phase
 argument-hint: [phase-number]
-allowed-tools: read, write, edit, execute, search
-platform: copilot
-generated: true
-templateVersion: 2.0.0
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 ```
 
 **Supported Fields (Skills):**
 
-- `name` (optional): Display name
-- `description` (recommended): What the skill does
+Same as Claude Code - uses the [Agent Skills open standard](https://github.com/agentskills/agentskills):
+
+- `name` (required): Unique identifier (lowercase, hyphenated)
+- `description` (required): What the skill does and when Copilot should use it
 - `argument-hint` (optional): Expected arguments
-- `allowed-tools` (optional): Comma-separated string (lowercase)
-- `platform` (required): "copilot"
-- `generated` (required): true
-- `templateVersion` (required): Template version (e.g., "2.0.0")
+- `allowed-tools` (optional): Comma-separated string
+- `license` (optional): License information
 
-**Tool Name Mappings:**
+**Tool Names:**
 
-- `read` (not Read)
-- `write` (not Write)
-- `edit` (not Edit)
-- `execute` (not Bash)
-- `search` (not Grep)
-- `agent` (not Task)
+Copilot supports [tool aliases](https://docs.github.com/en/copilot/reference/custom-agents-configuration#tool-aliases) (case insensitive):
+- `Read` or `read` → File reading
+- `Edit`, `Write`, `MultiEdit` → File editing  
+- `Bash`, `execute`, `shell`, `powershell` → Shell execution
+- `Grep`, `Glob`, `search` → Search operations
+- `Task`, `agent`, `custom-agent` → Subagent delegation
 
 ### Agent Frontmatter Example
 
@@ -149,24 +147,24 @@ templateVersion: 2.0.0
 ---
 name: gsd-executor
 description: Executes plans with atomic commits and deviation handling
-tools: read, write, edit, execute
-platform: copilot
-target: github-copilot
+tools: Read, Write, Edit, Bash
 ---
 ```
 
 **Supported Fields (Agents):**
 
-- `name` (optional): Display name
-- `description` (required): Purpose and capabilities
-- `tools` (optional): Comma-separated string (lowercase)
-- `platform` (required): "copilot"
-- `target` (optional): vscode/github-copilot
-- `infer` (optional): Auto-invoke (default: true)
+Based on [GitHub Copilot custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration#yaml-frontmatter-properties):
 
-**Note:** `skills` field NOT supported in Copilot (Claude-only feature)
+- `name` (required): Unique identifier
+- `description` (required): When to delegate to this agent
+- `tools` (optional): Array of tool names or aliases (e.g., `["read", "edit", "search"]`)
+  - Use `["*"]` to enable all tools
+  - Use `[]` to disable all tools
+- `mcp-servers` (optional, org/enterprise only): MCP server configuration
 
-See official docs: https://docs.github.com/en/copilot/reference/custom-agents-configuration
+See official docs:
+- Skills: https://docs.github.com/en/copilot/concepts/agents/about-agent-skills
+- Agents: https://docs.github.com/en/copilot/reference/custom-agents-configuration
 
 ### Path References
 
@@ -186,30 +184,32 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 - **Global Directory:** `~/.codex/skills/`, `~/.codex/agents/`, `~/.codex/get-shit-done/`
 - **Command Prefix:** `$gsd-...` (NOT `/gsd-...`)
 - **File Extensions:** `.md` for skills, `.agent.md` for agents
-- **Frontmatter:** YAML with required metadata fields
 - **Binary Detection:** `codex` command
+
+**Key difference from Claude/Copilot:** Command prefix is `$` instead of `/`
 
 ### Skill Frontmatter Example
 
 ```yaml
 ---
-name: $gsd-plan-phase
+name: gsd-plan-phase
 description: Create execution plans for a phase
 argument-hint: [phase-number]
-allowed-tools: read, write, edit, execute, search
-platform: codex
-generated: true
-templateVersion: 2.0.0
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 ```
 
-**Key Difference from Copilot:**
+**Supported Fields (Skills):**
 
-- Command prefix is `$gsd-` (not `/gsd-`)
-- All skill content replaces `/gsd-` with `$gsd-`
-- Platform field is "codex" (not "copilot")
+Same as Claude Code and GitHub Copilot - uses the [Agent Skills open standard](https://developers.openai.com/codex/skills/):
 
-**Tool Name Mappings:** Same as Copilot (lowercase, execute, search, agent)
+- `name` (required): Unique identifier (lowercase, hyphenated)
+- `description` (required): What the skill does and when to use it
+- `argument-hint` (optional): Expected arguments
+- `allowed-tools` (optional): Comma-separated string
+- `license` (optional): License information
+
+**Tool Names:** Same as Copilot (case insensitive aliases supported)
 
 ### Agent Frontmatter Example
 
@@ -217,12 +217,11 @@ templateVersion: 2.0.0
 ---
 name: gsd-executor
 description: Executes plans with atomic commits and deviation handling
-tools: read, write, edit, execute
-platform: codex
+tools: Read, Write, Edit, Bash
 ---
 ```
 
-**Supported Fields:** Same as Copilot (see above)
+**Supported Fields (Agents):** Same format as Copilot
 
 ### Path References
 
