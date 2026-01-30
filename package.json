@@ -1,7 +1,7 @@
 {
   "name": "get-shit-done-multi",
   "version": "2.0.0",
-  "description": "A meta-prompting, context engineering and spec-driven development system for AI coding assistants. Multi-CLI version by shoootyou, based on original work by TÂCHES.",
+  "description": "Structured workflow system for AI coding assistants. Deploy 29 skills and 13 agents for spec-driven development with planning, execution, debugging, and verification workflows across Claude, Copilot, and Codex.",
   "keywords": [
     "claude",
     "codex",
