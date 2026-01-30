@@ -168,6 +168,17 @@ export async function install(appVersion, options) {
       // Phase 3: Install shared directory
       stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
       displayCompletionLine('Shared', stats.shared, stats.shared);
+
+      // Phase 4: Install platform instructions
+      stats.instructions = await installPlatformInstructions(
+        templatesDir,
+        targetDir,
+        templateVars,
+        null,
+        isVerbose,
+        adapter
+      );
+      displayCompletionLine('Platform Instructions', stats.instructions, stats.instructions);
     } catch (error) {
       throw error;
     }
