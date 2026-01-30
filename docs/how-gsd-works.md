@@ -215,6 +215,16 @@ GSD uses specialized agents for complex tasks:
 
 Each agent is spawned as needed and works autonomously.
 
+### Platform Auto-Configuration
+
+During installation, GSD creates a platform instructions file that teaches your AI assistant how to work with GSD:
+
+- **Claude/Codex (local)**: Creates instruction file in project root (`CLAUDE.md` or `AGENTS.md`)
+- **Copilot (local)**: Creates `.github/copilot-instructions.md`
+- **Global installations**: Creates instruction file in platform directory (e.g., `~/.claude/CLAUDE.md`)
+
+The instruction file uses smart merge: if you already have custom instructions, GSD only updates its own section without overwriting your content. This allows you to combine GSD workflows with your own custom assistant configurations.
+
 ## Next Steps
 
 - [What is GSD](what-is-gsd.md) - High-level concept

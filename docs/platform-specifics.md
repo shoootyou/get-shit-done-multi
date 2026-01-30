@@ -9,6 +9,7 @@ and Codex CLI.
 
 - **Target Directory:** `.claude/skills/`, `.claude/agents/`, `.claude/get-shit-done/`
 - **Global Directory:** `~/.claude/skills/`, `~/.claude/agents/`, `~/.claude/get-shit-done/`
+- **Instructions File:** `CLAUDE.md` (local: project root, global: `~/.claude/CLAUDE.md`)
 - **Command Prefix:** `/gsd-...`
 - **File Extensions:** `.md` for both skills and agents
 - **Frontmatter:** YAML with optional metadata block
@@ -105,6 +106,7 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 
 - **Target Directory:** `.github/skills/`, `.github/agents/`, `.github/get-shit-done/`
 - **Global Directory:** `~/.copilot/skills/`, `~/.copilot/agents/`, `~/.copilot/get-shit-done/`
+- **Instructions File:** `copilot-instructions.md` (local: `.github/copilot-instructions.md`, global: `~/.copilot/copilot-instructions.md`)
 - **Command Prefix:** `/gsd-...`
 - **File Extensions:** `.md` for skills, `.agent.md` for agents
 - **Binary Detection:** `copilot` command
@@ -182,6 +184,7 @@ Templates: `templates/skills/*/SKILL.md`, `templates/agents/*.agent.md`
 
 - **Target Directory:** `.codex/skills/`, `.codex/agents/`, `.codex/get-shit-done/`
 - **Global Directory:** `~/.codex/skills/`, `~/.codex/agents/`, `~/.codex/get-shit-done/`
+- **Instructions File:** `AGENTS.md` (local: project root, global: `~/.codex/AGENTS.md`)
 - **Command Prefix:** `$gsd-...` (NOT `/gsd-...`)
 - **File Extensions:** `.md` for skills, `.agent.md` for agents
 - **Binary Detection:** `codex` command

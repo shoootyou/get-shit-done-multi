@@ -1,10 +1,11 @@
 # What Gets Installed
 
-When you run `npx get-shit-done-multi`, the installer copies three types of files to your platform directory:
+When you run `npx get-shit-done-multi`, the installer copies four types of files to your platform directory:
 
 1. **Skills** (29 files) - Commands you invoke (e.g., `/gsd-plan-phase`)
 2. **Agents** (13 files) - Specialized sub-agents (e.g., gsd-executor)
 3. **Shared Directory** (1 folder) - References, templates, workflows
+4. **Platform Instructions** (1 file) - Configuration that helps your AI assistant understand GSD
 
 **Total size:** Approximately 2MB
 
@@ -269,6 +270,56 @@ The `.gsd-install-manifest.json` file tracks your installation:
 - Uninstall operations (what files to remove?)
 - Integrity checking (are all files present?)
 
+## Platform Instructions File
+
+Each platform gets a configuration file that helps the AI assistant understand GSD workflows and command structure. This file is automatically created or updated during installation.
+
+### File Locations by Platform
+
+| Platform | Local Installation | Global Installation |
+|----------|-------------------|---------------------|
+| **Claude Code** | `CLAUDE.md` (project root) | `~/.claude/CLAUDE.md` |
+| **GitHub Copilot CLI** | `.github/copilot-instructions.md` | `~/.copilot/copilot-instructions.md` |
+| **Codex CLI** | `AGENTS.md` (project root) | `~/.codex/AGENTS.md` |
+
+### What It Contains
+
+The instructions file provides your AI assistant with:
+
+- Location of GSD skills and agents
+- Command prefix for your platform (`/` or `$`)
+- Quick reference to available GSD commands
+- How to invoke GSD workflows
+
+**Example for Claude (`CLAUDE.md`):**
+
+```markdown
+# Instructions for GSD
+
+- Use the get-shit-done skill when the user asks for GSD or uses a `gsd-*` command.
+- Treat `/gsd-...` or `gsd-...` as command invocations
+- When a command says to spawn a subagent, prefer a matching custom agent
+- Do not apply GSD workflows unless the user explicitly asks for them.
+```
+
+### Smart Merge Behavior
+
+The installer uses smart merge logic when updating the instructions file:
+
+1. **File doesn't exist:** Creates new file with GSD instructions
+2. **File exists without GSD content:** Appends GSD instructions to end of file
+3. **File exists with GSD content:** Replaces only the GSD section, preserving your other custom instructions
+
+This means you can have your own custom instructions in the same file, and GSD will not overwrite them. It only updates its own section.
+
+### Platform-Specific Differences
+
+**Claude and Codex (local):** File is created in project root, making it easy to commit to git and share with your team.
+
+**Copilot (local):** File is created inside `.github/` directory, following Copilot's convention for configuration files.
+
+**Global installations:** All platforms create the file inside their platform directory (e.g., `~/.claude/`, `~/.copilot/`, `~/.codex/`).
+
 ## Platform-Specific Locations
 
 Where files are installed depends on the platform and scope you choose.
@@ -327,11 +378,12 @@ Where files are installed depends on the platform and scope you choose.
 Approximate sizes for each component:
 
 | Component | Size | Files |
- |-----------   |------   |-------  |
+|-----------|----|-------|
 | **Skills** | ~1.2 MB | 29 SKILL.md files |
 | **Agents** | ~600 KB | 13 .agent.md files |
 | **Shared Directory** | ~200 KB | References, templates, workflows |
-| **Total** | **~2 MB** | **42+ files** |
+| **Platform Instructions** | ~1 KB | 1 instruction file |
+| **Total** | **~2 MB** | **43+ files** |
 
 These are template files (plain text Markdown), so they compress well and load quickly.
 
