@@ -269,9 +269,9 @@ Before installing GSD, ensure you have:
    ```
 
 1. **One of the following AI platforms:**
-   - Claude Code (Claude Desktop with Code integration)
-   - GitHub Copilot CLI (`gh copilot` command)
-   - Codex CLI (OpenAI Codex integration)
+   - **Claude Code** requires `claude` binary - [Installation guide](https://code.claude.com/docs/en/setup)
+   - **GitHub Copilot CLI** requires `copilot` binary - [Installation guide](https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli)
+   - **Codex CLI** requires `codex` binary - [Installation guide](https://developers.openai.com/codex/cli/)
 
 2. **Sufficient disk space:**
    - At least 2MB available on target disk

@@ -117,7 +117,10 @@ with additional features like frontmatter control and automatic loading. See
 ## Requirements
 
 - **Node.js 20+** (Node 20 LTS active until October 2026)
-- One of: Claude Code, GitHub Copilot CLI, or Codex CLI
+- **One of the following AI platforms:**
+  - **Claude Code** requires `claude` binary - [Installation guide](https://code.claude.com/docs/en/setup)
+  - **GitHub Copilot CLI** requires `copilot` binary - [Installation guide](https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli)
+  - **Codex CLI** requires `codex` binary - [Installation guide](https://developers.openai.com/codex/cli/)
 
 ## Credits & License
 

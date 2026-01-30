@@ -156,9 +156,9 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
 **Solutions:**
 
 1. **Install your AI platform first:**
-   - **Claude Code:** Install Claude Desktop with Code integration
-   - **GitHub Copilot CLI:** Run `gh extension install github/gh-copilot`
-   - **Codex CLI:** Install OpenAI Codex integration
+   - **Claude Code:** Install `claude` binary - [Installation guide](https://code.claude.com/docs/en/setup)
+   - **GitHub Copilot CLI:** Install `copilot` binary - [Installation guide](https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli)
+   - **Codex CLI:** Install `codex` binary - [Installation guide](https://developers.openai.com/codex/cli/)
 
 2. **Use explicit platform flag:**
 
@@ -379,9 +379,9 @@ Error: Command not recognized
    If files are missing, reinstall.
 
 1. **Check platform-specific requirements:**
-   - **Claude:** Ensure Claude Code integration is enabled
-   - **Copilot:** Ensure `gh copilot` command works
-   - **Codex:** Ensure Codex CLI is configured
+   - **Claude:** Ensure `claude` binary is installed and Claude Code integration is enabled
+   - **Copilot:** Ensure `copilot` binary is installed and working
+   - **Codex:** Ensure `codex` binary is installed and configured
 
 ### 8. Update detection not working
 
