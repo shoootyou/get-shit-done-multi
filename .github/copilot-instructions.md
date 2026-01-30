@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for GSD
+# Instructions for GSD
 
 - Use the get-shit-done skill when the user asks for GSD or uses a `gsd-*` command.
 - Treat `/gsd-...` or `gsd-...` as command invocations and load the matching file from `.github/skills/get-shit-done/commands/gsd/`.

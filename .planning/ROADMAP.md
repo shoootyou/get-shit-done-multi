@@ -702,6 +702,58 @@ Plans:
 
 ---
 
+### Phase 9: Platform Instructions Installer
+
+**Goal:** Install platform-specific instructions file (AGENTS.md/CLAUDE.md/copilot-instructions.md) with smart merge logic
+
+**Type:** Feature Enhancement (v2.1+)
+
+**Dependencies:** Phase 2 (core installer), Phase 3 (multi-platform support)
+
+**Plans:** 4 plans (all pending)
+
+**Status:** PENDING
+
+**Requirements Mapped:** None (post-v2.0 enhancement)
+
+**Success Criteria:**
+1. New function `installPlatformInstructions()` created with merge logic
+2. Smart merge: create new, append without tags, or replace content between `<gsd_instructions>` tags
+3. All 3 adapters return correct filenames (CLAUDE.md, copilot-instructions.md, AGENTS.md)
+4. Orchestrator integration in both verbose and non-verbose modes
+5. Template variables (PLATFORM_ROOT, COMMAND_PREFIX) replaced correctly
+6. Integration tests pass for all platforms and merge scenarios
+7. No duplicate content when installing multiple times
+8. User content preserved when replacing GSD section
+
+**Plans:** 4/4 plans pending
+
+Plans:
+- [ ] 09-01-PLAN.md — Implement install-platform-instructions.js with merge logic
+- [ ] 09-02-PLAN.md — Add getInstructionsFilename() method to all adapters
+- [ ] 09-03-PLAN.md — Integrate into orchestrator.js (both verbose modes)
+- [ ] 09-04-PLAN.md — Create integration tests for all platforms and merge scenarios
+
+**Wave Structure:**
+- Wave 1: 09-01, 09-02 (parallel - function implementation and adapter methods)
+- Wave 2: 09-03 (depends on Wave 1 - orchestrator integration)
+- Wave 3: 09-04 (depends on Wave 2 - integration tests)
+
+**Key Deliverables:**
+- `bin/lib/installer/install-platform-instructions.js` (new file)
+- Updated adapters with `getInstructionsFilename()` method
+- Orchestrator integration after `installShared()`
+- Integration tests for merge logic
+
+**Notes:**
+- Post-v2.0 feature (backward compatible)
+- Template file `templates/AGENTS.md` already exists
+- Similar pattern to `install-shared.js` for consistency
+- Tag-based deduplication prevents content duplication on reinstall
+- Preserves user's custom instructions when updating GSD section
+
+---
+
 ## Phase Sequencing
 
 ### Critical Path
