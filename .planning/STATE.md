@@ -951,7 +951,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 todo captured:
+- 2026-01-30-fix-platform-specifics-unified-standard.md — Fix platform-specifics.md to show all platforms use the same skill/agent standard (currently shows incorrect differences)
 
 ### Completed Todos
 - 2026-01-30-update-platform-binary-requirements.md — Updated binary requirements (claude, copilot, codex) with installation links in README.md, how-to-install.md, and troubleshooting.md
