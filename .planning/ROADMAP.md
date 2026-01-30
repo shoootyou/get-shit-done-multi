@@ -3,7 +3,7 @@
 **Project:** get-shit-done-multi  
 **Milestone:** v2.0 — Complete Multi-Platform Installer  
 **Created:** 2025-01-25  
-**Status:** Phase 7.1 Complete — Ready for Phase 8
+**Status:** Phase 9 Complete ✅ — All phases finished
 
 ---
 
@@ -11,13 +11,13 @@
 
 This roadmap delivers a **complete template-based installer** that deploys AI CLI skills and agents to Claude Code, GitHub Copilot CLI, and Codex CLI. Users run `npx get-shit-done-multi`, answer interactive prompts, and get working skills installed atomically with rollback on failure.
 
-**Approach:** Establish clean foundation with ONE-TIME migration (Phase 1 converts `.github/` → `/templates/` with frontmatter corrections, then deleted), build core installer using templates (Phase 2), add multi-platform support (Phase 3), enhance UX with interactive prompts (Phase 4), add reliability with transactions (Phase 5) and versioning (Phase 6), harden with security (Phase 7), and document everything (Phase 8).
+**Approach:** Establish clean foundation with ONE-TIME migration (Phase 1 converts `.github/` → `/templates/` with frontmatter corrections, then deleted), build core installer using templates (Phase 2), add multi-platform support (Phase 3), enhance UX with interactive prompts (Phase 4), add reliability with transactions (Phase 5) and versioning (Phase 6), harden with security (Phase 7), document everything (Phase 8), and add platform instructions installer (Phase 9).
 
 **Architecture Strategy:** Phase 1 is a ONE-TIME migration that establishes `/templates/` as permanent source of truth. After Phase 1, `.github/` becomes historical reference only, and all future work uses `/templates/`. Conversion logic is temporary and deleted after Phase 1 completes.
 
 **Version Strategy:** Initial release is v2.0 (complete product). Future versions follow SemVer: new commands = MINOR, breaking changes = MAJOR.
 
-**Coverage:** 37 v2.0 requirements mapped across 8 phases
+**Coverage:** 37 v2.0 requirements mapped across 9 phases
 
 ---
 
@@ -702,7 +702,7 @@ Plans:
 
 ---
 
-### Phase 9: Platform Instructions Installer
+### Phase 9: Platform Instructions Installer ✅ COMPLETE
 
 **Goal:** Install platform-specific instructions file (AGENTS.md/CLAUDE.md/copilot-instructions.md) with smart merge logic
 
@@ -710,9 +710,11 @@ Plans:
 
 **Dependencies:** Phase 2 (core installer), Phase 3 (multi-platform support)
 
-**Plans:** 4 plans (all pending)
+**Plans:** 4 plans (all complete)
 
-**Status:** PENDING
+**Status:** COMPLETE ✅
+
+**Completed:** 2026-01-30
 
 **Requirements Mapped:** None (post-v2.0 enhancement)
 
@@ -729,10 +731,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Implement install-platform-instructions.js with merge logic
-- [ ] 09-02-PLAN.md — Add getInstructionsPath() method to all adapters
-- [ ] 09-03-PLAN.md — Integrate into orchestrator.js (both verbose modes)
-- [ ] 09-04-PLAN.md — Create integration tests for all platforms and merge scenarios
+- [x] 09-01-PLAN.md — Implement install-platform-instructions.js with merge logic
+- [x] 09-02-PLAN.md — Add getInstructionsPath() method to all adapters
+- [x] 09-03-PLAN.md — Integrate into orchestrator.js (both verbose modes)
+- [x] 09-04-PLAN.md — Create integration tests for all platforms and merge scenarios
 
 **Wave Structure:**
 - Wave 1: 09-01, 09-02 (parallel - function implementation and adapter methods)
@@ -844,13 +846,19 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 
 | Phase | Status | Start Date | Completion Date | Notes |
 |-------|--------|------------|-----------------|-------|
-| 1 - Core Installer | Pending | — | — | Foundation (v2.0) |
-| 2 - Multi-Platform | Pending | — | — | All 3 platforms |
-| 3 - Interactive UX | Pending | — | — | Prompts |
-| 4 - Transactions | Pending | — | — | Rollback |
-| 5 - Versioning | Pending | — | — | Multi-install |
-| 6 - Security | Pending | — | — | Path validation |
-| 7 - Documentation | Pending | — | — | Complete docs |
+| 1 - Template Migration | Complete ✅ | 2026-01-26 | 2026-01-26 | Foundation (v2.0) |
+| 2 - Core Installer | Complete ✅ | 2026-01-26 | 2026-01-26 | All 3 platforms |
+| 3 - Multi-Platform | Complete ✅ | 2026-01-26 | 2026-01-27 | Prompts |
+| 4 - Interactive UX | Complete ✅ | 2026-01-27 | 2026-01-27 | Rollback |
+| 5 - Transactions | Complete ✅ | 2026-01-27 | 2026-01-27 | Multi-install |
+| 6 - Versioning | Complete ✅ | 2026-01-27 | 2026-01-27 | Update detection |
+| 6.1 - Old Version Detection | Complete ✅ | 2026-01-27 | 2026-01-27 | Migration support |
+| 6.2 - Output Verification | Complete ✅ | 2026-01-27 | 2026-01-28 | Bug fixes |
+| 7 - Path Security | Complete ✅ | 2026-01-28 | 2026-01-28 | Path validation |
+| 7.1 - Pre-Flight Validation | Complete ✅ | 2026-01-28 | 2026-01-28 | Refactoring |
+| 7.2 - Cleanup & Publishing | Complete ✅ | 2026-01-29 | 2026-01-29 | Publishing fixes |
+| 8 - Documentation | Complete ✅ | 2026-01-29 | 2026-01-29 | Complete docs |
+| 9 - Platform Instructions | Complete ✅ | 2026-01-30 | 2026-01-30 | Instructions installer |
 
 **Legend:**
 - **Pending:** Not started
