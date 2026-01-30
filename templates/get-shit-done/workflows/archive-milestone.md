@@ -208,8 +208,8 @@ Git tag: archive/${MILESTONE_NAME}
 Commit: ${COMMIT_SHORT}
 
 Next steps:
-1. /gsd:map-codebase - Refresh codebase analysis for next milestone
-2. /gsd:new-milestone - Start planning next milestone
+1. {{COMMAND_PREFIX}}map-codebase - Refresh codebase analysis for next milestone
+2. {{COMMAND_PREFIX}}new-milestone - Start planning next milestone
 
 .planning/codebase/ preserved from this milestone.
 ```
