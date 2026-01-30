@@ -990,7 +990,7 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+- 2026-01-30-update-package-and-repo-descriptions.md — Update package.json description and provide repository description
 
 ### Completed Todos
 - 2026-01-30-update-documentation-corrections-clarifications.md — Updated how-to-customize.md (added --all flag, fixed --version, clarified custom paths, removed partial install), cleaned architecture.md (removed Key Decisions and Testing sections), fixed repo URLs (yourusername → shoootyou), removed broken commands link
