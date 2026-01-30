@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-30  
-**Updated By:** GSD Execute-Phase (Phase 8 Plan 05 Complete - Phase 8 COMPLETE)
+**Updated By:** GSD Execute-Phase (Phase 9 Plan 01 Complete - Core Platform Instructions Installer)
 
 ---
 
@@ -11,21 +11,21 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 8 COMPLETE - All documentation and polish work finished. Phase 9 (Platform Instructions Installer) added to roadmap.
+**Current Focus:** Phase 9 In Progress - Platform Instructions Installer (Plan 01 complete: Core merge logic and path resolution)
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 8 — Documentation and Polish (COMPLETE ✅)
-**Completed:** 5 of 5 plans  
-**Next:** Phase 9 — Platform Instructions Installer (PENDING)
+**Current Phase:** Phase 9 — Platform Instructions Installer (IN PROGRESS 🚧)
+**Completed:** 1 of 4 plans  
+**Next:** Plan 09-02 — Adapter getInstructionsPath() methods (or 09-03 if 09-02 already done)
 
 ### Plan Status
-**Completed Plans:** 41/49 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 0/4)  
-**Last activity:** 2026-01-30 - Completed 08-05-PLAN.md (markdown quality validation)  
-**Next:** Phase 9 planning (Platform Instructions Installer)
+**Completed Plans:** 42/49 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 1/4)  
+**Last activity:** 2026-01-30 - Completed 09-01-PLAN.md (core platform instructions installer)  
+**Next:** Check if 09-02 needed or proceed to 09-03 (orchestrator integration)
 
 ### Progress Bar
 ```
@@ -42,10 +42,10 @@ Phase 7:   [██████████████████████�
 Phase 7.1: [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 7.2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 8:   [████████████████████████████████████████████████████] 100% (5/5 plans) ✅ COMPLETE
-Phase 9:   [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0% (0/4 plans) 🔜 PENDING
+Phase 9:   [███████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  25% (1/4 plans) 🚧 IN PROGRESS
 
 Overall Progress:
-[████████████████████████████████████████░░░░░░░░] 84% (41/49 total plans)
+[███████████████████████████████████████░░░░░░░░░] 84% (41/49 total plans)
 ```
 
 ---
@@ -877,6 +877,19 @@ Overall Progress:
      - Output/plaintext content: `plaintext`
      - Python script to automatically detect and tag
      - Rationale: Improves syntax highlighting, clarifies content type
+
+127. **2026-01-30 (09-02):** Adapter method placement pattern (PLATFORM-ADAPTER-PATTERN)
+     - New path-related methods added after getPathReference()
+     - Groups all path methods together in adapter class
+     - Maintains consistent ordering across all three adapters
+     - Rationale: Logical grouping improves code readability and maintainability
+
+128. **2026-01-30 (09-02):** Delegation pattern for instruction paths (INSTRUCTION-PATH-DELEGATION)
+     - All adapters delegate to instruction-paths.js utility
+     - Follows existing pattern from platform-paths.js
+     - Keeps adapters thin, focused on platform-specific logic
+     - Single source of truth for instruction file locations
+     - Rationale: Centralized path rules easier to maintain, consistent with existing architecture
 
 
 ### Roadmap Evolution
