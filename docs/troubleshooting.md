@@ -36,7 +36,7 @@ Error: EACCES: permission denied, mkdir '~/.claude/skills'
 1. **Use local installation (recommended):**
 
    ```bash
-   npx get-shit-done-multi --local --yes
+   npx get-shit-done-multi --local
    ```
 
    This installs to current directory where you likely have permissions.
@@ -164,7 +164,7 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
 
    ```bash
    # Force installation to specific platform
-   npx get-shit-done-multi --claude --yes
+   npx get-shit-done-multi --claude
    ```
 
    This skips auto-detection and installs to the specified platform.
@@ -176,7 +176,7 @@ Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
    mkdir -p ~/.claude/skills ~/.claude/agents
    
    # Then install with explicit flag
-   npx get-shit-done-multi --claude --global --yes
+   npx get-shit-done-multi --claude --global
    ```
 
 ### 4. Error: Existing installation conflict
@@ -210,7 +210,7 @@ This installation will overwrite existing files.
    ```bash
    # Installer will overwrite old files with new versions
    # This is the normal upgrade path
-   npx get-shit-done-multi --yes
+   npx get-shit-done-multi
    ```
 
 1. **Uninstall first, then reinstall:**
@@ -229,7 +229,7 @@ This installation will overwrite existing files.
 
    ```bash
    # Keep global installation, add local
-   npx get-shit-done-multi --local --yes
+   npx get-shit-done-multi --local
    ```
 
 ### 5. Error: Path resolution failed (Windows)
@@ -318,18 +318,9 @@ Continue installation? (y/n)
    ```bash
    # Type 'n' to cancel
    # Then install to direct path:
-   npx get-shit-done-multi --local --yes
+   npx get-shit-done-multi --local
 
    ```
-
-3. **Use `--yes` to auto-approve:**
-
-   ```bash
-   # Skip all prompts (includes symlink approval)
-   npx get-shit-done-multi --yes
-   ```
-
-   Only use if you trust the symlink.
 
 ## Post-Installation Issues
 
@@ -441,7 +432,7 @@ No installations found.
 
    ```bash
    # Reinstall (overwrites and creates new manifest)
-   npx get-shit-done-multi --claude --global --yes
+   npx get-shit-done-multi --claude --global
    ```
 
 4. **Check file permissions:**
@@ -486,7 +477,7 @@ Installation may be incomplete
    ```bash
    # Make sure no process is using GSD files
    # Then retry upgrade
-   npx get-shit-done-multi --yes
+   npx get-shit-done-multi
    ```
 
 2. **Force reinstall:**
@@ -496,7 +487,7 @@ Installation may be incomplete
    rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
    
    # Fresh install
-   npx get-shit-done-multi --claude --global --yes
+   npx get-shit-done-multi --claude --global
    ```
 
 1. **Check for file locks:**

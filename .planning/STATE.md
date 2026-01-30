@@ -951,10 +951,10 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 todo captured:
-- 2026-01-30-remove-yes-flag.md — Remove unused --yes flag from CLI and all documentation
+None
 
 ### Completed Todos
+- 2026-01-30-remove-yes-flag.md — Removed unused --yes flag from bin/install.js and all user-facing documentation (5 files updated)
 - 2026-01-30-fix-readme-documentation-post-phase-8.md — Fixed command prefixes, code blocks, added workflow section,
   documented commands→skills migration
 - 2026-01-30-review-package-configuration-decisions.md — Investigated markdownlint config (dev-only, keep as-is) and

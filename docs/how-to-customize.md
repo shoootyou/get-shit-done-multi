@@ -88,7 +88,7 @@ Each platform gets its own installation. Your `.planning/` directory works with 
 Skip prompts for automation:
 
 ```bash
-npx get-shit-done-multi --claude --global --yes
+npx get-shit-done-multi --claude --global
 ```
 
 Useful for:
@@ -126,7 +126,7 @@ Installer detects outdated installations and prompts for upgrade.
 ### Upgrade Specific Platform
 
 ```bash
-npx get-shit-done-multi --claude --yes
+npx get-shit-done-multi --claude
 ```
 
 ## Custom Paths (Not Yet Implemented)

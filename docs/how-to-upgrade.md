@@ -186,7 +186,7 @@ When upgrading across major versions (e.g., v2.x → v3.x):
 4. **Proceed with upgrade:**
 
    ```bash
-   npx get-shit-done-multi --yes
+   npx get-shit-done-multi
    ```
 
 ### Safe Upgrades
@@ -242,21 +242,15 @@ node_modules/.bin/get-shit-done-multi
 For CI/CD or automation, upgrade non-interactively:
 
 ```bash
-# Upgrade all installations without prompting
-npx get-shit-done-multi --yes
+# Upgrade all installations
+npx get-shit-done-multi
 
 # Upgrade specific platform only
-npx get-shit-done-multi --claude --yes
+npx get-shit-done-multi --claude
 
 # Upgrade to global location
-npx get-shit-done-multi --global --yes
+npx get-shit-done-multi --global
 ```
-
-The `--yes` flag:
-
-- Skips all confirmation prompts
-- Automatically upgrades outdated installations
-- Uses default options (local scope if not specified)
 
 ## Troubleshooting Upgrades
 
@@ -268,7 +262,7 @@ The `--yes` flag:
 
 ```bash
 # Use --local flag to install in current directory
-npx get-shit-done-multi --local --yes
+npx get-shit-done-multi --local
 
 # Or fix permissions on global directory
 chmod -R u+w ~/.claude/
@@ -292,7 +286,7 @@ cat ~/.claude/get-shit-done/.gsd-install-manifest.json
 
 # Look for gsd_version field
 # If incorrect, try reinstalling:
-npx get-shit-done-multi --claude --global --yes
+npx get-shit-done-multi --claude --global
 ```
 
 ### Upgrade Succeeds but Skills Not Updated
@@ -318,7 +312,7 @@ npx get-shit-done-multi --claude --global --yes
 
    ```bash
    # Switch from global to local
-   npx get-shit-done-multi --local --yes
+   npx get-shit-done-multi --local
    ```
 
 1. Remove unused installations first

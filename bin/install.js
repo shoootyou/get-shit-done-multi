@@ -56,7 +56,6 @@ async function main() {
 
   // Other flags
   program
-    .option('-y, --yes', 'Skip confirmation prompts')
     .option('-v, --verbose', 'Show detailed output')
     .option('--check-updates', 'Check for updates without installing');
 

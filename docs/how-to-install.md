@@ -40,16 +40,16 @@ For automation or CI/CD pipelines, use flags to skip prompts:
 
 ```bash
 # Install to Claude Code (non-interactive)
-npx get-shit-done-multi --claude --yes
+npx get-shit-done-multi --claude
 
 # Install to GitHub Copilot CLI (local, non-interactive)
-npx get-shit-done-multi --copilot --local --yes
+npx get-shit-done-multi --copilot --local
 
 # Install to Codex CLI (global, non-interactive)
-npx get-shit-done-multi --codex --global --yes
+npx get-shit-done-multi --codex --global
 
 # Install to multiple platforms at once
-npx get-shit-done-multi --claude --copilot --yes
+npx get-shit-done-multi --claude --copilot
 ```
 
 ### Platform Selection
@@ -83,20 +83,10 @@ Control whether to install locally (project-specific) or globally (user-wide):
 
 ```bash
 # Install globally to Claude
-npx get-shit-done-multi --claude --global --yes
+npx get-shit-done-multi --claude --global
 
 # Install locally to current project (Copilot)
-npx get-shit-done-multi --copilot --local --yes
-```
-
-### Other Flags
-
-**Skip Confirmation Prompts:**
-
-```bash
-npx get-shit-done-multi --yes
-# or
-npx get-shit-done-multi -y
+npx get-shit-done-multi --copilot --local
 ```
 
 **Show Help:**
