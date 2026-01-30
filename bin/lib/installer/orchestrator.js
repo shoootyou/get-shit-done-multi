@@ -195,6 +195,17 @@ export async function install(appVersion, options) {
     console.log();
     logger.simpleSubtitle('Installing Shared Directory');
     stats.shared = await installShared(templatesDir, targetDir, templateVars, null, isVerbose);
+
+    console.log();
+    logger.simpleSubtitle('Installing Platform Instructions');
+    stats.instructions = await installPlatformInstructions(
+      templatesDir,
+      targetDir,
+      templateVars,
+      null,
+      isVerbose,
+      adapter
+    );
   }
 
   // Generate manifest after successful installation (Phase 5)
