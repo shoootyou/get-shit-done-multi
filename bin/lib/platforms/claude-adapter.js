@@ -111,4 +111,13 @@ export class ClaudeAdapter extends PlatformAdapter {
     
     return Array.from(skills).sort();
   }
+  
+  /**
+   * Get instructions file path for Claude platform
+   * @param {boolean} isGlobal - Global vs local installation
+   * @returns {string} Absolute path to instructions file
+   */
+  getInstructionsPath(isGlobal) {
+    return getInstructionPath('claude', isGlobal);
+  }
 }

@@ -60,4 +60,13 @@ export class PlatformAdapter {
   getPathReference() {
     throw new Error(`${this.platformName}: getPathReference() must be implemented`);
   }
+  
+  /**
+   * Get instructions file path for this platform
+   * @param {boolean} isGlobal - Global vs local installation
+   * @returns {string} Absolute path to instructions file
+   */
+  getInstructionsPath(isGlobal) {
+    throw new Error(`${this.platformName}: getInstructionsPath() must be implemented`);
+  }
 }
