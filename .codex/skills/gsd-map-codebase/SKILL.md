@@ -47,103 +47,10 @@ Check for .planning/STATE.md - loads context if project already initialized
 1. Check if .planning/codebase/ already exists (offer to refresh or skip)
 2. Create .planning/codebase/ directory structure
 3. Spawn 4 parallel gsd-codebase-mapper agents:
-
-```javascript
-// Agent 1: Tech focus
-Task({
-  prompt: `
-<objective>
-Map codebase technology stack and integrations
-</objective>
-
-<focus>tech</focus>
-
-<area>\${FOCUS_AREA || "entire codebase"}</area>
-
-<writes>
-- .planning/codebase/STACK.md
-- .planning/codebase/INTEGRATIONS.md
-</writes>
-
-<workflow>
-@.codex/get-shit-done/workflows/map-codebase.md
-</workflow>
-  `,
-  agent_type: "gsd-codebase-mapper",
-  description: "Map tech stack and integrations"
-});
-
-// Agent 2: Architecture focus
-Task({
-  prompt: `
-<objective>
-Map codebase architecture and structure
-</objective>
-
-<focus>arch</focus>
-
-<area>\${FOCUS_AREA || "entire codebase"}</area>
-
-<writes>
-- .planning/codebase/ARCHITECTURE.md
-- .planning/codebase/STRUCTURE.md
-</writes>
-
-<workflow>
-@.codex/get-shit-done/workflows/map-codebase.md
-</workflow>
-  `,
-  agent_type: "gsd-codebase-mapper",
-  description: "Map architecture and structure"
-});
-
-// Agent 3: Quality focus
-Task({
-  prompt: `
-<objective>
-Map codebase conventions and testing practices
-</objective>
-
-<focus>quality</focus>
-
-<area>\${FOCUS_AREA || "entire codebase"}</area>
-
-<writes>
-- .planning/codebase/CONVENTIONS.md
-- .planning/codebase/TESTING.md
-</writes>
-
-<workflow>
-@.codex/get-shit-done/workflows/map-codebase.md
-</workflow>
-  `,
-  agent_type: "gsd-codebase-mapper",
-  description: "Map conventions and testing"
-});
-
-// Agent 4: Concerns focus
-Task({
-  prompt: `
-<objective>
-Identify codebase concerns and issues
-</objective>
-
-<focus>concerns</focus>
-
-<area>\${FOCUS_AREA || "entire codebase"}</area>
-
-<writes>
-- .planning/codebase/CONCERNS.md
-</writes>
-
-<workflow>
-@.codex/get-shit-done/workflows/map-codebase.md
-</workflow>
-  `,
-  agent_type: "gsd-codebase-mapper",
-  description: "Identify concerns and issues"
-});
-```
+   - Agent 1: tech focus → writes STACK.md, INTEGRATIONS.md
+   - Agent 2: arch focus → writes ARCHITECTURE.md, STRUCTURE.md
+   - Agent 3: quality focus → writes CONVENTIONS.md, TESTING.md
+   - Agent 4: concerns focus → writes CONCERNS.md
 4. Wait for agents to complete, collect confirmations (NOT document contents)
 5. Verify all 7 documents exist with line counts
 6. Commit codebase map

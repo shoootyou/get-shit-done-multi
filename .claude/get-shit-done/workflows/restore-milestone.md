@@ -64,7 +64,7 @@ ls .planning/history/[milestone-name]/ 2>/dev/null
 ```
 Archive not found: .planning/history/[milestone-name]/
 
-Use /gsd:list-milestones to see available archives.
+Use /gsd-list-milestones to see available archives.
 ```
 
 Exit workflow.
@@ -218,7 +218,7 @@ Archive location: .planning/history/[milestone-name]/ (kept for reference)
 
 Next steps:
 1. Review restored planning files
-2. /gsd:resume-project - Resume work on this milestone
+2. /gsd-resume-project - Resume work on this milestone
 
 Archive is still available in history/ for reference.
 ```

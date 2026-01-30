@@ -7,124 +7,127 @@ argument-hint: '[version]'
 
 
 <objective>
-Mark milestone complete (version provided as argument), archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
+Mark milestone {{version}} complete, archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
 
-Purpose: Create historical record of shipped version, archive milestone artifacts, and prepare for next milestone.
+Purpose: Create historical record of shipped version, archive milestone artifacts (roadmap + requirements), and prepare for next milestone.
+Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tagged.
 </objective>
 
+<execution_context>
+**Load these files NOW (before proceeding):**
+
+- @.claude/get-shit-done/workflows/complete-milestone.md (main workflow)
+- @.claude/get-shit-done/templates/milestone-archive.md (archive template)
+  </execution_context>
+
+<context>
+**Project files:**
+- `.planning/ROADMAP.md`
+- `.planning/REQUIREMENTS.md`
+- `.planning/STATE.md`
+- `.planning/PROJECT.md`
+
+**User input:**
+
+- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
+  </context>
+
 <process>
-<step name="check_audit">
-Look for .planning/v{version}-MILESTONE-AUDIT.md where version is provided as argument
 
-If missing:
-  Recommend: "/gsd-audit-milestone first - need E2E validation before completion"
-  Exit (user must audit first)
+**Follow complete-milestone.md workflow:**
 
-If exists with status: gaps_found:
-  Recommend: "/gsd-plan-milestone-gaps - address gaps before completion"
-  Exit (user must fix gaps first)
+0. **Check for audit:**
 
-If exists with status: passed:
-  Proceed with completion
-</step>
+   - Look for `.planning/v{{version}}-MILESTONE-AUDIT.md`
+   - If missing or stale: recommend `/gsd-audit-milestone` first
+   - If audit status is `gaps_found`: recommend `/gsd-plan-milestone-gaps` first
+   - If audit status is `passed`: proceed to step 1
 
-<step name="archive_roadmap_requirements">
-Archive current milestone artifacts:
+   ```markdown
+   ## Pre-flight Check
 
-```bash
-# version argument provided by user
-version="$1"
+   {If no v{{version}}-MILESTONE-AUDIT.md:}
+   ⚠ No milestone audit found. Run `/gsd-audit-milestone` first to verify
+   requirements coverage, cross-phase integration, and E2E flows.
 
-# Create milestone directory
-mkdir -p ".planning/milestones/v${version}"
+   {If audit has gaps:}
+   ⚠ Milestone audit found gaps. Run `/gsd-plan-milestone-gaps` to create
+   phases that close the gaps, or proceed anyway to accept as tech debt.
 
-# Archive key files
-cp .planning/ROADMAP.md ".planning/milestones/v${version}/"
-cp .planning/REQUIREMENTS.md ".planning/milestones/v${version}/"
+   {If audit passed:}
+   ✓ Milestone audit passed. Proceeding with completion.
+   ```
 
-# Archive audit report
-cp ".planning/v${version}-MILESTONE-AUDIT.md" ".planning/milestones/v${version}/"
+1. **Verify readiness:**
 
-# Count phases completed
-PHASE_COUNT=$(ls -d .planning/phases/* | wc -l)
-```
-</step>
+   - Check all phases in milestone have completed plans (SUMMARY.md exists)
+   - Present milestone scope and stats
+   - Wait for confirmation
 
-<step name="update_project">
-Update PROJECT.md to reflect milestone completion:
+2. **Gather stats:**
 
-Read current "What This Is" section.
-Evolve it to reflect completed work from this milestone.
-Update "Current focus" to "Between milestones" or next milestone if known.
-</step>
+   - Count phases, plans, tasks
+   - Calculate git range, file changes, LOC
+   - Extract timeline from git log
+   - Present summary, confirm
 
-<step name="update_milestones_registry">
-Update MILESTONES.md registry:
+3. **Extract accomplishments:**
 
-```bash
-cat >> .planning/MILESTONES.md << ENDMARKER
+   - Read all phase SUMMARY.md files in milestone range
+   - Extract 4-6 key accomplishments
+   - Present for approval
 
-## v${version}
-- **Completed:** $(date +%Y-%m-%d)
-- **Phases:** ${PHASE_COUNT} phases completed
-- **Requirements:** $(grep -c "^###" .planning/REQUIREMENTS.md) requirements met
-- **Status:** Completed
-- **Location:** .planning/milestones/v${version}/
-- **Audit:** Passed E2E integration checks
-ENDMARKER
-```
-</step>
+4. **Archive milestone:**
 
-<step name="git_tag">
-Create git tag for milestone:
+   - Create `.planning/milestones/v{{version}}-ROADMAP.md`
+   - Extract full phase details from ROADMAP.md
+   - Fill milestone-archive.md template
+   - Update ROADMAP.md to one-line summary with link
 
-```bash
-git add ".planning/milestones/v${version}/"
-git add .planning/MILESTONES.md
-git add .planning/PROJECT.md
-git commit -m "milestone: complete v${version}
+5. **Archive requirements:**
 
-- ${PHASE_COUNT} phases completed
-- All requirements met
-- E2E audit passed"
+   - Create `.planning/milestones/v{{version}}-REQUIREMENTS.md`
+   - Mark all v1 requirements as complete (checkboxes checked)
+   - Note requirement outcomes (validated, adjusted, dropped)
+   - Delete `.planning/REQUIREMENTS.md` (fresh one created for next milestone)
 
-git tag -a "v${version}" -m "Release v${version}
+6. **Update PROJECT.md:**
 
-$(cat .planning/ROADMAP.md | head -20)
-"
-```
-</step>
+   - Add "Current State" section with shipped version
+   - Add "Next Milestone Goals" section
+   - Archive previous content in `<details>` (if v1.1+)
 
-<step name="delete_working_files">
-Delete ROADMAP.md and REQUIREMENTS.md (milestone cycle ends):
+7. **Commit and tag:**
 
-```bash
-git rm .planning/ROADMAP.md .planning/REQUIREMENTS.md
-git commit -m "milestone: clear roadmap for next cycle"
-```
+   - Stage: MILESTONES.md, PROJECT.md, ROADMAP.md, STATE.md, archive files
+   - Commit: `chore: archive v{{version}} milestone`
+   - Tag: `git tag -a v{{version}} -m "[milestone summary]"`
+   - Ask about pushing tag
 
-Note: Files are preserved in .planning/milestones/v${version}/
-</step>
+8. **Offer next steps:**
+   - `/gsd-new-milestone` — start next milestone (questioning → research → requirements → roadmap)
 
-<step name="present_summary">
-Present completion summary:
-
-```
-## MILESTONE COMPLETE: v{version}
-
-**Completed:** {date}
-**Phases:** {count} phases
-**Requirements:** {count} requirements met
-**Audit:** Passed
-
-**Archived to:** .planning/milestones/v{version}/
-**Git tag:** v{version}
-
-### Next Steps
-
-1. Retrospective (what went well, what to improve)
-2. Start next milestone: /gsd-new-milestone
-3. Or take a break - you earned it!
-```
-</step>
 </process>
+
+<success_criteria>
+
+- Milestone archived to `.planning/milestones/v{{version}}-ROADMAP.md`
+- Requirements archived to `.planning/milestones/v{{version}}-REQUIREMENTS.md`
+- `.planning/REQUIREMENTS.md` deleted (fresh for next milestone)
+- ROADMAP.md collapsed to one-line entry
+- PROJECT.md updated with current state
+- Git tag v{{version}} created
+- Commit successful
+- User knows next steps (including need for fresh requirements)
+  </success_criteria>
+
+<critical_rules>
+
+- **Load workflow first:** Read complete-milestone.md before executing
+- **Verify completion:** All phases must have SUMMARY.md files
+- **User confirmation:** Wait for approval at verification gates
+- **Archive before deleting:** Always create archive files before updating/deleting originals
+- **One-line summary:** Collapsed milestone in ROADMAP.md should be single line with link
+- **Context efficiency:** Archive keeps ROADMAP.md and REQUIREMENTS.md constant size per milestone
+- **Fresh requirements:** Next milestone starts with `/gsd-new-milestone` which includes requirements definition
+</critical_rules>
