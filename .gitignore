@@ -6,10 +6,7 @@ CLAUDE.md
 /research.claude/
 
 # Planning folder and files
-.planning-old
-.planning/config.json
-.planning/debug
-.planning/VERIFICATION.md
+.planning
 
 # Docker sandbox directories
 .sandbox-home/
