@@ -891,6 +891,31 @@ Overall Progress:
      - Single source of truth for instruction file locations
      - Rationale: Centralized path rules easier to maintain, consistent with existing architecture
 
+129. **2026-01-30 (09-01):** Dynamic marker extraction for merge logic (MERGE-DYNAMIC-MARKERS)
+     - Markers extracted from first/last lines AFTER variable replacement
+     - Allows markers to vary by platform (different command prefixes)
+     - Comparison in destination file uses post-replacement markers
+     - Rationale: Support platform-specific content in instruction files
+
+130. **2026-01-30 (09-01):** Three-scenario merge strategy (MERGE-SCENARIOS)
+     - File doesn't exist → create new file
+     - File exists, no marker → append with blank line separator
+     - File exists, marker found → compare block and replace if different
+     - Special handling: markdown title interruption detection
+     - Rationale: Smart merge preserves user customizations while updating GSD content
+
+131. **2026-01-30 (09-01):** Scope-aware instruction file paths (INSTRUCTION-SCOPE-PATHS)
+     - Local installations: Claude/Codex at root, Copilot in .github/
+     - Global installations: All in platform directory (.claude/, .copilot/, .codex/)
+     - Centralized in instruction-paths.js utility
+     - Rationale: Respect platform conventions while maintaining consistency
+
+132. **2026-01-30 (09-01):** Atomic writes for instruction files (MERGE-ATOMIC-WRITES)
+     - Write to .tmp file first, then rename to target
+     - Cleanup temp file on failure
+     - Prevents partial writes and file corruption
+     - Rationale: Safe file operations during merge, especially for user-customized files
+
 
 ### Roadmap Evolution
 
@@ -1149,12 +1174,12 @@ Then continue with remaining phases from ROADMAP.md.
 
 ## Session Continuity
 
-**Last session:** 2026-01-30T23:16:33Z  
-**Stopped at:** Completed 08-05-PLAN.md (Quality Validation) - Phase 8 COMPLETE  
+**Last session:** 2026-01-30T08:36:10Z  
+**Stopped at:** Completed 09-01-PLAN.md (Core Platform Instructions Installer)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-01-30  
-**Ready for:** v2.0 release preparation or Phase 9 (if defined)
+**Ready for:** Plan 09-02 or 09-03 (check if adapter methods already implemented)
