@@ -951,7 +951,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+1 todo captured:
+- 2026-01-30-update-documentation-corrections-clarifications.md — Fix how-to-customize.md (add --all, fix --version, clarify custom paths, remove partial install), clean architecture.md, fix repo URLs
 
 ### Completed Todos
 - 2026-01-30-fix-platform-specifics-unified-standard.md — Fixed platform-specifics.md to show all platforms use Agent Skills open standard with same frontmatter format (removed incorrect platform-specific fields)
