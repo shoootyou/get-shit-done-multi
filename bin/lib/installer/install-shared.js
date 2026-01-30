@@ -17,10 +17,10 @@ export async function installShared(templatesDir, targetDir, variables, multiBar
   // Copy entire directory
   await copyDirectory(sharedTemplateDir, sharedTargetDir);
 
+  logger.verboseComplete(isVerbose);
+
   // Process all text files recursively for template variables
   await processDirectoryRecursively(sharedTargetDir, variables, isVerbose);
-
-  logger.verboseComplete(isVerbose);
 
   return 1;
 }
@@ -56,7 +56,7 @@ async function processDirectoryRecursively(dir, variables, isVerbose) {
     const ext = entry.name.substring(entry.name.lastIndexOf('.'));
     if (!TEXT_EXTENSIONS.has(ext)) {
       if (isVerbose) {
-        logger.verboseInProgress(`Skipping binary: ${entry.name}`, isVerbose);
+        logger.warn(`Skipping binary: ${entry.name}`, 4);
       }
       continue;
     }
@@ -82,10 +82,6 @@ async function processDirectoryRecursively(dir, variables, isVerbose) {
       }
 
       await fsWriteFile(fullPath, processed);
-
-      if (isVerbose) {
-        logger.verboseInProgress(`Processed: ${entry.name}`, isVerbose);
-      }
     } catch (error) {
       // Re-throw with context
       throw new Error(`Failed to process ${entry.name}: ${error.message}`);
