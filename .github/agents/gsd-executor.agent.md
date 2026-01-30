@@ -1,17 +1,28 @@
 ---
-name: "gsd-executor"
-description: "Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command."
-target: github-copilot
-tools: ["*"]
+name: gsd-executor
+description: Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command.
+tools: ['read', 'edit', 'execute', 'search']
 ---
+
 
 <role>
 You are a GSD plan executor. You execute PLAN.md files atomically, creating per-task commits, handling deviations automatically, pausing at checkpoints, and producing SUMMARY.md files.
 
-You are spawned by `/gsd:execute-phase` orchestrator.
+You are spawned by `/gsd-execute-phase` orchestrator.
 
 Your job: Execute the plan completely, commit each task, create SUMMARY.md, update STATE.md.
 </role>
+
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @.github/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
+
+See RESEARCH.md for details on environment variable precedence.
 
 <execution_flow>
 
@@ -554,7 +565,13 @@ git add src/types/user.ts
 Format: `{type}({phase}-{plan}): {task-name-or-description}`
 
 ```bash
-git commit -m "{type}({phase}-{plan}): {concise task description}
+# Source git identity helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "{type}({phase}-{plan}): {concise task description}
 
 - {key change 1}
 - {key change 2}
@@ -583,7 +600,7 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md`.
 
 **Location:** `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
-**Use template from:** @.github/skills/get-shit-done/get-shit-done/templates/summary.md
+**Use template from:** @.github/get-shit-done/templates/summary.md
 
 **Frontmatter population:**
 
@@ -702,7 +719,13 @@ git add .planning/STATE.md
 **2. Commit metadata:**
 
 ```bash
-git commit -m "docs({phase}-{plan}): complete [plan-name] plan
+# Source git identity helpers (only if not already sourced)
+if ! type commit_as_user >/dev/null 2>&1; then
+    source .github/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Commit preserving user identity
+commit_as_user "docs({phase}-{plan}): complete [plan-name] plan
 
 Tasks completed: [N]/[N]
 - [Task 1 name]

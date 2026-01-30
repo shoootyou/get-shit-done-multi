@@ -1,0 +1,65 @@
+{
+  // markdownlint-cli2 configuration
+  // See: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+  "config": {
+    // Default to all rules enabled
+    "default": true,
+
+    // MD001: Heading increment - Disable (allow skipping levels for document structure)
+    "MD001": false,
+
+    // MD013: Line length - Relax to 120 characters (default 80 too strict)
+    "MD013": {
+      "line_length": 120,
+      "code_blocks": false,  // Don't enforce in code blocks
+      "tables": false,       // Don't enforce in tables
+      "headings": false      // Don't enforce in headings
+    },
+
+    // MD024: Duplicate headings - Allow siblings only (same level in different sections OK)
+    "MD024": {
+      "siblings_only": true
+    },
+
+    // MD025: Multiple top-level headings - Disable (some docs need multiple H1s)
+    "MD025": false,
+
+    // MD033: Allow inline HTML (for badges, links)
+    "MD033": false,
+
+    // MD036: Emphasis as heading - Disable (allow bold for sub-sections)
+    "MD036": false,
+
+    // MD041: First line must be top-level heading - Disable (YAML frontmatter conflicts)
+    "MD041": false,
+
+    // MD034: Bare URLs - Disable (allow bare URLs in documentation)
+    "MD034": false,
+
+    // MD046: Code block style - Consistent fenced style
+    "MD046": {
+      "style": "fenced"
+    },
+
+    // MD060: Table column style - Disable (too strict for documentation)
+    "MD060": false
+  },
+
+  // Ignore patterns (glob format)
+  "ignores": [
+    "node_modules/**",
+    ".planning/**",
+    "templates/**",
+    ".git/**",
+    "coverage/**",
+    ".claude/**",
+    ".codex/**",
+    ".github/agents/**",
+    ".github/get-shit-done/**",
+    ".github/skills/**",
+    ".gsd-backup/**",
+    "get-shit-done/**",
+    "GSD-STYLE.md"
+  ]
+}

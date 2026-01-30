@@ -1,0 +1,16 @@
+{
+  "skill_version": "1.9.2",
+  "requires_version": "1.9.0+",
+  "platforms": [
+    "claude",
+    "copilot",
+    "codex"
+  ],
+  "metadata": {
+    "platform": "copilot",
+    "generated": "2026-01-24",
+    "templateVersion": "1.0.0",
+    "projectVersion": "1.9.0",
+    "projectName": "get-shit-done-multi"
+  }
+}
