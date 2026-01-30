@@ -77,8 +77,14 @@ npx get-shit-done-multi --codex
 Install to multiple platforms simultaneously:
 
 ```bash
+# Install to two platforms
 npx get-shit-done-multi --claude --copilot
+
+# Install to all three platforms
 npx get-shit-done-multi --claude --copilot --codex
+
+# Or use --all shorthand
+npx get-shit-done-multi --all
 ```
 
 Each platform gets its own installation. Your `.planning/` directory works with all platforms.
@@ -99,21 +105,19 @@ Useful for:
 
 ## Version Management
 
-### Check Installed Versions
+### Check Package Version
 
 ```bash
 npx get-shit-done-multi --version
 ```
 
-Shows ALL installations (global + local, all platforms):
+Shows the package version from npm (not the installed version):
 
 ```plaintext
-Installed versions:
-
-- Claude (global): v2.0.0 at ~/.claude/get-shit-done/
-- Copilot (local): v2.0.0 at .github/get-shit-done/
-
+get-shit-done-multi version 2.0.0
 ```
+
+**Note:** This shows the npm package version. To check installed versions, see [How to Upgrade](how-to-upgrade.md).
 
 ### Upgrade All Installations
 
@@ -129,35 +133,35 @@ Installer detects outdated installations and prompts for upgrade.
 npx get-shit-done-multi --claude
 ```
 
-## Custom Paths (Not Yet Implemented)
+## Custom Paths
 
-Future feature (v2.1+):
-
-```bash
-npx get-shit-done-multi --custom-path ~/my-skills/
-```
-
-**Workaround for now:**
-
-1. Install to local directory
-2. Manually move files to custom location
-3. Update platform configuration to point to custom location
-
-## Partial Installation (Not Yet Implemented)
-
-Future feature (v2.1+):
-
-Select specific skills/agents to install:
+Install GSD to a non-standard directory:
 
 ```bash
-npx get-shit-done-multi --skills gsd-plan-phase,gsd-execute-phase
+# Install to custom path for Claude
+npx get-shit-done-multi --claude --custom-path ~/my-custom-location/
+
+# Install to custom path for Copilot
+npx get-shit-done-multi --copilot --custom-path /opt/ai-tools/
 ```
 
-**Workaround for now:**
+**How it works:**
 
-1. Install all skills
-2. Manually delete unwanted skills
-3. Note: Full installation recommended for complete workflow
+- Installs content **directly** in the specified path (doesn't create platform subdirectories)
+- Example: `--copilot --custom-path ~/tools/` installs to `~/tools/` (not `~/tools/.github/`)
+- Designed for platforms that use non-standard paths
+
+**Restrictions:**
+
+- **Single platform only** - cannot combine with multiple platform flags
+- Cannot use `--claude --copilot --custom-path` (will error)
+- Use separate commands for multiple platforms with custom paths
+
+**Use cases:**
+
+- Platform configured to look in custom directory
+- Corporate environments with restricted paths
+- Custom AI tool configurations
 
 ## Manual Customization
 

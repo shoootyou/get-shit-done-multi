@@ -37,7 +37,7 @@ rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
 
 # Step 2: Install to Copilot
 npx get-shit-done-multi --copilot
-```text
+```
 
 Your `.planning/` directory is NOT affected. All project history preserved.
 
@@ -108,8 +108,7 @@ Local installation takes precedence if both exist.
 
    ```bash
    npx get-shit-done-multi
-
-```text
+   ```
 
 3. **Your .planning/ directories are NOT affected**
 

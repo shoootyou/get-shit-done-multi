@@ -29,12 +29,11 @@ We welcome:
 git clone https://github.com/shoootyou/get-shit-done-multi.git
 cd get-shit-done-multi
 npm install
-```plaintext
+```
 
 ### Project Structure
 
-```
-
+```plaintext
 get-shit-done-multi/
 ├── bin/                    # CLI entry point
 │   └── install.js
@@ -44,8 +43,7 @@ get-shit-done-multi/
 │   └── shared/           # Platform-specific configuration
 ├── tests/                # Integration tests
 └── docs/                 # Documentation
-
-```plaintext
+```
 
 ## Running Tests
 
@@ -111,8 +109,7 @@ npm run lint:md:fix
    git checkout -b fix/your-bug-fix
    # or
    git checkout -b feat/your-feature
-
-```plaintext
+   ```
 
 2. **Make changes with tests:**
    - Write or update tests for your changes

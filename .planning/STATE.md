@@ -951,10 +951,10 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-1 todo captured:
-- 2026-01-30-update-documentation-corrections-clarifications.md — Fix how-to-customize.md (add --all, fix --version, clarify custom paths, remove partial install), clean architecture.md, fix repo URLs
+None
 
 ### Completed Todos
+- 2026-01-30-update-documentation-corrections-clarifications.md — Updated how-to-customize.md (added --all flag, fixed --version, clarified custom paths, removed partial install), cleaned architecture.md (removed Key Decisions and Testing sections), fixed repo URLs (yourusername → shoootyou), removed broken commands link
 - 2026-01-30-fix-platform-specifics-unified-standard.md — Fixed platform-specifics.md to show all platforms use Agent Skills open standard with same frontmatter format (removed incorrect platform-specific fields)
 - 2026-01-30-update-platform-binary-requirements.md — Updated binary requirements (claude, copilot, codex) with installation links in README.md, how-to-install.md, and troubleshooting.md
 - 2026-01-30-remove-yes-flag.md — Removed unused --yes flag from bin/install.js and all user-facing documentation (5 files updated)

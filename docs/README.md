@@ -50,8 +50,8 @@ See [CHANGELOG.md](../CHANGELOG.md) for version history and release notes.
 
 ## Support
 
-- **GitHub Issues:** https://github.com/yourusername/get-shit-done-multi/issues
-- **Discussions:** https://github.com/yourusername/get-shit-done-multi/discussions
+- **GitHub Issues:** https://github.com/shoootyou/get-shit-done-multi/issues
+- **Discussions:** https://github.com/shoootyou/get-shit-done-multi/discussions
 - **Fork Information:** Forked from v1.6.4 of [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done)
 
 ## Quick Links

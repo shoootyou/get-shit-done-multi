@@ -110,7 +110,6 @@ with additional features like frontmatter control and automatic loading. See
 
 **Reference:**
 
-- [All Commands](docs/commands/README.md)
 - [Full Documentation](docs/README.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
