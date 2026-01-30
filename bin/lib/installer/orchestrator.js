@@ -150,7 +150,7 @@ export async function install(appVersion, options) {
   await ensureDirectory(targetDir);
 
   // Initialize progress tracking
-  const stats = { skills: 0, agents: 0, shared: 0, target: targetDir };
+  const stats = { skills: 0, agents: 0, shared: 0, instructions: 0, target: targetDir };
 
   if (!isVerbose) {
     console.log();
