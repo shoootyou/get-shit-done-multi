@@ -1,6 +1,6 @@
 ---
 name: get-shit-done
-description: Structured spec-driven workflow for planning and executing software projects with Codex CLI.
+description: "Structured spec-driven workflow for planning and executing software projects with Codex CLI."
 ---
 
 

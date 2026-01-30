@@ -1701,14 +1701,14 @@ Summary: .planning/phases/{phase-dir}/{phase}-{plan}-SUMMARY.md
 
 **{phase}-{next-plan}: [Plan Name]** — [objective from next PLAN.md]
 
-`/gsd:execute-phase {phase}`
+`{{COMMAND_PREFIX}}execute-phase {phase}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:verify-work {phase}-{plan}` — manual acceptance testing before continuing
+- `{{COMMAND_PREFIX}}verify-work {phase}-{plan}` — manual acceptance testing before continuing
 - Review what was built before continuing
 
 ---
@@ -1762,15 +1762,15 @@ All {Y} plans finished.
 
 **Phase {Z+1}: {Next Phase Name}** — {Goal from ROADMAP.md}
 
-`/gsd:plan-phase {Z+1}`
+`{{COMMAND_PREFIX}}plan-phase {Z+1}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:verify-work {Z}` — manual acceptance testing before continuing
-- `/gsd:discuss-phase {Z+1}` — gather context first
+- `{{COMMAND_PREFIX}}verify-work {Z}` — manual acceptance testing before continuing
+- `{{COMMAND_PREFIX}}discuss-phase {Z+1}` — gather context first
 - Review phase accomplishments before continuing
 
 ---
@@ -1800,15 +1800,15 @@ All {Y} plans finished.
 
 **Complete Milestone** — archive and prepare for next
 
-`/gsd:complete-milestone`
+`{{COMMAND_PREFIX}}complete-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:verify-work` — manual acceptance testing before completing milestone
-- `/gsd:add-phase <description>` — add another phase before completing
+- `{{COMMAND_PREFIX}}verify-work` — manual acceptance testing before completing milestone
+- `{{COMMAND_PREFIX}}add-phase <description>` — add another phase before completing
 - Review accomplishments before archiving
 
 ---

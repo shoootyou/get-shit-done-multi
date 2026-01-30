@@ -1,6 +1,6 @@
 ---
 name: gsd-update
-description: Update GSD installation to latest version from npm
+description: "Update GSD installation to latest version from npm"
 allowed-tools: Read, Bash
 ---
 

@@ -82,7 +82,8 @@ export async function showBackupFailure(error, partialBackupPath = null) {
  * @param {string} oldVersion - Version being migrated from
  * @param {string} targetDir - Base directory
  * @param {Object} options - Migration options
- * @returns {Promise<{success: boolean, backupPath?: string, error?: string}>}
+ * @param {string} [options.sharedBackupDir] - Shared backup directory for all migrations
+ * @returns {Promise<{success: boolean, backupPath?: string, backupDir?: string, error?: string}>}
  */
 export async function performMigration(platform, oldVersion, targetDir, options = {}) {
   try {
@@ -92,8 +93,11 @@ export async function performMigration(platform, oldVersion, targetDir, options 
       return { success: false, error: 'No old files found' };
     }
 
-    // 2. Create backup directory
-    const backupDir = await createBackupDirectory(oldVersion, targetDir);
+    // 2. Use shared backup directory or create new one (only once)
+    let backupDir = options.sharedBackupDir;
+    if (!backupDir) {
+      backupDir = await createBackupDirectory(oldVersion, targetDir);
+    }
 
     // 3. Prompt user (unless skipPrompts)
     if (!options.skipPrompts) {
@@ -103,8 +107,8 @@ export async function performMigration(platform, oldVersion, targetDir, options 
       }
     }
 
-    // 4. Create backup (with disk space check)
-    const result = await createBackup(platform, oldVersion, paths, targetDir);
+    // 4. Create backup (with disk space check) - reuse the same backupDir
+    const result = await createBackup(platform, oldVersion, paths, targetDir, backupDir);
 
     // 5. Show result
     if (result.success) {
@@ -122,7 +126,7 @@ export async function performMigration(platform, oldVersion, targetDir, options 
         }
       }
 
-      return { success: true, backupPath: result.backupPath };
+      return { success: true, backupPath: result.backupPath, backupDir };
     } else {
       await showBackupFailure(new Error('Copy failed'), result.backupPath);
       return { success: false, error: 'Backup failed', backupPath: result.backupPath };

@@ -154,12 +154,13 @@ export async function copyWithRetry(sourcePath, destPath, options = {}) {
  * @param {string} oldVersion - Version being backed up
  * @param {string[]} sourcePaths - Array of relative paths to backup
  * @param {string} targetDir - Base directory
+ * @param {string} [existingBackupDir] - Existing backup directory to reuse (optional)
  * @returns {Promise<{success: boolean, backupPath: string, failed?: string[]}>}
  */
-export async function createBackup(platform, oldVersion, sourcePaths, targetDir) {
+export async function createBackup(platform, oldVersion, sourcePaths, targetDir, existingBackupDir = null) {
   try {
-    // 1. Create backup directory
-    const backupPath = await createBackupDirectory(oldVersion, targetDir);
+    // 1. Use existing backup directory or create new one
+    const backupPath = existingBackupDir || await createBackupDirectory(oldVersion, targetDir);
     
     // 2. Resolve source paths (they should be relative to targetDir)
     const resolvedPaths = sourcePaths.map(p => {

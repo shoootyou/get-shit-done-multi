@@ -1,6 +1,6 @@
 ---
 name: gsd-research-phase
-description: Research implementation approach for phase before planning
+description: "Research implementation approach for phase before planning"
 allowed-tools: Task, Read, Edit, Bash
 ---
 

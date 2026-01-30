@@ -1,6 +1,6 @@
 ---
 name: gsd-debugger
-description: Primary orchestrator for debugging sessions. Manages investigation flow, debug file state, and spawns gsd-debugger-specialist for complex scenarios.
+description: "Primary orchestrator for debugging sessions. Manages investigation flow, debug file state, and spawns gsd-debugger-specialist for complex scenarios."
 tools: ['read', 'edit', 'execute', 'search']
 ---
 

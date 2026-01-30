@@ -36,7 +36,7 @@ Check if `.planning/MILESTONES.md` exists:
 if [ ! -f .planning/MILESTONES.md ]; then
   echo "No milestones archived yet."
   echo ""
-  echo "Archive your first milestone with /gsd:archive-milestone"
+  echo "Archive your first milestone with {{COMMAND_PREFIX}}archive-milestone"
   exit 0
 fi
 ```
@@ -85,7 +85,7 @@ cat .planning/MILESTONES.md
 echo ""
 echo "Total: ${MILESTONE_COUNT} milestone(s) archived"
 echo ""
-echo "Restore a milestone: /gsd:restore-milestone [name]"
+echo "Restore a milestone: {{COMMAND_PREFIX}}restore-milestone [name]"
 ```
 
 **Output structure:**

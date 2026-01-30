@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "copilot",
   "scope": "local",
-  "installed_at": "2026-01-29T00:48:33.307Z",
+  "installed_at": "2026-01-30T14:28:02.518Z",
   "files": [
     "agents/gsd-codebase-mapper.agent.md",
     "agents/gsd-debugger-specialist.agent.md",
@@ -18,7 +18,9 @@
     "agents/gsd-roadmapper.agent.md",
     "agents/gsd-verifier.agent.md",
     "agents/versions.json",
+    "copilot-instructions.md",
     "dependabot.yml",
+    "get-shit-done/.gsd-install-manifest.json",
     "get-shit-done/references/checkpoints.md",
     "get-shit-done/references/continuation-format.md",
     "get-shit-done/references/git-integration.md",

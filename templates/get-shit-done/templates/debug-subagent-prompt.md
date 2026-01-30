@@ -51,7 +51,7 @@ Create: .planning/debug/{slug}.md
 
 ## Usage
 
-**From /gsd:debug:**
+**From {{COMMAND_PREFIX}}debug:**
 ```python
 Task(
   prompt=filled_template,

@@ -28,240 +28,31 @@ Phase: $ARGUMENTS (optional)
 </context>
 
 <process>
-<step name="load_phase_context">
-Load phase context from planning directory.
-
-1. If phase argument provided: use that phase
-2. If no argument: check for active UAT sessions (*.UAT.md files)
-3. Load SUMMARY.md files from phase directory
-4. Extract phase goal from ROADMAP.md
-5. Understand what was built and what needs verification
-</step>
-
-<step name="check_existing_uat">
-Check for existing {phase}-*-UAT.md files in phase directory.
-
-If exists with status "diagnosed":
-- Display current content
-- Offer: "Resume / Start fresh / Cancel"
-- If Resume: continue from where left off
-- If Start fresh: archive old UAT, create new
-- If Cancel: exit
-
-If exists with status "passed":
-- Display: "This phase already passed UAT"
-- Offer to re-test or exit
-</step>
-
-<step name="generate_test_scenarios">
-Based on phase goal and SUMMARY files:
-
-1. Extract testable deliverables (user-observable outcomes)
-2. Derive 3-5 test scenarios from user's perspective
-3. For each scenario:
-   - What to test (specific action/flow)
-   - Steps to execute the test
-   - Expected outcome (what success looks like)
-4. Present test plan to user for confirmation
-5. Allow user to add/remove/modify scenarios before starting
-</step>
-
-<step name="guide_testing">
-Present tests one at a time with conversational flow.
-
-For each test scenario:
-1. Show test description and expected behavior
-2. Present steps clearly
-3. Ask: "What happened?" (plain text response)
-4. Interpret response:
-   - "yes" / "y" / "next" / "passed" = PASS
-   - Anything else = ISSUE (capture description)
-5. If issue: ask follow-up questions to understand:
-   - What exactly happened vs expected?
-   - Can you reproduce it?
-   - Any error messages?
-6. Infer severity from description (blocker/major/minor)
-7. Log result and continue to next test
-
-**Anti-patterns:**
-- Don't use structured forms for test responses
-- Don't ask "what severity?" — infer from description
-- Don't present full checklist upfront — one at a time
-- Don't run automated tests — this is manual user validation
-- Don't fix issues during testing — log as gaps, diagnose after
-</step>
-
-<step name="triage_issues">
-After all tests complete, if issues found:
-
-1. Review all logged issues
-2. Categorize each:
-   - **Bug**: Behavior broken (feature exists but doesn't work correctly)
-   - **Gap**: Feature missing (expected functionality not implemented)
-3. Assess severity:
-   - **Blocker**: Prevents core functionality, must fix
-   - **Major**: Significant impact on usability
-   - **Minor**: Edge case or polish issue
-4. Prepare for resolution routing
-</step>
-
-<step name="route_to_resolution">
-Based on triage results, spawn appropriate agents.
-
-**If bugs found (broken behavior):**
-
-Spawn debugger to investigate:
-```javascript
-task({
-  agent_type: "gsd-debugger",
-  description: "Debug UAT issues",
-  prompt: `
-<issues>
-${issueDescriptions}
-</issues>
-
-<context>
-Phase ${phase} completed. UAT revealed bugs.
-Load SUMMARY files and investigate root causes.
-</context>
-
-<objective>
-Create DEBUG.md session with:
-- Reproduction steps for each bug
-- Investigation strategy
-- Root cause analysis
-</objective>
-  `
-})
-```
-
-**If gaps found (missing features):**
-
-Spawn planner in gaps mode:
-```javascript
-task({
-  agent_type: "gsd-planner",
-  description: "Plan gap closure",
-  prompt: `
-<gaps>
-${gapDescriptions}
-</gaps>
-
-<context>
-Phase ${phase} UAT revealed missing features.
-Create plans to address these gaps.
-</context>
-
-<objective>
-Create gap closure plans using --gaps flag pattern.
-Each gap should have its own plan with:
-- What needs to be built
-- How it integrates with existing work
-- Verification criteria
-</objective>
-  `
-})
-```
-
-**If both bugs and gaps:**
-Spawn both agents in parallel (debugger first, then planner)
-
-**If all tests passed:**
-Write UAT.md with status: passed
-Skip spawning, proceed to commit
-</step>
-
-<step name="wait_for_diagnosis">
-If agents were spawned:
-
-1. Wait for debugger to create DEBUG.md
-2. Wait for planner to create gap closure plans
-3. Spawn gsd-plan-checker to verify fix plans
-4. If checker finds issues: iterate planner ↔ checker (max 3 iterations)
-5. When plans verified: proceed to write UAT report
-</step>
-
-<step name="write_uat_report">
-Create .planning/phases/{phase}-*/{phase}-*-UAT.md:
-
-```yaml
----
-phase: {phase}
-tested: {timestamp}
-status: {passed|diagnosed}
-severity: {blocker|major|minor|none}
-tests_total: {N}
-tests_passed: {M}
----
-
-# Phase {phase} UAT Report
-
-## Test Results
-
-{For each test scenario:}
-### Test {N}: {scenario name}
-
-**Steps:**
-{test steps}
-
-**Expected:**
-{expected outcome}
-
-**Result:** {PASS|ISSUE}
-
-{If issue: detailed description}
-
-## Issues Found
-
-{If issues:}
-### Issue {N}: {title}
-
-**Type:** {bug|gap}
-**Severity:** {blocker|major|minor}
-**Description:** {what's wrong}
-**Impact:** {how it affects users}
-
-## Resolution Status
-
-{If issues diagnosed:}
-- DEBUG.md created: {path}
-- Fix plans created: {list plan files}
-- Plans verified: {yes|no|iterations}
-- Ready for execution: {yes|no}
-
-{If all passed:}
-All tests passed. Phase verified.
-
-## Next Steps
-
-{Route A/B/C/D from offer_next}
-```
-</step>
-
-<step name="commit">
-Commit the UAT report:
-
-```bash
-git add .planning/phases/{phase}-*/{phase}-*-UAT.md
-
-# If issues found and diagnosed
-git commit -m "test(${phase}): UAT diagnosed - ${N} issues triaged"
-
-# If all passed
-git commit -m "test(${phase}): UAT passed - all features verified"
-```
-</step>
-
-<step name="present_summary">
-Present completion summary with routing.
-
-Use offer_next section to route based on UAT results:
-- Route A: All tests pass + more phases remain
-- Route B: All tests pass + last phase complete
-- Route C: Issues found + fix plans ready
-- Route D: Issues found + planning blocked
-</step>
+1. Check for active UAT sessions (resume or start new)
+2. Find SUMMARY.md files for the phase
+3. Extract testable deliverables (user-observable outcomes)
+4. Create {phase}-UAT.md with test list
+5. Present tests one at a time:
+   - Show expected behavior
+   - Wait for plain text response
+   - "yes/y/next" = pass, anything else = issue (severity inferred)
+6. Update UAT.md after each response
+7. On completion: commit, present summary
+8. If issues found:
+   - Spawn parallel debug agents to diagnose root causes
+   - Spawn gsd-planner in --gaps mode to create fix plans
+   - Spawn gsd-plan-checker to verify fix plans
+   - Iterate planner ↔ checker until plans pass (max 3)
+   - Present ready status with `/clear` then `{{COMMAND_PREFIX}}execute-phase`
 </process>
+
+<anti_patterns>
+- Don't use AskUserQuestion for test responses — plain text conversation
+- Don't ask severity — infer from description
+- Don't present full checklist upfront — one test at a time
+- Don't run automated tests — this is manual user validation
+- Don't fix issues during testing — log as gaps, diagnose after all tests complete
+</anti_patterns>
 
 <offer_next>
 Output this markdown directly (not as a code block). Route based on UAT results:
@@ -406,14 +197,6 @@ Review the issues above and either:
 
 ───────────────────────────────────────────────────────────────
 </offer_next>
-
-<anti_patterns>
-- Don't use AskUserQuestion for test responses — plain text conversation
-- Don't ask severity — infer from description
-- Don't present full checklist upfront — one test at a time
-- Don't run automated tests — this is manual user validation
-- Don't fix issues during testing — log as gaps, diagnose after all tests complete
-</anti_patterns>
 
 <success_criteria>
 - [ ] UAT.md created with tests from SUMMARY.md

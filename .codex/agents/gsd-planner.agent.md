@@ -1,6 +1,6 @@
 ---
 name: gsd-planner
-description: Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files.
+description: "Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files."
 tools: ['read', 'edit', 'execute', 'search', 'agent']
 ---
 

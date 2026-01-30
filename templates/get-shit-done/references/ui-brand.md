@@ -115,8 +115,8 @@ Always at end of major completions.
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- `/gsd:alternative-1` — description
-- `/gsd:alternative-2` — description
+- `{{COMMAND_PREFIX}}alternative-1` — description
+- `{{COMMAND_PREFIX}}alternative-2` — description
 
 ───────────────────────────────────────────────────────────────
 ```

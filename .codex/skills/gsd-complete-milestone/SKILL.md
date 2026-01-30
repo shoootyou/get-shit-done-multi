@@ -1,8 +1,8 @@
 ---
 name: gsd-complete-milestone
-description: Mark milestone complete, archive to milestones/, update PROJECT and MILESTONES registry
+description: "Mark milestone complete, archive to milestones/, update PROJECT and MILESTONES registry"
 allowed-tools: Read, Edit, Bash
-argument-hint: [version]
+argument-hint: "[version]"
 ---
 
 
