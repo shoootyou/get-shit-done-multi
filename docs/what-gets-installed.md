@@ -45,7 +45,7 @@ the GSD workflow.
 - `/gsd-pause-work` - Pause current work and save state
 - `/gsd-resume-work` - Resume paused work from checkpoint
 - `/gsd-progress` - Show overall project progress
-- `/gsd-add-todo` - Capture ideas with duplicate detection and area inference
+- `/gsd-add-todo` - Add item to project todo list
 - `/gsd-check-todos` - Review and update todo items
 
 **Analysis & Debugging:**

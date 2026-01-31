@@ -38,7 +38,6 @@ Complete rewrite with multi-platform support, template-based installation, and c
 
 - **29 Skills**: Complete workflow from project creation to milestone completion
   - **Unified Milestone Completion**: `/gsd-complete-milestone` handles both completion and archiving to `history/v{X.Y}/` with atomic file operations
-  - **Interactive Task Capture**: `/gsd-add-todo` captures ideas during work sessions with smart duplicate detection and area inference
 - **13 Specialized Agents**: Research, planning, execution, verification, debugging
 - **Correct Frontmatter**: All skills have proper `allowed-tools` format (comma-separated string), `argument-hint` for usage guidance
 - **Proper Tool Names**: Uses canonical tool names (Read, Write, Edit, Bash, Grep, Glob, Task) that work identically across platforms
@@ -153,7 +152,6 @@ Copilot aliases → Claude canonical:
 
 - **`/gsd-complete-milestone`**: Now archives directly to `.planning/history/v{X.Y}/` with mirrored structure (no intermediate `milestones/` directory)
 - **`/gsd-list-milestones`**: Reads from `MILESTONES.md` registry instead of scanning filesystem
-- **`/gsd-add-todo`**: Enhanced with duplicate detection, area inference from file paths, and STATE.md integration
 
 **Fixes:**
 
