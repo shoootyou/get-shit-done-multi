@@ -766,25 +766,25 @@ Plans:
 
 **Dependencies:** Phase 2 (core installer foundation)
 
-**Plans:** 2 plans
+**Plans:** 2 plans (all complete)
 
-**Status:** NOT STARTED
+**Status:** ✅ COMPLETE
 
 **Requirements Mapped:** None (post-v2.0 optimization)
 
 **Success Criteria:**
-1. Research document created analyzing existing skill patterns ✅ (RESEARCH.md exists)
-2. `/gsd-complete-milestone` unified to move all files directly to `.planning/history/v{X.Y}/`
-3. All confirmations use `AskUserQuestion` tool (no manual text prompts)
-4. Git tag creation is optional via AskUserQuestion
-5. `/gsd-archive-milestone` and `/gsd-restore-milestone` show deprecation messages automatically
-6. `/gsd-list-milestones` updated to list from MILESTONES.md registry (no restore references)
-7. Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
-8. All skills follow AI-first philosophy (natural language instructions, no scripts)
+1. ✅ Research document created analyzing existing skill patterns (RESEARCH.md exists)
+2. ✅ `/gsd-complete-milestone` unified to move all files directly to `.planning/history/v{X.Y}/`
+3. ✅ All confirmations use `AskUserQuestion` tool (no manual text prompts)
+4. ✅ Git tag creation is optional via AskUserQuestion
+5. ✅ `/gsd-archive-milestone` and `/gsd-restore-milestone` show deprecation messages automatically
+6. ✅ `/gsd-list-milestones` updated to list from MILESTONES.md registry (no restore references)
+7. ✅ Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
+8. ✅ All skills follow AI-first philosophy (natural language instructions, no scripts)
 
 Plans:
-- [ ] 10-01-PLAN.md — Refactor complete-milestone with direct history/ archiving (AI-first)
-- [ ] 10-02-PLAN.md — Deprecate archive/restore, update list-milestones (AI-first)
+- [x] 10-01-PLAN.md — Refactor complete-milestone with direct history/ archiving (AI-first)
+- [x] 10-02-PLAN.md — Deprecate archive/restore, update list-milestones (AI-first)
 
 **Wave Structure:**
 - Wave 1: 10-01 (refactor complete-milestone foundation)
