@@ -766,14 +766,14 @@ Plans:
 
 **Dependencies:** Phase 2 (core installer foundation)
 
-**Plans:** 4 plans (not started)
+**Plans:** 3 plans
 
 **Status:** NOT STARTED
 
 **Requirements Mapped:** None (post-v2.0 optimization)
 
 **Success Criteria:**
-1. Research document created analyzing existing skill patterns (structure, XML vs markdown, language style, examples)
+1. Research document created analyzing existing skill patterns ✅ (RESEARCH.md exists)
 2. `/gsd-complete-milestone` unified to move all files directly to `.planning/history/v{X.Y}/`
 3. All confirmations use `ask_user` tool (no manual text prompts)
 4. Git tag creation is optional via ask_user
@@ -782,17 +782,14 @@ Plans:
 7. `/gsd-list-milestones` updated to list from history/ with no restore references
 8. Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
 
-**Plans:** 4 plans
-
 Plans:
-- [ ] 10-01-PLAN.md — Research existing skill patterns and create style guide
-- [ ] 10-02-PLAN.md — Refactor gsd-complete-milestone to unify archive functionality
-- [ ] 10-03-PLAN.md — Deprecate archive/restore commands with automatic messages
-- [ ] 10-04-PLAN.md — Update gsd-list-milestones for new structure
+- [ ] 10-01-PLAN.md — Refactor complete-milestone with direct history/ archiving
+- [ ] 10-02-PLAN.md — Deprecate archive/restore commands with blocking messages
+- [ ] 10-03-PLAN.md — Update list-milestones for history/ structure
 
 **Wave Structure:**
-- Wave 1: 10-01 (research - must complete first to inform implementation)
-- Wave 2: 10-02, 10-03, 10-04 (parallel - independent refactoring after research)
+- Wave 1: 10-01 (refactor complete-milestone foundation)
+- Wave 2: 10-02, 10-03 (parallel - deprecation and list update)
 
 **Key Deliverables:**
 - `RESEARCH.md` documenting skill writing patterns and style guide
