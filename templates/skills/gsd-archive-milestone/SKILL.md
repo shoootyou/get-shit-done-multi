@@ -1,6 +1,6 @@
 ---
 name: gsd-archive-milestone
-description: **DEPRECATED** — Use gsd-complete-milestone instead. This command has been unified into the completion workflow. Shows deprecation notice and exits.
+description: Use gsd-complete-milestone instead. This command has been unified into the completion workflow. Shows deprecation notice and exits.
 allowed-tools: Read
 ---
 
