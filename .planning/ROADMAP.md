@@ -766,7 +766,7 @@ Plans:
 
 **Dependencies:** Phase 2 (core installer foundation)
 
-**Plans:** 3 plans
+**Plans:** 2 plans
 
 **Status:** NOT STARTED
 
@@ -775,29 +775,28 @@ Plans:
 **Success Criteria:**
 1. Research document created analyzing existing skill patterns ✅ (RESEARCH.md exists)
 2. `/gsd-complete-milestone` unified to move all files directly to `.planning/history/v{X.Y}/`
-3. All confirmations use `ask_user` tool (no manual text prompts)
-4. Git tag creation is optional via ask_user
+3. All confirmations use `AskUserQuestion` tool (no manual text prompts)
+4. Git tag creation is optional via AskUserQuestion
 5. `/gsd-archive-milestone` and `/gsd-restore-milestone` show deprecation messages automatically
-6. Deprecated workflow files removed from `/templates/get-shit-done/workflows/`
-7. `/gsd-list-milestones` updated to list from history/ with no restore references
-8. Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
+6. `/gsd-list-milestones` updated to list from MILESTONES.md registry (no restore references)
+7. Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
+8. All skills follow AI-first philosophy (natural language instructions, no scripts)
 
 Plans:
-- [ ] 10-01-PLAN.md — Refactor complete-milestone with direct history/ archiving
-- [ ] 10-02-PLAN.md — Deprecate archive/restore commands with blocking messages
-- [ ] 10-03-PLAN.md — Update list-milestones for history/ structure
+- [ ] 10-01-PLAN.md — Refactor complete-milestone with direct history/ archiving (AI-first)
+- [ ] 10-02-PLAN.md — Deprecate archive/restore, update list-milestones (AI-first)
 
 **Wave Structure:**
 - Wave 1: 10-01 (refactor complete-milestone foundation)
-- Wave 2: 10-02, 10-03 (parallel - deprecation and list update)
+- Wave 2: 10-02 (deprecation messages and list-milestones update)
 
 **Key Deliverables:**
-- `RESEARCH.md` documenting skill writing patterns and style guide
-- Updated `/templates/skills/gsd-complete-milestone/SKILL.md`
-- Updated `/templates/get-shit-done/workflows/complete-milestone.md`
-- Deprecated `/templates/skills/gsd-archive-milestone/SKILL.md` (auto-response only)
-- Deprecated `/templates/skills/gsd-restore-milestone/SKILL.md` (auto-response only)
-- Deleted `/templates/get-shit-done/workflows/archive-milestone.md`
+- `RESEARCH.md` documenting AI-first skill patterns ✅
+- Updated `/templates/skills/gsd-complete-milestone/SKILL.md` (natural language instructions)
+- Created `/templates/get-shit-done/workflows/complete-milestone.md` (bash patterns)
+- Deprecated `/templates/skills/gsd-archive-milestone/SKILL.md` (blocking message)
+- Deprecated `/templates/skills/gsd-restore-milestone/SKILL.md` (blocking message)
+- Updated `/templates/skills/gsd-list-milestones/SKILL.md` (registry-based)
 - Deleted `/templates/get-shit-done/workflows/restore-milestone.md`
 - Updated `/templates/skills/gsd-list-milestones/SKILL.md`
 - Updated `/templates/get-shit-done/workflows/list-milestones.md`
