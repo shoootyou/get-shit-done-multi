@@ -17,6 +17,27 @@ The standard approach in GSD is:
 
 **Primary recommendation:** Consolidate into single /gsd-complete-milestone command that archives directly to history/v{X.Y}/ mirroring .planning/ structure, use AskUserQuestion tool for all confirmations, and modify deprecated commands to show branded blocking messages.
 
+## AI-First Development Philosophy
+
+**Critical principle:** This project is oriented toward writing skills for other AI agents. Skills should be written primarily in natural language (Markdown) with clear instructions, not code.
+
+### When to Use Scripts vs Natural Language
+
+**Prefer natural language instructions (HIGH freedom):**
+- File operations (mv, mkdir, git commands) - AI can execute bash directly
+- Text manipulation (sed, grep, awk) - AI can compose these
+- Workflow orchestration - AI follows procedural steps
+- User interactions (AskUserQuestion) - AI tool, not script
+- Git operations with identity helpers - Source and call bash functions
+
+**Scripts are last resort (require user justification):**
+- Complex algorithms that AI repeatedly gets wrong
+- Performance-critical operations (large file processing)
+- Deterministic reliability requirements (data transformations)
+- Operations AI has no tools for
+
+**For Phase 10:** All tasks can be accomplished with natural language instructions + bash commands. No scripts needed.
+
 ## Standard Stack
 
 The established tools/patterns for GSD skill development:
@@ -328,8 +349,38 @@ Problems that look simple but have existing solutions:
 | Stage banners | Custom ASCII art | ui-brand.md patterns | Brand consistency, established width/format |
 | Directory structure mirroring | Custom recursion | mv entire directories + mkdir parents | Filesystem handles recursion atomically |
 | File existence checks | Complex conditionals | `2>/dev/null \|\| true` pattern | Established pattern for optional files |
+| File operations | Python/JS scripts | Bash commands in SKILL.md | AI executes bash directly, no script needed |
+| Text processing | Custom scripts | sed/grep/awk in bash | AI composes these, readable by other AIs |
 
-**Key insight:** GSD already has strong conventions. Follow existing patterns rather than inventing new approaches.
+**Key insight:** GSD skills are written for AI consumption. Use natural language instructions + bash commands (which AI can read and execute) rather than opaque scripts.
+
+### Skill-Creator Standard (templates/skills/skill-creator)
+
+**Core principle:** Skills should be concise, AI-readable instructions. Default assumption: Claude is already very smart.
+
+**Skill structure:**
+```
+skill-name/
+├── SKILL.md (required)
+│   ├── YAML frontmatter (name, description)
+│   └── Markdown instructions
+└── Bundled Resources (optional - last resort)
+    ├── scripts/          - Only when AI repeatedly fails
+    ├── references/       - Documentation loaded as needed
+    └── assets/           - Templates, not documentation
+```
+
+**Progressive disclosure:**
+1. Metadata (name + description) - Always in context (~100 words)
+2. SKILL.md body - When skill triggers (<5k words, prefer <500 lines)
+3. Bundled resources - As needed by Claude
+
+**When to use scripts:**
+- Same code rewritten repeatedly (token inefficient)
+- Deterministic reliability needed (complex algorithms)
+- NOT for simple bash operations AI can execute directly
+
+**For Phase 10:** All skills being modified follow this standard. Use natural language instructions in SKILL.md, reference workflows from templates/get-shit-done/workflows/, no new scripts needed.
 
 ## Common Pitfalls
 
