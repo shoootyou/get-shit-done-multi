@@ -758,6 +758,63 @@ Plans:
 
 ---
 
+### Phase 10: Milestone Completion Workflow Unification
+
+**Goal:** Unify milestone completion commands into streamlined workflow that moves directly to history/, uses ask_user for confirmations, and deprecates redundant commands
+
+**Type:** Workflow Optimization & UX Enhancement
+
+**Dependencies:** Phase 2 (core installer foundation)
+
+**Plans:** 4 plans (not started)
+
+**Status:** NOT STARTED
+
+**Requirements Mapped:** None (post-v2.0 optimization)
+
+**Success Criteria:**
+1. Research document created analyzing existing skill patterns (structure, XML vs markdown, language style, examples)
+2. `/gsd-complete-milestone` unified to move all files directly to `.planning/history/v{X.Y}/`
+3. All confirmations use `ask_user` tool (no manual text prompts)
+4. Git tag creation is optional via ask_user
+5. `/gsd-archive-milestone` and `/gsd-restore-milestone` show deprecation messages automatically
+6. Deprecated workflow files removed from `/templates/get-shit-done/workflows/`
+7. `/gsd-list-milestones` updated to list from history/ with no restore references
+8. Workspace always clean after complete-milestone (only PROJECT, MILESTONES, codebase/, config remain)
+
+**Plans:** 4 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Research existing skill patterns and create style guide
+- [ ] 10-02-PLAN.md — Refactor gsd-complete-milestone to unify archive functionality
+- [ ] 10-03-PLAN.md — Deprecate archive/restore commands with automatic messages
+- [ ] 10-04-PLAN.md — Update gsd-list-milestones for new structure
+
+**Wave Structure:**
+- Wave 1: 10-01 (research - must complete first to inform implementation)
+- Wave 2: 10-02, 10-03, 10-04 (parallel - independent refactoring after research)
+
+**Key Deliverables:**
+- `RESEARCH.md` documenting skill writing patterns and style guide
+- Updated `/templates/skills/gsd-complete-milestone/SKILL.md`
+- Updated `/templates/get-shit-done/workflows/complete-milestone.md`
+- Deprecated `/templates/skills/gsd-archive-milestone/SKILL.md` (auto-response only)
+- Deprecated `/templates/skills/gsd-restore-milestone/SKILL.md` (auto-response only)
+- Deleted `/templates/get-shit-done/workflows/archive-milestone.md`
+- Deleted `/templates/get-shit-done/workflows/restore-milestone.md`
+- Updated `/templates/skills/gsd-list-milestones/SKILL.md`
+- Updated `/templates/get-shit-done/workflows/list-milestones.md`
+- Support scripts (if needed) in `/templates/skills/{skill-name}/scripts/`
+
+**Notes:**
+- Scripts referenced with `{{PLATFORM_ROOT}}/skills/{skill-name}/scripts/{script-name}`
+- Deprecation messages similar to `/gsd-help` (respond directly, no confirmation)
+- Tag creation optional to support both release milestones and internal sprints
+- Workspace cleanup enables clean slate for `/gsd-new-milestone`
+- Single source of truth for archived milestones (`.planning/history/` only)
+
+---
+
 ## Phase Sequencing
 
 ### Critical Path
@@ -794,6 +851,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7
 | 5 | 4 | 6 |
 | 6 | 1-4 | 5 |
 | 7 | 1-6 | — |
+| 10 | 2 | — |
 
 ---
 
