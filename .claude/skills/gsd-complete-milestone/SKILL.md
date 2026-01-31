@@ -1,130 +1,223 @@
 ---
 name: gsd-complete-milestone
-description: Mark milestone complete, archive to milestones/, update PROJECT and MILESTONES registry
-allowed-tools: Read, Edit, Bash
+description: 'Complete milestone with direct history/v{X.Y}/ archiving and cleanup'
+allowed-tools: Read, Edit, Bash, AskUserQuestion
 argument-hint: '[version]'
 ---
 
 
 <objective>
-Mark milestone complete (version provided as argument), archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
+Complete milestone {{version}}, archive all files directly to .planning/history/v{{version}}/ with mirrored structure, and clean workspace for next milestone.
 
-Purpose: Create historical record of shipped version, archive milestone artifacts, and prepare for next milestone.
+Purpose: Archive milestone artifacts to permanent history/, update MILESTONES.md registry, optional git tag, prepare clean workspace.
+Output: Milestone archived to history/v{{version}}/, workspace contains only PROJECT.md, MILESTONES.md, config.json, codebase/.
 </objective>
 
+<execution_context>
+@.claude/get-shit-done/workflows/complete-milestone.md
+@.claude/get-shit-done/references/ui-brand.md
+</execution_context>
+
+<context>
+**Project files:**
+- `.planning/ROADMAP.md`
+- `.planning/STATE.md`
+- `.planning/PROJECT.md`
+- `.planning/REQUIREMENTS.md` (optional)
+- `.planning/phases/` (if exists)
+- `.planning/research/` (if exists)
+- `.planning/todos/` (if exists)
+
+**User input:**
+- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
+</context>
+
 <process>
-<step name="check_audit">
-Look for .planning/v{version}-MILESTONE-AUDIT.md where version is provided as argument
 
-If missing:
-  Recommend: "/gsd-audit-milestone first - need E2E validation before completion"
-  Exit (user must audit first)
+<step name="verify_readiness">
 
-If exists with status: gaps_found:
-  Recommend: "/gsd-plan-milestone-gaps - address gaps before completion"
-  Exit (user must fix gaps first)
-
-If exists with status: passed:
-  Proceed with completion
-</step>
-
-<step name="archive_roadmap_requirements">
-Archive current milestone artifacts:
+Check if milestone is complete by counting phases with SUMMARY.md files:
 
 ```bash
-# version argument provided by user
-version="$1"
+# Count completed plans
+ls .planning/phases/*/SUMMARY.md 2>/dev/null | wc -l
 
-# Create milestone directory
-mkdir -p ".planning/milestones/v${version}"
-
-# Archive key files
-cp .planning/ROADMAP.md ".planning/milestones/v${version}/"
-cp .planning/REQUIREMENTS.md ".planning/milestones/v${version}/"
-
-# Archive audit report
-cp ".planning/v${version}-MILESTONE-AUDIT.md" ".planning/milestones/v${version}/"
-
-# Count phases completed
-PHASE_COUNT=$(ls -d .planning/phases/* | wc -l)
+# Check ROADMAP for milestone scope
+cat .planning/ROADMAP.md
 ```
+
+Present milestone scope and stats to user.
 </step>
 
-<step name="update_project">
-Update PROJECT.md to reflect milestone completion:
+<step name="confirm_completion">
 
-Read current "What This Is" section.
-Evolve it to reflect completed work from this milestone.
-Update "Current focus" to "Between milestones" or next milestone if known.
+Use AskUserQuestion to get combined readiness + archive confirmation:
+
+**Tool: AskUserQuestion**
+- **header:** "Ready to Complete Milestone?"
+- **question:** "Complete v{{version}}? This will archive all files to history/v{{version}}/"
+- **details:** Show milestone stats:
+  - Number of phases completed
+  - Number of plans completed
+  - Key accomplishments (extracted from SUMMARYs)
+- **options:**
+  - "Complete and archive" — Archive to history/ and mark complete
+  - "Cancel" — Exit without changes
+
+**If "Cancel":** Exit with message "Milestone completion cancelled."
+
+**If "Complete and archive":** Continue to next step.
+</step>
+
+<step name="archive_to_history">
+
+Archive all milestone files directly to history/v{{version}}/ using bash commands:
+
+```bash
+# Source git helpers
+if ! type commit_as_user >/dev/null 2>&1; then
+    source .claude/get-shit-done/workflows/git-identity-helpers.sh
+fi
+
+# Create destination with mirrored structure
+mkdir -p .planning/history/v{{version}}/
+
+# Move required files atomically
+mv .planning/ROADMAP.md .planning/history/v{{version}}/
+mv .planning/STATE.md .planning/history/v{{version}}/
+mv .planning/PROJECT.md .planning/history/v{{version}}/
+
+# Move optional files (don't fail if missing)
+mv .planning/REQUIREMENTS.md .planning/history/v{{version}}/ 2>/dev/null || true
+
+# Move directories (preserves structure)
+mv .planning/phases .planning/history/v{{version}}/ 2>/dev/null || true
+mv .planning/research .planning/history/v{{version}}/ 2>/dev/null || true
+mv .planning/todos .planning/history/v{{version}}/ 2>/dev/null || true
+
+# Stage all changes
+git add .planning/history/v{{version}}/
+git add -u .planning/  # Stages deletions
+
+# Commit with user identity
+commit_as_user "milestone: archive v{{version}} to history
+
+Moved to .planning/history/v{{version}}/:
+- ROADMAP.md, STATE.md, PROJECT.md
+- REQUIREMENTS.md
+- phases/, research/, todos/
+
+Workspace ready for next milestone."
+```
+
+**Note:** All operations are atomic at filesystem level (mv appears instantly or not at all).
 </step>
 
 <step name="update_milestones_registry">
-Update MILESTONES.md registry:
+
+Update .planning/MILESTONES.md with new entry (create if doesn't exist):
 
 ```bash
-cat >> .planning/MILESTONES.md << ENDMARKER
+# Extract milestone name from ROADMAP.md (now in history/)
+MILESTONE_NAME=$(grep "^# " .planning/history/v{{version}}/ROADMAP.md | head -1 | sed 's/^# //')
 
-## v${version}
-- **Completed:** $(date +%Y-%m-%d)
-- **Phases:** ${PHASE_COUNT} phases completed
-- **Requirements:** $(grep -c "^###" .planning/REQUIREMENTS.md) requirements met
-- **Status:** Completed
-- **Location:** .planning/milestones/v${version}/
-- **Audit:** Passed E2E integration checks
-ENDMARKER
-```
-</step>
+# Count phases and plans
+PHASE_COUNT=$(find .planning/history/v{{version}}/phases -name "SUMMARY.md" 2>/dev/null | cut -d/ -f5 | cut -d- -f1 | sort -u | wc -l)
+PLAN_COUNT=$(find .planning/history/v{{version}}/phases -name "SUMMARY.md" 2>/dev/null | wc -l)
 
-<step name="git_tag">
-Create git tag for milestone:
+# Extract key accomplishments from SUMMARYs
+# (AI: Read 3-5 SUMMARY files and extract major accomplishments)
 
-```bash
-git add ".planning/milestones/v${version}/"
+# Append to registry
+cat >> .planning/MILESTONES.md << EOF
+
+## v{{version}} — ${MILESTONE_NAME}
+
+**Completed:** $(date +%Y-%m-%d)
+**Phases:** ${PHASE_COUNT}
+**Plans:** ${PLAN_COUNT}
+
+**Key Accomplishments:**
+- [ACCOMPLISHMENT_1]
+- [ACCOMPLISHMENT_2]
+- [ACCOMPLISHMENT_3]
+
+**Location:** .planning/history/v{{version}}/
+
+EOF
+
 git add .planning/MILESTONES.md
-git add .planning/PROJECT.md
-git commit -m "milestone: complete v${version}
-
-- ${PHASE_COUNT} phases completed
-- All requirements met
-- E2E audit passed"
-
-git tag -a "v${version}" -m "Release v${version}
-
-$(cat .planning/ROADMAP.md | head -20)
-"
+commit_as_user "milestone: register v{{version}} completion"
 ```
 </step>
 
-<step name="delete_working_files">
-Delete ROADMAP.md and REQUIREMENTS.md (milestone cycle ends):
+<step name="confirm_git_tag">
 
+Use AskUserQuestion to offer optional git tag:
+
+**Tool: AskUserQuestion**
+- **header:** "Git Tag"
+- **question:** "Create git tag v{{version}}?"
+- **options:**
+  - "Create tag v{{version}}" — Tag this version
+  - "Skip tag" — No git tag
+
+**If "Create tag v{{version}}":**
 ```bash
-git rm .planning/ROADMAP.md .planning/REQUIREMENTS.md
-git commit -m "milestone: clear roadmap for next cycle"
+git tag v{{version}}
+echo "Tag v{{version}} created locally."
+echo "To push: git push origin v{{version}}"
 ```
 
-Note: Files are preserved in .planning/milestones/v${version}/
+**If "Skip tag":** Continue to next step.
 </step>
 
-<step name="present_summary">
-Present completion summary:
+<step name="show_completion">
+
+Display stage banner (following ui-brand.md):
 
 ```
-## MILESTONE COMPLETE: v{version}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► MILESTONE COMPLETE ✓
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Completed:** {date}
-**Phases:** {count} phases
-**Requirements:** {count} requirements met
-**Audit:** Passed
+**v{{version}} {MILESTONE_NAME}** — {N} phases complete
 
-**Archived to:** .planning/milestones/v{version}/
-**Git tag:** v{version}
+Archived to: .planning/history/v{{version}}/
+Git tag: v{{version}} {if created}
 
-### Next Steps
+Workspace clean: PROJECT.md, MILESTONES.md, config.json, codebase/
 
-1. Retrospective (what went well, what to improve)
-2. Start next milestone: /gsd-new-milestone
-3. Or take a break - you earned it!
+───────────────────────────────────────────────────────────────
+
+## ▶ Next Up
+
+**New Milestone** — Start planning next version
+
+`/gsd-new-milestone`
+
+<sub>`/clear` first → fresh context window</sub>
+
+───────────────────────────────────────────────────────────────
 ```
 </step>
+
 </process>
+
+<success_criteria>
+- [ ] All milestone files archived to .planning/history/v{{version}}/
+- [ ] Directory structure mirrored (phases/, research/, todos/)
+- [ ] Git commit preserves user identity
+- [ ] Optional git tag created based on user choice
+- [ ] Workspace contains only: PROJECT.md, MILESTONES.md, config.json, codebase/
+- [ ] User knows next command (/gsd-new-milestone)
+</success_criteria>
+
+<critical_rules>
+- **Use AskUserQuestion:** All confirmations via AskUserQuestion tool (not manual text prompts)
+- **Atomic operations:** Use mv for file moves (not cp then rm)
+- **Git identity:** Source git-identity-helpers.sh and use commit_as_user
+- **Optional files:** Use 2>/dev/null || true for files that might not exist
+- **Direct archiving:** Archive to history/v{{version}}/ (not milestones/)
+- **Clean workspace:** After completion, only PROJECT.md, MILESTONES.md, config.json, codebase/ remain
+</critical_rules>

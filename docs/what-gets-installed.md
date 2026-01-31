@@ -20,10 +20,8 @@ the GSD workflow.
 
 - `/gsd-new-project` - Start new project with research and roadmap
 - `/gsd-new-milestone` - Add new milestone to existing project
-- `/gsd-complete-milestone` - Mark milestone as done
-- `/gsd-archive-milestone` - Archive completed milestone
-- `/gsd-restore-milestone` - Restore archived milestone
-- `/gsd-list-milestones` - Show all milestones and their status
+- `/gsd-complete-milestone` - Complete milestone with archiving to history/v{X.Y}/
+- `/gsd-list-milestones` - Show all milestones from registry
 - `/gsd-audit-milestone` - Review milestone progress and issues
 
 **Phase Planning & Execution:**

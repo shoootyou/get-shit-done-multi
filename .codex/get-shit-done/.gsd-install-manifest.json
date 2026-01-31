@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "codex",
   "scope": "local",
-  "installed_at": "2026-01-30T14:28:17.171Z",
+  "installed_at": "2026-01-31T23:06:05.365Z",
   "files": [
     "agents/gsd-codebase-mapper.agent.md",
     "agents/gsd-debugger-specialist.agent.md",
@@ -65,6 +65,7 @@
     "get-shit-done/workflows/discuss-phase.md",
     "get-shit-done/workflows/execute-phase.md",
     "get-shit-done/workflows/execute-plan.md",
+    "get-shit-done/workflows/git-identity-helpers.sh",
     "get-shit-done/workflows/list-milestones.md",
     "get-shit-done/workflows/list-phase-assumptions.md",
     "get-shit-done/workflows/map-codebase.md",
