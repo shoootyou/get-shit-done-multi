@@ -1173,7 +1173,7 @@ Ready to archive milestone and prepare for next milestone.
 - `templates/agents/` — Migrated agents (13 files + versions.json, ✅ Complete)
 - `templates/get-shit-done/` — Shared resources with template variables (✅ Complete)
 - `get-shit-done/` — Source shared resources (read-only reference)
-- `docs/` — Documentation (needs creation)
+- `docs/` — Documentation (✅ Complete - 13 guides for users and developers)
 
 ---
 
@@ -1202,10 +1202,8 @@ Ready to archive milestone and prepare for next milestone.
 - Phase 9: Platform Instructions Installer (✅ Complete - 4/4 plans)
 
 **Total Plans:** 41/41 complete (100%)
-- Phase 7: Path Security (🚧 In Progress - 1/2 plans complete)
-- Phase 8: Documentation (Pending)
 
-**Current Scope:** Phase 7 Plan 01 complete - Path Security Validation Modules. Created defense-in-depth path-validator.js with 8 security layers (URL decode, null bytes, normalize, traversal, containment, allowlist, length, components). Created symlink-resolver.js with single-level resolution and chain detection. Installed sanitize-filename as reference. Next: Integration into pre-install-checks.
+**Current Scope:** All phases complete. Ready for milestone completion with `/gsd-complete-milestone`.
 
 ---
 
