@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-01-31  
-**Updated By:** GSD Execute Plan (Completed 10-01-PLAN.md)
+**Updated By:** GSD Execute Plan (Completed 10-02-PLAN.md)
 
 ---
 
@@ -19,13 +19,13 @@
 
 ### Phase Status
 **Current Phase:** Phase 10 — Milestone Completion Workflow Unification (IN PROGRESS)
-**Completed:** 1 of 4 plans  
+**Completed:** 2 of 4 plans  
 **Milestone:** v2.0 COMPLETE (Phase 10 is v2.1+ optimization)
 
 ### Plan Status
-**Completed Plans:** 42/45 total (Phase 1: 4/4, Phase 2: 4/4✅, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 1/4)  
-**Last activity:** 2026-01-31 - Completed 10-01-PLAN.md (milestone completion workflow unification)  
-**Next:** Execute 10-02-PLAN.md (deprecate archive/restore commands)
+**Completed Plans:** 43/45 total (Phase 1: 4/4, Phase 2: 4/4✅, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/4)  
+**Last activity:** 2026-01-31 - Completed 10-02-PLAN.md (deprecated archive/restore commands, updated list-milestones)  
+**Next:** Execute 10-03-PLAN.md (if exists)
 
 ### Progress Bar
 ```
@@ -43,10 +43,10 @@ Phase 7.1: [██████████████████████�
 Phase 7.2: [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 8:   [████████████████████████████████████████████████████] 100% (5/5 plans) ✅ COMPLETE
 Phase 9:   [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
-Phase 10:  [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans) ◆ IN PROGRESS
+Phase 10:  [██████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░] 50% (2/4 plans) ◆ IN PROGRESS
 
 Overall Progress:
-[████████████████████████████████████████████████████] 93% (42/45 total plans)
+[█████████████████████████████████████████████████████] 96% (43/45 total plans)
 ```
 
 ---
@@ -56,8 +56,8 @@ Overall Progress:
 ### Velocity
 - **Phases Completed:** 12 of 13 (Phase 1-9 complete, Phase 10 in progress)
 - **Phases In Progress:** 1 (Phase 10)
-- **Plans Completed:** 42/45 (93%)
-- **Days Active:** 5 (2026-01-26 to 2026-01-30)
+- **Plans Completed:** 43/45 (96%)
+- **Days Active:** 5 (2026-01-26 to 2026-01-31)
 - **Plans Today:** 0 (last: 09-04 on 2026-01-30)
 
 ### Quality
@@ -924,6 +924,24 @@ Overall Progress:
      - Workspace contains only PROJECT.md, MILESTONES.md, config.json, codebase/ after completion
      - Rationale: AI-first approach, cleaner workspace, atomic operations with git tracking
 
+134. **2026-01-31 (10-02):** Block deprecated commands immediately (MILESTONE-DEPRECATION-BLOCK)
+     - Deprecated commands show message and exit without executing operations
+     - No way to override blocking behavior (by design)
+     - Clear migration path shown in deprecation message
+     - Rationale: Prevent confusion and accidental use of deprecated multi-step workflow
+
+135. **2026-01-31 (10-02):** Educational deprecation messages (MILESTONE-DEPRECATION-EDUCATION)
+     - Show bash alternatives in restore-milestone (ls, cat, git show)
+     - Explain why restore is no longer needed (permanent history/ archives)
+     - Old vs new workflow comparison in archive-milestone
+     - Rationale: Teach users new paradigm, provide self-service alternatives
+
+136. **2026-01-31 (10-02):** Registry-based milestone listing (MILESTONE-LIST-REGISTRY)
+     - List-milestones reads MILESTONES.md directly with simple cat command
+     - No directory scanning or complex parsing needed
+     - MILESTONES.md already formatted for display
+     - Rationale: Simpler implementation, faster execution, easier maintenance
+
 
 ### Roadmap Evolution
 
@@ -1025,41 +1043,29 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Phase 9 Complete (4/4 plans)!** All phases of milestone v2.0 are now complete. Platform instructions installer implemented with smart merge logic (create new, append, or replace between markers), added getInstructionsPath() method to all adapters, integrated into orchestrator with stats tracking, and created comprehensive integration tests covering all merge scenarios and platforms. **Additionally, created missing Phase 2 Plan 03 SUMMARY.md** documenting the CLI integration and orchestration work from 2026-01-26 (14 commits covering Commander.js parser, installation orchestrator, ASCII banner, and manifest generation).
+✅ **Phase 10 Plan 02 Complete (2/4 plans)!** Deprecated archive-milestone and restore-milestone commands with blocking messages, updated list-milestones to read from MILESTONES.md registry. All deprecated commands show GSD branded banners, explain migration path, and exit immediately without executing operations. List-milestones now uses simple cat command to display registry directly (no directory scanning or complex parsing). **Phase 10 now 50% complete (2/4 plans).**
 
 ### What's Next
-**All 9 Phases Complete - Ready for Milestone Completion**
+**Continue Phase 10 - Execute Plan 03 Next**
 
-All work for v2.0 milestone is complete:
-- ✅ Phase 1: Template Migration (4/4 plans)
-- ✅ Phase 2: Core Installer Foundation (4/4 plans)
-- ✅ Phase 3: Multi-Platform Support (3/3 plans)
-- ✅ Phase 4: Interactive CLI UX (1/1 plans)
-- ✅ Phase 5: Atomic Transactions (2/2 plans)
-- ✅ Phase 6: Update Detection & Versioning (3/3 plans)
-- ✅ Phase 6.1: Old Version Detection & Migration (4/4 plans)
-- ✅ Phase 6.2: Installation Output Verification (3/3 plans)
-- ✅ Phase 7: Path Security Validation (2/2 plans)
-- ✅ Phase 7.1: Pre-Flight Validation Refactor (2/2 plans)
-- ✅ Phase 7.2: Codebase Cleanup & Publishing (4/4 plans)
-- ✅ Phase 8: Documentation & Polish (5/5 plans)
-- ✅ Phase 9: Platform Instructions Installer (4/4 plans)
+Phase 10 status:
+- ✅ Plan 01: Unified milestone completion workflow (complete-milestone refactored)
+- ✅ Plan 02: Deprecated archive/restore, updated list-milestones (just completed)
+- ⏳ Plan 03: Check if exists
+- ⏳ Plan 04: Check if exists
 
-**Total:** 41/41 plans complete (100%)
-
-Ready to archive milestone and prepare for next milestone.
+**Next:** Check for 10-03-PLAN.md or 10-04-PLAN.md to continue Phase 10
 
 ### Context for Next Session
-- ✅ **All 13 phases complete:** v2.0 milestone ready for completion
-- ✅ **Documentation gap fixed:** Phase 2 Plan 03 SUMMARY.md created from git history
-- ✅ **Package status:** Production-ready, published to npm as get-shit-done-multi@2.0.0
-- ✅ **All requirements:** 37/37 v2.0 requirements implemented and verified
-- **Progress:** 100% (41/41 plans)
-- **Next action:** Run `/gsd-complete-milestone` to archive milestone and plan next milestone
-- **Alternative:** Run `/gsd-verify-work` for user acceptance testing before milestone completion
+- ✅ **Milestone completion workflow unified:** Direct history/ archiving, AskUserQuestion confirmations
+- ✅ **Archive/restore deprecated:** Blocking messages with clear migration path
+- ✅ **List-milestones updated:** Registry-based with simple cat command
+- **Progress:** 96% (43/45 total plans)
+- **Phase 10:** 50% complete (2/4 plans)
+- **Next action:** Execute 10-03-PLAN.md if exists, or check ROADMAP.md for Phase 10 completion
 
 ### Handoff Notes
-✅ Milestone v2.0 Complete! All 13 phases finished with 41 plans executed. Created missing Phase 2 Plan 03 SUMMARY documenting CLI integration work (Commander.js parser, orchestrator, progress bars, manifest generation - 14 commits from 2026-01-26). All planning files updated to reflect 100% completion: STATE.md progress bars show all phases complete, ROADMAP.md Phase 9 marked complete with checkboxes, Progress Tracking table updated with all completion dates. Package published and ready. No blockers. See planning files for complete project history.
+Phase 10 progressing smoothly. Completed unified milestone completion workflow with direct history/ archiving and AI-first patterns (Plan 01). Just completed deprecation of archive-milestone and restore-milestone commands with blocking messages and educational content (Plan 02). List-milestones now reads from MILESTONES.md registry directly using simple cat command. All deprecation messages use GSD branded banners and template variables. Ready to continue with remaining Phase 10 plans.
 
 ---
 
