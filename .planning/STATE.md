@@ -1022,9 +1022,10 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-- 2026-02-01-update-changelog-and-docs-for-v2.md — Update CHANGELOG.md and docs/ for v2.0.0 to include phase 10 changes (gsd-archive-milestone deprecation, gsd-complete-milestone unification, gsd-add-todo enhancements)
+None
 
 ### Completed Todos
+- 2026-02-01-update-changelog-and-docs-for-v2.md — Updated CHANGELOG.md and docs/what-gets-installed.md for v2.0.0 to include phase 10 changes (milestone completion unification, skill deprecations, gsd-add-todo enhancements)
 - 2026-01-30-update-package-and-repo-descriptions.md — Updated package.json description to highlight structured workflow with 29 skills and 13 agents
 - 2026-01-30-update-documentation-corrections-clarifications.md — Updated how-to-customize.md (added --all flag, fixed --version, clarified custom paths, removed partial install), cleaned architecture.md (removed Key Decisions and Testing sections), fixed repo URLs (yourusername → shoootyou), removed broken commands link
 - 2026-01-30-fix-platform-specifics-unified-standard.md — Fixed platform-specifics.md to show all platforms use Agent Skills open standard with same frontmatter format (removed incorrect platform-specific fields)
