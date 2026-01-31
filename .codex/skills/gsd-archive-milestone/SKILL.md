@@ -1,93 +1,68 @@
 ---
 name: gsd-archive-milestone
-description: "Move completed milestone files to .planning/history/ for long-term storage"
-allowed-tools: Read, Edit, Bash
-argument-hint: "[version]"
+description: "Use gsd-complete-milestone instead. This command has been unified into the completion workflow. Shows deprecation notice and exits."
+allowed-tools: Read
 ---
 
 
-<objective>
-Move completed milestone from .planning/milestones/ to .planning/history/ for long-term archival.
+# Archive Milestone (DEPRECATED)
 
-Purpose: Clean up active workspace while preserving historical records.
-Output: Milestone moved to history/, updated MILESTONES.md registry.
+**This command has been replaced by gsd-complete-milestone.**
+
+<objective>
+DEPRECATED: This command has been unified into gsd-complete-milestone.
 </objective>
 
 <process>
-<step name="verify_milestone_exists">
-Check milestone exists:
 
-```bash
-version="$1"
-milestone_dir=".planning/milestones/v${version}"
+<step name="show_deprecation_and_exit">
+Display deprecation notice using GSD branded banner format:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► DEPRECATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This command has been unified into the milestone completion workflow.
+
+**Old workflow (deprecated):**
+1. $gsd-complete-milestone    # Mark complete
+2. $gsd-archive-milestone     # Move to milestones/ ← YOU ARE HERE
+3. $gsd-restore-milestone     # Retrieve from milestones/
+
+**New workflow (unified):**
+$gsd-complete-milestone       # Archives directly to history/v{X.Y}/
+
+All milestone files now move directly to `.planning/history/v{X.Y}/`
+with mirrored directory structure during completion. Archives are
+permanent and git-tracked.
+
+───────────────────────────────────────────────────────────────
+
+## Why This Changed
+
+The old multi-step workflow created confusion about when files were
+truly archived. The new unified workflow moves everything to permanent
+history/ storage in a single atomic operation.
+
+**To review archived milestones:**
+$gsd-list-milestones
+
+**To start new milestone:**
+$gsd-new-milestone
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-If not found:
-  Error: "Milestone v{version} not found in milestones/"
-  Hint: "Did you mean to complete it first? $gsd-complete-milestone {version}"
+Exit immediately without executing any operations.
 </step>
 
-<step name="create_history_directory">
-Create history directory structure:
-
-```bash
-mkdir -p ".planning/history/v${version}"
-```
-</step>
-
-<step name="move_milestone_files">
-Move milestone directory to history:
-
-```bash
-# Move entire milestone directory
-mv ".planning/milestones/v${version}/"* ".planning/history/v${version}/"
-rmdir ".planning/milestones/v${version}"
-
-# Verify move
-ls -la ".planning/history/v${version}/"
-```
-</step>
-
-<step name="update_milestones_registry">
-Update MILESTONES.md registry with archive status:
-
-```bash
-# Update status from "Completed" to "Archived"
-sed -i "s|Location: .planning/milestones/v${version}/|Location: .planning/history/v${version}/|" .planning/MILESTONES.md
-sed -i "s|Status: Completed|Status: Archived|" .planning/MILESTONES.md
-
-# Add archive timestamp
-SECTION_LINE=$(grep -n "^## v${version}" .planning/MILESTONES.md | cut -d: -f1)
-sed -i "${SECTION_LINE}a\- **Archived:** $(date +%Y-%m-%d)" .planning/MILESTONES.md
-```
-</step>
-
-<step name="commit">
-```bash
-git add ".planning/history/v${version}/"
-git add .planning/MILESTONES.md
-git rm -r ".planning/milestones/v${version}/"
-git commit -m "milestone: archive v${version} to history/
-
-Moved to long-term storage for historical record."
-```
-</step>
-
-<step name="present_summary">
-```
-## MILESTONE ARCHIVED: v{version}
-
-**Archived to:** .planning/history/v{version}/
-**Status:** Archived (long-term storage)
-
-Files preserved:
-- ROADMAP.md (milestone plan)
-- REQUIREMENTS.md (requirements met)
-- MILESTONE-AUDIT.md (E2E validation)
-
-### Recovery
-
-To restore: $gsd-restore-milestone {version}
-```
-</step>
 </process>
+
+<success_criteria>
+- [ ] Deprecation message displayed with branded banner
+- [ ] Clear explanation of old vs new workflow
+- [ ] User directed to correct command (complete-milestone)
+- [ ] No file operations executed
+- [ ] Template variables ($gsd-) used for cross-platform support
+</success_criteria>

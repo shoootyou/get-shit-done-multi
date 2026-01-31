@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "claude",
   "scope": "local",
-  "installed_at": "2026-01-30T20:13:49.080Z",
+  "installed_at": "2026-01-31T22:53:53.197Z",
   "files": [
     "agents/gsd-codebase-mapper.md",
     "agents/gsd-debugger.md",
@@ -15,6 +15,7 @@
     "agents/gsd-research-synthesizer.md",
     "agents/gsd-roadmapper.md",
     "agents/gsd-verifier.md",
+    "get-shit-done/.gsd-install-manifest.json",
     "get-shit-done/references/checkpoints.md",
     "get-shit-done/references/continuation-format.md",
     "get-shit-done/references/git-integration.md",
