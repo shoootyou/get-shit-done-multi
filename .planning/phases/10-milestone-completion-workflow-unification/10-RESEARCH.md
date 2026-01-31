@@ -37,9 +37,12 @@ The established tools/patterns for GSD skill development:
 | AskUserQuestion | User confirmations | Any decision gate |
 | SKILL.md YAML frontmatter | Skill metadata | Every skill definition |
 
-### GSD File Structure
+### GSD File Structure (Template Variables)
+
+**Note:** When working with templates under `/templates/`, use `{{PLATFORM_ROOT}}` variable which gets replaced during installation with the actual platform directory (`.github`, `.claude`, or `.codex`).
+
 ```
-.github/
+{{PLATFORM_ROOT}}/                      # Replaced with .github, .claude, or .codex
 ├── skills/
 │   └── gsd-{name}/
 │       └── SKILL.md                    # Skill definition
@@ -67,6 +70,10 @@ The established tools/patterns for GSD skill development:
         ├── research/                    # Research subset
         └── todos/                       # Todos subset
 ```
+
+**Template variables:**
+- `{{PLATFORM_ROOT}}` - Platform directory (.github, .claude, or .codex)
+- `{{COMMAND_PREFIX}}` - Command prefix (e.g., /gsd-, gsd-, $gsd-)
 
 **Installation:** N/A (internal refactoring)
 
@@ -151,7 +158,8 @@ git add -u .planning/  # Stages deletions
 
 **What:** Use AskUserQuestion tool (provided by Claude Desktop) for all user decisions
 **When to use:** Any decision gate, confirmation, or choice between options
-**Example:**
+
+**Example (Simple confirmation):**
 ```markdown
 <step name="confirm_archive">
 Use AskUserQuestion:
@@ -166,7 +174,50 @@ If "Archive now": Continue to move_files step.
 </step>
 ```
 
-**Why:** Consistent UI, explicit choice tracking, avoids manual text prompts.
+**Example (Multi-question workflow preferences):**
+```markdown
+<!-- Source: templates/skills/gsd-new-project/SKILL.md - Phase 5: Workflow Preferences -->
+<step name="workflow_preferences">
+Ask all workflow preferences in a single AskUserQuestion call (3 questions):
+
+```
+questions: [
+  {
+    header: "Mode",
+    question: "How do you want to work?",
+    multiSelect: false,
+    options: [
+      { label: "YOLO (Recommended)", description: "Auto-approve, just execute" },
+      { label: "Interactive", description: "Confirm at each step" }
+    ]
+  },
+  {
+    header: "Depth",
+    question: "How thorough should planning be?",
+    multiSelect: false,
+    options: [
+      { label: "Quick", description: "Ship fast (3-5 phases, 1-3 plans each)" },
+      { label: "Standard", description: "Balanced scope and speed (5-8 phases, 3-5 plans each)" },
+      { label: "Comprehensive", description: "Thorough coverage (8-12 phases, 5-10 plans each)" }
+    ]
+  },
+  {
+    header: "Execution",
+    question: "Run plans in parallel?",
+    multiSelect: false,
+    options: [
+      { label: "Parallel (Recommended)", description: "Independent plans run simultaneously" },
+      { label: "Sequential", description: "One plan at a time" }
+    ]
+  }
+]
+```
+
+Create `.planning/config.json` with chosen mode, depth, and parallelization.
+</step>
+```
+
+**Why:** Consistent UI, explicit choice tracking, avoids manual text prompts. Supports both single and multi-question patterns.
 
 ### Pattern 3: Git Identity Preservation
 
@@ -176,7 +227,7 @@ If "Archive now": Continue to move_files step.
 ```bash
 # Source helpers (idempotent check)
 if ! type commit_as_user >/dev/null 2>&1; then
-    source .github/get-shit-done/workflows/git-identity-helpers.sh
+    source {{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # Stage files
@@ -189,6 +240,8 @@ commit_as_user "milestone: archive v1.0 to history
 Moved to long-term storage.
 Files preserved: ROADMAP, STATE, PROJECT, phases/, research/"
 ```
+
+**Note:** In templates, use `{{PLATFORM_ROOT}}` variable which gets replaced with `.github`, `.claude`, or `.codex` during installation.
 
 **Why:** Preserves user as commit author, not Claude agent name.
 
@@ -368,12 +421,12 @@ Verified patterns from existing GSD codebase:
 
 ### Complete Archive with Git Identity
 ```bash
-# Source: .github/get-shit-done/workflows/archive-milestone.md
+# Source: templates/get-shit-done/workflows/archive-milestone.md
 # Pattern: Atomic move with git tracking and user identity preservation
 
 # 1. Source helpers (idempotent)
 if ! type commit_as_user >/dev/null 2>&1; then
-    source .github/get-shit-done/workflows/git-identity-helpers.sh
+    source {{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
 fi
 
 # 2. Create destination
@@ -407,7 +460,7 @@ Workspace ready for next milestone."
 
 ### AskUserQuestion Confirmation Pattern
 ```markdown
-<!-- Source: .github/skills/gsd-new-milestone/SKILL.md -->
+<!-- Source: templates/skills/gsd-new-milestone/SKILL.md -->
 <!-- Pattern: User confirmation with explicit options -->
 
 <step name="confirm_scope">
@@ -425,7 +478,7 @@ If "Update PROJECT.md": Continue to next step.
 
 ### Stage Banner Pattern
 ```markdown
-<!-- Source: .github/get-shit-done/references/ui-brand.md -->
+<!-- Source: templates/get-shit-done/references/ui-brand.md -->
 <!-- Pattern: Major workflow transition banner -->
 
 Display stage banner:
@@ -445,7 +498,7 @@ Git tag: v1.0
 
 **New Milestone** — Start planning v1.1
 
-`/gsd-new-milestone`
+`{{COMMAND_PREFIX}}new-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -458,7 +511,7 @@ Git tag: v1.0
 <!-- Pattern: Deprecated command with blocking message -->
 
 <objective>
-DEPRECATED: Use /gsd-complete-milestone instead.
+**DEPRECATED: Use {{COMMAND_PREFIX}}complete-milestone instead.**
 </objective>
 
 <process>
@@ -470,20 +523,20 @@ Display deprecation notice:
  GSD ► DEPRECATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-This command has been unified into /gsd-complete-milestone.
+This command has been unified into {{COMMAND_PREFIX}}complete-milestone.
 
 **Old workflow (deprecated):**
-1. /gsd-complete-milestone    # Mark complete
-2. /gsd-archive-milestone     # Move to milestones/
-3. /gsd-restore-milestone     # Retrieve from milestones/
+1. {{COMMAND_PREFIX}}complete-milestone    # Mark complete
+2. {{COMMAND_PREFIX}}archive-milestone     # Move to milestones/
+3. {{COMMAND_PREFIX}}restore-milestone     # Retrieve from milestones/
 
 **New workflow:**
-/gsd-complete-milestone       # Archives directly to history/v{X.Y}/
+{{COMMAND_PREFIX}}complete-milestone       # Archives directly to history/v{X.Y}/
 
 All milestone files now move directly to history/ with mirrored
 .planning/ structure. Archives are permanent and git-tracked.
 
-To review archived milestones: /gsd-list-milestones
+To review archived milestones: {{COMMAND_PREFIX}}list-milestones
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -495,14 +548,14 @@ Exit without processing.
 
 ### MILESTONES.md Listing Pattern
 ```bash
-# Source: .github/get-shit-done/workflows/list-milestones.md
+# Source: templates/get-shit-done/workflows/list-milestones.md
 # Pattern: Parse and display milestone registry
 
 # Check if registry exists
 if [ ! -f .planning/MILESTONES.md ]; then
     echo "No milestones archived yet."
     echo ""
-    echo "Complete your first milestone with /gsd-complete-milestone"
+    echo "Complete your first milestone with {{COMMAND_PREFIX}}complete-milestone"
     exit 0
 fi
 
@@ -515,12 +568,12 @@ echo ""
 cat .planning/MILESTONES.md
 
 echo ""
-echo "To start next milestone: /gsd-new-milestone"
+echo "To start next milestone: {{COMMAND_PREFIX}}new-milestone"
 ```
 
 ### Phase Directory Detection
 ```bash
-# Source: .github/skills/gsd-new-milestone/SKILL.md
+# Source: templates/skills/gsd-new-milestone/SKILL.md
 # Pattern: Find highest phase number for continuation
 
 # Match both zero-padded (05-*) and unpadded (5-*) folders
@@ -541,8 +594,8 @@ PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_NU
 | Flat archive structure | Mirrored .planning/ subdirectories | Phase 10 (v2.0) | Better organization, clear structure |
 
 **Deprecated/outdated:**
-- `/gsd-archive-milestone`: Replaced by complete-milestone direct archiving
-- `/gsd-restore-milestone`: Archives are permanent (git-tracked), no restore needed
+- `{{COMMAND_PREFIX}}archive-milestone`: Replaced by complete-milestone direct archiving
+- `{{COMMAND_PREFIX}}restore-milestone`: Archives are permanent (git-tracked), no restore needed
 - Manual confirmation prompts: Use AskUserQuestion instead
 - Two-step archival (complete → archive): Now single-step (complete archives directly)
 
@@ -553,16 +606,18 @@ None. All patterns verified from existing codebase.
 ## Sources
 
 ### Primary (HIGH confidence)
-- `.github/skills/gsd-complete-milestone/SKILL.md` — Current complete workflow
-- `.github/skills/gsd-archive-milestone/SKILL.md` — Archive patterns to consolidate
-- `.github/skills/gsd-restore-milestone/SKILL.md` — Restore patterns to deprecate
-- `.github/skills/gsd-list-milestones/SKILL.md` — Listing patterns
-- `.github/skills/gsd-new-milestone/SKILL.md` — Banner patterns, AskUserQuestion usage
-- `.github/get-shit-done/workflows/complete-milestone.md` — Full completion workflow
-- `.github/get-shit-done/workflows/archive-milestone.md` — Archive file operations
-- `.github/get-shit-done/workflows/git-identity-helpers.sh` — Git identity functions
-- `.github/get-shit-done/references/ui-brand.md` — Banner and UI patterns
+- `templates/skills/gsd-complete-milestone/SKILL.md` — Current complete workflow
+- `templates/skills/gsd-archive-milestone/SKILL.md` — Archive patterns to consolidate
+- `templates/skills/gsd-restore-milestone/SKILL.md` — Restore patterns to deprecate
+- `templates/skills/gsd-list-milestones/SKILL.md` — Listing patterns
+- `templates/skills/gsd-new-milestone/SKILL.md` — Banner patterns, AskUserQuestion usage
+- `templates/get-shit-done/workflows/complete-milestone.md` — Full completion workflow
+- `templates/get-shit-done/workflows/archive-milestone.md` — Archive file operations
+- `templates/get-shit-done/workflows/git-identity-helpers.sh` — Git identity functions
+- `templates/get-shit-done/references/ui-brand.md` — Banner and UI patterns
 - `.planning/phases/*/` — Phase directory structure examples
+
+**Note:** Sources are under `/templates/` and use `{{PLATFORM_ROOT}}` variable which gets replaced with `.github`, `.claude`, or `.codex` during installation.
 
 ### Research Method
 Direct codebase inspection (not external research). All patterns verified from existing implementation.
