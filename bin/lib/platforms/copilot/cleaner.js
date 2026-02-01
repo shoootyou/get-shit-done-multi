@@ -1,7 +1,7 @@
 // bin/lib/serialization/copilot-cleaner.js
 
 import matter from 'gray-matter';
-import { serializeFrontmatter } from './copilot-serializer.js';
+import { serializeFrontmatter } from './serializer.js';
 
 /**
  * Clean frontmatter by removing empty string fields

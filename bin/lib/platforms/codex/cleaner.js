@@ -1,7 +1,7 @@
 // bin/lib/serialization/codex-cleaner.js
 
 import matter from 'gray-matter';
-import { serializeFrontmatter } from './codex-serializer.js';
+import { serializeFrontmatter } from './serializer.js';
 
 /**
  * Clean frontmatter by removing empty string fields
