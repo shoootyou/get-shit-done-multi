@@ -7,6 +7,7 @@
  */
 
 import { ValidationError } from './validation-error.js';
+import { validateName, validateDescription } from './field-validators.js';
 
 /**
  * BaseValidator class
@@ -119,8 +120,11 @@ export class BaseValidator {
    * @throws {ValidationError} If required field validation fails
    */
   validateRequiredFields(frontmatter, context) {
-    // Placeholder - will be implemented with field validators in Task 2
-    // This method will call validateName() and validateDescription()
+    // Validate name field (required)
+    validateName(frontmatter.name, context);
+    
+    // Validate description field (required)
+    validateDescription(frontmatter.description, context);
   }
 
   /**
