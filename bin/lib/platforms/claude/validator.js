@@ -1,12 +1,12 @@
-// bin/lib/frontmatter/claude-validator.js
+// bin/lib/platforms/claude/validator.js
 
 /**
  * Claude-specific skill validator
  * Extends base validator with Claude platform rules
  */
 
-import { BaseValidator } from './base-validator.js';
-import * as logger from '../cli/logger.js';
+import { BaseValidator } from '../../frontmatter/base-validator.js';
+import * as logger from '../../cli/logger.js';
 
 // Platform name constant (reuse from platform-names.js pattern)
 const CLAUDE = 'claude';

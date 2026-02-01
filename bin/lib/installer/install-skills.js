@@ -3,12 +3,12 @@ import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/fil
 import { readdir, readFile } from 'fs/promises';
 import { findUnknownVariables, replaceVariables } from '../templates/template-renderer.js';
 import { cleanFrontmatter as cleanClaudeFrontmatter } from '../serialization/claude-cleaner.js';
-import { cleanFrontmatter as cleanCopilotFrontmatter } from '../serialization/copilot-cleaner.js';
+import { cleanFrontmatter as cleanCopilotFrontmatter } from '../platforms/copilot/cleaner.js';
 import { cleanFrontmatter as cleanCodexFrontmatter } from '../serialization/codex-cleaner.js';
 import * as logger from '../cli/logger.js';
 import matter from 'gray-matter';
 import { ClaudeValidator } from '../frontmatter/claude-validator.js';
-import { CopilotValidator } from '../frontmatter/copilot-validator.js';
+import { CopilotValidator } from '../platforms/copilot/validator.js';
 import { CodexValidator } from '../frontmatter/codex-validator.js';
 import { ValidationError } from '../frontmatter/validation-error.js';
 

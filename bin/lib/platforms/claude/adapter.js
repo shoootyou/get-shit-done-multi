@@ -1,8 +1,8 @@
 import matter from 'gray-matter';
-import { PlatformAdapter } from './base-adapter.js';
-import { getPlatformDir, getPathReference } from './platform-paths.js';
-import { getInstructionPath } from './instruction-paths.js';
-import { serializeFrontmatter } from '../serialization/claude-serializer.js';
+import { PlatformAdapter } from '../base-adapter.js';
+import { getPlatformDir, getPathReference } from '../platform-paths.js';
+import { getInstructionPath } from '../instruction-paths.js';
+import { serializeFrontmatter } from './serializer.js';
 
 /**
  * Platform adapter for Claude Code
