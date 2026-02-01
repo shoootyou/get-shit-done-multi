@@ -1168,9 +1168,10 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-- 2026-02-01-update-pr-action-to-replace-comments.md — Update PR action to replace comments instead of creating new ones (investigate hashicorp/setup-terraform pattern, add timestamp)
+None
 
 ### Completed Todos
+- 2026-02-01-update-pr-action-to-replace-comments.md — Updated PR action to replace comments instead of creating new ones using hashicorp/setup-terraform pattern with timestamp
 - 2026-02-01-add-pr-validation-comments.md — Added automatic PR comments with validation results (success/failure summary)
 - 2026-02-01-pin-actions-to-sha.md — Pinned GitHub Actions to commit SHA with version comments (security best practice)
 - 2026-02-01-add-pr-validation-workflow.md — Created GitHub Action to validate PRs (tests + tarball install, no publish) - runs on all PRs

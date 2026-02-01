@@ -80,24 +80,54 @@ jobs:
         with:
           script: |
             const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const timestamp = new Date().toISOString();
+            
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## ✅ Validation Passed
-              **All checks completed successfully:**
-              - ✓ Tests passed
-              - ✓ Tarball created and validated
-              - ✓ Installation verified
-
-              This PR is ready for review.
-
-              <details>
-              <summary>View details</summary>
-
-              [Workflow run details](${runUrl})
-              </details>`
+              issue_number: context.issue.number,
             });
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('PR Validation Results')
+            });
+            
+            // 2. Prepare format of the comment
+            const output = `## ✅ Validation Passed
+
+**All checks completed successfully:**
+- ✓ Tests passed
+- ✓ Tarball created and validated
+- ✓ Installation verified
+
+This PR is ready for review.
+
+<details>
+<summary>View details</summary>
+
+[Workflow run details](${runUrl})
+</details>
+
+---
+*Last updated: ${timestamp}*
+<!-- PR Validation Results -->`;
+            
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              });
+            }
             
       - name: Comment on PR - Failure
         if: failure()
@@ -105,6 +135,7 @@ jobs:
         with:
           script: |
             const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const timestamp = new Date().toISOString();
             let failureDetails = '';
             
             if ('${{ steps.tests.outcome }}' === 'failure') {
@@ -114,22 +145,50 @@ jobs:
               failureDetails += '- ❌ Tarball creation/validation failed\n';
             }
             
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## ❌ Validation Failed
-              **The following checks failed:**
-              ${failureDetails}
-
-              Please review the errors and push fixes.
-
-              <details>
-              <summary>View full logs</summary>
-
-              [Workflow run details](${runUrl})
-              </details>`
+              issue_number: context.issue.number,
             });
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('PR Validation Results')
+            });
+            
+            // 2. Prepare format of the comment
+            const output = `## ❌ Validation Failed
+
+**The following checks failed:**
+${failureDetails}
+
+Please review the errors and push fixes.
+
+<details>
+<summary>View full logs</summary>
+
+[Workflow run details](${runUrl})
+</details>
+
+---
+*Last updated: ${timestamp}*
+<!-- PR Validation Results -->`;
+            
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              });
+            }
             
       - name: Fail workflow if any step failed
         if: steps.tests.outcome == 'failure' || steps.tarball.outcome == 'failure'
