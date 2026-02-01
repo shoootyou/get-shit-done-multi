@@ -57,3 +57,6 @@ coverage/
 
 # Other installations
 templates/skills/skill-creator/*
+
+# Other files
+.scripts
