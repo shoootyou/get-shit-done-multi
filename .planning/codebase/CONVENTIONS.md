@@ -1,284 +1,312 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-01-29
+**Analysis Date:** 2026-02-01
 
 **Analysis Scope:**
-- Files reviewed: 85 source files
-- Test files: 21 files
-- Language: JavaScript (ES6+ modules)
+- Files reviewed: 69 source files
+- Test files: 25 files
+- Total lines of code: ~5,547 lines (source) + ~4,597 lines (tests)
 
 ## Naming Patterns
 
 **Files:**
-- kebab-case for all source files: `frontmatter-serializer.js`, `path-validator.js`, `install-loop.js`
-- Test files: `{module-name}.test.js` pattern (e.g., `frontmatter-serializer.test.js`)
-- Entry point: `bin/install.js` (executable with shebang)
+- Module files: `kebab-case.js` (e.g., `file-scanner.js`, `path-validator.js`, `install-error.js`)
+- Test files: `module-name.test.js` (e.g., `file-scanner.test.js`, `path-validator.test.js`)
+- Platform-specific modules: `platform/feature.js` (e.g., `claude/adapter.js`, `copilot/serializer.js`)
+- Shared/base modules: Prefix with `base-` (e.g., `base-adapter.js`, `base-validator.js`)
 
 **Functions:**
-- camelCase for functions: `serializeFrontmatter()`, `validatePath()`, `handleCheckUpdates()`
-- Async functions clearly marked: `async function install()`, `export async function copyDirectory()`
-- Descriptive action verbs: `create`, `validate`, `transform`, `handle`, `resolve`
+- Exported functions: `camelCase` (e.g., `scanInstallationFiles()`, `validatePath()`, `serializeFrontmatter()`)
+- Internal helpers: `camelCase` with descriptive names (e.g., `logWithIcon()`, `indentMultiline()`)
+- Factory functions: Descriptive verb phrases (e.g., `invalidArgs()`, `createTestDir()`, `cleanupTestDir()`)
 
 **Variables:**
-- camelCase for local variables: `testDir`, `templatesDir`, `scriptDir`
-- ALL_CAPS for constants: `SHARED_DIR`, `MANIFEST_FILE`, `ALLOWED_DIRS`, `WINDOWS_RESERVED`
-- Descriptive names avoiding abbreviations: `targetDirOverride` not `tgtDirOvr`
+- Local variables: `camelCase` (e.g., `testDir`, `files`, `basePath`)
+- Constants: `SCREAMING_SNAKE_CASE` for true constants (e.g., `EXIT_CODES`, `RED`, `GREEN`, `YELLOW`)
+- Path constants: Use `__filename`, `__dirname` pattern for ESM compatibility
 
 **Classes:**
-- PascalCase for class names: `PlatformAdapter`, `ClaudeAdapter`, `CopilotAdapter`, `AdapterRegistry`
-- Class files match class name: `base-adapter.js` exports `PlatformAdapter`
+- Class names: `PascalCase` (e.g., `ClaudeAdapter`, `InstallError`, `ValidationError`)
+- Extends pattern: Descriptive suffix (e.g., `PlatformAdapter`, `BaseValidator`)
 
-**Constants and Exports:**
-- Export objects use camelCase: `export const platformNames = {...}`
-- Export arrays use ALL_CAPS: `export const ALLOWED_DIRS = [...]`
+**Directories:**
+- All lowercase, hyphenated if needed (e.g., `bin/lib/`, `file-scanner/`, `get-shit-done/`)
+- Platform directories: Platform name (e.g., `claude/`, `copilot/`, `codex/`)
+- Shared code: `_shared/` prefix to indicate internal/base implementations
 
 ## Code Style
 
 **Formatting:**
-- No formatter configured (no .prettierrc or .eslintrc found)
-- Indentation: 2 spaces (consistent across all files)
-- Line length: No hard limit, but typically < 120 characters
-- Semicolons: Used consistently at statement ends
-- String quotes: Single quotes for strings, backticks for template literals
-- Trailing commas: Used in multi-line arrays and objects
+- No explicit formatter config (no Prettier/EditorConfig found)
+- Indentation: 2 spaces (observed consistently)
+- Line length: No hard limit enforced, but generally kept reasonable (~80-120 characters)
+- Semicolons: Used consistently
+- Quotes: Single quotes for strings, backticks for template literals
 
-**Module System:**
-- ES6 modules (`import`/`export`)
-- `"type": "module"` in package.json
-- Named exports preferred over default exports
-- File extensions required in imports: `from './path-validator.js'` not `from './path-validator'`
+**Linting:**
+- Markdown: `markdownlint-cli2` with custom config (`.markdownlint-cli2.jsonc`)
+- JavaScript: No ESLint config found - relies on code review and testing
+- Markdown rules:
+  - Line length: 120 characters (relaxed from default 80)
+  - Allow HTML for badges and links
+  - Allow duplicate headings at same level
+  - Fenced code blocks required
 
-**Line Breaks:**
-- Blank line between function definitions
-- Blank line after imports
-- No blank lines at start/end of files
+**File headers:**
+- Executable scripts: Shebang `#!/usr/bin/env node` or `#!/usr/bin/env bash`
+- Module files: JSDoc comment block at top describing purpose
+- Example pattern:
+  ```javascript
+  /**
+   * Scan directory recursively and collect all file paths
+   * Used for reconstructing file lists during manifest repair
+   * 
+   * @param {string} directory - Directory to scan
+   * @param {string} excludePrefix - File prefix to exclude (default: '.gsd-')
+   * @returns {Promise<string[]>} Array of relative file paths
+   */
+  ```
 
 ## Import Organization
 
 **Order:**
-1. External dependencies (Node.js built-ins, npm packages)
-2. Internal modules (relative imports)
+1. Node.js built-in modules (e.g., `fs`, `path`, `os`)
+2. Third-party packages (e.g., `chalk`, `gray-matter`, `commander`)
+3. Internal modules - absolute paths from project root (e.g., `../../bin/lib/...`)
 
-**Example from `bin/lib/platforms/claude-adapter.js`:**
-```javascript
-import matter from 'gray-matter';
-import { PlatformAdapter } from './base-adapter.js';
-import { getPlatformDir, getPathReference } from './platform-paths.js';
-import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
-```
+**Import style:**
+- ES modules (ESM) only - `import`/`export` syntax
+- Named imports preferred: `import { foo, bar } from 'module'`
+- Default imports when appropriate: `import chalk from 'chalk'`
+- Namespace imports rare: `import * as logger from './logger.js'`
 
-**Path Aliases:**
-- None configured
-- All imports use relative paths: `'../../bin/lib/io/file-operations.js'`
+**Path references:**
+- Relative imports use explicit `.js` extension: `'./adapter.js'`, `'../platform-paths.js'`
+- Test imports use relative paths from test to source: `'../../bin/lib/utils/file-scanner.js'`
 
-**Node.js Built-ins:**
-- Imported without `node:` prefix: `import { join } from 'path'`
+**ESM compatibility patterns:**
+- Use `fileURLToPath` and `dirname` for `__dirname` equivalent:
+  ```javascript
+  import { fileURLToPath } from 'url';
+  import { dirname } from 'path';
+  
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  ```
 
 ## Error Handling
 
 **Patterns:**
-- Async/await with try-catch blocks
-- Custom error classes: `InstallError` with `EXIT_CODES`
-- Validation throws descriptive errors: `throw new Error('Path traversal detected')`
-- File operations handle missing files gracefully
-- Test cleanup errors logged but not thrown: `console.warn('Cleanup warning: ${error.message}')`
+- Custom error classes for domain errors:
+  - `InstallError` (`bin/lib/errors/install-error.js`) for installation failures
+  - `ValidationError` (`bin/lib/platforms/_shared/validation-error.js`) for validation failures
+  - `DirectoryError` for directory-related issues
+- Factory functions for common error types: `invalidArgs()`, `missingTemplates()`, `permissionDenied()`
+- Exit codes defined as constants in `EXIT_CODES` object
+- Error details passed as optional parameter: `new InstallError(message, code, details)`
 
-**Validation Strategy:**
-- Validate early, fail fast
-- Collect all validation errors before throwing: `validateAllPaths()` returns array of errors
-- Pre-flight checks before destructive operations
-- Security validation separate from business logic
+**Throwing errors:**
+- Use `throw new Error()` for programmer errors (e.g., missing implementations, invalid arguments)
+- Use custom error classes for recoverable/user-facing errors
+- Include context in error messages: `throw new Error(\`\${this.platformName}: getFileExtension() must be implemented\`)`
+
+**Try-catch:**
+- Used for I/O operations and external API calls
+- Silent failures return default values (e.g., empty array, `false`) when appropriate
+- Example pattern:
+  ```javascript
+  try {
+    const entries = await fs.readdir(directory);
+    // ... process
+  } catch (error) {
+    // If directory doesn't exist or can't be read, return empty array
+    return [];
+  }
+  ```
 
 ## Logging
 
-**Framework:** Custom logger in `bin/lib/cli/logger.js`
+**Framework:** Custom logger module (`bin/lib/cli/logger.js`)
 
 **Functions:**
-- `info(message, indent, fullColor)` — General information
-- `listItem(message, indent)` — Bulleted list items
-- Color helpers via chalk library
+- `listItem(message, indent)` - Bullet point list items
+- `info(message, indent, fullColor)` - Info messages with ℹ icon
+- `success(message, indent, fullColor)` - Success messages with ✓ icon
+- `warn(message, indent, fullColor)` - Warnings with ⚠ icon
+- `error(message, indent, fullColor)` - Errors with ✖ icon
+- `verbose(message, indent, isVerbose)` - Conditional logging based on verbose flag
+- `blockTitle(title, opts)` - Section headers with borders
+- `summary(stats, platform)` - Installation summary formatting
 
 **Patterns:**
-- Verbose mode controlled by `isVerbose` flag
-- No logging in library functions (return values instead)
-- Progress indicators via `cli-progress` library
-- Spinners via `@clack/prompts` for interactive mode
+- Use chalk for colors: `chalk.red()`, `chalk.green()`, `chalk.yellow()`, `chalk.blue()`
+- Icons used consistently: ℹ (info), ✓ (success), ⚠ (warn), ✖ (error), • (list)
+- Multiline messages use vertical bar continuation: `'| '` prefix on continuation lines
+- Indentation support via `indent` parameter (number of spaces)
+- Color application: `fullColor` param applies color to entire line vs just icon
+
+**Console usage:**
+- Direct `console.log()` usage: ~100 instances across codebase
+- Prefer logger functions for user-facing output
+- Use `console.warn()` for cleanup warnings in tests
+- Never use `console.error()` directly - use `logger.error()` instead
 
 ## Comments
 
 **When to Comment:**
-- File-level JSDoc explaining module purpose
-- Complex algorithms or non-obvious logic
-- Platform-specific quirks or workarounds
-- Security-related decisions
-- Test descriptions in describe/test blocks
+- JSDoc blocks for all exported functions
+- Section headers for logical groupings within modules
+- Inline comments for complex logic or non-obvious code
+- TODO/FIXME comments rare - only 1 found (already completed item)
 
-**JSDoc:**
-- Used extensively for public functions
-- Includes `@param`, `@returns`, `@throws` tags
-- Module-level docblocks explain purpose and rationale
-- Private functions marked with `@private` tag
+**JSDoc style:**
+- Always include `@param` for parameters with type and description
+- Always include `@returns` for return values
+- Use descriptive parameter names that match function signature
+- Example:
+  ```javascript
+  /**
+   * Transform tools for Claude (keep capitalized)
+   * @param {string} tools - Comma-separated tools from template
+   * @returns {string} Unchanged for Claude
+   */
+  ```
 
-**Example from `bin/lib/rendering/frontmatter-serializer.js`:**
-```javascript
-/**
- * Custom YAML frontmatter serializer with platform-specific formatting
- * 
- * Why custom: js-yaml's flowLevel option is all-or-nothing. We need:
- * - Root-level objects in block style
- * - Arrays in flow style (Copilot/Codex) or block style (Claude)
- * - Nested objects in block style
- * - Omit empty arrays
- * - Special character handling in tool names
- * 
- * @module frontmatter-serializer
- */
+**Section comments:**
+- Use single-line comments with title case: `// Internal: Base function for logging`
+- Double slashes with space: `// comment` not `//comment`
 
-/**
- * Serialize frontmatter data to YAML string with platform-specific formatting
- * 
- * @param {Object} data - Frontmatter data object
- * @param {string} platform - Platform name ('copilot', 'codex', 'claude')
- * @returns {string} YAML string (without --- delimiters)
- * 
- * @example
- * // Copilot/Codex (single-line arrays)
- * serializeFrontmatter({tools: ['read', 'write']}, 'copilot')
- * // => "tools: ['read', 'write']"
- */
-export function serializeFrontmatter(data, platform) {
-  // ...
-}
-```
-
-**Inline Comments:**
+**Inline comments:**
 - Explain "why" not "what"
-- Mark tech debt: `// TODO: Read version from manifest (Phase 6 - VERSION-02)`
-- Clarify non-obvious code paths
-- Document test expectations: `// Verify single-line format with single quotes`
+- Example: `// Only include files, not directories`
+- Example: `// For multiline messages, add vertical bar prefix to continuation lines`
 
 ## Function Design
 
 **Size:**
-- Small, focused functions (typically 10-30 lines)
-- Large functions split into private helpers
-- Example: `serializeFrontmatter()` delegates to `formatArray()`, `formatObject()`, `formatScalar()`
+- Most functions under 50 lines
+- Largest functions ~150-370 lines (complex orchestration: `orchestrator.js`, `pre-flight-validator.js`)
+- Extract complex logic into helper functions within same module
 
 **Parameters:**
-- Options object for 3+ parameters: `install(appVersion, options)`
-- Destructuring in function signature: `const { platform, adapter, isGlobal } = options`
-- Optional parameters have defaults: `options = {}`
-- Boolean flags prefixed with `is` or `should`: `isGlobal`, `isVerbose`, `skipPrompts`
+- Use destructuring for options objects: `{ platform, adapter, isGlobal, isVerbose }`
+- Default values in parameter list: `async function scanInstallationFiles(directory, excludePrefix = '.gsd-')`
+- Boolean flags use `is` or `has` prefix: `isGlobal`, `isVerbose`, `hasMultipleLines`
+- Options objects for 4+ parameters
 
 **Return Values:**
-- Explicit returns (no implicit undefined)
-- Async functions always return Promises
-- Stats objects for operations: `{ skills: N, agents: N, shared: N }`
-- Validation returns normalized data: `{ normalized, resolved }`
+- Async functions return Promises (explicitly marked with `async`)
+- Return early for validation/guard clauses
+- Return specific types consistently:
+  - Validation functions: throw or return normalized object
+  - Query functions: return boolean or specific type
+  - Scan functions: return array (empty array on error)
 
-**Async/Await:**
-- Prefer async/await over Promises
-- Mark functions explicitly: `async function install()`
-- All file operations are async
-- No mixing of callbacks and Promises
+**Pure functions preferred:**
+- Most utility functions are pure (no side effects)
+- I/O operations isolated to specific modules: `file-operations.js`, `io/`
+- Logging functions have side effects but don't mutate state
 
 ## Module Design
 
 **Exports:**
-- Named exports for functions and constants
-- Class exports: `export class PlatformAdapter`
-- Multiple exports per file common: `bin/lib/platforms/platform-paths.js` exports 8+ functions
+- Named exports for all public functions: `export async function scanInstallationFiles(...)`
+- Class exports: `export class ClaudeAdapter extends PlatformAdapter`
+- Constants: `export const EXIT_CODES = { ... }`
+- No default exports except for configuration files
 
-**File Organization:**
-- One class per file for adapters
-- Related functions grouped in single file: `bin/lib/io/file-operations.js`
-- Utilities separated by concern: `bin/lib/cli/`, `bin/lib/platforms/`, `bin/lib/validation/`
+**Module organization:**
+- One primary concern per file
+- Related functions grouped in same module
+- Base/shared implementations in `_shared/` directory
+- Platform-specific code in platform subdirectories
 
-**Dependencies:**
-- Minimal external dependencies
-- Core: fs-extra, chalk, @clack/prompts, commander, js-yaml
-- Dev: vitest, @vitest/ui, gray-matter
+**Barrel files:**
+- Not used - each module imported directly
+- No `index.js` files for re-exporting
 
-**Barrel Files:**
-- Not used — explicit imports from specific modules
+**Internal functions:**
+- Non-exported functions for internal use only
+- Placed above exported functions or at top of file
+- Example: `function logWithIcon(...)` in `logger.js` is internal helper
 
-## Platform Patterns
+## Async/Await Patterns
 
-**Adapter Pattern:**
-- Base class: `PlatformAdapter` in `bin/lib/platforms/base-adapter.js`
-- Platform-specific: `ClaudeAdapter`, `CopilotAdapter`, `CodexAdapter`
-- Registry: `adapterRegistry` in `bin/lib/platforms/registry.js`
-- Each adapter implements: `getFileExtension()`, `getTargetDir()`, `transformTools()`, `transformFrontmatter()`
+**Usage:**
+- All I/O operations are async
+- Use `async/await` consistently, avoid Promise chains
+- Example:
+  ```javascript
+  export async function scanInstallationFiles(directory, excludePrefix = '.gsd-') {
+    try {
+      const entries = await fs.readdir(directory, { recursive: true });
+      // ... process
+    } catch (error) {
+      return [];
+    }
+  }
+  ```
 
-**Template Variables:**
-- Defined in templates with double curly braces: `{{PLATFORM_ROOT}}`, `{{COMMAND_PREFIX}}`, `{{VERSION}}`
-- Replaced during installation via adapter methods
-- Platform-specific transformations
+**Error handling:**
+- Try-catch blocks around await calls when handling errors
+- Let errors bubble up when appropriate (don't catch if you can't handle)
+- Silent failures return safe defaults for non-critical operations
 
-## Test Patterns (Preview)
+**Parallel operations:**
+- Not heavily used in codebase
+- Sequential operations preferred for simplicity and reliability
 
-**Organization:**
-- `tests/unit/` for isolated unit tests
-- `tests/integration/` for multi-component tests
-- `tests/validation/` for validation flows
-- `tests/version/` for version detection
-- `tests/helpers/` for test utilities
+## Class Patterns
 
-**Isolation:**
-- All tests use `/tmp` or home directory (never project root)
-- Test utilities in `tests/helpers/test-utils.js`
-- `createTestDir()` → `/tmp/gsd-test-*` prefix
-- `cleanupTestDir()` removes test directories
+**Inheritance:**
+- Base classes define interface and shared behavior
+- Platform-specific classes extend base classes
+- Example:
+  ```javascript
+  export class ClaudeAdapter extends PlatformAdapter {
+    constructor() {
+      super('claude');
+    }
+    
+    // Override abstract methods
+    getFileExtension() {
+      return '.md';
+    }
+  }
+  ```
 
-**Vitest Configuration:**
-- Explicit imports (no globals)
-- Node environment
-- Process isolation via `pool: 'forks'`
-- 30s timeout for integration tests
-- Coverage: statements 70%, branches 50%, functions 70%, lines 70%
+**Abstract methods:**
+- Base class throws error if method not implemented
+- Pattern: `throw new Error(\`\${this.platformName}: method() must be implemented\`)`
 
-## Security Conventions
+**Constructor patterns:**
+- Call `super()` first in subclass constructors
+- Validate required parameters in base constructor
+- Pass platform name to base class
 
-**Path Validation:**
-- All paths validated before use
-- Allowlist: `.claude/`, `.github/`, `.codex/`, `get-shit-done/`
-- Reject path traversal: `../`, URL-encoded variants
-- Reject null bytes: `\x00`
-- Reject Windows reserved names: `CON`, `PRN`, `AUX`, etc.
-- Max path length: 4096 characters
-- Max component length: 255 characters
+**Instance methods:**
+- All public methods have JSDoc comments
+- Methods return specific types (not `this` for chaining)
+- No getters/setters - direct property access
 
-**File Operations:**
-- Validate before read/write
-- Use `fs-extra` promise-based API
-- Check file existence before operations
-- Handle symlinks explicitly
+## Platform Adapter Pattern
 
-## Project-Specific Conventions
+**Structure:**
+Each platform (Claude, Copilot, Codex) implements:
+- Adapter class: `{Platform}Adapter extends PlatformAdapter`
+- Validator class: `{Platform}Validator extends BaseValidator`
+- Serializer module: Platform-specific frontmatter formatting
+- Cleaner module: Platform-specific content transformations
 
-**Source Protection:**
-- `.claude/`, `.github/`, `.codex/` are READ-ONLY reference directories
-- Never modify source directories
-- Templates live in `templates/` directory
-- Tests use `targetDirOverride` parameter to avoid writing to source
-
-**Version Management:**
-- version.json per skill: `templates/skills/gsd-*/version.json`
-- versions.json for all agents: `templates/agents/versions.json`
-- SemVer for project version: `2.0.0`
-
-**Frontmatter Handling:**
-- Custom serializer for platform-specific formatting
-- Claude: Multi-line arrays with dash prefix
-- Copilot/Codex: Single-line arrays with single quotes
-- Empty arrays omitted from output
-- Field ordering: name, description, tools, skills, metadata
-
-**Tool Names:**
-- Official Claude names: Read, Write, Edit, Bash, Grep, Glob, Task
-- Comma-separated string format (not array)
-- Platform adapters handle transformations
+**Required methods:**
+- `getFileExtension()` - Returns platform file extension
+- `getTargetDir(isGlobal)` - Returns installation directory
+- `getCommandPrefix()` - Returns command prefix (e.g., `/gsd-` or `$gsd-`)
+- `transformTools(tools)` - Transforms tool list for platform
+- `transformFrontmatter(content)` - Transforms YAML frontmatter
+- `getPathReference()` - Returns path reference prefix
+- `getInstructionsPath(isGlobal)` - Returns platform instruction file path
 
 ---
 
-*Convention analysis: 2026-01-29*
+*Convention analysis: 2026-02-01*

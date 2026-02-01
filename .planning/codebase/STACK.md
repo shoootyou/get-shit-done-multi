@@ -1,12 +1,13 @@
 # Technology Stack
 
-**Analysis Date:** 2026-01-29
+**Analysis Date:** 2025-02-01
 
 **Codebase Size:**
-- Files analyzed: 81 files (source + test)
-- Source files: 57 files (bin/lib implementation)
-- Test files: 20 files
-- Lines of code: 9,740 lines total (5,895 lines implementation)
+- Files analyzed: 109 files (bin, scripts, templates)
+- Source files: 69 JS files in `bin/lib/`
+- Test files: 25 test files
+- Template files: 95 markdown files
+- Lines of code: 40,171 lines total (bin + templates + scripts)
 
 ## Languages
 
@@ -61,11 +62,16 @@
 - `semver@7.7.3` - Version comparison for update detection
 - `cli-progress@3.12.0` - Progress bars for installation
 
+**Validation:**
+- `joi@18.0.2` - Schema validation for frontmatter fields
+  - Used in `bin/lib/platforms/_shared/field-validators.js`
+
 **Development:**
 - `@babel/parser@7.28.6` - AST parsing for validation tests
 - `@babel/traverse@7.28.6` - AST traversal for code analysis in tests
 - `@inquirer/prompts@8.2.0` - Alternative prompts (not currently used)
 - `open@11.0.0` - Open URLs/files from CLI (test utility)
+- `markdownlint-cli2@0.20.0` - Markdown linting
 
 ## Configuration
 
@@ -87,8 +93,9 @@
 - Binary name: `get-shit-done-multi`
 
 **Package Distribution:**
-- Files published: `bin/`, `templates/`
+- Files published: `bin/`, `templates/`, `docs/` (per `package.json` files field)
 - Main entry: `index.js` (placeholder - bin is the actual entry)
+- Binary: `get-shit-done-multi` → `bin/install.js`
 - No build artifacts - source code distributed directly
 
 ## Platform Requirements
@@ -99,11 +106,15 @@
 - Git for version detection and manifest management
 
 **Production:**
-- Deployment target: User's local machine via npx
+- Deployment target: NPM registry
+- Package name: `get-shit-done-multi`
+- Version: 2.0.0 (current stable)
+- Installation: `npx get-shit-done-multi`
+- Beta channel: `npx get-shit-done-multi@beta`
 - Installs to AI assistant config directories:
-  - Claude Code: `~/.claude/agents/`, `~/.claude/skills/`, `.claude/` (local)
-  - GitHub Copilot CLI: `~/.github/agents/`, `.github/` (local)
-  - Codex CLI: `~/.codex/agents/`, `.codex/` (local)
+  - Claude Code: `~/.claude/get-shit-done/` (global), `.claude/get-shit-done/` (local)
+  - GitHub Copilot CLI: `~/.github/get-shit-done/` (global), `.github/get-shit-done/` (local)
+  - Codex CLI: `~/.codex/get-shit-done/` (global), `.codex/get-shit-done/` (local)
 - No server deployment - CLI tool only
 
 **Platform Support:**
@@ -132,6 +143,24 @@
 - Platform-specific transformations (Claude/Copilot/Codex)
 - Version tracking in `versions.json`
 
+## NPM Scripts
+
+**Testing:**
+- `npm test` - Run all tests with Vitest
+- `npm run test:watch` - Watch mode for development
+- `npm run test:ui` - Interactive browser-based test UI
+- `npm run test:coverage` - Generate coverage report
+- `npm run test:validation` - Run skill validation tests only
+
+**Linting:**
+- `npm run lint:md` - Check markdown files with markdownlint-cli2
+- `npm run lint:md:fix` - Auto-fix markdown issues
+
+**Publishing:**
+- `npm run publish-pre` - Pre-release publishing script (bash)
+  - Located at `scripts/publish-pre.sh`
+  - Handles version validation and NPM publishing
+
 ---
 
-*Stack analysis: 2026-01-29*
+*Stack analysis: 2025-02-01*

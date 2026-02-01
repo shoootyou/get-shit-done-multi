@@ -1,343 +1,203 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-01-29
+**Analysis Date:** 2026-02-01
 
 **Test Coverage:**
-- Test files: 21 files
-- Source files: 85 files (57 in bin/lib)
-- Test ratio: 37% (test files / total source+test files)
-- Coverage targets: statements 70%, branches 50%, functions 70%, lines 70%
+- Test files: 25 files
+- Source files: 69 files
+- Test ratio: 36% (test files / source files)
+- Total test code: ~4,597 lines
+- Total source code: ~5,547 lines
 
 ## Test Framework
 
 **Runner:**
-- vitest 4.0.18
+- Vitest v4.0.18
 - Config: `vitest.config.js`
 
 **Assertion Library:**
-- Vitest built-in (Chai-compatible API)
+- Vitest built-in assertions (expect API)
+- No additional assertion libraries
 
 **Run Commands:**
 ```bash
-npm test                    # Run all tests once
-npm run test:watch          # Watch mode
-npm run test:ui             # Web UI
-npm run test:coverage       # Coverage report
+npm test                # Run all tests
+npm run test:watch      # Watch mode with auto-rerun
+npm run test:ui         # Launch Vitest UI in browser
+npm run test:coverage   # Generate coverage report
+npm run test:validation # Run specific test file (skill validation)
 ```
 
-**Additional Tools:**
-- gray-matter (frontmatter parsing in tests)
-- fs/promises (file operations)
+**CI Commands:**
+```bash
+npm ci                  # Install dependencies (CI)
+npm test                # Run tests in CI
+```
 
 ## Test File Organization
 
 **Location:**
-- Tests co-located by type, not by source
-- Separate test tree under `tests/` directory
-
-**Directory Structure:**
-```
-tests/
-├── helpers/
-│   └── test-utils.js              # Shared test utilities
-├── unit/                          # Isolated module tests (9 files)
-│   ├── file-scanner.test.js
-│   ├── frontmatter-serializer.test.js
-│   ├── path-validator.test.js
-│   ├── path-resolver.test.js
-│   └── ...
-├── integration/                   # Multi-component tests (6 files)
-│   ├── installer.test.js
-│   ├── path-security.test.js
-│   ├── validation-flow.test.js
-│   └── ...
-├── validation/                    # Validation-specific (1 file)
-│   └── manifest-generator.test.js
-└── version/                       # Version detection (4 files)
-    ├── version-detector.test.js
-    └── ...
-```
+- Tests in dedicated `tests/` directory (not co-located with source)
+- Mirror source structure within `tests/`
 
 **Naming:**
 - Pattern: `{module-name}.test.js`
-- Matches source file name: `bin/lib/rendering/frontmatter-serializer.js` → `tests/unit/frontmatter-serializer.test.js`
-- No `.spec.js` variant used
+- Examples: `file-scanner.test.js`, `path-validator.test.js`, `installer.test.js`
+
+**Structure:**
+```
+tests/
+├── unit/                        # Unit tests for individual modules
+│   ├── file-scanner.test.js
+│   ├── path-validator.test.js
+│   ├── platforms/               # Platform-specific unit tests
+│   │   ├── claude/
+│   │   │   └── serializer.test.js
+│   │   ├── copilot/
+│   │   │   └── serializer.test.js
+│   │   └── codex/
+│   │       └── serializer.test.js
+│   └── ...
+├── integration/                 # Integration tests
+│   ├── installer.test.js
+│   ├── validation-flow.test.js
+│   ├── migration-flow.test.js
+│   └── ...
+├── version/                     # Version detection tests
+│   ├── version-detector.test.js
+│   ├── version-checker.test.js
+│   └── ...
+├── validation/                  # Validation tests
+│   ├── manifest-generator.test.js
+│   └── pre-install-checks.test.js
+└── helpers/                     # Test utilities
+    └── test-utils.js
+```
 
 ## Test Structure
 
 **Suite Organization:**
 ```javascript
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { functionToTest } from '../../bin/lib/module.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('module-name', () => {
-  describe('feature or function', () => {
-    test('should do specific thing', () => {
+  // Setup/teardown
+  let testDir;
+  
+  beforeEach(async () => {
+    // Create test environment
+    testDir = await createTestDir();
+  });
+  
+  afterEach(async () => {
+    // Clean up
+    await cleanupTestDir(testDir);
+  });
+  
+  describe('function-name', () => {
+    it('should handle normal case', async () => {
       // Arrange
-      const input = 'test';
+      const input = 'test-data';
       
       // Act
-      const result = functionToTest(input);
+      const result = await functionUnderTest(input);
       
       // Assert
-      expect(result).toBe('expected');
+      expect(result).toBe(expected);
     });
     
-    test('should handle edge case', () => {
-      expect(() => functionToTest(null)).toThrow('error message');
+    it('should handle edge case', async () => {
+      // Test edge case
+    });
+    
+    it('should throw on invalid input', () => {
+      expect(() => functionUnderTest(invalid))
+        .toThrow('Expected error message');
     });
   });
 });
 ```
 
 **Patterns:**
-- Nested `describe` blocks for grouping related tests
-- `test()` not `it()` (both work, but `test()` is consistent)
-- Descriptive test names starting with "should"
-- Arrange-Act-Assert pattern in test body
-- One assertion focus per test (but multiple expect calls OK)
+- Use `describe()` for grouping related tests (module, then function)
+- Use `it()` or `test()` for individual test cases (both supported, `it` more common)
+- Nested `describe()` blocks for organizing function-specific tests
+- Descriptive test names: "should {expected behavior} {given condition}"
 
-**Example from `tests/unit/frontmatter-serializer.test.js`:**
+**Test lifecycle:**
+- `beforeEach()` - Run before each test (create fresh test environment)
+- `afterEach()` - Run after each test (clean up resources)
+- `beforeAll()`/`afterAll()` - Not commonly used (prefer `beforeEach`/`afterEach` for isolation)
+
+## Mocking
+
+**Framework:** Vitest built-in mocking (minimal usage)
+
+**Current usage:**
+- Very limited mocking in codebase (~9 instances found)
+- Prefer real implementations and test isolation over mocks
+- Use filesystem-based test directories instead of mocking fs
+
+**Patterns:**
 ```javascript
-describe('frontmatter-serializer', () => {
-  describe('empty array omission', () => {
-    test('omits empty tools array from output', () => {
-      const data = {
-        name: 'test-agent',
-        tools: [],
-        description: 'Test agent'
-      };
-      
-      const result = serializeFrontmatter(data, 'copilot');
-      
-      // Verify empty array is not present
-      expect(result).not.toContain('tools:');
-      expect(result).not.toContain('[]');
-      
-      // Verify other fields are present
-      expect(result).toContain('name: test-agent');
-      expect(result).toContain("description: Test agent");
-    });
-  });
-  
-  describe('Copilot single-line tools format', () => {
-    test('formats tools as single-line array with single quotes', () => {
-      const data = {
-        name: 'test-agent',
-        tools: ['read', 'write', 'bash']
-      };
-      
-      const result = serializeFrontmatter(data, 'copilot');
-      
-      expect(result).toContain("tools: ['read', 'write', 'bash']");
-      expect(result).not.toMatch(/tools:\n\s*-/);
-    });
-  });
-});
+// Rarely used - prefer real implementations
+import { vi } from 'vitest';
+
+vi.mock('module-name', () => ({
+  functionName: vi.fn()
+}));
 ```
 
-## Test Isolation
+**What to Mock:**
+- External API calls (when necessary)
+- Time-dependent operations (not heavily used)
 
-**Critical Pattern: `/tmp` Usage**
+**What NOT to Mock:**
+- Filesystem operations - use real temp directories instead
+- Internal modules - test real implementations
+- Simple utilities - no need to mock
 
-All tests use isolated temporary directories. **Never write to project directories.**
+## Fixtures and Factories
 
-**Test Utilities (`tests/helpers/test-utils.js`):**
+**Test Data:**
 ```javascript
-import { join } from 'path';
-import { mkdtemp, rm, mkdir, writeFile } from 'fs/promises';
-import { tmpdir } from 'os';
-
-/**
- * Create isolated test directory in /tmp
- * @returns {Promise<string>} Test directory path
- */
+// Helper functions in tests/helpers/test-utils.js
 export async function createTestDir() {
   const prefix = join(tmpdir(), 'gsd-test-');
   return mkdtemp(prefix);
 }
 
-/**
- * Clean up test directory
- * @param {string} dir - Directory to remove
- */
 export async function cleanupTestDir(dir) {
   try {
     await rm(dir, { recursive: true, force: true });
   } catch (error) {
-    // Ignore cleanup errors
     console.warn(`Cleanup warning: ${error.message}`);
   }
 }
-```
 
-**Setup/Teardown Pattern:**
-```javascript
-describe('integration test', () => {
-  let testDir;
-  
-  beforeEach(async () => {
-    testDir = await createTestDir();
-  });
-  
-  afterEach(async () => {
-    await cleanupTestDir(testDir);
-  });
-  
-  test('should do something', async () => {
-    // testDir is isolated, no project pollution
-  });
-});
-```
-
-**Alternative Pattern (Home Directory):**
-
-Some integration tests use home directory to avoid system path restrictions:
-
-```javascript
-beforeEach(async () => {
-  const home = homedir();
-  testDir = await mkdtemp(join(home, '.gsd-test-integration-'));
-});
-```
-
-**Why This Matters:**
-
-From `.planning/SOURCE-PROTECTION.md`:
-- `.claude/`, `.github/`, `.codex/` are READ-ONLY source references
-- Tests must use `targetDirOverride` parameter
-- Never write to project root during tests
-- Accidental deletion during tests was caught and prevented by this pattern
-
-## Fixtures and Test Data
-
-**Inline Test Data:**
-
-Most tests create data inline:
-
-```javascript
-test('should format frontmatter', () => {
-  const data = {
-    name: 'test-agent',
-    tools: ['read', 'write']
-  };
-  
-  const result = serializeFrontmatter(data, 'copilot');
-  expect(result).toContain("tools: ['read', 'write']");
-});
-```
-
-**Template Creation Helper:**
-
-From `tests/helpers/test-utils.js`:
-
-```javascript
-/**
- * Create minimal template structure for testing
- * @param {string} baseDir - Base directory for templates
- */
 export async function createMinimalTemplates(baseDir) {
   const templatesDir = join(baseDir, 'templates');
-  const skillsDir = join(templatesDir, 'skills', 'gsd-test-skill');
-  const agentsDir = join(templatesDir, 'agents');
-  const sharedDir = join(templatesDir, 'get-shit-done');
-  
-  await mkdir(skillsDir, { recursive: true });
-  await mkdir(agentsDir, { recursive: true });
-  await mkdir(sharedDir, { recursive: true });
-  
-  // Create skill
-  await writeFile(
-    join(skillsDir, 'SKILL.md'),
-    `---
-name: Test Skill
-description: Test skill
-allowed-tools: Read, Write
----
-Install to {{PLATFORM_ROOT}}/skills/
-Use {{COMMAND_PREFIX}}test-skill
-`
-  );
-  
-  // Create agent
-  await writeFile(
-    join(agentsDir, 'gsd-test-agent.md'),
-    `---
-name: test-agent
-description: Test agent
-tools: Read, Write
----
-Agent content with {{PLATFORM_ROOT}} reference
-`
-  );
-  
+  // ... create test template structure
   return templatesDir;
 }
 ```
 
-**No Fixture Files:**
-- No separate fixture directory
-- Test data created programmatically
-- Keeps tests self-contained and readable
-
-## Mocking
-
-**Framework:** Vitest built-in mocking
+**Location:**
+- Test utilities: `tests/helpers/test-utils.js`
+- Inline test data within test files for simple cases
+- Factory functions for complex test setups
 
 **Patterns:**
-
-Tests favor real implementations over mocks. Most tests:
-- Use real file system operations (in `/tmp`)
-- Use real adapters and validators
-- Mock only external dependencies (if needed)
-
-**Example of Real Implementation Testing:**
-```javascript
-test('should install skills, agents, and shared directory', async () => {
-  const targetDir = join(testDir, '.claude');
-  const binDir = join(testDir, 'bin');
-  await ensureDirectory(binDir);
-  
-  const options = {
-    platform: 'claude',
-    isGlobal: false,
-    isVerbose: false,
-    scriptDir: binDir,
-    targetDir // Override for test isolation
-  };
-  
-  const stats = await install(options);
-  
-  // Check stats
-  expect(stats.skills).toBeGreaterThan(0);
-  expect(stats.agents).toBeGreaterThan(0);
-  expect(stats.shared).toBe(1);
-  
-  // Check structure exists
-  expect(await pathExists(join(targetDir, 'skills'))).toBe(true);
-  expect(await pathExists(join(targetDir, 'agents'))).toBe(true);
-});
-```
-
-**What to Mock:**
-- External API calls (none in current codebase)
-- System commands that can't run in test (none currently)
-
-**What NOT to Mock:**
-- File operations (use real fs in `/tmp`)
-- Path validation (test real logic)
-- Adapters (test real transformations)
+- Use real temporary directories via `mkdtemp()` in system tmpdir
+- Create minimal but realistic test data structures
+- Clean up all test artifacts in `afterEach()`
+- Use Node.js `os.tmpdir()` and `homedir()` for cross-platform compatibility
 
 ## Coverage
 
 **Requirements:**
-- statements: 70%
-- branches: 50% (lowered temporarily for Phase 2)
-- functions: 70%
-- lines: 70%
-
-**Configuration (`vitest.config.js`):**
 ```javascript
+// vitest.config.js coverage thresholds
 coverage: {
   provider: 'v8',
   reporter: ['text', 'json', 'html'],
@@ -345,7 +205,7 @@ coverage: {
   exclude: ['bin/lib/**/*.test.js'],
   thresholds: {
     statements: 70,
-    branches: 50,
+    branches: 50,    // Lowered temporarily (utility modules under-tested)
     functions: 70,
     lines: 70
   }
@@ -355,195 +215,342 @@ coverage: {
 **View Coverage:**
 ```bash
 npm run test:coverage
-# Opens HTML report in coverage/index.html
+# Opens coverage/index.html in browser
+# Shows text summary in terminal
 ```
 
-**Coverage Strategy:**
-- Unit tests cover core logic (validators, serializers, transformers)
-- Integration tests cover flows (installation, validation, migration)
-- Not aiming for 100% — focus on critical paths
+**Coverage reports:**
+- Text summary in terminal
+- JSON report for CI/analysis
+- HTML report for detailed review
+- Reports generated in `coverage/` directory (gitignored)
+
+**Coverage goals:**
+- 70% statements, functions, lines
+- 50% branches (temporary - plan to increase)
+- Focus on critical paths: installation, validation, migration
 
 ## Test Types
 
-**Unit Tests (`tests/unit/`):**
-- Test single module in isolation
-- Fast execution (< 1ms per test)
-- No file I/O (or minimal, in /tmp)
-- Examples: `path-validator.test.js`, `frontmatter-serializer.test.js`
+**Unit Tests:**
+- Scope: Individual functions and modules
+- Location: `tests/unit/`
+- Focus: Pure logic, utilities, validators, serializers
+- Examples:
+  - `file-scanner.test.js` - File scanning utility
+  - `path-validator.test.js` - Path validation logic
+  - `platforms/claude/serializer.test.js` - YAML frontmatter serialization
 
-**Integration Tests (`tests/integration/`):**
-- Test multiple modules together
-- File system operations
-- Real template creation
-- Examples: `installer.test.js`, `validation-flow.test.js`
+**Integration Tests:**
+- Scope: Multiple modules working together
+- Location: `tests/integration/`
+- Focus: End-to-end workflows, installation, validation
+- Examples:
+  - `installer.test.js` - Full installation workflow
+  - `validation-flow.test.js` - Validation + manifest generation
+  - `migration-flow.test.js` - Version migration end-to-end
 
-**Validation Tests (`tests/validation/`):**
-- Test validation logic end-to-end
-- Security checks (path traversal, reserved names)
-- Example: `manifest-generator.test.js`
+**Version Tests:**
+- Scope: Version detection and checking
+- Location: `tests/version/`
+- Focus: Version parsing, comparison, detection
+- Examples:
+  - `version-detector.test.js` - Detect installed versions
+  - `version-checker.test.js` - Compare versions
 
-**Version Tests (`tests/version/`):**
-- Test version detection
-- Manifest reading
-- Installation finding
-- Examples: `version-detector.test.js`, `installation-finder.test.js`
+**Validation Tests:**
+- Scope: Pre-install checks and validation
+- Location: `tests/validation/`
+- Focus: Security, permissions, manifests
+- Examples:
+  - `pre-install-checks.test.js` - Directory validation
+  - `manifest-generator.test.js` - Manifest creation
+
+**E2E Tests:**
+- Not implemented yet
+- Would test full CLI interaction with real processes
 
 ## Common Patterns
 
 **Async Testing:**
 ```javascript
-test('should read file content', async () => {
-  const file = join(testDir, 'test.txt');
-  await writeFile(file, 'hello world');
-  const content = await readFile(file);
-  expect(content).toBe('hello world');
+it('should handle async operation', async () => {
+  const result = await asyncFunction();
+  expect(result).toBe(expected);
+});
+
+it('should reject on error', async () => {
+  await expect(asyncFunction(invalid))
+    .rejects.toThrow('Error message');
 });
 ```
 
 **Error Testing:**
 ```javascript
-test('should reject path traversal attempts', async () => {
-  const maliciousTarget = join(testDir, '../../../etc');
-  
-  await expect(
-    runPreInstallationChecks(maliciousTarget, templatesDir, false, 'claude')
-  ).rejects.toThrow(); // Any error means validation worked
+// Synchronous errors
+it('should throw on invalid input', () => {
+  expect(() => validatePath(basePath, '../etc/passwd'))
+    .toThrow('Path traversal detected');
 });
 
-test('should throw on null byte', () => {
-  expect(() => validatePath(basePath, 'safe.txt\x00../../evil'))
-    .toThrow('Null byte detected');
-});
-```
-
-**Multiple Assertions:**
-```javascript
-test('should format complete Copilot agent', () => {
-  const data = {
-    name: 'gsd-install',
-    description: 'Install GSD skills',
-    tools: ['read', 'write', 'bash'],
-    metadata: { platform: 'copilot', generated: '2026-01-28' }
-  };
-  
-  const result = serializeFrontmatter(data, 'copilot');
-  
-  // Verify tools format
-  expect(result).toContain("tools: ['read', 'write', 'bash']");
-  
-  // Verify metadata block
-  expect(result).toContain('metadata:');
-  expect(result).toContain('  platform: copilot');
-  
-  // Parse to verify structure
-  const parsed = yaml(`---\n${result}\n---`);
-  expect(parsed.data.name).toBe('gsd-install');
-  expect(parsed.data.tools).toEqual(['read', 'write', 'bash']);
+// Async errors
+it('should reject promise on error', async () => {
+  await expect(install('2.0.0', invalidOptions))
+    .rejects.toThrow('Invalid options');
 });
 ```
 
-**Attack Vector Testing:**
+**Filesystem Testing:**
 ```javascript
-describe('Attack Vector Integration Tests', () => {
-  test('should block all URL-encoded traversal variants', async () => {
-    const attacks = [
-      '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc',
-      '%2e%2e%5c%2e%2e%5c%2e%2e%5cetc',
-      'skills%2f%2e%2e%2f%2e%2e%2fetc'
-    ];
-    
-    for (const attack of attacks) {
-      const maliciousTarget = join(testDir, decodeURIComponent(attack));
-      await expect(
-        runPreInstallationChecks(maliciousTarget, templatesDir, false, 'claude')
-      ).rejects.toThrow();
-    }
+it('should create file structure', async () => {
+  // Use real filesystem in temp directory
+  const testDir = await createTestDir();
+  
+  try {
+    await writeFile(join(testDir, 'test.txt'), 'content');
+    const exists = await pathExists(join(testDir, 'test.txt'));
+    expect(exists).toBe(true);
+  } finally {
+    await cleanupTestDir(testDir);
+  }
+});
+```
+
+**Assertion Patterns:**
+```javascript
+// Equality
+expect(result).toBe(value);           // Strict equality (===)
+expect(result).toEqual(object);       // Deep equality
+
+// Truthiness
+expect(result).toBeTruthy();
+expect(result).toBeFalsy();
+
+// Arrays
+expect(array).toHaveLength(3);
+expect(array).toContain(item);
+expect(array).toContainEqual(object);
+
+// Objects
+expect(obj).toHaveProperty('key');
+expect(obj).toMatchObject({ key: value });
+
+// Instances
+expect(error).toBeInstanceOf(Error);
+
+// Strings
+expect(string).toContain('substring');
+
+// Numbers
+expect(number).toBeGreaterThan(5);
+expect(number).toBeLessThan(10);
+```
+
+**Temporary Directory Pattern:**
+```javascript
+describe('module with file operations', () => {
+  let testDir;
+  
+  beforeEach(async () => {
+    // Create unique temp dir for each test
+    testDir = join(tmpdir(), `.gsd-test-${Math.random().toString(36).slice(2)}`);
+    await ensureDir(testDir);
+  });
+  
+  afterEach(async () => {
+    // Clean up after each test
+    await rm(testDir, { recursive: true, force: true });
+  });
+  
+  it('test case', async () => {
+    // Test uses testDir
   });
 });
 ```
 
-**Batch Validation Testing:**
+**Platform-Specific Testing:**
 ```javascript
-test('should collect all errors without stopping', () => {
-  const paths = [
-    '.claude/valid.md',        // valid
-    '../../../etc/passwd',     // invalid
-    '.github/CON',             // invalid
-    '.codex/good.json',        // valid
-    'evil/file.txt'            // invalid
-  ];
-  
-  const result = validateAllPaths(basePath, paths);
-  
-  expect(result.valid).toHaveLength(2);
-  expect(result.errors).toHaveLength(3);
-  expect(result.errors[0]).toContain('Path traversal');
-  expect(result.errors[1]).toContain('Windows reserved');
-  expect(result.errors[2]).toContain('Path not in allowlist');
+describe('Claude Serializer', () => {
+  describe('array formatting - block style', () => {
+    test('serializes arrays as multi-line block style', () => {
+      const data = { skills: ['gsd-help', 'gsd-verify'] };
+      const result = serializeFrontmatter(data);
+      
+      expect(result).toContain('skills:\n  - gsd-help\n  - gsd-verify');
+    });
+  });
+});
+```
+
+## CI/CD Integration
+
+**GitHub Actions Workflows:**
+
+### PR Validation (`.github/workflows/pr-validation.yml`)
+- Triggers: All pull requests
+- Node version: 20.x
+- Steps:
+  1. Checkout code
+  2. Setup Node.js with npm cache
+  3. Install dependencies (`npm ci`)
+  4. Run tests (`npm test`)
+  5. Build if build script exists
+  6. Create and validate tarball
+  7. Comment on PR with results
+- Concurrency: Cancel in-progress runs for same PR
+- Permissions: read contents, write PR comments
+
+### Publish Workflow (`.github/workflows/publish-main.yml`)
+- Trigger: Manual workflow dispatch
+- Node version: 20.x
+- Environment: prod
+- Steps:
+  1. Validate version format
+  2. Check tag doesn't exist
+  3. Update package.json version
+  4. Install dependencies (`npm ci`)
+  5. Run tests (`npm test`)
+  6. Build if needed
+  7. Create and test tarball
+  8. Dry-run publish
+  9. Create git tag
+  10. Create GitHub release
+  11. Publish to NPM with provenance
+- Security: OIDC provenance for supply chain integrity
+
+**Concurrency:**
+- PR validation: Cancel in-progress for same PR
+- Publish: No concurrent publishes allowed
+
+**Status Reporting:**
+- PR validation posts status as PR comment
+- Updates existing comment on re-run
+- Shows test results, tarball validation
+
+## Test Isolation
+
+**Principles:**
+- Each test runs independently
+- No shared state between tests
+- Fresh test environment per test
+- Clean up all artifacts
+
+**Patterns:**
+- Use `beforeEach()`/`afterEach()` for setup/teardown
+- Create unique temp directories per test
+- Avoid test interdependencies
+- Don't rely on test execution order
+
+**Process Isolation:**
+```javascript
+// vitest.config.js
+export default defineConfig({
+  test: {
+    globals: false,        // Explicit imports required
+    environment: 'node',   // Node.js environment
+    isolate: true,         // Isolate tests
+    pool: 'forks'          // Process isolation
+  }
 });
 ```
 
 ## Test Configuration
 
-**Vitest Config (`vitest.config.js`):**
+**Timeouts:**
 ```javascript
-import { defineConfig } from 'vitest/config';
-
+// vitest.config.js
 export default defineConfig({
   test: {
-    globals: false,           // Explicit imports required
-    environment: 'node',      // Node.js environment (not browser)
-    testTimeout: 30000,       // 30s for integration tests
-    hookTimeout: 10000,       // 10s for setup/teardown
-    isolate: true,            // Isolate test environment
-    pool: 'forks',            // Process isolation (not threads)
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      include: ['bin/lib/**/*.js'],
-      exclude: ['bin/lib/**/*.test.js'],
-      thresholds: {
-        statements: 70,
-        branches: 50,
-        functions: 70,
-        lines: 70
-      }
-    }
+    testTimeout: 30000,   // 30s for integration tests
+    hookTimeout: 10000    // 10s for setup/teardown
   }
 });
 ```
 
-**Key Settings:**
-- `globals: false` — No auto-imported `describe`, `test`, `expect` (explicit imports required)
-- `pool: 'forks'` — Each test file runs in separate process (full isolation)
-- `testTimeout: 30000` — Generous timeout for file operations
-- `isolate: true` — Full test environment isolation
+**Test Execution:**
+- No global test functions (explicit imports)
+- Fork pool for process isolation
+- Individual test isolation enforced
 
-## Testing Philosophy
+## Best Practices
 
-**Integration Over Unit:**
-- More integration tests than pure unit tests
-- Test real behavior, not implementation details
-- Use real file system (in /tmp) rather than mocking
+**DO:**
+- Write descriptive test names: "should {behavior} when {condition}"
+- Use AAA pattern (Arrange, Act, Assert) for clarity
+- Test one thing per test case
+- Use real filesystem with temp directories
+- Clean up all test artifacts
+- Test error cases and edge cases
+- Use async/await consistently
+- Keep tests fast and focused
+
+**DON'T:**
+- Share state between tests
+- Mock excessively - prefer real implementations
+- Commit test artifacts or temp files
+- Rely on test execution order
+- Leave resources open (files, connections)
+- Test implementation details - test behavior
+- Mix unit and integration concerns in same test
 
 **Security Testing:**
-- Explicit attack vector tests
-- Path traversal variants (basic, URL-encoded, Windows)
-- Windows reserved names
-- Null byte injection
-- Path length limits
+- Path traversal attacks tested in `path-validator.test.js`
+- Null byte injection tested
+- Windows reserved names tested
+- Permission checks tested in integration tests
 
-**Practical Coverage:**
-- 70% coverage is target, not 100%
-- Focus on critical paths: validation, security, installation
-- Under-tested areas documented in coverage reports
+**Example: Comprehensive Test Suite**
+```javascript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { createTestDir, cleanupTestDir } from '../helpers/test-utils.js';
 
-**Test Maintenance:**
-- Self-contained tests (no shared state)
-- Cleanup always runs (even on failure)
-- Descriptive names for easy debugging
-- Comments explain "why" not "what"
+describe('file-scanner', () => {
+  let testDir;
+
+  beforeEach(async () => {
+    testDir = await createTestDir();
+  });
+
+  afterEach(async () => {
+    await cleanupTestDir(testDir);
+  });
+
+  describe('scanInstallationFiles', () => {
+    it('should scan and return all files recursively', async () => {
+      // Arrange
+      await fs.writeFile(join(testDir, 'file1.txt'), 'content');
+      await fs.ensureDir(join(testDir, 'subdir'));
+      await fs.writeFile(join(testDir, 'subdir', 'file2.txt'), 'content');
+
+      // Act
+      const files = await scanInstallationFiles(testDir);
+
+      // Assert
+      expect(files).toHaveLength(2);
+      expect(files).toContain('file1.txt');
+      expect(files).toContain(join('subdir', 'file2.txt'));
+    });
+
+    it('should exclude files with specified prefix', async () => {
+      await fs.writeFile(join(testDir, 'normal.txt'), 'content');
+      await fs.writeFile(join(testDir, '.gsd-manifest.json'), 'manifest');
+
+      const files = await scanInstallationFiles(testDir);
+
+      expect(files).toHaveLength(1);
+      expect(files).toContain('normal.txt');
+      expect(files).not.toContain('.gsd-manifest.json');
+    });
+
+    it('should return empty array for non-existent directory', async () => {
+      const files = await scanInstallationFiles(join(testDir, 'nonexistent'));
+
+      expect(files).toEqual([]);
+    });
+  });
+});
+```
 
 ---
 
-*Testing analysis: 2026-01-29*
+*Testing analysis: 2026-02-01*

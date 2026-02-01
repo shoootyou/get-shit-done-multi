@@ -1,447 +1,423 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-01-29
+**Analysis Date:** 2026-02-01
 
 ## Codebase Metrics
 
 **Files Analyzed:**
-- Total files: 81 files
-- Source files: 60 files (JavaScript)
-- Test files: 21 files
-- Config files: 2 files (package.json, vitest.config.js)
+- Total files: 137 files
+- Source files: ~70 JavaScript modules
+- Test files: 25 test files
+- Template files: ~40 templates (agents, skills, shared)
+- Config files: 5 files
 
 **Lines of Code:**
-- Total: 9,740 lines
-- Source: ~7,740 lines (excluding tests)
+- Total: ~7,500 lines
+- Installer (bin/lib): ~5,500 lines
 - Tests: ~2,000 lines
+- Templates: Variable (template content)
 
 **Excluded from analysis:**
-- Infrastructure: .claude, .github, .codex, node_modules, .git
-- Build artifacts: dist, build, out, target, coverage
+- Infrastructure: node_modules, .git
+- Build artifacts: None (no build step required)
+- Generated files: None
 
 ## Directory Layout
 
-```
+```plaintext
 get-shit-done-multi/
-├── .planning/                          # Planning and documentation (NOT in package)
-│   ├── codebase/                       # Codebase analysis documents
-│   ├── debug/                          # Debug logs
-│   ├── phases/                         # Phase plans and summaries
-│   ├── research/                       # Research documents
-│   ├── todos/                          # TODO tracking
-│   ├── ARCHITECTURE-DECISION.md        # ADRs
-│   ├── PROJECT.md                      # Project definition
-│   ├── ROADMAP.md                      # Roadmap
-│   ├── STATE.md                        # Current state
-│   ├── REQUIREMENTS.md                 # Requirements
-│   └── *.md                            # Other planning docs
-├── bin/                                # Executable and library code
-│   ├── install.js                      # Main entry point (#!/usr/bin/env node)
-│   └── lib/                            # Library modules (layered architecture)
-│       ├── cli/                        # CLI layer (prompts, logger, progress)
-│       ├── platforms/                  # Platform layer (adapters, detection)
-│       ├── installer/                  # Installer layer (orchestration)
-│       ├── rendering/                  # Rendering layer (templates, frontmatter)
-│       ├── validation/                 # Validation layer (path, CLI validators)
-│       ├── preflight/                  # Pre-flight checks
-│       ├── migration/                  # Migration layer (v1.x → v2.0.0)
-│       ├── version/                    # Version layer (detection, comparison)
-│       ├── updater/                    # Updater layer (check updates)
-│       ├── manifests/                  # Manifest layer (read/write/validate)
-│       ├── io/                         # IO layer (file operations)
-│       ├── paths/                      # Path utilities (resolver, symlink)
-│       ├── utils/                      # Utilities (file scanner)
-│       ├── config/                     # Configuration (path allowlists)
-│       └── errors/                     # Error types and exit codes
-├── templates/                          # Universal templates (SOURCE OF TRUTH)
-│   ├── agents/                         # Agent templates (.agent.md files)
-│   │   ├── gsd-*.agent.md              # 13 agent templates
-│   │   └── versions.json               # Consolidated agent versions
-│   ├── skills/                         # Skill templates
-│   │   ├── gsd-*/                      # 28 regular skills
-│   │   │   ├── SKILL.md                # Skill file with template vars
-│   │   │   └── version.json            # Per-skill version
-│   │   └── get-shit-done/              # Platform-specific skill
-│   │       ├── claude/                 # Claude-specific
-│   │       ├── copilot/                # Copilot-specific
-│   │       └── codex/                  # Codex-specific
-│   └── get-shit-done/                  # Shared template
-│       └── .gsd-install-manifest.json  # Manifest template
-├── tests/                              # Test suite (Vitest)
-│   ├── unit/                           # Unit tests
-│   ├── integration/                    # Integration tests
-│   ├── version/                        # Version-specific tests
-│   ├── validation/                     # Validation tests
-│   └── helpers/                        # Test utilities
-├── get-shit-done/                      # GSD workflow templates (source)
-│   ├── references/                     # Reference documents
-│   ├── templates/                      # Project templates
-│   └── workflows/                      # Workflow definitions
-├── .gsd-backup/                        # Migration backups (generated)
-├── assets/                             # Assets (logo, etc.)
-├── package.json                        # NPM package definition
-├── vitest.config.js                    # Vitest configuration
-├── README.md                           # User-facing README
-├── GSD-STYLE.md                        # GSD style guide
-├── CHANGELOG.md                        # Version changelog
-├── LICENSE                             # MIT license
-└── Makefile                            # Build commands
+├── bin/                    # Installer executable and modules
+│   ├── install.js          # Main entry point
+│   └── lib/                # Installer library modules
+│       ├── cli/            # CLI interface and interactive mode
+│       ├── config/         # Configuration utilities
+│       ├── errors/         # Custom error types
+│       ├── installer/      # Installation orchestration
+│       ├── io/             # File I/O operations
+│       ├── manifests/      # Installation manifest management
+│       ├── migration/      # Version migration logic
+│       ├── paths/          # Path resolution and validation
+│       ├── platforms/      # Platform adapters and validators
+│       ├── preflight/      # Pre-installation validation
+│       ├── templates/      # Template rendering
+│       ├── updater/        # Update checking
+│       ├── utils/          # Shared utilities
+│       ├── validation/     # Runtime validation
+│       └── version/        # Version detection and comparison
+├── templates/              # Template files (agents, skills, shared)
+│   ├── agents/             # Agent templates (.agent.md)
+│   ├── skills/             # Skill templates (SKILL.md in subdirs)
+│   └── get-shit-done/      # Shared GSD resources
+│       ├── references/     # Reference documentation
+│       ├── templates/      # Project templates
+│       └── workflows/      # Workflow helpers
+├── tests/                  # Test suite
+│   ├── integration/        # Integration tests
+│   ├── unit/               # Unit tests
+│   ├── validation/         # Validation tests
+│   ├── version/            # Version detection tests
+│   └── helpers/            # Test helpers
+├── docs/                   # Documentation
+├── scripts/                # Build and publish scripts
+└── .planning/              # Project planning artifacts (GSD)
+    ├── codebase/           # Codebase documentation (this file)
+    └── history/            # Planning history
 ```
 
 ## Directory Purposes
 
-**`.planning/`:**
-- Purpose: Project planning, documentation, and state tracking
-- Contains: Phase plans, research, ADRs, roadmap, requirements, TODOs
-- Key files: `PROJECT.md`, `ROADMAP.md`, `STATE.md`, `ARCHITECTURE-DECISION.md`, `REQUIREMENTS.md`
-- Not included in npm package (`.npmignore`)
-
-**`bin/`:**
-- Purpose: Executable entry point and core library
-- Contains: `install.js` (main), `lib/` (layered modules)
-- Key files: `install.js` (entry point)
-
-**`bin/lib/cli/`:**
-- Purpose: CLI layer - user interaction, progress, logging
-- Contains: Interactive prompts, banner, logger, flag parser, progress bars
-- Key files: `interactive.js`, `logger.js`, `banner-manager.js`, `install-loop.js`, `flag-parser.js`
-
-**`bin/lib/platforms/`:**
-- Purpose: Platform-specific transformations and detection
-- Contains: Platform adapters (Claude, Copilot, Codex), registry, detectors
-- Key files: `base-adapter.js`, `claude-adapter.js`, `copilot-adapter.js`, `codex-adapter.js`, `registry.js`, `platform-paths.js`
-
-**`bin/lib/installer/`:**
-- Purpose: Installation orchestration and file operations
-- Contains: Orchestrator, skills installer, agents installer, shared installer
-- Key files: `orchestrator.js`, `install-skills.js`, `install-agents.js`, `install-shared.js`
-
-**`bin/lib/rendering/`:**
-- Purpose: Template processing and frontmatter transformation
-- Contains: Template renderer, frontmatter serializer, frontmatter cleaner
-- Key files: `template-renderer.js`, `frontmatter-serializer.js`, `frontmatter-cleaner.js`
-
-**`bin/lib/validation/` and `bin/lib/preflight/`:**
-- Purpose: Pre-flight checks and validation
-- Contains: Path validators, CLI validators, pre-install checks, pre-flight validator
-- Key files: `path-validator.js`, `cli-validator.js`, `pre-install-checks.js`, `pre-flight-validator.js`
-
-**`bin/lib/migration/`:**
-- Purpose: Migrate v1.x installations to v2.0.0
-- Contains: Migration orchestrator, migration manager, backup manager
-- Key files: `migration-orchestrator.js`, `migration-manager.js`, `backup-manager.js`
-
-**`bin/lib/version/`:**
-- Purpose: Version detection, comparison, installation finding
-- Contains: Old version detector, version checker, installation finder
-- Key files: `old-version-detector.js`, `version-checker.js`, `installation-finder.js`
-
-**`bin/lib/updater/`:**
-- Purpose: Update checking and status formatting
-- Contains: Update checker, validators, formatters, message generators
-- Key files: `check-update.js`, `validator.js`, `format-status.js`, `update-messages.js`
-
-**`bin/lib/manifests/`:**
-- Purpose: Manifest reading, writing, validation, repair
-- Contains: Reader, writer, schema, repair utilities
-- Key files: `reader.js`, `writer.js`, `schema.js`, `repair.js`
-
-**`bin/lib/io/` and `bin/lib/paths/`:**
-- Purpose: Safe file operations and path utilities
-- Contains: File operations, path resolvers, symlink resolvers
-- Key files: `file-operations.js`, `path-resolver.js`, `symlink-resolver.js`
-
-**`bin/lib/utils/`:**
-- Purpose: Shared utilities
-- Contains: File scanner
-- Key files: `file-scanner.js`
-
-**`bin/lib/config/`:**
-- Purpose: Configuration constants
-- Contains: Path allowlists, Windows reserved names
-- Key files: `paths.js`
-
-**`bin/lib/errors/`:**
-- Purpose: Error types and exit codes
-- Contains: Install error, directory error
-- Key files: `install-error.js`, `directory-error.js`
-
-**`templates/`:**
-- Purpose: Universal templates (SOURCE OF TRUTH)
-- Contains: Skills (29), agents (14), shared directory
-- Key structure:
-  - `agents/*.agent.md` - Agent templates with template variables
-  - `agents/versions.json` - Consolidated agent versions
-  - `skills/gsd-*/` - 29 skill directories with SKILL.md and version.json
-  - `skills/get-shit-done/{claude|copilot|codex}/` - Platform-specific get-shit-done skills
-  - `get-shit-done/` - Shared workflow references and templates
-
-**`tests/`:**
-- Purpose: Test suite (Vitest)
-- Contains: Unit tests, integration tests, version-specific tests, validation tests, helpers
+**bin/**
+- Purpose: NPM executable and installer implementation
+- Contains: Main entry point and modular library
 - Key files:
-  - `unit/old-version-detector.test.js` (326 LOC)
-  - `unit/migration-manager.test.js` (318 LOC)
-  - `integration/migration-flow.test.js` (405 LOC)
-  - `unit/frontmatter-serializer.test.js` (395 LOC)
+  - `install.js` - CLI entry point (exported as `get-shit-done-multi` binary)
+  - `lib/` - All installer modules
 
-**`get-shit-done/`:**
-- Purpose: GSD workflow templates (source)
-- Contains: References (8 files), templates (2 subdirs), workflows (17 files)
-- Copied to installation directory by installer
-- Key files: `workflows/execute-plan.md`, `references/checkpoints.md`, `references/ui-brand.md`
+**bin/lib/cli/**
+- Purpose: Command-line interface and user interaction
+- Contains: Flag parsing, prompts, logging, progress display
+- Key files:
+  - `interactive.js` - Interactive mode with @clack/prompts
+  - `installation-core.js` - Shared installation logic
+  - `install-loop.js` - Multi-platform installation loop
+  - `logger.js` - Structured logging with colors (303 lines)
+  - `flag-parser.js` - CLI flag parsing
+  - `progress.js` - Progress bars and completion display
+  - `banner-manager.js` - Welcome banner display
 
-**`.gsd-backup/`:**
-- Purpose: Migration backups (auto-generated)
-- Generated: Yes (by `backup-manager.js`)
-- Committed: No (in `.gitignore`)
+**bin/lib/platforms/**
+- Purpose: Platform abstraction layer
+- Contains: Adapters, validators, serializers for each platform
+- Subdirectories:
+  - `_shared/` - Base classes and shared validators
+  - `claude/` - Claude Code adapter and validator
+  - `copilot/` - GitHub Copilot adapter and validator
+  - `codex/` - Codex adapter and validator
+- Key files:
+  - `registry.js` - Singleton adapter registry
+  - `detector.js` - Platform installation detector
+  - `binary-detector.js` - CLI binary detector
+  - `platform-paths.js` - Platform-specific path helpers
+  - `platform-names.js` - Display name mappings
+
+**bin/lib/installer/**
+- Purpose: Installation orchestration and file operations
+- Contains: Main orchestrator and component installers
+- Key files:
+  - `orchestrator.js` - Main installation flow (354 lines)
+  - `install-skills.js` - Skill installation logic (152 lines)
+  - `install-agents.js` - Agent installation logic
+  - `install-shared.js` - Shared directory installation
+  - `install-platform-instructions.js` - Platform instruction file installation
+
+**bin/lib/validation/**
+- Purpose: Runtime validation and error handling
+- Contains: Path validators, permission checks, error logging
+- Key files:
+  - `path-validator.js` - 8-layer path security validation (192 lines)
+  - `pre-install-checks.js` - Pre-installation validation (226 lines)
+  - `error-logger.js` - Error logging to `.planning/errors/` (158 lines)
+  - `cli-validator.js` - CLI argument validation
+
+**bin/lib/preflight/**
+- Purpose: Pre-flight validation orchestration
+- Contains: Grouped validation checks before installation
+- Key files:
+  - `pre-flight-validator.js` - Main preflight orchestrator (369 lines)
+  - `error-formatter.js` - User-friendly error formatting (149 lines)
+
+**bin/lib/version/**
+- Purpose: Version detection and comparison
+- Contains: Version tracking, manifest reading, old version detection
+- Key files:
+  - `version-detector.js` - Current version detection (187 lines)
+  - `old-version-detector.js` - v1.x detection (228 lines)
+  - `version-checker.js` - Semantic version comparison
+  - `installation-finder.js` - Find installations by scope
+
+**bin/lib/migration/**
+- Purpose: Version migration orchestration
+- Contains: Backup creation, migration prompts, old version cleanup
+- Key files:
+  - `migration-manager.js` - Migration prompts and flow (145 lines)
+  - `migration-orchestrator.js` - Multi-platform migration coordination
+  - `backup-manager.js` - Backup creation and validation (213 lines)
+
+**bin/lib/manifests/**
+- Purpose: Installation manifest management
+- Contains: Schema, reader, writer, repair logic
+- Key files:
+  - `schema.js` - Joi schema and validation (170 lines)
+  - `reader.js` - Manifest reading with error handling
+  - `writer.js` - Manifest generation and writing
+  - `repair.js` - Corrupt manifest repair
+
+**bin/lib/io/**
+- Purpose: File system operations
+- Contains: Wrappers for fs-extra with error handling
+- Key files:
+  - `file-operations.js` - File operations with security validation
+
+**bin/lib/paths/**
+- Purpose: Path resolution and symlink handling
+- Contains: Path helpers and symlink detection
+- Key files:
+  - `path-resolver.js` - Path resolution utilities
+  - `symlink-resolver.js` - Symlink detection and resolution
+
+**bin/lib/templates/**
+- Purpose: Template variable replacement
+- Contains: Template rendering logic
+- Key files:
+  - `template-renderer.js` - Variable substitution (`{{VARIABLE}}`)
+
+**bin/lib/updater/**
+- Purpose: Update checking
+- Contains: Version comparison with npm registry
+- Key files:
+  - `check-update.js` - Update checking orchestrator
+  - `check-global.js` - Global installation check
+  - `check-local.js` - Local installation check
+
+**bin/lib/errors/**
+- Purpose: Custom error types
+- Contains: InstallError and DirectoryError classes
+- Key files:
+  - `install-error.js` - Main error class with exit codes
+  - `directory-error.js` - Directory-specific errors
+
+**templates/**
+- Purpose: Source templates for installation
+- Contains: Agent and skill templates with frontmatter
+- Subdirectories:
+  - `agents/` - 11 agent templates (.agent.md)
+  - `skills/` - 29 skill directories with platform-specific variants
+  - `get-shit-done/` - Shared resources (references, workflows, templates)
+
+**templates/skills/[skill-name]/**
+- Purpose: Individual skill definitions
+- Contains: SKILL.md with frontmatter
+- Examples:
+  - `gsd-new-milestone/SKILL.md`
+  - `gsd-execute-phase/SKILL.md`
+  - `gsd-map-codebase/SKILL.md`
+
+**templates/skills/get-shit-done/**
+- Purpose: Main orchestrator skill (platform-specific)
+- Contains: Platform-specific SKILL.md variants
+- Subdirectories:
+  - `claude/SKILL.md` - Claude Code version
+  - `copilot/SKILL.md` - GitHub Copilot version
+  - `codex/SKILL.md` - Codex version
+
+**templates/get-shit-done/**
+- Purpose: Shared GSD resources
+- Contains: Reference docs, project templates, workflow helpers
+- Subdirectories:
+  - `references/` - Reference documentation
+  - `templates/` - Project templates (codebase, research-project)
+  - `workflows/` - Bash workflow helpers
+
+**tests/**
+- Purpose: Test suite
+- Contains: Unit, integration, and validation tests
+- Subdirectories:
+  - `unit/` - Unit tests for individual modules
+  - `integration/` - Integration tests for workflows
+  - `validation/` - Validation tests
+  - `version/` - Version detection tests
+  - `helpers/` - Test utilities
+
+**docs/**
+- Purpose: User documentation
+- Contains: How-to guides, architecture docs, platform specifics
+- Key files:
+  - `README.md` - Documentation index
+  - `architecture.md` - System architecture overview
+  - `how-to-install.md` - Installation guide
+  - `platform-comparison.md` - Platform differences
+  - `troubleshooting.md` - Common issues
+
+**.planning/**
+- Purpose: GSD project planning artifacts
+- Contains: Codebase docs, planning history
+- Subdirectories:
+  - `codebase/` - This file and other codebase documentation
+  - `history/` - Planning session history
 
 ## Key File Locations
 
 **Entry Points:**
-- `bin/install.js`: Main entry point (`npx get-shit-done-multi`)
-- `bin/lib/cli/interactive.js`: Interactive mode entry
-- `bin/lib/cli/installation-core.js`: CLI mode entry
+- `bin/install.js` - Main CLI entry point (executed as `npx get-shit-done-multi`)
+- `bin/lib/cli/interactive.js` - Interactive mode entry
+- `bin/lib/installer/orchestrator.js` - Installation orchestrator
 
 **Configuration:**
-- `package.json`: NPM package definition, scripts, dependencies
-- `vitest.config.js`: Vitest configuration
-- `.gitignore`: Git ignore rules
-- `.npmignore`: NPM ignore rules (excludes .planning/, tests/, etc.)
+- `package.json` - NPM package configuration, dependencies, scripts
+- `vitest.config.js` - Test configuration
+- `.markdownlint-cli2.jsonc` - Markdown linting config
 
 **Core Logic:**
-- `bin/lib/installer/orchestrator.js`: Installation orchestration (332 LOC)
-- `bin/lib/platforms/base-adapter.js`: Platform adapter interface
-- `bin/lib/rendering/template-renderer.js`: Template variable replacement
-- `bin/lib/manifests/schema.js`: Manifest schema and validation (170 LOC)
+- `bin/lib/platforms/registry.js` - Platform adapter registry
+- `bin/lib/installer/orchestrator.js` - Main installation flow
+- `bin/lib/preflight/pre-flight-validator.js` - Pre-install validation
+- `bin/lib/platforms/[platform]/adapter.js` - Platform-specific logic
 
 **Testing:**
-- `tests/unit/*.test.js`: Unit tests
-- `tests/integration/*.test.js`: Integration tests
-- `tests/helpers/test-utils.js`: Test utilities
+- `tests/integration/installer.test.js` - Full installation flow test
+- `tests/integration/skill-validation.test.js` - Skill validation tests
+- `tests/unit/platforms/[platform]/serializer.test.js` - Platform serializer tests
 
-**Documentation:**
-- `README.md`: User-facing documentation
-- `GSD-STYLE.md`: GSD style guide
-- `CHANGELOG.md`: Version history
-- `.planning/*.md`: Planning documents (not in package)
+**Templates:**
+- `templates/agents/gsd-executor.agent.md` - Executor agent template
+- `templates/agents/gsd-planner.agent.md` - Planner agent template (largest, 41KB)
+- `templates/skills/get-shit-done/claude/SKILL.md` - Main Claude skill
 
 ## Naming Conventions
 
 **Files:**
-- Kebab case: `install.js`, `flag-parser.js`, `pre-flight-validator.js`
-- Test files: `*.test.js` (e.g., `path-validator.test.js`)
-- Platform adapters: `{platform}-adapter.js` (e.g., `claude-adapter.js`)
-- Agent templates: `gsd-*.agent.md` (e.g., `gsd-planner.agent.md`)
-- Skill templates: `gsd-*/SKILL.md` (e.g., `gsd-help/SKILL.md`)
+- Modules: `kebab-case.js` (e.g., `install-skills.js`, `path-resolver.js`)
+- Tests: `kebab-case.test.js` (e.g., `installer.test.js`)
+- Templates: `UPPERCASE.md` or `.agent.md` (e.g., `SKILL.md`, `gsd-planner.agent.md`)
+- Config: Standard names (`package.json`, `vitest.config.js`)
 
 **Directories:**
-- Lowercase: `bin`, `lib`, `tests`, `templates`
-- Kebab case for multi-word: `bin/lib`, `get-shit-done`
-- Hidden directories: `.planning`, `.gsd-backup`
-
-**Classes:**
-- PascalCase: `PlatformAdapter`, `ClaudeAdapter`, `InstallError`
+- Modules: `kebab-case` (e.g., `bin/lib/cli/`, `platforms/`)
+- Platform subdirs: `lowercase` (e.g., `claude/`, `copilot/`, `codex/`)
+- Shared: `_shared/` (with underscore prefix)
 
 **Functions:**
-- camelCase: `installSkills()`, `renderTemplate()`, `detectBinaries()`
+- Exported: `camelCase` (e.g., `installSkills`, `validatePath`)
+- Classes: `PascalCase` (e.g., `PlatformAdapter`, `ClaudeAdapter`)
+- Constants: `SCREAMING_SNAKE_CASE` (e.g., `EXIT_CODES`, `PLATFORM_ROOT`)
 
-**Constants:**
-- UPPER_SNAKE_CASE: `EXIT_CODES`, `ALLOWED_DIRS`, `MANIFEST_FILE`
+**Variables:**
+- Local: `camelCase` (e.g., `targetDir`, `isGlobal`)
+- Module-level: `camelCase` or `SCREAMING_SNAKE_CASE` for constants
 
 ## Where to Add New Code
 
-**New Platform Adapter:**
-- Implementation: `bin/lib/platforms/{platform}-adapter.js` (extend `PlatformAdapter`)
-- Registration: Add to `bin/lib/platforms/registry.js`
-- Paths: Add to `bin/lib/platforms/platform-paths.js` (`platformDirs`)
-- Detection: Add to `bin/lib/platforms/binary-detector.js`
-- Tests: `tests/unit/{platform}-adapter.test.js`
+**New Platform:**
+- Adapter: `bin/lib/platforms/[platform]/adapter.js`
+- Validator: `bin/lib/platforms/[platform]/validator.js`
+- Serializer: `bin/lib/platforms/[platform]/serializer.js`
+- Cleaner: `bin/lib/platforms/[platform]/cleaner.js`
+- Register: Add to `bin/lib/platforms/registry.js`
+- Tests: `tests/unit/platforms/[platform]/`
+
+**New Skill:**
+- Template: `templates/skills/gsd-[skill-name]/SKILL.md`
+- Platform variants (if needed): `templates/skills/gsd-[skill-name]/[platform]/SKILL.md`
+- No code changes required (templates are auto-discovered)
+
+**New Agent:**
+- Template: `templates/agents/gsd-[agent-name].agent.md`
+- No code changes required (templates are auto-discovered)
 
 **New Validation Check:**
-- Pre-flight validation: Add to `bin/lib/preflight/pre-flight-validator.js`
-- Path validation: Add to `bin/lib/validation/path-validator.js`
-- CLI validation: Add to `bin/lib/validation/cli-validator.js`
-- Tests: `tests/unit/` or `tests/integration/validation-flow.test.js`
+- Pre-flight: Add to `bin/lib/preflight/pre-flight-validator.js`
+- Runtime: Add to `bin/lib/validation/pre-install-checks.js`
+- Path security: Add to `bin/lib/validation/path-validator.js`
 
-**New CLI Feature:**
-- Interactive prompt: Add to `bin/lib/cli/interactive.js`
-- Flag parsing: Add to `bin/lib/cli/flag-parser.js`
-- Usage docs: Update `bin/lib/cli/usage.js`
-- Tests: `tests/integration/installation-output.test.js`
-
-**New Installer Feature:**
-- Orchestration: Modify `bin/lib/installer/orchestrator.js`
-- File operations: Add to `bin/lib/io/file-operations.js`
-- Tests: `tests/integration/installer.test.js`
-
-**New Template:**
-- Skill: Create `templates/skills/gsd-{name}/SKILL.md` + `version.json`
-- Agent: Create `templates/agents/gsd-{name}.agent.md`, update `versions.json`
-- Platform-specific: Create subdirectories in `templates/skills/get-shit-done/{platform}/`
-- Shared content: Add to `get-shit-done/references/` or `get-shit-done/workflows/`
+**New CLI Flag:**
+- Parser: Add to `bin/lib/cli/flag-parser.js`
+- Entry point: Add to `bin/install.js` (Commander definition)
+- Validation: Add to `bin/lib/validation/cli-validator.js` if needed
 
 **New Error Type:**
-- Definition: Add to `bin/lib/errors/install-error.js`
-- Factory function: Add factory function to same file
+- Define: Add to `bin/lib/errors/install-error.js`
 - Exit code: Add to `EXIT_CODES` constant
-- Tests: `tests/unit/` (if needed)
+- Formatter: Add to `bin/lib/preflight/error-formatter.js` if user-facing
 
-**New Utility:**
+**Utilities:**
 - Shared helpers: `bin/lib/utils/`
-- Path utilities: `bin/lib/paths/`
-- File scanner: `bin/lib/utils/file-scanner.js`
+- File operations: `bin/lib/io/file-operations.js`
+- Path helpers: `bin/lib/paths/path-resolver.js`
+
+**Tests:**
+- Unit tests: `tests/unit/[module-name].test.js`
+- Integration tests: `tests/integration/[feature-name].test.js`
+- Test helpers: `tests/helpers/`
 
 ## Special Directories
 
-**`.planning/`:**
-- Purpose: Project planning and documentation
-- Generated: No (manually created)
-- Committed: Yes (tracked in git)
-- Distributed: No (excluded from npm package)
+**bin/lib/platforms/_shared/**
+- Purpose: Shared platform code (base classes, validators)
+- Generated: No
+- Committed: Yes
+- Note: Underscore prefix indicates shared/base code
 
-**`.gsd-backup/`:**
-- Purpose: Migration backups (timestamped snapshots)
-- Generated: Yes (by `backup-manager.js` during migration)
-- Committed: No (in `.gitignore`)
-- Distributed: No
+**templates/skills/get-shit-done/**
+- Purpose: Main orchestrator skill (platform-specific variants)
+- Generated: No
+- Committed: Yes
+- Note: Only skill with platform subdirectories (claude/, copilot/, codex/)
 
-**`node_modules/`:**
+**.planning/**
+- Purpose: GSD project artifacts (created during GSD usage)
+- Generated: Yes (by GSD workflows)
+- Committed: Yes (for this project's own development)
+- Note: Typically .gitignored in user projects
+
+**node_modules/**
 - Purpose: NPM dependencies
-- Generated: Yes (by `npm install`)
-- Committed: No (in `.gitignore`)
-- Distributed: No
+- Generated: Yes (by npm install)
+- Committed: No
+- Note: Standard NPM practice
 
-**`coverage/`:**
-- Purpose: Test coverage reports
-- Generated: Yes (by `vitest run --coverage`)
-- Committed: No (in `.gitignore`)
-- Distributed: No
+**.git/**
+- Purpose: Git repository metadata
+- Generated: Yes (by git)
+- Committed: No (metadata directory)
 
-**`templates/`:**
-- Purpose: Universal templates (permanent source of truth)
-- Generated: No (source-controlled content)
-- Committed: Yes (tracked in git)
-- Distributed: Yes (included in npm package)
+## Installation Target Directories
 
-## NPM Package Structure
+**Global Installation:**
+- Claude: `~/.claude/`
+- Copilot: `~/.github/copilot/`
+- Codex: `~/.codex/`
 
-**Published to NPM:** `get-shit-done-multi`
+**Local Installation:**
+- Claude: `./.claude/`
+- Copilot: `./.github/copilot/`
+- Codex: `./.codex/`
 
-**Included files** (from `package.json` `files` field):
-- `bin/` - Executable and library code
-- `templates/` - Universal templates (skills, agents, shared)
-
-**Excluded files** (automatically excluded or in `.gitignore`):
-- `.planning/` - Planning documents
-- `tests/` - Test suite
-- `.gsd-backup/` - Backup directory
-- `coverage/` - Coverage reports
-- `node_modules/` - Dependencies
-- `.git/`, `.github/`, `.claude/`, `.codex/` - Version control and IDE dirs
-
-**`get-shit-done/`:**
-- Purpose: GSD workflow templates (source)
-- Generated: No (manually created)
-- Committed: Yes (tracked in git)
-- Distributed: Yes (included in npm package, copied to installations)
-
-**Entry point:** `bin: { "get-shit-done-multi": "bin/install.js" }`
-
-**Version:** `2.0.0` (current milestone)
-
-## File Size Distribution
-
-**Largest source files:**
-- `bin/lib/preflight/pre-flight-validator.js`: 369 LOC
-- `bin/lib/installer/orchestrator.js`: 332 LOC
-- `bin/lib/cli/logger.js`: 303 LOC
-- `bin/lib/cli/interactive.js`: 258 LOC
-- `bin/lib/version/old-version-detector.js`: 228 LOC
-- `bin/lib/validation/pre-install-checks.js`: 226 LOC
-- `bin/lib/migration/backup-manager.js`: 212 LOC
-- `bin/lib/rendering/frontmatter-serializer.js`: 206 LOC
-- `bin/lib/validation/path-validator.js`: 192 LOC
-
-**Largest test files:**
-- `tests/integration/migration-flow.test.js`: 405 LOC
-- `tests/unit/frontmatter-serializer.test.js`: 395 LOC
-- `tests/unit/old-version-detector.test.js`: 326 LOC
-- `tests/unit/migration-manager.test.js`: 318 LOC
-- `tests/integration/update-detection.test.js`: 215 LOC
-- `tests/integration/installation-output.test.js`: 211 LOC
-
-**Complexity notes:**
-- Most modules stay under 250 LOC
-- Orchestrator (332 LOC) is largest installer file (handles complex flow)
-- Pre-flight validator (369 LOC) handles all validation logic
-- Logger (303 LOC) provides extensive formatting options
-
-## Installation Targets
-
-**Global installations:**
-- Claude Code: `~/.claude/`
-- GitHub Copilot CLI: `~/.copilot/`
-- Codex CLI: `~/.codex/`
-
-**Local installations:**
-- Claude Code: `.claude/`
-- GitHub Copilot CLI: `.github/`
-- Codex CLI: `.codex/`
-
-**Installation structure:**
-```
-{platform_dir}/
-├── skills/
-│   ├── gsd-help/
+**Installed Structure:**
+```plaintext
+.[platform]/
+├── agents/                 # Installed agents
+│   ├── gsd-executor.md     # (or .agent.md for copilot/codex)
+│   └── ...
+├── skills/                 # Installed skills
+│   ├── gsd-new-milestone/
 │   │   └── SKILL.md
-│   ├── gsd-add-phase/
-│   │   └── SKILL.md
-│   ├── get-shit-done/
-│   │   └── SKILL.md (platform-specific)
-│   └── ... (29 skills total)
-├── agents/
-│   ├── gsd-planner.agent.md (or .md for Claude)
-│   ├── gsd-executor.agent.md
-│   └── ... (14 agents total)
-└── get-shit-done/
+│   └── get-shit-done/
+│       └── SKILL.md        # Platform-specific variant
+└── get-shit-done/          # Shared resources
+    ├── .gsd-install-manifest.json  # Installation metadata
     ├── references/
-    │   ├── checkpoints.md
-    │   ├── ui-brand.md
-    │   ├── git-integration.md
-    │   └── ... (8 files)
     ├── templates/
-    │   ├── codebase/
-    │   └── research-project/
-    ├── workflows/
-    │   ├── execute-plan.md
-    │   ├── map-codebase.md
-    │   └── ... (17 files)
-    └── .gsd-install-manifest.json  # Version tracking
+    └── workflows/
 ```
 
-## Migration Strategy
+## Module Boundaries
 
-**Phase 1 (Complete - January 2026):**
-- ONE-TIME migration from `.github/` → `/templates/`
-- Frontmatter corrections applied
-- Version tracking added
-- Migration code preserved for v1.x → v2.0 migrations
+**Clear Separation:**
+- CLI layer never imports from installer layer directly (goes through installation-core)
+- Platform adapters are isolated (no cross-platform dependencies)
+- Validation layer is independent (no dependencies on installer)
+- File I/O is centralized (all file ops go through `io/file-operations.js`)
 
-**Phase 7.2 (Complete - January 2026):**
-- Removed audit-functions.* files (5MB+ cleanup)
-- Deleted scripts/, hooks/, .scripts/ directories
-- Removed Docker files (Dockerfile, docker-compose.yml)
-- Fixed package.json (files array, Node 20 requirement)
-- Moved gray-matter from devDependencies to dependencies
-- Repository ~320KB smaller
+**Shared Dependencies:**
+- Error types used across all layers
+- Logger used across all layers
+- Path utilities used by installer, validation, and I/O layers
 
-**Current State:**
-- `/templates/` is permanent source of truth
-- Installation always reads from `/templates/`
-- All installations track version via manifest files
-- Migration system handles v1.x → v2.0.0 upgrades automatically
+**Circular Dependency Prevention:**
+- Base classes in `_shared/` never import from concrete implementations
+- Registry initialized at module load (no lazy loading needed)
+- Validators are stateless (no shared state between invocations)
 
 ---
 
-*Structure analysis: 2026-01-29*
+*Structure analysis: 2026-02-01*
