@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { copyDirectory } from '../io/file-operations.js';
 import { readdir, readFile, writeFile as fsWriteFile } from 'fs/promises';
-import { replaceVariables } from '../rendering/template-renderer.js';
+import { replaceVariables } from '../serialization/template-renderer.js';
 import * as logger from '../cli/logger.js';
 import yaml from 'js-yaml';
 

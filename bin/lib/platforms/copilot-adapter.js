@@ -2,7 +2,7 @@ import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
 import { getInstructionPath } from './instruction-paths.js';
-import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
+import { serializeFrontmatter } from '../serialization/frontmatter-serializer.js';
 
 /**
  * Platform adapter for GitHub Copilot CLI

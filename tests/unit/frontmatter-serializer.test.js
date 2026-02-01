@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { serializeFrontmatter } from '../../bin/lib/rendering/frontmatter-serializer.js';
+import { serializeFrontmatter } from '../../bin/lib/serialization/frontmatter-serializer.js';
 import yaml from 'gray-matter';
 
 describe('frontmatter-serializer', () => {

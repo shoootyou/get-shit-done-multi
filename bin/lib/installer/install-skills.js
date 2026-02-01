@@ -1,8 +1,8 @@
 import { join, basename, dirname } from 'path';
 import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
-import { findUnknownVariables, replaceVariables } from '../rendering/template-renderer.js';
-import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
+import { findUnknownVariables, replaceVariables } from '../serialization/template-renderer.js';
+import { cleanFrontmatter } from '../serialization/frontmatter-cleaner.js';
 import * as logger from '../cli/logger.js';
 import matter from 'gray-matter';
 import { ClaudeValidator } from '../frontmatter/claude-validator.js';
