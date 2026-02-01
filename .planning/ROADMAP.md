@@ -995,6 +995,31 @@ bin/lib/platforms/
 
 [To be added during planning]
 
+### Phase 12.2: Add NPM publishing workflow with GitHub Actions (INSERTED)
+
+**Goal:** Implement manual GitHub Actions workflows to publish the package to NPM registry with version validation, automatic git tagging, and GitHub releases
+
+**Depends on:** Phase 12
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 12.2-01-PLAN.md — Create publish workflows and releasing documentation (Wave 1)
+
+**Details:**
+Two separate workflows for stable releases (main branch, admin-only) and pre-releases (dev branch). Each workflow validates version format, checks tag existence, runs tests and build, creates git tag and GitHub release, then publishes to NPM. Comprehensive validation occurs before point-of-no-return (tag creation). Includes troubleshooting documentation and NPM token setup guide.
+
+Requirements:
+- GitHub Actions workflows: `publish-main.yml` (stable releases) and `publish-dev.yml` (pre-releases)
+- Manual workflow_dispatch trigger with version input
+- Version validation: main branch rejects pre-release suffixes, dev branch allows them
+- Pre-flight checks: tag existence, version comparison, files field validation
+- Execution order: validate → test → build → pack → install tarball → tag → release → publish
+- NPM authentication via setup-node with NODE_AUTH_TOKEN
+- Git tag creation with annotation, GitHub release via gh CLI
+- Conditional dist-tag for dev branch (beta for pre-release, latest for stable)
+- Documentation: `docs/releasing.md` with step-by-step instructions, troubleshooting, token setup
+
 ---
 
 ## Phase Sequencing

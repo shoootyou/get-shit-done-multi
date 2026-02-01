@@ -1073,6 +1073,11 @@ Overall Progress:
   - Benefits: One directory per platform, easier to add/remove platforms, shorter file names, clearer boundaries
   - Architecture: platforms/{claude,copilot,codex}/ with adapter.js, validator.js, serializer.js, cleaner.js per platform
 
+- **2026-02-01:** Phase 12.2 inserted after Phase 12 - Add NPM publishing workflow with GitHub Actions (URGENT)
+  - Reason: Need automated, reliable process for publishing releases to NPM registry
+  - Impact: Manual workflow for controlled releases with version management and git tagging
+  - Scope: GitHub Actions workflow, version input, git tag creation/validation, NPM publish, documentation
+
 ### Critical Constraints
 
 **Active Constraints (MUST be followed):**
