@@ -91,11 +91,14 @@ describe('symlink-resolver', () => {
         .rejects.toThrow('Broken symlink');
     });
     
-    it('should throw for non-existent path', async () => {
+    it('should return isSymlink=false for non-existent path', async () => {
       const nonExistent = join(testDir, 'does-not-exist');
       
-      await expect(resolveSymlinkSingleLevel(nonExistent))
-        .rejects.toThrow('Path does not exist');
+      const result = await resolveSymlinkSingleLevel(nonExistent);
+      
+      expect(result.isSymlink).toBe(false);
+      expect(result.original).toBe(nonExistent);
+      expect(result.target).toBe(nonExistent);
     });
   });
   

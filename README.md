@@ -47,6 +47,16 @@ phase by phase with atomic task plans and clean commits.
 
 **Note:** Use `/gsd-` prefix for Claude and Copilot, `$gsd-` prefix for Codex.
 
+### Beta Version
+
+Test the latest features before stable release:
+
+```bash
+npx get-shit-done-multi@beta
+```
+
+The beta version includes pre-release features from the dev branch.
+
 ## Workflow
 
 ```text

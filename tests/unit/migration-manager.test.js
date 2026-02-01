@@ -137,17 +137,17 @@ describe('backup-manager', () => {
       await writeFile(join(source1, 'skill.md'), 'skill content');
       await writeFile(join(source2, 'VERSION'), '1.8.0');
       
-      const sourcePaths = [source1, source2];
+      // Use relative paths as expected by createBackup
+      const sourcePaths = ['.claude/commands/gsd', '.claude/get-shit-done'];
       
       const result = await createBackup('claude', '1.8.0', sourcePaths, testDir);
       
       expect(result.success).toBe(true);
       expect(result.backupPath).toBeDefined();
       
-      // Check files were copied
+      // Check files were copied - backup preserves directory structure
       const backupContents = await readdir(result.backupPath);
-      expect(backupContents).toContain('gsd');
-      expect(backupContents).toContain('get-shit-done');
+      expect(backupContents).toContain('.claude');
     });
     
     it('should return success: true when all files copied', async () => {

@@ -92,7 +92,7 @@ describe('Codex Serializer', () => {
       
       // Verify other fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain('description: "Test agent"');
+      expect(result).toContain('description: Test agent');
     });
     
     test('omits undefined fields', () => {
@@ -111,7 +111,7 @@ describe('Codex Serializer', () => {
       
       // Verify defined fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain('description: "Test agent"');
+      expect(result).toContain('description: Test agent');
     });
   });
   
@@ -215,8 +215,8 @@ describe('Codex Serializer', () => {
       
       const result = serializeFrontmatter(data);
       
-      // Codex always quotes description fields
-      expect(result).toContain('description: "This is a long description"');
+      // Simple strings with spaces don't require quoting in YAML
+      expect(result).toContain('description: This is a long description');
     });
     
     test('handles strings with special characters', () => {

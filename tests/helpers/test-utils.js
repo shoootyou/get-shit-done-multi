@@ -45,8 +45,8 @@ export async function createMinimalTemplates(baseDir) {
   await writeFile(
     join(skillsDir, 'SKILL.md'),
     `---
-name: Test Skill
-description: Test skill
+name: test-skill
+description: Test skill for integration tests
 allowed-tools: Read, Write
 ---
 Install to {{PLATFORM_ROOT}}/skills/
@@ -56,7 +56,7 @@ Use {{COMMAND_PREFIX}}test-skill
   
   // Create agent
   await writeFile(
-    join(agentsDir, 'gsd-test-agent.md'),
+    join(agentsDir, 'gsd-test-agent.agent.md'),
     `---
 name: test-agent
 description: Test agent
@@ -81,5 +81,12 @@ Agent content with {{PLATFORM_ROOT}} reference
     }, null, 2)
   );
   
+  // Create required AGENTS.md file
+  await writeFile(
+    join(templatesDir, 'AGENTS.md'),
+    '# Available Agents\n\nTest agents documentation',
+    'utf8'
+  );
+
   return templatesDir;
 }
