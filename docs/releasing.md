@@ -89,13 +89,15 @@ Use the local script `publish-pre.sh` for fast validation and optional publishin
 
 **Dry-run validation only** (recommended first):
 ```bash
-npm run publish-pre 2.0.0-beta.1
+npm run publish-pre -- 2.0.0-beta.1
 ```
 
 **Validate and publish** (after dry-run succeeds):
 ```bash
-npm run publish-pre 2.0.0-beta.1 --publish
+npm run publish-pre -- 2.0.0-beta.1 --publish
 ```
+
+> **Note:** The `--` separator is required when passing flags through `npm run`. It tells npm to pass everything after it to the script.
 
 ### Step-by-Step Instructions
 
@@ -110,14 +112,14 @@ npm run publish-pre 2.0.0-beta.1 --publish
 
 3. Run validation (dry-run):
    ```bash
-   npm run publish-pre 2.0.0-beta.1
+   npm run publish-pre -- 2.0.0-beta.1
    ```
 
 4. Review output and verify all checks pass
 
 5. If validation succeeds, publish:
    ```bash
-   npm run publish-pre 2.0.0-beta.1 --publish
+   npm run publish-pre -- 2.0.0-beta.1 --publish
    ```
 
 6. Verify success:

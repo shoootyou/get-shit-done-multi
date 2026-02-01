@@ -23,9 +23,13 @@ Flags:
   --publish   Actually publish to NPM (default: dry-run only)
 
 Examples:
+  # Direct script invocation:
   $0 1.9.1-beta.1              # Dry-run validation only
   $0 1.9.1-beta.1 --publish    # Validate and publish to NPM
-  $0 2.0.0                     # Validate stable version (dry-run)
+
+  # Via npm run (note the -- separator before flags):
+  npm run publish-pre -- 1.9.1-beta.1              # Dry-run
+  npm run publish-pre -- 1.9.1-beta.1 --publish    # Publish
 
 EOF
   exit 1
@@ -171,7 +175,7 @@ else
   exit 1
 fi
 
-if ! npm publish --dry-run --tag "$DIST_TAG"; then
+if ! npm publish --dry-run --tag "$DIST_TAG" --registry http://localhost:4873; then
   echo -e "${RED}❌ Dry-run failed${NC}"
   rm "$TARBALL_PATH"
   git checkout package.json
@@ -184,7 +188,7 @@ if [ "$PUBLISH_FLAG" = "true" ]; then
   echo -e "\n${BLUE}[9/9]${NC} Publishing to NPM..."
   
   # Dist-tag was already extracted in step 8
-  if ! npm publish --tag "$DIST_TAG"; then
+  if ! npm publish --tag "$DIST_TAG" --registry http://localhost:4873 ; then
     echo -e "${RED}❌ Publish failed${NC}"
     rm "$TARBALL_PATH"
     git checkout package.json
@@ -214,5 +218,7 @@ else
   echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
   echo ""
   echo -e "All checks passed! Run with ${GREEN}--publish${NC} flag to actually publish:"
-  echo -e "  ${GREEN}npm run publish-pre $VERSION --publish${NC}"
+  echo -e "  ${GREEN}./scripts/publish-pre.sh $VERSION --publish${NC}"
+  echo -e "Or via npm run:"
+  echo -e "  ${GREEN}npm run publish-pre -- $VERSION --publish${NC}"
 fi
