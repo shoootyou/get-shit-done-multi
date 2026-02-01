@@ -15,6 +15,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: prod
     permissions:
       contents: write
       id-token: write
@@ -29,7 +30,6 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
-          
       - name: Validate version format
         run: |
           if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
@@ -133,8 +133,6 @@ jobs:
           echo "Running npm publish dry-run..."
           npm publish --dry-run
           echo "✓ Dry-run publish successful"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
       - name: Create git tag
         run: |
@@ -160,9 +158,7 @@ jobs:
           
       - name: Publish to NPM
         run: |
-          echo "Publishing to NPM with latest tag..."
-          npm publish
-          echo "✓ Package published to NPM"
+          echo "Publishing to NPM with provenance and latest tag..."
+          npm publish --provenance --access public
+          echo "✓ Package published to NPM with OIDC provenance"
           echo "View at: https://www.npmjs.com/package/get-shit-done-multi/v/${{ inputs.version }}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
