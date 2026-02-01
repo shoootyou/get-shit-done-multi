@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-02-01  
-**Updated By:** GSD Execute Plan (Completed 11-02-PLAN.md)
+**Updated By:** GSD Execute Plan (Completed 12-01-PLAN.md)
 
 ---
 
@@ -11,24 +11,24 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 11 — Skill Validation and Adapter System (COMPLETE)
+**Current Focus:** Phase 12 — Unify frontmatter structure and apply adapter pattern (IN PROGRESS)
 
-**Next Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern
+**Next Phase:** Phase 12 Wave 2 — Per-platform serializer split
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 11 — Skill Validation and Adapter System (COMPLETE)
-**Next Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern (NOT PLANNED)
-**Completed:** 2 of 2 plans  
+**Current Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern (IN PROGRESS)
+**Next Phase:** Wave 2 — Per-platform serializer split
+**Completed:** 1 of 3 plans  
 **Milestone:** v2.1 Enhancement
 
 ### Plan Status
-**Completed Plans:** 45/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2)  
-**Last activity:** 2026-02-01 - Completed 11-02-PLAN.md (platform validators and integration)  
-**Next:** Phase 12 added - plan with /gsd-plan-phase 12
+**Completed Plans:** 46/48 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 1/3)  
+**Last activity:** 2026-02-01 - Completed 12-01-PLAN.md (rename rendering/ to serialization/)  
+**Next:** Plan 12-02 (per-platform serializer split)
 
 ### Progress Bar
 ```
@@ -48,9 +48,10 @@ Phase 8:   [██████████████████████�
 Phase 9:   [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 10:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 11:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
+Phase 12:  [█████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  33% (1/3 plans) 🔄 IN PROGRESS
 
 Overall Progress:
-[████████████████████████████████████████████████████] 100% (45/45 total plans) ✅ ALL PHASES COMPLETE
+[████████████████████████████████████████████████████]  96% (46/48 total plans)
 ```
 
 ---
@@ -977,6 +978,24 @@ Overall Progress:
      - Frontmatter: object, not empty, contains required fields
      - Rationale: Enforce base spec rules for all platforms
 
+142. **2026-02-01 (12-01):** Renamed rendering/ module to serialization/ (MODULE-NAMING)
+     - Module name now reflects purpose (YAML serialization, not UI rendering)
+     - All 10 import paths updated across platform adapters, installer modules, and tests
+     - Git history preserved via git mv command
+     - Rationale: Accurate naming prevents confusion about module responsibility
+
+143. **2026-02-01 (12-01):** Git mv for history preservation (GIT-HISTORY)
+     - Used git mv instead of delete+create to preserve file history
+     - Enables git blame traceability and code archeology
+     - Alternative of delete+create rejected due to history loss
+     - Rationale: File history critical for understanding code evolution
+
+144. **2026-02-01 (12-01):** Wave-based migration strategy (MIGRATION-WAVES)
+     - Wave 1: Structure changes (rename module directory)
+     - Wave 2: Per-platform split (separate serializers)
+     - Wave 3: Template separation (move template-renderer.js)
+     - Rationale: Incremental changes reduce risk, enable verification at each stage
+
 
 ### Roadmap Evolution
 
@@ -1282,12 +1301,12 @@ Phase 10 progressing smoothly. Completed unified milestone completion workflow w
 
 ## Session Continuity
 
-**Last session:** 2026-02-01T00:46:24Z  
-**Stopped at:** Completed 11-02-PLAN.md (Platform Validators and Integration)  
+**Last session:** 2026-02-01T02:03:01Z  
+**Stopped at:** Completed 12-01-PLAN.md (Rename rendering/ to serialization/)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-02-01  
-**Ready for:** All phases complete - v2.1 milestone achieved
+**Ready for:** Phase 12 Plan 02 - Per-platform serializer split (Wave 2)
