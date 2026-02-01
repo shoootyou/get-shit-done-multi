@@ -926,19 +926,20 @@ Applies Phase 11's per-platform isolation pattern to serialization components:
 
 ---
 
-### Phase 12.1: Refactor to per-platform directory structure (INSERTED)
+### Phase 12.1: Refactor to per-platform directory structure (INSERTED) ✅ COMPLETE
 
 **Goal:** Reorganize module structure from domain-based (frontmatter/, serialization/, platforms/) to platform-based (platforms/claude/, platforms/copilot/, platforms/codex/, platforms/_shared/) for better encapsulation and easier platform addition
 
 **Depends on:** Phase 12
 
-**Plans:** 4 plans
+**Plans:** 5 plans
 
 Plans:
-- [ ] 12.1-01-PLAN.md — Migrate Claude platform files to platforms/claude/
-- [ ] 12.1-02-PLAN.md — Migrate Copilot platform files to platforms/copilot/
-- [ ] 12.1-03-PLAN.md — Migrate Codex platform files to platforms/codex/
-- [ ] 12.1-04-PLAN.md — Migrate shared files to platforms/_shared/ and cleanup
+- [x] 12.1-01-PLAN.md — Migrate Claude platform files to platforms/claude/
+- [x] 12.1-02-PLAN.md — Migrate Copilot platform files to platforms/copilot/
+- [x] 12.1-03-PLAN.md — Migrate Codex platform files to platforms/codex/
+- [x] 12.1-04-PLAN.md — Migrate shared files to platforms/_shared/ and cleanup
+- [x] 12.1-05-PLAN.md — Fix import paths after restructure (gap closure)
 
 **Details:**
 Phase 12 achieved per-platform isolation (separate files per platform), but files are still scattered across domain directories. This phase consolidates all platform-specific code into single platform directories.
