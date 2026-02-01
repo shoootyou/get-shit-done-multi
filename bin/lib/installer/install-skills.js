@@ -2,15 +2,15 @@ import { join, basename, dirname } from 'path';
 import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
 import { findUnknownVariables, replaceVariables } from '../templates/template-renderer.js';
-import { cleanFrontmatter as cleanClaudeFrontmatter } from '../serialization/claude-cleaner.js';
+import { cleanFrontmatter as cleanClaudeFrontmatter } from '../platforms/claude/cleaner.js';
 import { cleanFrontmatter as cleanCopilotFrontmatter } from '../platforms/copilot/cleaner.js';
-import { cleanFrontmatter as cleanCodexFrontmatter } from '../serialization/codex-cleaner.js';
+import { cleanFrontmatter as cleanCodexFrontmatter } from '../platforms/codex/cleaner.js';
 import * as logger from '../cli/logger.js';
 import matter from 'gray-matter';
-import { ClaudeValidator } from '../frontmatter/claude-validator.js';
+import { ClaudeValidator } from '../platforms/claude/validator.js';
 import { CopilotValidator } from '../platforms/copilot/validator.js';
-import { CodexValidator } from '../frontmatter/codex-validator.js';
-import { ValidationError } from '../frontmatter/validation-error.js';
+import { CodexValidator } from '../platforms/codex/validator.js';
+import { ValidationError } from '../platforms/_shared/validation-error.js';
 
 /**
  * Validator registry - map of platform names to validator instances

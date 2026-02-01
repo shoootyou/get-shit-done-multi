@@ -5,8 +5,8 @@
  * Extends base validator with Copilot platform rules
  */
 
-import { BaseValidator } from './base-validator.js';
-import * as logger from '../cli/logger.js';
+import { BaseValidator } from '../_shared/base-validator.js';
+import * as logger from '../../cli/logger.js';
 
 // Platform name constant (reuse from platform-names.js pattern)
 const COPILOT = 'copilot';

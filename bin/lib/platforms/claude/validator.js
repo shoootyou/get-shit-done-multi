@@ -5,7 +5,7 @@
  * Extends base validator with Claude platform rules
  */
 
-import { BaseValidator } from '../../frontmatter/base-validator.js';
+import { BaseValidator } from '../_shared/base-validator.js';
 import * as logger from '../../cli/logger.js';
 
 // Platform name constant (reuse from platform-names.js pattern)

@@ -1,7 +1,7 @@
 // tests/unit/template-renderer.test.js
 
 import { describe, it, expect } from 'vitest';
-import { replaceVariables, findUnknownVariables } from '../../bin/lib/serialization/template-renderer.js';
+import { replaceVariables, findUnknownVariables } from '../../bin/lib/templates/template-renderer.js';
 
 describe('template-renderer', () => {
   describe('replaceVariables', () => {

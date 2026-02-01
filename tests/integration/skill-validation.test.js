@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtemp, rm } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { ClaudeValidator } from '../../bin/lib/frontmatter/claude-validator.js';
-import { CopilotValidator } from '../../bin/lib/frontmatter/copilot-validator.js';
-import { CodexValidator } from '../../bin/lib/frontmatter/codex-validator.js';
-import { ValidationError } from '../../bin/lib/frontmatter/validation-error.js';
+import { ClaudeValidator } from '../../bin/lib/platforms/claude/validator.js';
+import { CopilotValidator } from '../../bin/lib/platforms/copilot/validator.js';
+import { CodexValidator } from '../../bin/lib/platforms/codex/validator.js';
+import { ValidationError } from '../../bin/lib/platforms/_shared/validation-error.js';
 
 describe('Skill Validation', () => {
   let tempDir;
