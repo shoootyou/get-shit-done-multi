@@ -1168,10 +1168,11 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-- 2026-02-01-document-beta-installation.md — Document how to install beta version with `npx get-shit-done-multi@beta`
-- 2026-02-01-add-pr-validation-workflow.md — Create GitHub Action to validate PRs (tests + tarball install, no publish)
+None
 
 ### Completed Todos
+- 2026-02-01-add-pr-validation-workflow.md — Created GitHub Action to validate PRs (tests + tarball install, no publish) - runs on all PRs
+- 2026-02-01-document-beta-installation.md — Added Beta Version section to README with npx get-shit-done-multi@beta installation instructions
 - 2026-02-01-update-changelog-and-docs-for-v2.md — Updated CHANGELOG.md and docs/what-gets-installed.md for v2.0.0 to include phase 10 changes (milestone completion unification, skill deprecations, gsd-add-todo enhancements)
 - 2026-01-30-update-package-and-repo-descriptions.md — Updated package.json description to highlight structured workflow with 29 skills and 13 agents
 - 2026-01-30-update-documentation-corrections-clarifications.md — Updated how-to-customize.md (added --all flag, fixed --version, clarified custom paths, removed partial install), cleaned architecture.md (removed Key Decisions and Testing sections), fixed repo URLs (yourusername → shoootyou), removed broken commands link
