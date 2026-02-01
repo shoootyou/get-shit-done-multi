@@ -115,6 +115,11 @@ export class CodexValidator extends BaseValidator {
    * @param {Object} context - Validation context
    */
   validateArgumentHint(value, context) {
+    // Allow null or empty string (will be removed during frontmatter cleaning)
+    if (value === null || value === '') {
+      return;
+    }
+    
     // Check if value is string or array
     if (typeof value !== 'string' && !Array.isArray(value)) {
       logger.warn(`Skill validation: ${context.templateName} - argument-hint: Expected string or array, got ${typeof value}`, 2);

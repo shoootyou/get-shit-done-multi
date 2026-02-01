@@ -108,13 +108,18 @@ export class ClaudeValidator extends BaseValidator {
 
   /**
    * Validate argument-hint field format
-   * Expected: String or array
+   * Expected: String, array, or empty/null (which gets removed during cleaning)
    * Example: "[issue-number]" or "[filename] [format]"
    * 
    * @param {*} value - argument-hint value
    * @param {Object} context - Validation context
    */
   validateArgumentHint(value, context) {
+    // Allow null or empty string (will be removed during frontmatter cleaning)
+    if (value === null || value === '') {
+      return;
+    }
+    
     // Check if value is string or array
     if (typeof value !== 'string' && !Array.isArray(value)) {
       logger.warn(`Skill validation: ${context.templateName} - argument-hint: Expected string or array, got ${typeof value}`, 2);
