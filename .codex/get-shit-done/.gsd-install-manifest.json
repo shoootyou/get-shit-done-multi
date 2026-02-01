@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "codex",
   "scope": "local",
-  "installed_at": "2026-01-31T23:06:05.365Z",
+  "installed_at": "2026-02-01T12:52:16.253Z",
   "files": [
     "agents/gsd-codebase-mapper.agent.md",
     "agents/gsd-debugger-specialist.agent.md",

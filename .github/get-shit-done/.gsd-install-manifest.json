@@ -2,7 +2,7 @@
   "gsd_version": "2.0.0",
   "platform": "copilot",
   "scope": "local",
-  "installed_at": "2026-01-31T23:06:05.314Z",
+  "installed_at": "2026-02-01T12:52:16.201Z",
   "files": [
     "agents/gsd-codebase-mapper.agent.md",
     "agents/gsd-debugger.agent.md",

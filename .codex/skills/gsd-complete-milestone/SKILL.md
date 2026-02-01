@@ -1,16 +1,15 @@
 ---
 name: gsd-complete-milestone
-description: "Complete milestone with direct history/v{X.Y}/ archiving and cleanup"
+description: Complete milestone with direct archiving and cleanup
 allowed-tools: Read, Edit, Bash, AskUserQuestion
-argument-hint: "[version]"
+argument-hint: '[milestone-version]'
 ---
 
 
 <objective>
-Complete milestone {{version}}, archive all files directly to .planning/history/v{{version}}/ with mirrored structure, and clean workspace for next milestone.
-
+Complete milestone {{milestone-version}}, archive all files directly to .planning/history/v{{milestone-version}}/ with mirrored structure, and clean workspace for next milestone.
 Purpose: Archive milestone artifacts to permanent history/, update MILESTONES.md registry, optional git tag, prepare clean workspace.
-Output: Milestone archived to history/v{{version}}/, workspace contains only PROJECT.md, MILESTONES.md, config.json, codebase/.
+Output: Milestone archived to history/v{{milestone-version}}/, workspace contains only PROJECT.md, MILESTONES.md, config.json, codebase/.
 </objective>
 
 <execution_context>
@@ -29,7 +28,7 @@ Output: Milestone archived to history/v{{version}}/, workspace contains only PRO
 - `.planning/todos/` (if exists)
 
 **User input:**
-- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
+- Version: {{milestone-version}} (e.g., "1.0", "1.1", "2.0")
 </context>
 
 <process>
@@ -55,7 +54,7 @@ Use AskUserQuestion to get combined readiness + archive confirmation:
 
 **Tool: AskUserQuestion**
 - **header:** "Ready to Complete Milestone?"
-- **question:** "Complete v{{version}}? This will archive all files to history/v{{version}}/"
+- **question:** "Complete v{{milestone-version}}? This will archive all files to history/v{{milestone-version}}/"
 - **details:** Show milestone stats:
   - Number of phases completed
   - Number of plans completed
@@ -71,7 +70,7 @@ Use AskUserQuestion to get combined readiness + archive confirmation:
 
 <step name="archive_to_history">
 
-Archive all milestone files directly to history/v{{version}}/ using bash commands:
+Archive all milestone files directly to history/v{{milestone-version}}/ using bash commands:
 
 ```bash
 # Source git helpers
@@ -80,29 +79,29 @@ if ! type commit_as_user >/dev/null 2>&1; then
 fi
 
 # Create destination with mirrored structure
-mkdir -p .planning/history/v{{version}}/
+mkdir -p .planning/history/v{{milestone-version}}/
 
 # Move required files atomically
-mv .planning/ROADMAP.md .planning/history/v{{version}}/
-mv .planning/STATE.md .planning/history/v{{version}}/
-mv .planning/PROJECT.md .planning/history/v{{version}}/
+mv .planning/ROADMAP.md .planning/history/v{{milestone-version}}/
+mv .planning/STATE.md .planning/history/v{{milestone-version}}/
+mv .planning/PROJECT.md .planning/history/v{{milestone-version}}/
 
 # Move optional files (don't fail if missing)
-mv .planning/REQUIREMENTS.md .planning/history/v{{version}}/ 2>/dev/null || true
+mv .planning/REQUIREMENTS.md .planning/history/v{{milestone-version}}/ 2>/dev/null || true
 
 # Move directories (preserves structure)
-mv .planning/phases .planning/history/v{{version}}/ 2>/dev/null || true
-mv .planning/research .planning/history/v{{version}}/ 2>/dev/null || true
-mv .planning/todos .planning/history/v{{version}}/ 2>/dev/null || true
+mv .planning/phases .planning/history/v{{milestone-version}}/ 2>/dev/null || true
+mv .planning/research .planning/history/v{{milestone-version}}/ 2>/dev/null || true
+mv .planning/todos .planning/history/v{{milestone-version}}/ 2>/dev/null || true
 
 # Stage all changes
-git add .planning/history/v{{version}}/
+git add .planning/history/v{{milestone-version}}/
 git add -u .planning/  # Stages deletions
 
 # Commit with user identity
-commit_as_user "milestone: archive v{{version}} to history
+commit_as_user "milestone: archive v{{milestone-version}} to history
 
-Moved to .planning/history/v{{version}}/:
+Moved to .planning/history/v{{milestone-version}}/:
 - ROADMAP.md, STATE.md, PROJECT.md
 - REQUIREMENTS.md
 - phases/, research/, todos/
@@ -119,11 +118,11 @@ Update .planning/MILESTONES.md with new entry (create if doesn't exist):
 
 ```bash
 # Extract milestone name from ROADMAP.md (now in history/)
-MILESTONE_NAME=$(grep "^# " .planning/history/v{{version}}/ROADMAP.md | head -1 | sed 's/^# //')
+MILESTONE_NAME=$(grep "^# " .planning/history/v{{milestone-version}}/ROADMAP.md | head -1 | sed 's/^# //')
 
 # Count phases and plans
-PHASE_COUNT=$(find .planning/history/v{{version}}/phases -name "SUMMARY.md" 2>/dev/null | cut -d/ -f5 | cut -d- -f1 | sort -u | wc -l)
-PLAN_COUNT=$(find .planning/history/v{{version}}/phases -name "SUMMARY.md" 2>/dev/null | wc -l)
+PHASE_COUNT=$(find .planning/history/v{{milestone-version}}/phases -name "SUMMARY.md" 2>/dev/null | cut -d/ -f5 | cut -d- -f1 | sort -u | wc -l)
+PLAN_COUNT=$(find .planning/history/v{{milestone-version}}/phases -name "SUMMARY.md" 2>/dev/null | wc -l)
 
 # Extract key accomplishments from SUMMARYs
 # (AI: Read 3-5 SUMMARY files and extract major accomplishments)
@@ -131,7 +130,7 @@ PLAN_COUNT=$(find .planning/history/v{{version}}/phases -name "SUMMARY.md" 2>/de
 # Append to registry
 cat >> .planning/MILESTONES.md << EOF
 
-## v{{version}} — ${MILESTONE_NAME}
+## v{{milestone-version}} — ${MILESTONE_NAME}
 
 **Completed:** $(date +%Y-%m-%d)
 **Phases:** ${PHASE_COUNT}
@@ -142,12 +141,12 @@ cat >> .planning/MILESTONES.md << EOF
 - [ACCOMPLISHMENT_2]
 - [ACCOMPLISHMENT_3]
 
-**Location:** .planning/history/v{{version}}/
+**Location:** .planning/history/v{{milestone-version}}/
 
 EOF
 
 git add .planning/MILESTONES.md
-commit_as_user "milestone: register v{{version}} completion"
+commit_as_user "milestone: register v{{milestone-version}} completion"
 ```
 </step>
 
@@ -157,16 +156,16 @@ Use AskUserQuestion to offer optional git tag:
 
 **Tool: AskUserQuestion**
 - **header:** "Git Tag"
-- **question:** "Create git tag v{{version}}?"
+- **question:** "Create git tag v{{milestone-version}}?"
 - **options:**
-  - "Create tag v{{version}}" — Tag this version
+  - "Create tag v{{milestone-version}}" — Tag this version
   - "Skip tag" — No git tag
 
-**If "Create tag v{{version}}":**
+**If "Create tag v{{milestone-version}}":**
 ```bash
-git tag v{{version}}
-echo "Tag v{{version}} created locally."
-echo "To push: git push origin v{{version}}"
+git tag v{{milestone-version}}
+echo "Tag v{{milestone-version}} created locally."
+echo "To push: git push origin v{{milestone-version}}"
 ```
 
 **If "Skip tag":** Continue to next step.
@@ -181,10 +180,10 @@ Display stage banner (following ui-brand.md):
  GSD ► MILESTONE COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**v{{version}} {MILESTONE_NAME}** — {N} phases complete
+**v{{milestone-version}} {MILESTONE_NAME}** — {N} phases complete
 
-Archived to: .planning/history/v{{version}}/
-Git tag: v{{version}} {if created}
+Archived to: .planning/history/v{{milestone-version}}/
+Git tag: v{{milestone-version}} {if created}
 
 Workspace clean: PROJECT.md, MILESTONES.md, config.json, codebase/
 
@@ -205,7 +204,7 @@ Workspace clean: PROJECT.md, MILESTONES.md, config.json, codebase/
 </process>
 
 <success_criteria>
-- [ ] All milestone files archived to .planning/history/v{{version}}/
+- [ ] All milestone files archived to .planning/history/v{{milestone-version}}/
 - [ ] Directory structure mirrored (phases/, research/, todos/)
 - [ ] Git commit preserves user identity
 - [ ] Optional git tag created based on user choice
@@ -218,6 +217,6 @@ Workspace clean: PROJECT.md, MILESTONES.md, config.json, codebase/
 - **Atomic operations:** Use mv for file moves (not cp then rm)
 - **Git identity:** Source git-identity-helpers.sh and use commit_as_user
 - **Optional files:** Use 2>/dev/null || true for files that might not exist
-- **Direct archiving:** Archive to history/v{{version}}/ (not milestones/)
+- **Direct archiving:** Archive to history/v{{milestone-version}}/ (not milestones/)
 - **Clean workspace:** After completion, only PROJECT.md, MILESTONES.md, config.json, codebase/ remain
 </critical_rules>

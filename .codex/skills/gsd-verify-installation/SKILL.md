@@ -1,6 +1,6 @@
 ---
 name: gsd-verify-installation
-description: "Run diagnostic checks on GSD installation and report status"
+description: Run diagnostic checks on GSD installation and report status
 allowed-tools: Bash, Read
 ---
 

@@ -1,8 +1,8 @@
 ---
 name: gsd-plan-phase
-description: "Orchestrate phase planning with research, planning, and verification loop"
+description: Orchestrate phase planning with research, planning, and verification loop
 allowed-tools: Task, Read, Edit, Bash
-argument-hint: "[phase] [--research] [--skip-research] [--gaps] [--skip-verify]"
+argument-hint: '[phase] [--research] [--skip-research] [--gaps] [--skip-verify]'
 ---
 
 

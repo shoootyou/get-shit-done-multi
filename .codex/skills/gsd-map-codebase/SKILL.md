@@ -1,8 +1,8 @@
 ---
 name: gsd-map-codebase
-description: "Analyze codebase with parallel mapper agents to produce structured documentation"
+description: Analyze codebase with parallel mapper agents to produce structured documentation
 allowed-tools: Task, Read, Edit, Bash, Grep
-argument-hint: "[area]"
+argument-hint: '[area]'
 ---
 
 

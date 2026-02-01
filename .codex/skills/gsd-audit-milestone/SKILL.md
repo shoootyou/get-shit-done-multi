@@ -1,8 +1,8 @@
 ---
 name: gsd-audit-milestone
-description: "Spawn integration checker to validate cross-phase integration and E2E flows"
+description: Spawn integration checker to validate cross-phase integration and E2E flows
 allowed-tools: Read, Edit, Bash, Task
-argument-hint: "[version]"
+argument-hint: '[version]'
 ---
 
 

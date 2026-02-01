@@ -1,6 +1,6 @@
 ---
 name: gsd-list-milestones
-description: "Display completed milestones from the MILESTONES.md registry"
+description: Display completed milestones from the MILESTONES.md registry
 allowed-tools: Read, Bash
 ---
 
