@@ -41,13 +41,13 @@ const cleaners = {
 function validateSkillFrontmatter(content, templateName, filePath, platform) {
   // Parse frontmatter from content
   const { data: frontmatter } = matter(content);
-  
+
   // Get validator for platform
   const validator = validators[platform];
   if (!validator) {
     throw new Error(`No validator found for platform: ${platform}`);
   }
-  
+
   // Validate with context
   const context = { templateName, filePath, platform };
   validator.validate(frontmatter, context);
@@ -82,10 +82,10 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
 
     // Process SKILL.md file
     const skillFile = join(destDir, 'SKILL.md');
-    await processTemplateFile(skillFile, variables, isVerbose, platform);
+    const hadWarn = await processTemplateFile(skillFile, variables, isVerbose, platform);
 
     count++;
-    logger.verboseComplete(isVerbose);
+    if (!hadWarn) logger.verboseComplete(isVerbose);
   }
 
   // Install platform-specific get-shit-done skill
@@ -96,10 +96,10 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
     await copyDirectory(getShitDoneTemplateDir, destDir);
 
     const skillFile = join(destDir, 'SKILL.md');
-    await processTemplateFile(skillFile, variables, isVerbose, platform);
+    const hadWarn = await processTemplateFile(skillFile, variables, isVerbose, platform);
 
     count++;
-    logger.verboseComplete(isVerbose);
+    if (!hadWarn) logger.verboseComplete(isVerbose);
   }
 
   return count;
@@ -107,14 +107,21 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
 
 /**
  * Process template file (read, replace variables, validate, clean, write)
+ * @param {string} filePath - Path to the template file
+ * @param {Object} variables - Variables for template replacement
+ * @param {boolean} isVerbose - Verbosity flag
+ * @param {string} platform - Target platform
+ * @returns {Promise<boolean>} True if at least one warning was detected
  */
 async function processTemplateFile(filePath, variables, isVerbose, platform) {
   const content = await readFile(filePath, 'utf8');
 
   // Find unknown variables and warn
   const unknown = findUnknownVariables(content, variables);
-  if (unknown.length > 0 && isVerbose) {
-    logger.warn(`Unknown variables in ${filePath}: ${unknown.join(', ')}`);
+  const hadWarn = unknown.length > 0;
+  if (hadWarn && isVerbose) {
+    console.log();
+    logger.warn(`Unknown variables in ${filePath}: ${unknown.join(', ')}`, 4);
   }
 
   // Replace template variables
@@ -141,4 +148,5 @@ async function processTemplateFile(filePath, variables, isVerbose, platform) {
   const cleaned = cleanFrontmatter(processed);
 
   await writeFile(filePath, cleaned);
+  return hadWarn;
 }
