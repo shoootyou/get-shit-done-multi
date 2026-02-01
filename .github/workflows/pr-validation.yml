@@ -12,6 +12,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     
     steps:
       - name: Checkout code
@@ -27,7 +30,9 @@ jobs:
         run: npm ci
         
       - name: Run tests
+        id: tests
         run: npm test
+        continue-on-error: true
         
       - name: Build if build script exists
         run: |
@@ -39,6 +44,8 @@ jobs:
           fi
           
       - name: Create and validate tarball
+        id: tarball
+        continue-on-error: true
         run: |
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "Creating tarball..."
@@ -67,6 +74,69 @@ jobs:
           rm -f "$TARBALL"
           echo "✓ Cleanup complete"
           
+      - name: Comment on PR - Success
+        if: success()
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ✅ Validation Passed
+
+**All checks completed successfully:**
+- ✓ Tests passed
+- ✓ Tarball created and validated
+- ✓ Installation verified
+
+This PR is ready for review.
+
+<details>
+<summary>View details</summary>
+
+[Workflow run details](${runUrl})
+</details>`
+            });
+            
+      - name: Comment on PR - Failure
+        if: failure()
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            let failureDetails = '';
+            
+            if ('${{ steps.tests.outcome }}' === 'failure') {
+              failureDetails += '- ❌ Tests failed\n';
+            }
+            if ('${{ steps.tarball.outcome }}' === 'failure') {
+              failureDetails += '- ❌ Tarball creation/validation failed\n';
+            }
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ❌ Validation Failed
+
+**The following checks failed:**
+${failureDetails}
+
+Please review the errors and push fixes.
+
+<details>
+<summary>View full logs</summary>
+
+[Workflow run details](${runUrl})
+</details>`
+            });
+            
+      - name: Fail workflow if any step failed
+        if: steps.tests.outcome == 'failure' || steps.tarball.outcome == 'failure'
+        run: exit 1
+      
       - name: Validation summary
         if: success()
         run: |
