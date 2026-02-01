@@ -1168,7 +1168,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+- 2026-02-01-document-beta-installation.md — Document how to install beta version with `npx get-shit-done-multi@beta`
+- 2026-02-01-add-pr-validation-workflow.md — Create GitHub Action to validate PRs (tests + tarball install, no publish)
 
 ### Completed Todos
 - 2026-02-01-update-changelog-and-docs-for-v2.md — Updated CHANGELOG.md and docs/what-gets-installed.md for v2.0.0 to include phase 10 changes (milestone completion unification, skill deprecations, gsd-add-todo enhancements)
