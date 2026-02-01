@@ -819,10 +819,11 @@ Plans:
 
 **Dependencies:** Phase 1 (templates must exist)
 
-**Plans:** 0 plans
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 11 to break down)
+- [ ] 11-01-PLAN.md — Foundation: Joi, Base Validator, Validation Error, Field Validators (Wave 1)
+- [ ] 11-02-PLAN.md — Platform Validators and Integration (Wave 2)
 
 **Requirements Mapped:**
 - TEMPLATE-04: Frontmatter validation against agentskills.io specification
