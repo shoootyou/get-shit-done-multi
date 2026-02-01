@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-02-01  
-**Updated By:** GSD Execute Phase (Completed Phase 12)
+**Updated By:** GSD Execute Phase (Completed Phase 12.2-01)
 
 ---
 
@@ -11,23 +11,22 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 12.1 — Refactor to per-platform directory structure (NOT PLANNED)
+**Current Focus:** Phase 12.2 — Add NPM Publishing Workflow with GitHub Actions
 
-**Next Phase:** Phase 12.1 needs planning
+**Next Phase:** Phase 12.2 complete - ready for additional features or new milestone
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 12.1 — Refactor to per-platform directory structure (NOT PLANNED)
-**Completed:** 0 of 0 plans  
+**Current Phase:** Phase 12.2 — Add NPM Publishing Workflow with GitHub Actions
+**Completed:** 1 of 1 plans ✅ COMPLETE
 **Milestone:** v2.0 — Complete Multi-Platform Installer
 
-### Plan Status
-**Completed Plans:** 48/48 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 3/3)  
-**Last activity:** 2026-02-01 - Completed 12-03-PLAN.md (documentation and test migration)  
-**Next:** All plans complete - ready for next milestone
+**Completed Plans:** 49/49 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 3/3, Phase 12.2: 1/1)  
+**Last activity:** 2026-02-01 - Completed 12.2-01-PLAN.md (NPM publishing workflow)  
+**Next:** All plans complete - ready for next milestone or additional features
 
 ### Progress Bar
 ```
@@ -48,9 +47,10 @@ Phase 9:   [██████████████████████�
 Phase 10:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 11:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 12:  [████████████████████████████████████████████████████] 100% (3/3 plans) ✅ COMPLETE
+Phase 12.2:[████████████████████████████████████████████████████] 100% (1/1 plans) ✅ COMPLETE
 
 Overall Progress:
-[████████████████████████████████████████████████████] 100% (48/48 total plans) ✅ COMPLETE
+[████████████████████████████████████████████████████] 100% (49/49 total plans) ✅ COMPLETE
 ```
 
 ---
@@ -1026,6 +1026,42 @@ Overall Progress:
      - Matches platform isolation pattern established in Phase 11-12
      - Rationale: Test clarity, platform-specific formatting verification, pattern consistency
 
+150. **2026-02-01 (12.2-01):** Two-workflow approach for releases (NPM-DUAL-WORKFLOW)
+     - Separate workflows for main (stable) and dev (pre-release) branches
+     - Main workflow: Admin-only, rejects pre-release versions, publishes with `latest` tag
+     - Dev workflow: Write-access, allows pre-release versions, conditional dist-tag (beta/latest)
+     - Rationale: Different permission requirements, version validation rules, and dist-tags
+
+151. **2026-02-01 (12.2-01):** Ephemeral package.json version updates (NPM-VERSION-EPHEMERAL)
+     - Workflow updates package.json during execution but doesn't commit back to repo
+     - Git tags are source of truth for versions
+     - Avoids commit spam, merge conflicts, and bot account commits
+     - Rationale: Clean repository history, version tracked in immutable tags
+
+152. **2026-02-01 (12.2-01):** Validate before point-of-no-return (NPM-VALIDATE-FIRST)
+     - All validation, tests, build, and tarball checks BEFORE git tag creation
+     - Git tags are immutable and should not be deleted
+     - 10 validation steps before tag, only 2 steps after
+     - Rationale: Safe failure path, avoid orphaned tags, tag indicates intent to publish
+
+153. **2026-02-01 (12.2-01):** Conditional dist-tag based on version format (NPM-DIST-TAG-DETECTION)
+     - Dev workflow detects pre-release suffix (`-` in version) automatically
+     - Pre-release versions publish with `beta` tag, stable with `latest`
+     - Prevents human error in dist-tag selection
+     - Rationale: Pre-releases shouldn't pollute `latest`, automatic detection safer
+
+154. **2026-02-01 (12.2-01):** Use GitHub CLI for releases (NPM-GH-CLI)
+     - Use `gh release create` instead of deprecated actions/create-release
+     - GitHub CLI pre-installed on all runners, actively maintained
+     - Simpler syntax, atomic tag and release creation
+     - Rationale: Future-proof, official tooling, avoids deprecated actions
+
+155. **2026-02-01 (12.2-01):** Recommend granular NPM tokens (NPM-TOKEN-GRANULAR)
+     - Granular access tokens over classic automation tokens
+     - Scope tokens to specific package, publish permission only
+     - Better security posture, prevents token abuse
+     - Rationale: NPM security best practice, minimize blast radius
+
 
 ### Roadmap Evolution
 
@@ -1342,12 +1378,12 @@ Phase 10 progressing smoothly. Completed unified milestone completion workflow w
 
 ## Session Continuity
 
-**Last session:** 2026-02-01T02:21:57Z  
-**Stopped at:** Completed 12-03-PLAN.md (Documentation and test migration)  
+**Last session:** 2026-02-01T13:37:33Z  
+**Stopped at:** Completed 12.2-01-PLAN.md (NPM publishing workflow with GitHub Actions)  
 **Resume file:** None
 
 ---
 
 **State initialized:** 2026-01-25  
 **Last updated:** 2026-02-01  
-**Ready for:** All phases complete - Ready for next milestone or enhancement
+**Ready for:** All phases complete - Phase 12.2 ready for manual testing (requires NPM_TOKEN)
