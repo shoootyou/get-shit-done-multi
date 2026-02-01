@@ -76,7 +76,7 @@ jobs:
           
       - name: Comment on PR - Success
         if: success()
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
@@ -85,24 +85,23 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `## ✅ Validation Passed
+              **All checks completed successfully:**
+              - ✓ Tests passed
+              - ✓ Tarball created and validated
+              - ✓ Installation verified
 
-**All checks completed successfully:**
-- ✓ Tests passed
-- ✓ Tarball created and validated
-- ✓ Installation verified
+              This PR is ready for review.
 
-This PR is ready for review.
+              <details>
+              <summary>View details</summary>
 
-<details>
-<summary>View details</summary>
-
-[Workflow run details](${runUrl})
-</details>`
+              [Workflow run details](${runUrl})
+              </details>`
             });
             
       - name: Comment on PR - Failure
         if: failure()
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
@@ -120,17 +119,16 @@ This PR is ready for review.
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `## ❌ Validation Failed
+              **The following checks failed:**
+              ${failureDetails}
 
-**The following checks failed:**
-${failureDetails}
+              Please review the errors and push fixes.
 
-Please review the errors and push fixes.
+              <details>
+              <summary>View full logs</summary>
 
-<details>
-<summary>View full logs</summary>
-
-[Workflow run details](${runUrl})
-</details>`
+              [Workflow run details](${runUrl})
+              </details>`
             });
             
       - name: Fail workflow if any step failed
