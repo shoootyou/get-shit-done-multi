@@ -894,22 +894,31 @@ By default, all validators enforce the two mandatory fields (name, description) 
 
 **Depends on:** Phase 11
 
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 12 to break down)
+- [ ] 12-01-PLAN.md — Rename bin/lib/rendering/ to bin/lib/serialization/ and update all imports
+- [ ] 12-02-PLAN.md — Split shared serializers/cleaners into per-platform files (claude, copilot, codex) and move template-renderer.js to bin/lib/templates/
+- [ ] 12-03-PLAN.md — Create docs/adding-platforms.md contributor guide and verify migration with full test suite
 
 **Details:**
-Current state analysis reveals structural inconsistency:
-1. **Module organization issue**: `bin/lib/frontmatter/` contains validators while `bin/lib/rendering/` contains frontmatter serializers/cleaners - naming suggests potential consolidation or clearer separation
-2. **Pattern inconsistency**: Phase 11 established one-per-platform pattern for validators, but rendering module contains shared serializers/cleaners not following this pattern
+Applies Phase 11's per-platform isolation pattern to serialization components:
+1. **Module rename**: `bin/lib/rendering/` → `bin/lib/serialization/` (clearer naming)
+2. **Per-platform split**: Shared frontmatter-serializer.js and frontmatter-cleaner.js split into 6 platform-specific files
+3. **Module separation**: template-renderer.js moved to `bin/lib/templates/` (general EJS rendering, not frontmatter-specific)
+4. **Contributor documentation**: Complete checklist for adding new platforms (e.g., Cursor, Windsurf)
 
-This phase will:
-- Evaluate whether to unify frontmatter-related code into single module or rename for clarity
-- Refactor rendering/serialization components to follow per-platform adapter pattern (similar to validators)
-- Ensure consistent architectural approach across all frontmatter-related functionality
+**Architecture after Phase 12:**
+- `bin/lib/frontmatter/` — Per-platform validators (Phase 11)
+- `bin/lib/serialization/` — Per-platform serializers and cleaners (Phase 12)
+- `bin/lib/templates/` — General template rendering (Phase 12)
+- Pattern consistency: validators, serializers, and cleaners all follow platform isolation principle
 
-[To be added during planning]
+**Wave structure:** 4 sequential waves
+- Wave 1: Module rename (structure change only)
+- Wave 2: Split serializers into per-platform files
+- Wave 3: Split cleaners and relocate template-renderer
+- Wave 4: Documentation and full test verification
 
 ---
 
