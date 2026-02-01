@@ -134,15 +134,18 @@ echo -e "\n${BLUE}[7/9]${NC} Creating tarball and validating installation..."
 TARBALL=$(npm pack)
 echo "Created: $TARBALL"
 
+# Save absolute path to tarball before changing directories
+TARBALL_PATH="$(pwd)/$TARBALL"
+
 TEMP_DIR=$(mktemp -d)
 echo "Testing installation in: $TEMP_DIR"
 
 cd "$TEMP_DIR"
-if ! npm install "../$TARBALL" --verbose; then
+if ! npm install "$TARBALL_PATH" --verbose; then
   echo -e "${RED}❌ Installation test failed${NC}"
   cd -
   rm -rf "$TEMP_DIR"
-  rm "$TARBALL"
+  rm "$TARBALL_PATH"
   git checkout package.json
   exit 1
 fi
@@ -154,7 +157,7 @@ echo -e "${GREEN}✓${NC} Tarball installs successfully"
 echo -e "\n${BLUE}[8/9]${NC} Running npm publish --dry-run..."
 if ! npm publish --dry-run; then
   echo -e "${RED}❌ Dry-run failed${NC}"
-  rm "$TARBALL"
+  rm "$TARBALL_PATH"
   git checkout package.json
   exit 1
 fi
@@ -175,7 +178,7 @@ if [ "$PUBLISH_FLAG" = "true" ]; then
   
   if ! npm publish --tag "$DIST_TAG"; then
     echo -e "${RED}❌ Publish failed${NC}"
-    rm "$TARBALL"
+    rm "$TARBALL_PATH"
     git checkout package.json
     exit 1
   fi
@@ -184,7 +187,7 @@ if [ "$PUBLISH_FLAG" = "true" ]; then
   echo -e "View at: ${BLUE}https://www.npmjs.com/package/get-shit-done-multi/v/${VERSION}${NC}"
   
   # Clean up tarball
-  rm "$TARBALL"
+  rm "$TARBALL_PATH"
   
   # Restore package.json (version update was ephemeral)
   git checkout package.json
@@ -194,7 +197,7 @@ if [ "$PUBLISH_FLAG" = "true" ]; then
   echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 else
   # Dry-run mode - clean up
-  rm "$TARBALL"
+  rm "$TARBALL_PATH"
   git checkout package.json
   
   echo -e "\n${BLUE}[9/9]${NC} Skipping publish (dry-run mode)"
