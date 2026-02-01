@@ -1,6 +1,6 @@
 ---
 name: gsd-restore-milestone
-description: Archives are now permanent in history/. This command is no longer needed. Shows deprecation notice and exits.
+description: Archives are now permanent in history. This command is no longer needed. Shows deprecation notice and exits.
 allowed-tools: Read
 ---
 

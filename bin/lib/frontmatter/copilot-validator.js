@@ -6,6 +6,7 @@
  */
 
 import { BaseValidator } from './base-validator.js';
+import * as logger from '../cli/logger.js';
 
 // Platform name constant (reuse from platform-names.js pattern)
 const COPILOT = 'copilot';
@@ -93,9 +94,7 @@ export class CopilotValidator extends BaseValidator {
   validateAllowedTools(value, context) {
     // Check if value is a string
     if (typeof value !== 'string') {
-      console.warn(
-        `⚠️  VALIDATION WARNING: ${context.templateName} - allowed-tools: Expected string, got ${typeof value}`
-      );
+      logger.warn(`Skill validation: ${context.templateName} - allowed-tools: Expected string, got ${typeof value}`, 2);
       return;
     }
 
@@ -103,9 +102,7 @@ export class CopilotValidator extends BaseValidator {
     // Valid examples: "Read, Write, Bash", "Read", "Bash, Edit"
     const toolPattern = /^[A-Z][a-zA-Z]+(,\s*[A-Z][a-zA-Z]+)*$/;
     if (!toolPattern.test(value)) {
-      console.warn(
-        `⚠️  VALIDATION WARNING: ${context.templateName} - allowed-tools: Expected comma-separated capitalized tool names (e.g., "Read, Write, Bash")`
-      );
+      logger.warn(`Skill validation: ${context.templateName} - allowed-tools: Expected comma-separated capitalized tool names (e.g., "Read, Write, Bash")`, 2);
     }
   }
 
@@ -120,9 +117,7 @@ export class CopilotValidator extends BaseValidator {
   validateArgumentHint(value, context) {
     // Check if value is string or array
     if (typeof value !== 'string' && !Array.isArray(value)) {
-      console.warn(
-        `⚠️  VALIDATION WARNING: ${context.templateName} - argument-hint: Expected string or array, got ${typeof value}`
-      );
+      logger.warn(`Skill validation: ${context.templateName} - argument-hint: Expected string or array, got ${typeof value}`, 2);
     }
   }
 }

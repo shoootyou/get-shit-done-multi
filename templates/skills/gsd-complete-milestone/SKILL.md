@@ -1,6 +1,6 @@
 ---
 name: gsd-complete-milestone
-description: Complete milestone with direct history/v{X.Y}/ archiving and cleanup
+description: Complete milestone with direct archiving and cleanup
 allowed-tools: Read, Edit, Bash, AskUserQuestion
 argument-hint: [version]
 ---
