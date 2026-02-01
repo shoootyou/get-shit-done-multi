@@ -13,19 +13,22 @@
 
 **Current Focus:** Phase 11 — Skill Validation and Adapter System (COMPLETE)
 
+**Next Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern
+
 ---
 
 ## Current Position
 
 ### Phase Status
 **Current Phase:** Phase 11 — Skill Validation and Adapter System (COMPLETE)
+**Next Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern (NOT PLANNED)
 **Completed:** 2 of 2 plans  
 **Milestone:** v2.1 Enhancement
 
 ### Plan Status
 **Completed Plans:** 45/45 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2)  
 **Last activity:** 2026-02-01 - Completed 11-02-PLAN.md (platform validators and integration)  
-**Next:** All phases complete - ready for v2.1 release
+**Next:** Phase 12 added - plan with /gsd-plan-phase 12
 
 ### Progress Bar
 ```
@@ -1007,6 +1010,12 @@ Overall Progress:
   - Scope: Frontmatter validation (name/description fields), platform-specific field adapters, reusable adapter pattern
   - Base spec: https://agentskills.io/specification with Claude extensions from https://code.claude.com/docs/en/slash-commands#frontmatter-reference
   - Philosophy: Default to standard (name + description mandatory), layer platform-specific fields on top, configurable per platform
+
+- **2026-02-01:** Phase 12 added - Unify frontmatter structure and apply adapter pattern
+  - Reason: Inconsistency between frontmatter validation (per-platform in Phase 11) and rendering modules (shared serializers)
+  - Impact: Consistent architectural pattern across all frontmatter functionality, clearer module organization
+  - Scope: Evaluate module naming/consolidation, refactor rendering to follow per-platform adapter pattern
+  - Issues: bin/lib/rendering/ has frontmatter-serializer/cleaner not following one-per-platform pattern from Phase 11
 
 ### Critical Constraints
 

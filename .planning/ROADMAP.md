@@ -888,6 +888,31 @@ By default, all validators enforce the two mandatory fields (name, description) 
 
 ---
 
+### Phase 12: Unify frontmatter structure and apply adapter pattern
+
+**Goal:** Reorganize frontmatter validation and rendering modules to follow consistent per-platform adapter pattern established in Phase 11
+
+**Depends on:** Phase 11
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 12 to break down)
+
+**Details:**
+Current state analysis reveals structural inconsistency:
+1. **Module organization issue**: `bin/lib/frontmatter/` contains validators while `bin/lib/rendering/` contains frontmatter serializers/cleaners - naming suggests potential consolidation or clearer separation
+2. **Pattern inconsistency**: Phase 11 established one-per-platform pattern for validators, but rendering module contains shared serializers/cleaners not following this pattern
+
+This phase will:
+- Evaluate whether to unify frontmatter-related code into single module or rename for clarity
+- Refactor rendering/serialization components to follow per-platform adapter pattern (similar to validators)
+- Ensure consistent architectural approach across all frontmatter-related functionality
+
+[To be added during planning]
+
+---
+
 ## Phase Sequencing
 
 ### Critical Path
