@@ -155,7 +155,23 @@ echo -e "${GREEN}✓${NC} Tarball installs successfully"
 
 # Step 8: Dry-run publish (always)
 echo -e "\n${BLUE}[8/9]${NC} Running npm publish --dry-run..."
-if ! npm publish --dry-run; then
+
+# Extract dist-tag from version suffix (e.g., "beta" from "2.0.0-beta.1")
+if echo "$VERSION" | grep -q '-'; then
+  # Extract the tag name from version (e.g., beta from 2.0.0-beta.1)
+  DIST_TAG=$(echo "$VERSION" | sed 's/^[0-9]*\.[0-9]*\.[0-9]*-\([^.]*\).*/\1/')
+  echo "Pre-release detected, using dist-tag: $DIST_TAG"
+else
+  # This script should only be used for pre-releases
+  echo -e "${RED}❌ Version $VERSION is not a pre-release${NC}"
+  echo "This script is for pre-releases only (e.g., 1.9.1-beta.1)"
+  echo "Use GitHub Actions for stable releases"
+  rm "$TARBALL_PATH"
+  git checkout package.json
+  exit 1
+fi
+
+if ! npm publish --dry-run --tag "$DIST_TAG"; then
   echo -e "${RED}❌ Dry-run failed${NC}"
   rm "$TARBALL_PATH"
   git checkout package.json
@@ -167,15 +183,7 @@ echo -e "${GREEN}✓${NC} Dry-run successful"
 if [ "$PUBLISH_FLAG" = "true" ]; then
   echo -e "\n${BLUE}[9/9]${NC} Publishing to NPM..."
   
-  # Determine dist-tag based on version
-  if echo "$VERSION" | grep -q '-'; then
-    DIST_TAG="beta"
-    echo "Pre-release detected, using dist-tag: $DIST_TAG"
-  else
-    DIST_TAG="latest"
-    echo "Stable release, using dist-tag: $DIST_TAG"
-  fi
-  
+  # Dist-tag was already extracted in step 8
   if ! npm publish --tag "$DIST_TAG"; then
     echo -e "${RED}❌ Publish failed${NC}"
     rm "$TARBALL_PATH"
