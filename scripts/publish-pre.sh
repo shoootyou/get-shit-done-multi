@@ -13,6 +13,7 @@ NC='\033[0m' # No Color
 usage() {
   cat <<EOF
 Usage: $0 <version> [--publish]
+       PUBLISH=true $0 <version>
 
 Validate and optionally publish a pre-release version to NPM.
 
@@ -22,12 +23,19 @@ Arguments:
 Flags:
   --publish   Actually publish to NPM (default: dry-run only)
 
+Environment Variables:
+  PUBLISH=true   Alternative to --publish flag, useful with npm run
+
 Examples:
   # Direct script invocation:
   $0 1.9.1-beta.1              # Dry-run validation only
   $0 1.9.1-beta.1 --publish    # Validate and publish to NPM
 
-  # Via npm run (note the -- separator before flags):
+  # Via npm run with environment variable:
+  npm run publish-pre 1.9.1-beta.1              # Dry-run
+  PUBLISH=true npm run publish-pre 1.9.1-beta.1 # Publish
+
+  # Via npm run with -- separator (also works):
   npm run publish-pre -- 1.9.1-beta.1              # Dry-run
   npm run publish-pre -- 1.9.1-beta.1 --publish    # Publish
 
@@ -38,6 +46,11 @@ EOF
 # Parse arguments
 VERSION=""
 PUBLISH_FLAG=""
+
+# Check environment variable first
+if [ "$PUBLISH" = "true" ]; then
+  PUBLISH_FLAG="true"
+fi
 
 for arg in "$@"; do
   case $arg in
@@ -217,8 +230,8 @@ else
   echo -e "${YELLOW} VALIDATION COMPLETE${NC}"
   echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
   echo ""
-  echo -e "All checks passed! Run with ${GREEN}--publish${NC} flag to actually publish:"
+  echo -e "All checks passed! To actually publish, use one of:"
   echo -e "  ${GREEN}./scripts/publish-pre.sh $VERSION --publish${NC}"
-  echo -e "Or via npm run:"
+  echo -e "  ${GREEN}PUBLISH=true npm run publish-pre $VERSION${NC}"
   echo -e "  ${GREEN}npm run publish-pre -- $VERSION --publish${NC}"
 fi
