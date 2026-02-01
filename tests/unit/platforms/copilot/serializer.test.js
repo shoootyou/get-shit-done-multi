@@ -1,35 +1,67 @@
 import { describe, test, expect } from 'vitest';
-import { serializeFrontmatter } from '../../bin/lib/serialization/claude-serializer.js';
+import { serializeFrontmatter } from '../../../../bin/lib/platforms/copilot/serializer.js';
 import yaml from 'gray-matter';
 
-describe('Claude Serializer', () => {
-  describe('array formatting - block style', () => {
-    test('serializes arrays as multi-line block style', () => {
-      const data = { skills: ['gsd-help', 'gsd-verify'] };
+describe('Copilot Serializer', () => {
+  describe('array formatting - flow style', () => {
+    test('serializes arrays as flow style with single quotes', () => {
+      const data = { 
+        tools: ['read', 'write', 'bash'] 
+      };
       const result = serializeFrontmatter(data);
       
-      // Verify block style formatting with dashes
-      expect(result).toContain('skills:\n  - gsd-help');
-      expect(result).toContain('  - gsd-verify');
+      // Verify flow style formatting
+      expect(result).toContain("tools: ['read', 'write', 'bash']");
       
-      // Verify NOT flow style
-      expect(result).not.toContain("skills: [");
+      // Verify NOT block style
+      expect(result).not.toMatch(/tools:\n\s*-/);
     });
     
-    test('formats tools as multi-line array', () => {
+    test('formats disallowedTools as flow style', () => {
       const data = {
-        tools: ['read', 'write', 'bash']
+        name: 'test-agent',
+        disallowedTools: ['dangerous-tool', 'legacy-tool']
       };
       
       const result = serializeFrontmatter(data);
       
-      expect(result).toContain('tools:');
-      expect(result).toContain('  - read');
-      expect(result).toContain('  - write');
-      expect(result).toContain('  - bash');
+      expect(result).toContain("disallowedTools: ['dangerous-tool', 'legacy-tool']");
+    });
+  });
+  
+  describe('special characters in tool names', () => {
+    test('handles slashes in tool names', () => {
+      const data = {
+        tools: ['custom-mcp/tool-1', 'read', 'another-mcp/tool-2']
+      };
       
-      // Verify NOT single-line format
-      expect(result).not.toContain("tools: [");
+      const result = serializeFrontmatter(data);
+      
+      // Verify slashes are kept as-is in single quotes
+      expect(result).toContain("tools: ['custom-mcp/tool-1', 'read', 'another-mcp/tool-2']");
+      
+      // Verify no escaping of slashes
+      expect(result).not.toContain('\\');
+    });
+    
+    test('handles hyphens in tool names', () => {
+      const data = {
+        tools: ['tool-with-dash', 'another-tool']
+      };
+      
+      const result = serializeFrontmatter(data);
+      
+      expect(result).toContain("tools: ['tool-with-dash', 'another-tool']");
+    });
+    
+    test('handles underscores in tool names', () => {
+      const data = {
+        tools: ['tool_with_underscore', 'read']
+      };
+      
+      const result = serializeFrontmatter(data);
+      
+      expect(result).toContain("tools: ['tool_with_underscore', 'read']");
     });
   });
   
@@ -70,6 +102,26 @@ describe('Claude Serializer', () => {
       expect(result).toContain('name: test-agent');
       expect(result).toContain('description: Test agent');
     });
+    
+    test('omits undefined nested fields', () => {
+      const data = {
+        name: 'test-agent',
+        metadata: {
+          platform: 'copilot',
+          version: undefined,
+          generated: '2026-01-28'
+        }
+      };
+      
+      const result = serializeFrontmatter(data);
+      
+      // Verify undefined nested field not present
+      expect(result).not.toContain('version:');
+      
+      // Verify defined nested fields are present
+      expect(result).toContain('  platform: copilot');
+      expect(result).toContain('  generated: \'2026-01-28\'');
+    });
   });
   
   describe('nested object formatting', () => {
@@ -77,7 +129,7 @@ describe('Claude Serializer', () => {
       const data = {
         name: 'test-agent',
         metadata: {
-          platform: 'claude',
+          platform: 'copilot',
           generated: '2026-01-28'
         }
       };
@@ -86,7 +138,7 @@ describe('Claude Serializer', () => {
       
       // Verify multi-line format
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: claude');
+      expect(result).toContain('  platform: copilot');
       expect(result).toContain('  generated: \'2026-01-28\'');
       
       // Verify NOT inline format
@@ -95,7 +147,7 @@ describe('Claude Serializer', () => {
       // Parse as YAML to verify structure
       const parsed = yaml(`---\n${result}\n---`);
       expect(parsed.data.metadata).toEqual({
-        platform: 'claude',
+        platform: 'copilot',
         generated: '2026-01-28'
       });
     });
@@ -103,7 +155,7 @@ describe('Claude Serializer', () => {
     test('formats nested objects with proper indentation', () => {
       const data = {
         metadata: {
-          platform: 'claude',
+          platform: 'copilot',
           config: {
             timeout: 30,
             retries: 3
@@ -113,47 +165,69 @@ describe('Claude Serializer', () => {
       
       const result = serializeFrontmatter(data);
       
-      // Verify nested indentation (4 spaces for nested object)
+      // Verify nested indentation
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: claude');
+      expect(result).toContain('  platform: copilot');
       expect(result).toContain('  config:');
       expect(result).toContain('    timeout: 30');
       expect(result).toContain('    retries: 3');
     });
   });
   
-  describe('complete Claude agent', () => {
-    test('formats real-world Claude agent with skills', () => {
+  describe('complete Copilot agent', () => {
+    test('formats real-world Copilot agent with all fields', () => {
       const data = {
-        name: 'gsd-helper',
-        description: 'GSD helper agent with skill access',
-        skills: ['gsd-help', 'gsd-install', 'gsd-verify'],
+        name: 'gsd-install',
+        description: 'Install GSD skills and agents to multiple platforms',
+        tools: ['read', 'write', 'bash', 'custom-mcp/file-ops'],
+        disallowedTools: ['dangerous-tool'],
         metadata: {
-          platform: 'claude',
-          generated: '2026-01-28'
+          platform: 'copilot',
+          generated: '2026-01-28T12:00:00Z',
+          version: '2.0.0'
         }
       };
       
       const result = serializeFrontmatter(data);
       
-      // Verify skills multi-line format
-      expect(result).toContain('skills:');
-      expect(result).toContain('  - gsd-help');
-      expect(result).toContain('  - gsd-install');
-      expect(result).toContain('  - gsd-verify');
+      // Verify field ordering (name first)
+      const lines = result.split('\n');
+      expect(lines[0]).toContain('name:');
+      
+      // Verify tools format (flow style)
+      expect(result).toContain("tools: ['read', 'write', 'bash', 'custom-mcp/file-ops']");
+      
+      // Verify disallowedTools format
+      expect(result).toContain("disallowedTools: ['dangerous-tool']");
       
       // Verify metadata block
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: claude');
+      expect(result).toContain('  platform: copilot');
+      expect(result).toContain('  generated: \'2026-01-28T12:00:00Z\'');
+      expect(result).toContain('  version: \'2.0.0\'');
       
       // Parse to verify structure
       const parsed = yaml(`---\n${result}\n---`);
-      expect(parsed.data.skills).toEqual(['gsd-help', 'gsd-install', 'gsd-verify']);
+      expect(parsed.data.name).toBe('gsd-install');
+      expect(parsed.data.tools).toEqual(['read', 'write', 'bash', 'custom-mcp/file-ops']);
+      expect(parsed.data.metadata.platform).toBe('copilot');
     });
   });
   
-  describe('special characters', () => {
-    test('handles strings with colons', () => {
+  describe('edge cases', () => {
+    test('handles strings with spaces', () => {
+      const data = {
+        name: 'test',
+        description: 'This is a long description'
+      };
+      
+      const result = serializeFrontmatter(data);
+      
+      // Should NOT be quoted (spaces alone don't require quoting in YAML)
+      expect(result).toContain('description: This is a long description');
+    });
+    
+    test('handles strings with special characters', () => {
       const data = {
         name: 'test',
         description: 'Description: with colon'
@@ -165,20 +239,6 @@ describe('Claude Serializer', () => {
       expect(result).toMatch(/description: ['"]Description: with colon['"]/);
     });
     
-    test('handles strings with hashes at start', () => {
-      const data = {
-        name: 'test',
-        description: '# Code comment'
-      };
-      
-      const result = serializeFrontmatter(data);
-      
-      // Should be quoted if hash is at start
-      expect(result).toMatch(/description: ['"]# Code comment['"]/);
-    });
-  });
-  
-  describe('edge cases', () => {
     test('handles empty object', () => {
       const data = {};
       
@@ -218,7 +278,7 @@ describe('Claude Serializer', () => {
     test('maintains standard field order', () => {
       const data = {
         // Intentionally out of order
-        metadata: { platform: 'claude' },
+        metadata: { platform: 'copilot' },
         tools: ['read'],
         description: 'Test',
         name: 'test-agent'

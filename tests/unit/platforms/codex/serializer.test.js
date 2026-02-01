@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { serializeFrontmatter } from '../../bin/lib/serialization/copilot-serializer.js';
+import { serializeFrontmatter } from '../../../../bin/lib/platforms/codex/serializer.js';
 import yaml from 'gray-matter';
 
-describe('Copilot Serializer', () => {
+describe('Codex Serializer', () => {
   describe('array formatting - flow style', () => {
     test('serializes arrays as flow style with single quotes', () => {
       const data = { 
@@ -15,6 +15,17 @@ describe('Copilot Serializer', () => {
       
       // Verify NOT block style
       expect(result).not.toMatch(/tools:\n\s*-/);
+    });
+    
+    test('formats skills as flow style', () => {
+      const data = {
+        name: 'test-agent',
+        skills: ['gsd-help', 'gsd-verify']
+      };
+      
+      const result = serializeFrontmatter(data);
+      
+      expect(result).toContain("skills: ['gsd-help', 'gsd-verify']");
     });
     
     test('formats disallowedTools as flow style', () => {
@@ -81,7 +92,7 @@ describe('Copilot Serializer', () => {
       
       // Verify other fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain('description: Test agent');
+      expect(result).toContain('description: "Test agent"');
     });
     
     test('omits undefined fields', () => {
@@ -100,27 +111,7 @@ describe('Copilot Serializer', () => {
       
       // Verify defined fields are present
       expect(result).toContain('name: test-agent');
-      expect(result).toContain('description: Test agent');
-    });
-    
-    test('omits undefined nested fields', () => {
-      const data = {
-        name: 'test-agent',
-        metadata: {
-          platform: 'copilot',
-          version: undefined,
-          generated: '2026-01-28'
-        }
-      };
-      
-      const result = serializeFrontmatter(data);
-      
-      // Verify undefined nested field not present
-      expect(result).not.toContain('version:');
-      
-      // Verify defined nested fields are present
-      expect(result).toContain('  platform: copilot');
-      expect(result).toContain('  generated: \'2026-01-28\'');
+      expect(result).toContain('description: "Test agent"');
     });
   });
   
@@ -129,7 +120,7 @@ describe('Copilot Serializer', () => {
       const data = {
         name: 'test-agent',
         metadata: {
-          platform: 'copilot',
+          platform: 'codex',
           generated: '2026-01-28'
         }
       };
@@ -138,7 +129,7 @@ describe('Copilot Serializer', () => {
       
       // Verify multi-line format
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: copilot');
+      expect(result).toContain('  platform: codex');
       expect(result).toContain('  generated: \'2026-01-28\'');
       
       // Verify NOT inline format
@@ -147,7 +138,7 @@ describe('Copilot Serializer', () => {
       // Parse as YAML to verify structure
       const parsed = yaml(`---\n${result}\n---`);
       expect(parsed.data.metadata).toEqual({
-        platform: 'copilot',
+        platform: 'codex',
         generated: '2026-01-28'
       });
     });
@@ -155,7 +146,7 @@ describe('Copilot Serializer', () => {
     test('formats nested objects with proper indentation', () => {
       const data = {
         metadata: {
-          platform: 'copilot',
+          platform: 'codex',
           config: {
             timeout: 30,
             retries: 3
@@ -167,22 +158,22 @@ describe('Copilot Serializer', () => {
       
       // Verify nested indentation
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: copilot');
+      expect(result).toContain('  platform: codex');
       expect(result).toContain('  config:');
       expect(result).toContain('    timeout: 30');
       expect(result).toContain('    retries: 3');
     });
   });
   
-  describe('complete Copilot agent', () => {
-    test('formats real-world Copilot agent with all fields', () => {
+  describe('complete Codex agent', () => {
+    test('formats real-world Codex agent with all fields', () => {
       const data = {
         name: 'gsd-install',
         description: 'Install GSD skills and agents to multiple platforms',
         tools: ['read', 'write', 'bash', 'custom-mcp/file-ops'],
-        disallowedTools: ['dangerous-tool'],
+        skills: ['gsd-help', 'gsd-verify'],
         metadata: {
-          platform: 'copilot',
+          platform: 'codex',
           generated: '2026-01-28T12:00:00Z',
           version: '2.0.0'
         }
@@ -197,12 +188,12 @@ describe('Copilot Serializer', () => {
       // Verify tools format (flow style)
       expect(result).toContain("tools: ['read', 'write', 'bash', 'custom-mcp/file-ops']");
       
-      // Verify disallowedTools format
-      expect(result).toContain("disallowedTools: ['dangerous-tool']");
+      // Verify skills format (flow style)
+      expect(result).toContain("skills: ['gsd-help', 'gsd-verify']");
       
       // Verify metadata block
       expect(result).toContain('metadata:');
-      expect(result).toContain('  platform: copilot');
+      expect(result).toContain('  platform: codex');
       expect(result).toContain('  generated: \'2026-01-28T12:00:00Z\'');
       expect(result).toContain('  version: \'2.0.0\'');
       
@@ -210,7 +201,8 @@ describe('Copilot Serializer', () => {
       const parsed = yaml(`---\n${result}\n---`);
       expect(parsed.data.name).toBe('gsd-install');
       expect(parsed.data.tools).toEqual(['read', 'write', 'bash', 'custom-mcp/file-ops']);
-      expect(parsed.data.metadata.platform).toBe('copilot');
+      expect(parsed.data.skills).toEqual(['gsd-help', 'gsd-verify']);
+      expect(parsed.data.metadata.platform).toBe('codex');
     });
   });
   
@@ -223,8 +215,8 @@ describe('Copilot Serializer', () => {
       
       const result = serializeFrontmatter(data);
       
-      // Should NOT be quoted (spaces alone don't require quoting in YAML)
-      expect(result).toContain('description: This is a long description');
+      // Codex always quotes description fields
+      expect(result).toContain('description: "This is a long description"');
     });
     
     test('handles strings with special characters', () => {
@@ -278,7 +270,7 @@ describe('Copilot Serializer', () => {
     test('maintains standard field order', () => {
       const data = {
         // Intentionally out of order
-        metadata: { platform: 'copilot' },
+        metadata: { platform: 'codex' },
         tools: ['read'],
         description: 'Test',
         name: 'test-agent'
