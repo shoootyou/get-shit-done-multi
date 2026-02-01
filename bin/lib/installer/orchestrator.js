@@ -22,7 +22,6 @@ import chalk from 'chalk';
 import { resolveTargetDirectory, getTemplatesDirectory, validatePath } from '../paths/path-resolver.js';
 import { copyDirectory, ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
 import { renderTemplate, findUnknownVariables, replaceVariables } from '../serialization/template-renderer.js';
-import { cleanFrontmatter } from '../serialization/frontmatter-cleaner.js';
 import { createMultiBar, displayCompletionLine } from '../cli/progress.js';
 import { installAgents } from './install-agents.js';
 import { installSkills } from './install-skills.js';

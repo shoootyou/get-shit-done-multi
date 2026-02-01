@@ -2,7 +2,9 @@ import { join, basename, dirname } from 'path';
 import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
 import { findUnknownVariables, replaceVariables } from '../serialization/template-renderer.js';
-import { cleanFrontmatter } from '../serialization/frontmatter-cleaner.js';
+import { cleanFrontmatter as cleanClaudeFrontmatter } from '../serialization/claude-cleaner.js';
+import { cleanFrontmatter as cleanCopilotFrontmatter } from '../serialization/copilot-cleaner.js';
+import { cleanFrontmatter as cleanCodexFrontmatter } from '../serialization/codex-cleaner.js';
 import * as logger from '../cli/logger.js';
 import matter from 'gray-matter';
 import { ClaudeValidator } from '../frontmatter/claude-validator.js';
@@ -17,6 +19,15 @@ const validators = {
   'claude': new ClaudeValidator(),
   'copilot': new CopilotValidator(),
   'codex': new CodexValidator()
+};
+
+/**
+ * Cleaner registry - map of platform names to cleaner functions
+ */
+const cleaners = {
+  'claude': cleanClaudeFrontmatter,
+  'copilot': cleanCopilotFrontmatter,
+  'codex': cleanCodexFrontmatter
 };
 
 /**
@@ -123,7 +134,11 @@ async function processTemplateFile(filePath, variables, isVerbose, platform) {
   }
 
   // Clean frontmatter (remove empty fields) with platform-specific formatting
-  const cleaned = cleanFrontmatter(processed, platform);
+  const cleanFrontmatter = cleaners[platform];
+  if (!cleanFrontmatter) {
+    throw new Error(`No cleaner found for platform: ${platform}`);
+  }
+  const cleaned = cleanFrontmatter(processed);
 
   await writeFile(filePath, cleaned);
 }

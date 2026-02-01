@@ -2,7 +2,7 @@ import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { getPlatformDir, getPathReference } from './platform-paths.js';
 import { getInstructionPath } from './instruction-paths.js';
-import { serializeFrontmatter } from '../serialization/frontmatter-serializer.js';
+import { serializeFrontmatter } from '../serialization/copilot-serializer.js';
 
 /**
  * Platform adapter for GitHub Copilot CLI
@@ -102,8 +102,8 @@ export class CopilotAdapter extends PlatformAdapter {
       data.tools = this.transformTools(data.tools);
     }
     
-    // Use custom serializer for correct format
-    const frontmatter = serializeFrontmatter(data, 'copilot');
+    // Use Copilot-specific serializer for correct format
+    const frontmatter = serializeFrontmatter(data);
     
     return `---\n${frontmatter}\n---\n\n${body}`;
   }

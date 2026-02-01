@@ -1,15 +1,14 @@
-// bin/lib/rendering/frontmatter-cleaner.js
+// bin/lib/serialization/copilot-cleaner.js
 
 import matter from 'gray-matter';
-import { serializeFrontmatter } from './frontmatter-serializer.js';
+import { serializeFrontmatter } from './copilot-serializer.js';
 
 /**
  * Clean frontmatter by removing empty string fields
  * @param {string} content - Markdown file content with frontmatter
- * @param {string} [platform='claude'] - Platform name for serialization
  * @returns {string} Content with cleaned frontmatter
  */
-export function cleanFrontmatter(content, platform = 'claude') {
+export function cleanFrontmatter(content) {
   try {
     const parsed = matter(content);
     const data = parsed.data;
@@ -39,8 +38,8 @@ export function cleanFrontmatter(content, platform = 'claude') {
       }
     }
     
-    // Rebuild content with cleaned frontmatter using custom serializer
-    const serialized = serializeFrontmatter(cleanedData, platform);
+    // Rebuild content with cleaned frontmatter using Copilot serializer
+    const serialized = serializeFrontmatter(cleanedData);
     return `---\n${serialized}\n---\n\n${parsed.content}`;
   } catch (error) {
     // If parsing fails, return original content
