@@ -14,18 +14,24 @@ Create validation layer and flexible adapter system to ensure skill frontmatter 
 ## Implementation Decisions
 
 ### Validation Error Experience
-- **Fail-fast approach:** Stop immediately on first validation error
-- **Error format:** Generate markdown bug report template automatically
-- **Bug report includes:**
+- **Fail-fast approach:** Stop immediately on first validation error (required fields only)
+- **Error format:** Print formatted error to console with all context
+- **Console error output includes:**
   - Template name (which skill failed)
   - Field name (which field is invalid)
   - Error description (what went wrong)
+  - Actual value (what was provided)
   - Expected format (what was expected per spec)
   - Spec reference URL (agentskills.io)
   - System info (package version, target platform, Node version)
+  - GitHub issue link for reporting
 - **GitHub issue link:** Include https://github.com/shoootyou/get-shit-done-multi/issues
-- **No bypass:** Always validate, no way to skip (strict enforcement)
-- Users copy/paste the formatted markdown report into GitHub issue
+- **No file writes:** All error information displayed in console
+- **User reporting:** Users copy/paste console output into GitHub issue (no automatic file generation)
+- **Warning vs Error:**
+  - Required fields (name, description): Print error and stop installation
+  - Optional fields (allowed-tools, argument-hint): Print warning and continue installation
+  - Unknown fields: Print warning and continue installation
 
 ### Validator Integration Point
 - **Validation timing:** Both raw template AND rendered output
@@ -56,14 +62,14 @@ Create validation layer and flexible adapter system to ensure skill frontmatter 
 - **Overall strictness:** Mixed approach
   - Required fields (name, description): fail on any violation
   - Optional fields (argument-hint, allowed-tools): warn only
-- **Invalid optional field behavior:** Platform decides
-  - Some platforms fail on invalid optional fields
-  - Some platforms warn and continue
-  - Defined per-platform in validator implementation
-- **Unknown field behavior:** Platform decides
-  - Some platforms allow extra fields (permissive)
-  - Some platforms reject unknown fields (strict)
-  - Defined per-platform in validator implementation
+- **Invalid optional field behavior:** Warn and continue (2026-02-01 decision)
+  - Optional fields that fail validation generate warnings
+  - Installation continues with field skipped
+  - User sees warning in console but process doesn't fail
+- **Unknown field behavior:** Warn but don't fail (2026-02-01 decision)
+  - Unknown fields generate warnings
+  - Fields may be ignored by target platform
+  - Permissive by default
 
 ### Field Validation Rules
 
@@ -86,6 +92,31 @@ Create validation layer and flexible adapter system to ensure skill frontmatter 
 - Must have proper `---` delimiters at start and end
 - Cannot be empty (e.g., `---\n\n---`)
 - Must include both required fields
+
+### Quote Handling (2026-02-01 Decision)
+- **Use YAML standard recommendation**
+- Validate parsed values AFTER YAML parsing
+- Wrapping quotes (e.g., `"Help command"`) are YAML syntax, removed by parser
+- Apostrophes in content (e.g., `Don't`) are valid per YAML standard
+- No need to detect or reject quote characters — YAML parser handles this
+
+### Tool Format (2026-02-01 Decision)
+- **Tools must be same format (capitalized) in ALL platforms**
+- Format: Capitalized, comma-separated string: `"Read, Write, Bash"`
+- Base validator enforces this format for all platforms
+- No platform-specific tool transformations
+- Platform adapters no longer need `transformTools()` method for format
+
+### Field Declaration (2026-02-01 Decision)
+- **Required fields:** Declared in base validator, fail on violation
+  - `name` (required)
+  - `description` (required)
+- **Optional fields:** Declared per platform, warn on violation
+  - `allowed-tools` (optional)
+  - `argument-hint` (optional)
+  - `skills` (optional, Claude-specific)
+- **Unknown fields:** Not in known list, warn but don't fail
+- Validators declare field requirements via validation method
 
 ### Claude's Discretion
 - Exact error message wording (as long as it includes required info)

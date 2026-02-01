@@ -8,7 +8,18 @@
 
 Validation layer for skill frontmatter requires three core components: (1) schema validation library for field-level rules, (2) platform-specific validators using adapter pattern, and (3) auto-discovery registry for extensibility. Project already uses `gray-matter` 4.0.3 for YAML parsing and follows adapter pattern in `/bin/lib/platforms/`. Research shows **Joi 18.0.2** is optimal for JavaScript-first validation with fail-fast support, template method pattern enables shared base validation with platform-specific overrides, and `fs.readdir()` + dynamic imports provide standard auto-discovery. Key insight: validate AFTER template variable replacement but BEFORE file I/O to catch errors early without breaking installations.
 
-**Primary recommendation:** Use Joi for schema validation, extend existing adapter pattern, validate at `transformFrontmatter()` integration point, fail-fast with markdown bug report generation.
+**Primary recommendation:** Use Joi for schema validation, extend existing adapter pattern, validate at `transformFrontmatter()` integration point, fail-fast with console error output.
+
+**Error reporting approach (2026-02-01):**
+- **Required field errors:** Stop installation immediately, print formatted error to console with all context
+- **Optional field warnings:** Continue installation, print warning to console, skip invalid field
+- **User reports:** Copy error/warning from console output and paste into GitHub issue
+- **No file writes:** All error information displayed in console, user manually copies for reporting
+
+**Decisions finalized (2026-02-01):**
+1. **Quote handling:** Use YAML standard — validate parsed values after YAML parsing (wrapping quotes removed by parser, apostrophes allowed)
+2. **Tool format:** Standardize capitalized format across ALL platforms — "Read, Write, Bash" (no more platform-specific transformations)
+3. **Field strictness:** Required fields (name, description) fail on violation; optional fields (allowed-tools, argument-hint) generate warnings only; unknown fields warn but don't fail
 
 ## Standard Stack
 
@@ -192,10 +203,14 @@ export function getValidator(platform) {
 ```
 
 ### Pattern 3: Fail-Fast with ValidationError
-**What:** Throw immediately on first error, include all context for debugging
-**When to use:** Per context decision - stop on first validation error
+**What:** Throw immediately on first error (required fields), include all context for debugging
+**When to use:** Per context decision - stop on first validation error for required fields
 
-**Example:**
+**Two-tier error handling (2026-02-01):**
+- **Required fields:** Throw `ValidationError` → installation stops, user gets full markdown report
+- **Optional fields:** Console warning → installation continues, user sees warning with report URL
+
+**Example (Required Field - Throws Error):**
 ```javascript
 // validation-error.js
 export class ValidationError extends Error {
@@ -238,6 +253,47 @@ export class ValidationError extends Error {
     lines.push('');
     lines.push('## Report Issue');
     lines.push('https://github.com/shoootyou/get-shit-done-multi/issues');
+    
+    return lines.join('\n');
+  }
+  
+  toConsoleOutput() {
+    // Formatted for console display
+    const lines = [
+      '',
+      '❌ VALIDATION ERROR',
+      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+      `Template: ${this.details.template || 'Unknown'}`,
+      `Platform: ${this.details.platform || 'Unknown'}`,
+      `Field: ${this.details.field || 'Unknown'}`,
+      `Error: ${this.message}`,
+      ''
+    ];
+    
+    if (this.details.value !== undefined) {
+      lines.push(`Value: "${this.details.value}"`);
+      lines.push('');
+    }
+    
+    if (this.details.expected) {
+      lines.push('Expected Format:');
+      lines.push(this.details.expected);
+      lines.push('');
+    }
+    
+    if (this.details.spec) {
+      lines.push(`Specification: ${this.details.spec}`);
+      lines.push('');
+    }
+    
+    lines.push('Installation stopped. Please fix the error and try again.');
+    lines.push('');
+    lines.push('To report this issue, copy the information above and submit to:');
+    lines.push('https://github.com/shoootyou/get-shit-done-multi/issues');
+    lines.push('');
+    lines.push(`System: get-shit-done-multi@${process.env.npm_package_version || '2.0.0'} | Node ${process.version}`);
+    lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    lines.push('');
     
     return lines.join('\n');
   }
@@ -360,26 +416,32 @@ description: Don't use this       # Contains apostrophe
 ```
 **Why it happens:** Ambiguous spec language, different interpretation of "quotes"
 **How to avoid:**
+- **DECISION (2026-02-01):** Use YAML standard recommendation
 - Validate parsed value, not raw YAML string
-- After parsing, `"Help command"` becomes `Help command` (quotes removed)
-- Allow apostrophes in content (contractions are valid English)
-- Reject if field starts/ends with quote characters: `/^["']|["']$/`
+- After parsing, `"Help command"` becomes `Help command` (wrapping quotes removed by YAML parser)
+- Allow apostrophes in content (contractions are valid English per YAML standard)
+- Wrapping quotes are YAML syntax, not content — don't validate them
 **Warning signs:** Valid contractions flagged as errors
 
 ### Pitfall 5: Platform-Specific Tool Format Differences
 **What goes wrong:** Tool names validated with wrong format expectations
 ```javascript
+// OLD (before 2026-02-01):
 // Claude: "Read, Write, Bash" (capitalized string)
 // Copilot: ['read', 'write', 'bash'] (lowercase array)
 // Codex: ['read', 'write', 'bash'] (lowercase array)
+
+// NEW (decision 2026-02-01):
+// ALL PLATFORMS: "Read, Write, Bash" (capitalized string)
 ```
-**Why it happens:** Each platform has different tool format, base validator doesn't know platform context
+**Why it happens:** Previously each platform had different tool format
 **How to avoid:**
-- Don't validate tools in base validator
-- Platform-specific validators handle tool format
-- Validate AFTER adapter's `transformTools()` method
-- Each validator knows its platform's format
-**Warning signs:** Validation fails only on specific platforms
+- **DECISION (2026-02-01):** Standardize on capitalized format across all platforms
+- Base validator enforces format: capitalized, comma-separated string
+- No platform-specific tool transformation needed
+- Validate in base validator's `validateOptionalFields()` method
+- Use `claudeToolsSchema` from field-validators.js for all platforms
+**Warning signs:** None — format now consistent across platforms
 
 ### Pitfall 6: Auto-Discovery Import Path Issues
 **What goes wrong:** Dynamic imports fail because paths don't resolve correctly
@@ -448,20 +510,12 @@ export const argumentHintSchema = Joi.string()
   .allow('')
   .optional();
 
-// Platform-specific allowed-tools (Claude format)
-export const claudeToolsSchema = Joi.string()
+// Unified allowed-tools format for all platforms (2026-02-01 decision)
+export const allowedToolsSchema = Joi.string()
   .pattern(/^[A-Z][a-z]+(\s*,\s*[A-Z][a-z]+)*$/)
   .optional()
   .messages({
     'string.pattern.base': 'Tools must be capitalized, comma-separated (e.g., "Read, Write, Bash")'
-  });
-
-// Platform-specific allowed-tools (Copilot/Codex format)
-export const arrayToolsSchema = Joi.array()
-  .items(Joi.string().lowercase())
-  .optional()
-  .messages({
-    'array.base': 'Tools must be an array of lowercase strings (e.g., ["read", "write", "bash"])'
   });
 ```
 
@@ -480,23 +534,45 @@ export class ClaudeValidator extends BaseValidator {
   }
   
   validateOptionalFields(frontmatter, context) {
-    // Claude allows 'allowed-tools' field (string format)
-    if (frontmatter['allowed-tools']) {
-      const { error } = claudeToolsSchema.validate(frontmatter['allowed-tools']);
-      if (error) {
-        throw new ValidationError(error.details[0].message, {
-          field: 'allowed-tools',
-          value: frontmatter['allowed-tools'],
-          template: context.templateName,
-          platform: 'claude',
-          expected: 'Capitalized, comma-separated: "Read, Write, Bash"',
-          spec: 'https://code.claude.com/docs/en/slash-commands#frontmatter-reference'
-        });
+    const optionalFields = {
+      'allowed-tools': allowedToolsSchema,
+      'argument-hint': argumentHintSchema
+    };
+    
+    // Validate each optional field
+    for (const [field, schema] of Object.entries(optionalFields)) {
+      if (frontmatter[field] !== undefined) {
+        const { error } = schema.validate(frontmatter[field]);
+        if (error) {
+          // Optional fields generate WARNING, not error (2026-02-01 decision)
+          // Print structured error to console for user to report
+          const report = this.generateWarningReport(error, field, frontmatter[field], context);
+          console.warn('\n' + report + '\n');
+        }
       }
     }
-    
-    // Claude allows 'argument-hint' field
-    // No special validation needed (any string valid)
+  }
+  
+  generateWarningReport(error, field, value, context) {
+    // Generate markdown-formatted warning for console output
+    const lines = [
+      '⚠️  VALIDATION WARNING',
+      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+      `Template: ${context.templateName}`,
+      `Platform: ${context.platform}`,
+      `Field: ${field}`,
+      `Error: ${error.details[0].message}`,
+      `Value: "${value}"`,
+      '',
+      'This field will be skipped during installation.',
+      '',
+      'If you believe this is incorrect, please report:',
+      'https://github.com/shoootyou/get-shit-done-multi/issues',
+      '',
+      `System: get-shit-done-multi@${process.env.npm_package_version || '2.0.0'} | Node ${process.version}`,
+      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    ];
+    return lines.join('\n');
   }
   
   validateUnknownFields(frontmatter, context) {
@@ -512,12 +588,12 @@ export class ClaudeValidator extends BaseValidator {
       field => !knownFields.includes(field)
     );
     
-    // Claude is permissive - warn but don't fail
+    // Permissive by default - warn but don't fail (2026-02-01 decision)
     if (unknownFields.length > 0) {
       console.warn(
         `Warning: Unknown fields in ${context.templateName}: ${unknownFields.join(', ')}`
       );
-      console.warn('These fields may be ignored by Claude Code');
+      console.warn('These fields may be ignored by the target platform');
     }
   }
 }
@@ -530,20 +606,31 @@ import matter from 'gray-matter';
 import { PlatformAdapter } from './base-adapter.js';
 import { serializeFrontmatter } from '../rendering/frontmatter-serializer.js';
 import { getValidator } from '../frontmatter/validators-registry.js';
+import { ValidationError } from '../frontmatter/validation-error.js';
 
 export class ClaudeAdapter extends PlatformAdapter {
   transformFrontmatter(content, templateName) {
     const { data, content: body } = matter(content);
     
     // VALIDATION POINT: After parsing, before transformation
-    const validator = getValidator('claude');
-    validator.validate(data, {
-      templateName: templateName,
-      platform: 'claude',
-      filePath: this.currentFilePath // For error context
-    });
+    try {
+      const validator = getValidator('claude');
+      validator.validate(data, {
+        templateName: templateName,
+        platform: 'claude',
+        filePath: this.currentFilePath // For error context
+      });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        // Print formatted error to console for user to report
+        console.error(error.toConsoleOutput());
+        // Re-throw to stop installation
+        throw error;
+      }
+      throw error;
+    }
     
-    // Extract skills if needed
+    // Extract skills if needed (validation passed, warnings logged)
     if (!data.skills) {
       const skillReferences = this.extractSkillReferences(body);
       if (skillReferences.length > 0) {
@@ -558,61 +645,85 @@ export class ClaudeAdapter extends PlatformAdapter {
 }
 ```
 
-### Markdown Bug Report Generation
+### Console Error Output (User Reports from This)
 ```javascript
 // bin/lib/frontmatter/error-formatter.js
-import { readPackageJson } from '../utils/package-reader.js';
+// Note: ValidationError.toConsoleOutput() handles formatting now
+// This module provides additional helpers if needed
 
-export function generateBugReport(error, context) {
-  const pkg = readPackageJson();
-  
-  const report = `
-# Validation Error Report
-
-**Generated:** ${new Date().toISOString()}
-
-## Error Details
-
-- **Template:** ${context.templateName}
-- **Platform:** ${context.platform}
-- **Field:** ${error.details.field || 'Unknown'}
-- **Error:** ${error.message}
-
-${error.details.value !== undefined ? `**Actual Value:**
-\`\`\`
-${error.details.value}
-\`\`\`
-` : ''}
-
-${error.details.expected ? `**Expected Format:**
-${error.details.expected}
-` : ''}
-
-${error.details.spec ? `**Specification:**
-${error.details.spec}
-` : ''}
-
-## System Information
-
-- **Package:** ${pkg.name}@${pkg.version}
-- **Node.js:** ${process.version}
-- **Platform:** ${process.platform}
-- **Architecture:** ${process.arch}
-
-## Next Steps
-
-1. Review the error details above
-2. Check the specification link for correct format
-3. Update the template file: \`templates/skills/${context.templateName}/SKILL.md\`
-4. If you believe this is a bug, copy this report and submit an issue:
-   https://github.com/shoootyou/get-shit-done-multi/issues
-
----
-*Report generated by get-shit-done-multi validation system*
-`.trim();
-  
-  return report;
+export function formatValidationErrorForConsole(error) {
+  // ValidationError class already has toConsoleOutput() method
+  // This is a wrapper if additional formatting needed at call site
+  return error.toConsoleOutput();
 }
+
+export function formatWarningForConsole(field, message, value, context) {
+  // Used by validators for optional field warnings
+  const lines = [
+    '',
+    '⚠️  VALIDATION WARNING',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    `Template: ${context.templateName}`,
+    `Platform: ${context.platform}`,
+    `Field: ${field}`,
+    `Error: ${message}`,
+    `Value: "${value}"`,
+    '',
+    'This field will be skipped during installation.',
+    '',
+    'If you believe this is incorrect, please report:',
+    'https://github.com/shoootyou/get-shit-done-multi/issues',
+    '',
+    `System: get-shit-done-multi@${process.env.npm_package_version || '2.0.0'} | Node ${process.version}`,
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    ''
+  ];
+  return lines.join('\n');
+}
+
+// Example console output for REQUIRED field error:
+/*
+❌ VALIDATION ERROR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Template: gsd-new-project
+Platform: claude
+Field: name
+Error: Name must contain only lowercase letters, numbers, and hyphens
+
+Value: "My Skill!"
+
+Expected Format:
+1-64 characters, lowercase letters, numbers, hyphens only
+
+Specification: https://agentskills.io/specification#name-field
+
+Installation stopped. Please fix the error and try again.
+
+To report this issue, copy the information above and submit to:
+https://github.com/shoootyou/get-shit-done-multi/issues
+
+System: get-shit-done-multi@2.0.0 | Node v20.11.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+// Example console output for OPTIONAL field warning:
+/*
+⚠️  VALIDATION WARNING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Template: gsd-plan-phase
+Platform: copilot
+Field: allowed-tools
+Error: Tools must be capitalized, comma-separated (e.g., "Read, Write, Bash")
+Value: "read, write, bash"
+
+This field will be skipped during installation.
+
+If you believe this is incorrect, please report:
+https://github.com/shoootyou/get-shit-done-multi/issues
+
+System: get-shit-done-multi@2.0.0 | Node v20.11.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 ```
 
 ## State of the Art
@@ -631,22 +742,29 @@ ${error.details.spec}
 
 ## Open Questions
 
-Things that couldn't be fully resolved:
+~~Things that couldn't be fully resolved:~~ **RESOLVED** (2026-02-01)
 
 1. **Exact agentskills.io spec interpretation for "no quotes"**
    - What we know: Spec says "no quotes" for name/description fields
-   - What's unclear: Does this mean no wrapping YAML quotes, or no quote characters at all (including apostrophes)?
-   - Recommendation: Validate parsed values (after YAML parsing removes wrapping quotes), allow apostrophes in content for contractions
+   - ~~What's unclear: Does this mean no wrapping YAML quotes, or no quote characters at all (including apostrophes)?~~
+   - ~~Recommendation: Validate parsed values (after YAML parsing removes wrapping quotes), allow apostrophes in content for contractions~~
+   - **DECISION:** Use YAML standard recommendation — validate parsed values after YAML parsing. Wrapping quotes are removed by parser, apostrophes in content are valid.
 
 2. **Tool name validation strictness**
    - What we know: Claude uses "Read, Write, Bash" (capitalized), Copilot/Codex use lowercase arrays
-   - What's unclear: Should base validator enforce ANY tool name format, or leave entirely to platforms?
-   - Recommendation: No tool validation in base validator, entirely platform-specific (context decision: platform-specific field adapters)
+   - ~~What's unclear: Should base validator enforce ANY tool name format, or leave entirely to platforms?~~
+   - ~~Recommendation: No tool validation in base validator, entirely platform-specific (context decision: platform-specific field adapters)~~
+   - **DECISION:** Tools must be same format (capitalized) in ALL platforms for now. Base validator enforces capitalized comma-separated string format: "Read, Write, Bash". Platform adapters no longer transform tool formats.
 
 3. **Unknown field handling consistency**
    - What we know: Context decision says "platform decides" whether to fail or warn
-   - What's unclear: Should there be a recommended default behavior?
-   - Recommendation: Default to permissive (warn) for unknown fields, strict (fail) for invalid known fields
+   - ~~What's unclear: Should there be a recommended default behavior?~~
+   - ~~Recommendation: Default to permissive (warn) for unknown fields, strict (fail) for invalid known fields~~
+   - **DECISION:** Field strictness controlled via field declaration:
+     - **Required fields** (name, description): Fail on any violation
+     - **Optional fields** (argument-hint, allowed-tools, etc.): Generate warning only, don't fail
+     - Platform validators declare which fields are required vs optional
+     - Unknown fields generate warnings (permissive by default)
 
 ## Sources
 
