@@ -932,10 +932,13 @@ Applies Phase 11's per-platform isolation pattern to serialization components:
 
 **Depends on:** Phase 12
 
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 12.1 to break down)
+- [ ] 12.1-01-PLAN.md — Migrate Claude platform files to platforms/claude/
+- [ ] 12.1-02-PLAN.md — Migrate Copilot platform files to platforms/copilot/
+- [ ] 12.1-03-PLAN.md — Migrate Codex platform files to platforms/codex/
+- [ ] 12.1-04-PLAN.md — Migrate shared files to platforms/_shared/ and cleanup
 
 **Details:**
 Phase 12 achieved per-platform isolation (separate files per platform), but files are still scattered across domain directories. This phase consolidates all platform-specific code into single platform directories.
