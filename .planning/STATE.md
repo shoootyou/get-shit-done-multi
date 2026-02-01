@@ -11,19 +11,18 @@
 
 **Current Milestone:** v2.0 — Complete Multi-Platform Installer
 
-**Current Focus:** Phase 12 — Unify frontmatter structure and apply adapter pattern (✅ COMPLETE)
+**Current Focus:** Phase 12.1 — Refactor to per-platform directory structure (NOT PLANNED)
 
-**Next Phase:** TBD - All planned phases complete
+**Next Phase:** Phase 12.1 needs planning
 
 ---
 
 ## Current Position
 
 ### Phase Status
-**Current Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern (✅ COMPLETE)
-**Next Phase:** TBD - All planned phases complete
-**Completed:** 3 of 3 plans  
-**Milestone:** v2.1 Enhancement
+**Current Phase:** Phase 12.1 — Refactor to per-platform directory structure (NOT PLANNED)
+**Completed:** 0 of 0 plans  
+**Milestone:** v2.0 — Complete Multi-Platform Installer
 
 ### Plan Status
 **Completed Plans:** 48/48 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 3/3)  
