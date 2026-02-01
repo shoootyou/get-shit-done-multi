@@ -1168,10 +1168,11 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-- 2026-02-01-pin-actions-to-sha.md — Pin GitHub Actions to commit SHA with version comments (security best practice)
-- 2026-02-01-add-pr-validation-comments.md — Add automatic PR comments with validation results (success/failure summary)
+None
 
 ### Completed Todos
+- 2026-02-01-add-pr-validation-comments.md — Added automatic PR comments with validation results (success/failure summary)
+- 2026-02-01-pin-actions-to-sha.md — Pinned GitHub Actions to commit SHA with version comments (security best practice)
 - 2026-02-01-add-pr-validation-workflow.md — Created GitHub Action to validate PRs (tests + tarball install, no publish) - runs on all PRs
 - 2026-02-01-document-beta-installation.md — Added Beta Version section to README with npx get-shit-done-multi@beta installation instructions
 - 2026-02-01-update-changelog-and-docs-for-v2.md — Updated CHANGELOG.md and docs/what-gets-installed.md for v2.0.0 to include phase 10 changes (milestone completion unification, skill deprecations, gsd-add-todo enhancements)
