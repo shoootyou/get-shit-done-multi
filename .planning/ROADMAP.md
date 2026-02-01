@@ -926,6 +926,74 @@ Applies Phase 11's per-platform isolation pattern to serialization components:
 
 ---
 
+### Phase 12.1: Refactor to per-platform directory structure (INSERTED)
+
+**Goal:** Reorganize module structure from domain-based (frontmatter/, serialization/, platforms/) to platform-based (platforms/claude/, platforms/copilot/, platforms/codex/, platforms/_shared/) for better encapsulation and easier platform addition
+
+**Depends on:** Phase 12
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 12.1 to break down)
+
+**Details:**
+Phase 12 achieved per-platform isolation (separate files per platform), but files are still scattered across domain directories. This phase consolidates all platform-specific code into single platform directories.
+
+**Current structure (after Phase 12):**
+```
+bin/lib/
+├── frontmatter/        → validators (per-platform)
+├── serialization/      → serializers + cleaners (per-platform)
+└── platforms/          → adapters (per-platform)
+```
+
+**Target structure (after Phase 12.1):**
+```
+bin/lib/platforms/
+├── _shared/
+│   ├── base-validator.js
+│   ├── base-adapter.js
+│   ├── field-validators.js
+│   ├── validation-error.js
+│   └── registry.js
+├── claude/
+│   ├── adapter.js
+│   ├── validator.js
+│   ├── serializer.js
+│   └── cleaner.js
+├── copilot/
+│   ├── adapter.js
+│   ├── validator.js
+│   ├── serializer.js
+│   └── cleaner.js
+└── codex/
+    ├── adapter.js
+    ├── validator.js
+    ├── serializer.js
+    └── cleaner.js
+```
+
+**Benefits:**
+- One directory per platform (everything Claude-related in platforms/claude/)
+- Adding new platform = copy existing platform directory and modify
+- Removing platform = delete one directory
+- Clearer encapsulation (platform changes isolated to one location)
+- Shorter file names (adapter.js instead of claude-adapter.js)
+- Aligns with "independence over DRY" philosophy from Phase 11
+
+**Migration scope:**
+- Move 6 files from frontmatter/ to platforms/claude/, platforms/copilot/, platforms/codex/
+- Move 6 files from serialization/ to platform directories
+- Move 3 files from platforms/ to platform subdirectories
+- Move shared files to platforms/_shared/
+- Update ~15 import statements
+- Update docs/adding-platforms.md to reflect new structure
+
+[To be added during planning]
+
+---
+
 ## Phase Sequencing
 
 ### Critical Path

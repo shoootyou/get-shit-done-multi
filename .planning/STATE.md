@@ -1067,6 +1067,13 @@ Overall Progress:
   - Scope: Evaluate module naming/consolidation, refactor rendering to follow per-platform adapter pattern
   - Issues: bin/lib/rendering/ has frontmatter-serializer/cleaner not following one-per-platform pattern from Phase 11
 
+- **2026-02-01:** Phase 12.1 inserted after Phase 12 - Refactor to per-platform directory structure (URGENT)
+  - Reason: Phase 12 achieved file-level isolation but platform code still scattered across domain directories (frontmatter/, serialization/, platforms/)
+  - Impact: Complete platform encapsulation - all Claude code in platforms/claude/, all Copilot in platforms/copilot/, etc.
+  - Scope: Consolidate validators, serializers, cleaners, adapters into platform subdirectories; move shared code to platforms/_shared/
+  - Benefits: One directory per platform, easier to add/remove platforms, shorter file names, clearer boundaries
+  - Architecture: platforms/{claude,copilot,codex}/ with adapter.js, validator.js, serializer.js, cleaner.js per platform
+
 ### Critical Constraints
 
 **Active Constraints (MUST be followed):**
