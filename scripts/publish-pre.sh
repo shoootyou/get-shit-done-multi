@@ -188,7 +188,7 @@ else
   exit 1
 fi
 
-if ! npm publish --dry-run --tag "$DIST_TAG" --registry http://localhost:4873; then
+if ! npm publish --dry-run --tag "$DIST_TAG"; then
   echo -e "${RED}❌ Dry-run failed${NC}"
   rm "$TARBALL_PATH"
   git checkout package.json
@@ -201,7 +201,7 @@ if [ "$PUBLISH_FLAG" = "true" ]; then
   echo -e "\n${BLUE}[9/9]${NC} Publishing to NPM..."
   
   # Dist-tag was already extracted in step 8
-  if ! npm publish --tag "$DIST_TAG" --registry http://localhost:4873 ; then
+  if ! npm publish --tag "$DIST_TAG" ; then
     echo -e "${RED}❌ Publish failed${NC}"
     rm "$TARBALL_PATH"
     git checkout package.json
