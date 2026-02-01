@@ -95,22 +95,22 @@ jobs:
             // 2. Prepare format of the comment
             const output = `## ✅ Validation Passed
 
-**All checks completed successfully:**
-- ✓ Tests passed
-- ✓ Tarball created and validated
-- ✓ Installation verified
+            **All checks completed successfully:**
+            - ✓ Tests passed
+            - ✓ Tarball created and validated
+            - ✓ Installation verified
 
-This PR is ready for review.
+            This PR is ready for review.
 
-<details>
-<summary>View details</summary>
+            <details>
+            <summary>View details</summary>
 
-[Workflow run details](${runUrl})
-</details>
+            [Workflow run details](${runUrl})
+            </details>
 
----
-*Last updated: ${timestamp}*
-<!-- PR Validation Results -->`;
+            ---
+            *Last updated: ${timestamp}*
+            <!-- PR Validation Results -->`;
             
             // 3. If we have a comment, update it, otherwise create a new one
             if (botComment) {
@@ -158,20 +158,20 @@ This PR is ready for review.
             // 2. Prepare format of the comment
             const output = `## ❌ Validation Failed
 
-**The following checks failed:**
-${failureDetails}
+            **The following checks failed:**
+            ${failureDetails}
 
-Please review the errors and push fixes.
+            Please review the errors and push fixes.
 
-<details>
-<summary>View full logs</summary>
+            <details>
+            <summary>View full logs</summary>
 
-[Workflow run details](${runUrl})
-</details>
+            [Workflow run details](${runUrl})
+            </details>
 
----
-*Last updated: ${timestamp}*
-<!-- PR Validation Results -->`;
+            ---
+            *Last updated: ${timestamp}*
+            <!-- PR Validation Results -->`;
             
             // 3. If we have a comment, update it, otherwise create a new one
             if (botComment) {
