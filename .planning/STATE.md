@@ -1,7 +1,7 @@
 # Project State
 
 **Last Updated:** 2026-02-01  
-**Updated By:** GSD Execute Plan (Completed 12-01-PLAN.md)
+**Updated By:** GSD Execute Plan (Completed 12-02-PLAN.md)
 
 ---
 
@@ -13,7 +13,7 @@
 
 **Current Focus:** Phase 12 — Unify frontmatter structure and apply adapter pattern (IN PROGRESS)
 
-**Next Phase:** Phase 12 Wave 2 — Per-platform serializer split
+**Next Phase:** Wave 4 — Documentation and testing (Plan 12-03)
 
 ---
 
@@ -21,14 +21,14 @@
 
 ### Phase Status
 **Current Phase:** Phase 12 — Unify frontmatter structure and apply adapter pattern (IN PROGRESS)
-**Next Phase:** Wave 2 — Per-platform serializer split
-**Completed:** 1 of 3 plans  
+**Next Phase:** Wave 4 — Documentation and testing
+**Completed:** 2 of 3 plans  
 **Milestone:** v2.1 Enhancement
 
 ### Plan Status
-**Completed Plans:** 46/48 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 1/3)  
-**Last activity:** 2026-02-01 - Completed 12-01-PLAN.md (rename rendering/ to serialization/)  
-**Next:** Plan 12-02 (per-platform serializer split)
+**Completed Plans:** 47/48 total (Phase 1: 4/4, Phase 2: 4/4, Phase 3: 3/3, Phase 4: 1/1, Phase 5: 2/2, Phase 6: 3/3, Phase 6.1: 4/4, Phase 6.2: 3/3, Phase 7: 2/2, Phase 7.1: 2/2, Phase 7.2: 4/4, Phase 8: 5/5, Phase 9: 4/4, Phase 10: 2/2, Phase 11: 2/2, Phase 12: 2/3)  
+**Last activity:** 2026-02-01 - Completed 12-02-PLAN.md (per-platform serializer split)  
+**Next:** Plan 12-03 (test migration and documentation)
 
 ### Progress Bar
 ```
@@ -48,10 +48,10 @@ Phase 8:   [██████████████████████�
 Phase 9:   [████████████████████████████████████████████████████] 100% (4/4 plans) ✅ COMPLETE
 Phase 10:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
 Phase 11:  [████████████████████████████████████████████████████] 100% (2/2 plans) ✅ COMPLETE
-Phase 12:  [█████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  33% (1/3 plans) 🔄 IN PROGRESS
+Phase 12:  [██████████████████████████████████░░░░░░░░░░░░░░░░░░]  67% (2/3 plans) 🔄 IN PROGRESS
 
 Overall Progress:
-[████████████████████████████████████████████████████]  96% (46/48 total plans)
+[████████████████████████████████████████████████████]  98% (47/48 total plans)
 ```
 
 ---
@@ -996,6 +996,24 @@ Overall Progress:
      - Wave 3: Template separation (move template-renderer.js)
      - Rationale: Incremental changes reduce risk, enable verification at each stage
 
+145. **2026-02-01 (12-02):** Code duplication over coupling (PLATFORM-ISOLATION)
+     - Each platform has full serializer/cleaner logic (~600 lines duplicated)
+     - Changes to Claude formatting don't affect Copilot/Codex
+     - Trade-off: maintenance (3 places) vs safety (isolated changes)
+     - Rationale: Platform isolation worth code duplication, matches Phase 11 validator pattern
+
+146. **2026-02-01 (12-02):** Separate templates/ module (MODULE-SEPARATION)
+     - Moved template-renderer.js from serialization/ to templates/
+     - EJS rendering is general-purpose, not frontmatter-specific
+     - Clear separation: serialization/ (per-platform YAML), templates/ (general rendering)
+     - Rationale: Correct separation of concerns, better module boundaries
+
+147. **2026-02-01 (12-02):** Platform-specific cleaners (CLEANER-ISOLATION)
+     - Each cleaner imports its own serializer (claude-cleaner → claude-serializer)
+     - Ensures platform consistency end-to-end
+     - Cleaner registry in install-skills.js for dynamic lookup
+     - Rationale: Complete platform isolation from parsing through serialization
+
 
 ### Roadmap Evolution
 
@@ -1111,18 +1129,17 @@ None
 ## Session Continuity
 
 ### What Just Happened
-✅ **Phase 10 Plan 02 Complete (2/4 plans)!** Deprecated archive-milestone and restore-milestone commands with blocking messages, updated list-milestones to read from MILESTONES.md registry. All deprecated commands show GSD branded banners, explain migration path, and exit immediately without executing operations. List-milestones now uses simple cat command to display registry directly (no directory scanning or complex parsing). **Phase 10 now 50% complete (2/4 plans).**
+✅ **Phase 12 Plan 02 Complete (2/3 plans)!** Split shared frontmatter serializer/cleaner into per-platform files (claude, copilot, codex) with full logic duplication, following Phase 11 validator pattern for platform isolation. Created 6 platform-specific files (3 serializers + 3 cleaners), moved template-renderer.js to bin/lib/templates/, updated all adapter imports, and deleted old shared files. Platform isolation achieved - changes to Claude don't affect Copilot/Codex. **Phase 12 now 67% complete (2/3 plans).**
 
 ### What's Next
-**Continue Phase 10 - Execute Plan 03 Next**
+**Continue Phase 12 - Execute Plan 03 Next**
 
-Phase 10 status:
-- ✅ Plan 01: Unified milestone completion workflow (complete-milestone refactored)
-- ✅ Plan 02: Deprecated archive/restore, updated list-milestones (just completed)
-- ⏳ Plan 03: Check if exists
-- ⏳ Plan 04: Check if exists
+Phase 12 status:
+- ✅ Plan 01: Renamed rendering/ to serialization/ (directory structure)
+- ✅ Plan 02: Per-platform serializer split (just completed)
+- ⏳ Plan 03: Test migration and documentation
 
-**Next:** Check for 10-03-PLAN.md or 10-04-PLAN.md to continue Phase 10
+**Next:** Execute 12-03-PLAN.md for test updates and final documentation
 
 ### Context for Next Session
 - ✅ **Milestone completion workflow unified:** Direct history/ archiving, AskUserQuestion confirmations
