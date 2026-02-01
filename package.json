@@ -38,6 +38,7 @@
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:validation": "vitest run tests/integration/skill-validation.test.js",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.planning\" \"#templates\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\" \"#.planning\" \"#templates\""
   },

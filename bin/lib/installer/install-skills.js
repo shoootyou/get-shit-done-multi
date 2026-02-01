@@ -1,9 +1,46 @@
-import { join } from 'path';
+import { join, basename, dirname } from 'path';
 import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
 import { findUnknownVariables, replaceVariables } from '../rendering/template-renderer.js';
 import { cleanFrontmatter } from '../rendering/frontmatter-cleaner.js';
 import * as logger from '../cli/logger.js';
+import matter from 'gray-matter';
+import { ClaudeValidator } from '../frontmatter/claude-validator.js';
+import { CopilotValidator } from '../frontmatter/copilot-validator.js';
+import { CodexValidator } from '../frontmatter/codex-validator.js';
+import { ValidationError } from '../frontmatter/validation-error.js';
+
+/**
+ * Validator registry - map of platform names to validator instances
+ */
+const validators = {
+  'claude': new ClaudeValidator(),
+  'copilot': new CopilotValidator(),
+  'codex': new CodexValidator()
+};
+
+/**
+ * Validate skill frontmatter after template variable replacement
+ * @param {string} content - Processed skill content with variables replaced
+ * @param {string} templateName - Name of the skill template
+ * @param {string} filePath - Path to the skill file
+ * @param {string} platform - Target platform (claude, copilot, codex)
+ * @throws {ValidationError} If frontmatter validation fails
+ */
+function validateSkillFrontmatter(content, templateName, filePath, platform) {
+  // Parse frontmatter from content
+  const { data: frontmatter } = matter(content);
+  
+  // Get validator for platform
+  const validator = validators[platform];
+  if (!validator) {
+    throw new Error(`No validator found for platform: ${platform}`);
+  }
+  
+  // Validate with context
+  const context = { templateName, filePath, platform };
+  validator.validate(frontmatter, context);
+}
 
 /**
  * Install skills from templates
@@ -58,7 +95,7 @@ export async function installSkills(templatesDir, targetDir, variables, multiBar
 }
 
 /**
- * Process template file (read, replace variables, write)
+ * Process template file (read, replace variables, validate, clean, write)
  */
 async function processTemplateFile(filePath, variables, isVerbose, platform) {
   const content = await readFile(filePath, 'utf8');
@@ -71,6 +108,19 @@ async function processTemplateFile(filePath, variables, isVerbose, platform) {
 
   // Replace template variables
   const processed = replaceVariables(content, variables);
+
+  // Validate frontmatter after variable replacement
+  const templateName = basename(dirname(filePath));
+  try {
+    validateSkillFrontmatter(processed, templateName, filePath, platform);
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      // Print formatted error and exit
+      console.error(error.toConsoleOutput());
+      process.exit(1);
+    }
+    throw error; // Re-throw non-validation errors
+  }
 
   // Clean frontmatter (remove empty fields) with platform-specific formatting
   const cleaned = cleanFrontmatter(processed, platform);
