@@ -811,6 +811,78 @@ Plans:
 
 ---
 
+### Phase 11: Skill Validation and Adapter System
+
+**Goal:** Create validation layer and flexible adapter system to ensure skill frontmatter compliance with agentskills.io spec and platform-specific extensions
+
+**Type:** Infrastructure Enhancement & Quality Assurance
+
+**Dependencies:** Phase 1 (templates must exist)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 11 to break down)
+
+**Requirements Mapped:**
+- TEMPLATE-04: Frontmatter validation against agentskills.io specification
+- TEMPLATE-05: Platform-specific field adapters (Claude, Codex, Copilot)
+- TEMPLATE-06: Mandatory field enforcement (name, description)
+- QUALITY-01: Skill format standardization
+- QUALITY-02: Template conversion validation
+
+**Success Criteria:**
+1. Validation layer enforces agentskills.io spec for all skills:
+   - `name` field: no quotes, single string, only letters/numbers/hyphens
+   - `description` field: no quotes, single string, max 1024 characters
+   - Frontmatter structure: proper `---` delimiters with required fields
+2. Adapter system uses agentskills.io as base standard plus Claude extensions
+3. Platform adapters can enable/disable fields based on target platform:
+   - Default: agentskills.io fields (name, description)
+   - Claude: Additional fields from https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+   - Codex/Copilot: Base spec only (extensible for future additions)
+4. Each field in adapter is optional/configurable (include or omit per platform)
+5. Validation catches malformed frontmatter during template generation:
+   - Missing frontmatter block
+   - Empty frontmatter (e.g., `---\n\n---`)
+   - Invalid field formats
+6. Name field validation follows https://agentskills.io/specification#name-field exactly
+7. Description field validation enforces 1024 character limit
+8. Adapter system is reusable and extensible for future platforms
+
+**Key Deliverables:**
+- `/bin/lib/frontmatter/base-validator.js` (base validation interface)
+- `/bin/lib/frontmatter/claude-validator.js` (Claude-specific validation)
+- `/bin/lib/frontmatter/copilot-validator.js` (Copilot-specific validation)
+- `/bin/lib/frontmatter/codex-validator.js` (Codex-specific validation)
+- `/bin/lib/frontmatter/field-validators.js` (name, description, shared validators)
+- `/bin/lib/frontmatter/agentskills-spec.js` (base specification reference)
+- Validation error messages with actionable guidance
+- Test suite for validation edge cases
+- Documentation on adding new platform validators
+
+**Architecture:**
+Similar to `/bin/lib/platforms/` pattern:
+- `base-validator.js` defines validation interface (like `base-adapter.js`)
+- Each platform has its own validator (like `claude-adapter.js`, `copilot-adapter.js`, etc.)
+- Each validator functions independently (code can repeat for isolation)
+- Platform-specific changes don't affect other validators
+- Validators enforce agentskills.io base + platform-specific extensions
+
+**Details:**
+The system validates during template rendering and provides clear error messages when skills don't meet format requirements. Each platform validator starts with agentskills.io as the base and layers platform-specific field requirements on top.
+
+By default, all validators enforce the two mandatory fields (name, description) and can optionally validate additional platform-specific fields. This ensures consistency across all tools while allowing platform-specific enhancements. Code isolation means changing Claude validation won't break Copilot or Codex.
+
+**Notes:**
+- Validation happens during template rendering (Phase 2 integration point)
+- Adapter configuration lives in platform-specific modules
+- Error messages reference official specifications
+- Base spec: https://agentskills.io/specification
+- Claude extensions: https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+
+---
+
 ## Phase Sequencing
 
 ### Critical Path

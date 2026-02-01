@@ -969,6 +969,13 @@ Overall Progress:
   - Scope: Research skill patterns, refactor complete-milestone, deprecate archive/restore, update list-milestones
   - Value: Simpler workflow (1 command instead of 2), clean workspace for new-milestone, consistent confirmations
 
+- **2026-01-31:** Phase 11 added after Phase 10 - Skill Validation and Adapter System
+  - Reason: Need standardized validation and flexible adapters for skill frontmatter across platforms
+  - Impact: Enforces agentskills.io spec + Claude extensions, prevents malformed skills, extensible for future platforms
+  - Scope: Frontmatter validation (name/description fields), platform-specific field adapters, reusable adapter pattern
+  - Base spec: https://agentskills.io/specification with Claude extensions from https://code.claude.com/docs/en/slash-commands#frontmatter-reference
+  - Philosophy: Default to standard (name + description mandatory), layer platform-specific fields on top, configurable per platform
+
 ### Critical Constraints
 
 **Active Constraints (MUST be followed):**
