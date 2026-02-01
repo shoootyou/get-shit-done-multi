@@ -1168,7 +1168,8 @@ Overall Progress:
 - [ ] Phase 6 Plan 02: Update Detection UI Integration (pending)
 
 ### Pending Todos
-None
+- 2026-02-01-pin-actions-to-sha.md — Pin GitHub Actions to commit SHA with version comments (security best practice)
+- 2026-02-01-add-pr-validation-comments.md — Add automatic PR comments with validation results (success/failure summary)
 
 ### Completed Todos
 - 2026-02-01-add-pr-validation-workflow.md — Created GitHub Action to validate PRs (tests + tarball install, no publish) - runs on all PRs
