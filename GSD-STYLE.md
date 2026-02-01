@@ -14,18 +14,108 @@ GSD is a **meta-prompting system** where every file is both implementation and s
 
 ---
 
+## Multi-Platform Support
+
+GSD supports three AI coding assistants with platform-specific adaptations:
+
+### Supported Platforms
+
+| Platform | Directory | Command Prefix | Agent Extension | Skill Extension |
+|----------|-----------|----------------|-----------------|-----------------|
+| Claude Code | `.claude/` | `/gsd-` | `.md` | `SKILL.md` |
+| GitHub Copilot CLI | `.github/` | `/gsd-` | `.agent.md` | `SKILL.md` |
+| Codex CLI | `.codex/` | `$gsd-` | `.agent.md` | `SKILL.md` |
+
+### Installation Structure
+
+Each platform follows the same directory structure:
+
+```
+.{platform}/
+├── agents/
+│   ├── gsd-executor.{ext}
+│   ├── gsd-planner.{ext}
+│   └── ... (13 agents)
+├── skills/
+│   ├── get-shit-done/
+│   │   └── SKILL.md
+│   ├── gsd-add-phase/
+│   │   ├── SKILL.md
+│   │   └── version.json
+│   └── ... (29 skills)
+└── get-shit-done/
+    ├── references/
+    ├── templates/
+    └── workflows/
+```
+
+**Key principles:**
+- Skills live in subdirectories with `SKILL.md` filename (not `{skill-name}.md`)
+- Agents use platform-specific extensions
+- Path references adapt to platform: `@.claude/...`, `@.github/...`, `@.codex/...`
+- Command examples adapt to prefix: `/gsd-add-todo` vs `$gsd-add-todo`
+
+### Platform-Specific Transformations
+
+The installer automatically transforms content per platform:
+
+**Tools format:**
+- Template: Capitalized comma-separated string (`'Edit, Read, Bash, Grep'`)
+- All platforms use same format in frontmatter
+
+**Path references:**
+- Files reference their own platform path
+- Example: Agent in `.github/` uses `@.github/get-shit-done/workflows/...`
+
+**Command prefixes:**
+- Claude/Copilot: `/gsd-` for all commands
+- Codex: `$gsd-` for all commands
+
+### Installation Scopes
+
+GSD supports three installation scopes:
+
+**Global installation** (`--global`):
+- Location: `~/.claude/`, `~/.copilot/`, `~/.codex/`
+- Available to all projects on the system
+- Use for personal GSD setup across all work
+
+**Local installation** (`--local`):
+- Location: `.claude/`, `.github/`, `.codex/` in current directory
+- Project-specific, committed to version control
+- Use for team collaboration or project-specific workflows
+
+**Custom path** (`--custom-path /path/to/dir`):
+- Install to any specified directory
+- Useful for testing or non-standard setups
+
+**Installation modes:**
+- Interactive: No flags, beautiful prompts guide selection
+- Non-interactive: `--claude --copilot --codex --global` for automation
+
+---
+
 ## File Structure Conventions
 
-### Slash Commands (`commands/gsd/*.md`)
+### Skills (`templates/skills/*.md`)
+
+Skills define user-facing commands. Templates are installed as platform-specific skills with transformed prefixes and extensions.
+
+**Frontmatter format:**
 
 ```yaml
 ---
-name: gsd:command-name
+name: gsd-command-name
 description: One-line description
 argument-hint: "<required>" or "[optional]"
-allowed-tools: [Read, Write, Bash, Glob, Grep, AskUserQuestion]
+allowed-tools: 'Edit, Read, Bash, Grep'
 ---
 ```
+
+**Notes:**
+- `allowed-tools`: Capitalized comma-separated string (not array)
+- Tool names: `Edit` (file operations), `Read` (view files), `Bash` (execute), `Grep` (search), `Glob` (find), `Task` (spawn agents)
+- Commands install to `{platform}/skills/{command-name}/SKILL.md`
 
 **Section order:**
 1. `<objective>` — What/why/when (always present)
@@ -182,7 +272,7 @@ Build authentication system
 | Type | Convention | Example |
 |------|------------|---------|
 | Files | kebab-case | `execute-phase.md` |
-| Commands | `gsd:kebab-case` | `gsd:execute-phase` |
+| Skills | `gsd-kebab-case` | `gsd-execute-phase` |
 | XML tags | kebab-case | `<execution_context>` |
 | Step names | snake_case | `name="load_project_state"` |
 | Bash variables | CAPS_UNDERSCORES | `PHASE_ARG`, `PLAN_START_TIME` |

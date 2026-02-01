@@ -1,1048 +1,844 @@
-# Troubleshooting Guide
+# Troubleshooting
 
-**Last updated:** 2026-01-19
+This guide covers common issues you may encounter when installing, upgrading, or using GSD.
 
-This guide helps you diagnose and resolve common issues when using GSD (Get Shit Done) across Claude Code, GitHub Copilot CLI, and Codex CLI.
+Each issue includes:
 
-## Quick Navigation by Symptom
-
-| Symptom | CLI | Section |
-|---------|-----|---------|
-| Command not found | All | [Installation Issues](#installation-issues) |
-| Permission denied | All | [Permission Issues](#permission-issues) |
-| Skill not detected | Claude Code | [Claude Code Issues](#claude-code-issues) |
-| GitHub auth failed | Copilot CLI | [Copilot CLI Issues](#copilot-cli-issues) |
-| API key not configured | Codex CLI | [Codex CLI Issues](#codex-cli-issues) |
-| Agent timeout | All | [Agent Issues](#agent-issues) |
-| State corruption | All | [State Management Issues](#state-management-issues) |
-| Concurrent CLI conflict | All | [State Management Issues](#state-management-issues) |
-| Directory lock timeout | All | [State Management Issues](#state-management-issues) |
+- **Problem:** Exact error message or symptom
+- **Symptoms:** How you experience the issue
+- **Cause:** Why it happens
+- **Solutions:** Ranked from best to worst
 
 ## Installation Issues
 
-### Command not found
+### 1. Error: Permission denied (EACCES)
 
-**Symptom:** Running `/gsd:new-project` shows "command not found" or "skill not recognized"
+**Problem:**
 
-**Diagnosis:**
-```bash
-# Run verification to diagnose issue
-/gsd:verify-installation
-
-# Expected output will show what's missing:
-# ✗ Skills not found
-# ✗ Commands not registered
+```plaintext
+Error: EACCES: permission denied, mkdir '~/.claude/skills'
 ```
 
-**Solutions by CLI:**
+**Symptoms:**
 
-**Claude Code:**
-```bash
-# 1. Check if installed
-ls -la .claude/get-shit-done/
+- Installation fails immediately
+- Cannot create directories in home folder
+- Cannot write files to target location
 
-# 2. If missing, install
-npx get-shit-done-multi --claude
+**Cause:**
 
-# 3. Restart Claude Code to refresh skills
-# (Skills are cached by Claude Code runtime)
-
-# 4. Verify
-/gsd:verify-installation
-```
-
-**Copilot CLI:**
-```bash
-# 1. Check if installed
-ls -la .github/skills/get-shit-done/
-
-# 2. If missing, install
-npx get-shit-done-multi --copilot
-
-# 3. Reload skills
-gh copilot reload
-
-# 4. Verify
-/gsd:verify-installation
-```
-
-**Codex CLI:**
-```bash
-# 1. Check if installed
-ls -la .codex/skills/get-shit-done/
-
-# 2. If missing, install
-npx get-shit-done-multi --codex
-
-# 3. Reload skills
-codex skills reload
-
-# 4. Verify
-/gsd:verify-installation
-```
-
-**Root Cause:**
-- Skills not installed in expected directory
-- CLI hasn't refreshed skill registry
-- Incorrect installation path (global vs local)
-
-**Prevention:**
-- Always run `/gsd:verify-installation` after installation
-- Restart CLI or reload skills after installation
-- Use consistent installation method (global vs local)
-
-### Installation path incorrect
-
-**Symptom:** Installation succeeds but commands not available
-
-**Diagnosis:**
-```bash
-# Check all possible installation paths
-
-# Claude Code
-ls ~/.claude/get-shit-done/  # Global (macOS)
-ls .claude/get-shit-done/    # Local
-
-# Copilot CLI
-ls .github/skills/get-shit-done/  # Local only
-
-# Codex CLI
-ls ~/.codex/skills/get-shit-done/  # Global
-ls .codex/skills/get-shit-done/    # Local
-```
+- No write permissions to target directory
+- Directory owned by different user
+- System restrictions (corporate machines, restricted accounts)
 
 **Solutions:**
 
-1. **Determine intended installation type:**
+1. **Use local installation (recommended):**
+
    ```bash
-   # For global: Affects all projects
-   npx get-shit-done-multi --claude  # Installs globally by default
+   npx get-shit-done-multi --local
+   ```
+
+   This installs to current directory where you likely have permissions.
+
+2. **Fix directory permissions:**
+
+   ```bash
+   # Fix permissions for your user
+   chmod -R u+w ~/.claude/
+   chmod -R u+w ~/.copilot/
+   chmod -R u+w ~/.codex/
    
-   # For local: Project-specific
-   npx get-shit-done-multi --claude --local
+   # Then retry installation
+   npx get-shit-done-multi
    ```
 
-2. **Remove incorrect installation:**
+1. **Create directories manually:**
+
    ```bash
-   # Remove global
-   rm -rf ~/.claude/get-shit-done/
+   # Create the directories first
+   mkdir -p ~/.claude/skills ~/.claude/agents ~/.claude/get-shit-done
    
-   # Remove local
-   rm -rf .claude/get-shit-done/
+   # Fix ownership
+   sudo chown -R $USER ~/.claude/
+   
+   # Then install
+   npx get-shit-done-multi --claude --global
+
    ```
 
-3. **Reinstall correctly:**
+4. **Use sudo (not recommended):**
+
    ```bash
-   # Follow setup guide for your CLI:
-   # - setup-claude-code.md
-   # - setup-copilot-cli.md
-   # - setup-codex-cli.md
+   sudo npx get-shit-done-multi --global
    ```
 
-**Root Cause:**
-- CLI expected global but found local (or vice versa)
-- Mixed installations confusing CLI
+   This can create permission issues later. Avoid unless necessary.
 
-**Prevention:**
-- Decide on global vs local before installing
-- Document team's preferred installation method
-- Use `/gsd:verify-installation` to confirm correct path
+### 2. Error: Insufficient disk space
 
-## Permission Issues
+**Problem:**
 
-### Permission denied on macOS
-
-**Symptom:** "Permission denied" errors when running GSD commands
-
-**Diagnosis:**
-```bash
-# Check file permissions
-ls -la .claude/get-shit-done/
-ls -la ~/.claude/get-shit-done/
-
-# Check if macOS Gatekeeper is blocking
-# System Preferences → Security & Privacy → General
-# Look for blocked application messages
+```plaintext
+Error: Pre-flight validation failed: Insufficient disk space
+Required: 2MB, Available: 0.5MB
 ```
+
+**Symptoms:**
+
+- Installation fails before copying files
+- Pre-flight validation shows disk space error
+- System disk is full or nearly full
+
+**Cause:**
+
+- Less than 2MB available on target disk
+- Disk quota exceeded
+- Temporary files filling disk
 
 **Solutions:**
 
-1. **Fix file permissions:**
+1. **Free up disk space:**
+
    ```bash
-   chmod -R 755 .claude/get-shit-done/
-   chmod -R 755 ~/.claude/get-shit-done/
+   # Check disk usage
+   df -h
+   
+   # Find large files
+   du -sh ~/* | sort -h
+   
+   # Remove unnecessary files
+
    ```
 
-2. **Grant Full Disk Access (macOS):**
-   - Open System Preferences → Security & Privacy
-   - Click "Privacy" tab
-   - Select "Full Disk Access" from left sidebar
-   - Click lock icon to make changes
-   - Add Claude Code, Terminal, or your CLI application
-   - Restart application
+2. **Install to different location with more space:**
 
-3. **Bypass Gatekeeper for specific files:**
    ```bash
-   xattr -r -d com.apple.quarantine .claude/get-shit-done/
+   # If home disk is full, install locally to project
+   cd /path/to/project/with/space
+   npx get-shit-done-multi --local
    ```
 
-**Root Cause:**
-- macOS Gatekeeper quarantines downloaded files
-- CLI application lacks disk access permissions
-- Incorrect file ownership or permissions
+1. **Use external drive or different partition:**
 
-**Prevention:**
-- Grant Full Disk Access during CLI setup
-- Install CLI via official channels (reduces quarantine)
-- Run `chmod` after installation as precaution
+   ```bash
+   # Create symlink from home to external drive
+   mkdir -p /Volumes/External/.claude
+   ln -s /Volumes/External/.claude ~/.claude
+   
+   # Then install normally
+   npx get-shit-done-multi --claude --global
+   ```
 
-### Permission denied on Windows
+### 3. Error: Platform not detected
 
-**Symptom:** "Access denied" or "Permission denied" on Windows
+**Problem:**
 
-**Diagnosis:**
-```bash
-# Check if files are read-only
-attrib %APPDATA%\Claude\get-shit-done\*
-
-# Check if antivirus is blocking
-# Review Windows Defender logs in Event Viewer
 ```
+
+Error: No AI platforms detected
+Please install Claude Code, GitHub Copilot CLI, or Codex CLI first
+
+```
+
+**Symptoms:**
+
+- Interactive mode shows "No platforms found"
+- Installer exits without installing
+- All platform detection attempts fail
+
+**Cause:**
+
+- None of the supported platforms are installed
+- Platforms installed but not in PATH
+- Platform directories don't exist yet
 
 **Solutions:**
 
-1. **Remove read-only flag:**
-   ```cmd
-   attrib -r %APPDATA%\Claude\get-shit-done\* /s
-   ```
+1. **Install your AI platform first:**
+   - **Claude Code:** Install `claude` binary - [Installation guide](https://code.claude.com/docs/en/setup)
+   - **GitHub Copilot CLI:** Install `copilot` binary - [Installation guide](https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli)
+   - **Codex CLI:** Install `codex` binary - [Installation guide](https://developers.openai.com/codex/cli/)
 
-2. **Run as Administrator:**
-   - Right-click CLI application
-   - Select "Run as Administrator"
-   - Try installation again
+2. **Use explicit platform flag:**
 
-3. **Add exclusion to Windows Defender:**
-   - Windows Security → Virus & threat protection
-   - Manage settings → Exclusions
-   - Add folder: `%APPDATA%\Claude\get-shit-done\`
-
-**Root Cause:**
-- Files marked read-only
-- Antivirus blocking file modifications
-- Insufficient user permissions
-
-**Prevention:**
-- Install with administrator privileges
-- Add GSD paths to antivirus exclusions
-- Ensure user has write access to installation paths
-
-### Permission denied on Linux
-
-**Symptom:** Permission errors on Linux systems
-
-**Diagnosis:**
-```bash
-# Check ownership and permissions
-ls -la ~/.config/claude/get-shit-done/
-ls -la .claude/get-shit-done/
-
-# Check SELinux status (if applicable)
-getenforce
-```
-
-**Solutions:**
-
-1. **Fix ownership:**
    ```bash
-   sudo chown -R $USER:$USER ~/.config/claude/get-shit-done/
-   ```
-
-2. **Fix permissions:**
-   ```bash
-   chmod -R 755 ~/.config/claude/get-shit-done/
-   ```
-
-3. **SELinux issues:**
-   ```bash
-   # Check SELinux context
-   ls -Z ~/.config/claude/
-
-   # Restore default context
-   restorecon -R ~/.config/claude/get-shit-done/
-   ```
-
-**Root Cause:**
-- Incorrect file ownership (files owned by root)
-- Restrictive file permissions
-- SELinux preventing access
-
-**Prevention:**
-- Install without `sudo` when possible
-- Ensure consistent user ownership
-- Configure SELinux policies if needed
-
-## CLI-Specific Issues
-
-### Claude Code Issues
-
-#### Skill not loading
-
-**Symptom:** Skills installed but not recognized by Claude Code
-
-**Diagnosis:**
-```bash
-# Check skill directory exists
-ls -la .claude/get-shit-done/
-
-# Check skill manifest
-cat .claude/get-shit-done/skill.json 2>/dev/null || \
-cat .claude/get-shit-done/package.json 2>/dev/null
-```
-
-**Solutions:**
-
-1. **Restart Claude Code:**
-   - Claude Code caches skill registry
-   - Restart forces refresh
-
-2. **Clear skill cache:**
-   ```bash
-   # Remove cache (path varies by OS)
-   rm -rf ~/Library/Caches/Claude/skills/  # macOS
-   rm -rf $XDG_CACHE_HOME/claude/skills/   # Linux
-   rm -rf %TEMP%\Claude\skills\            # Windows
-   ```
-
-3. **Reinstall skills:**
-   ```bash
-   rm -rf .claude/get-shit-done/
+   # Force installation to specific platform
    npx get-shit-done-multi --claude
    ```
 
-**Root Cause:**
-- Stale skill cache in Claude Code
-- Corrupted skill manifest
-- Installation interrupted mid-process
+   This skips auto-detection and installs to the specified platform.
 
-**Prevention:**
-- Always restart Claude Code after skill installation
-- Monitor installation output for errors
-- Use `/gsd:verify-installation` to confirm
+1. **Create platform directory manually:**
 
-#### Path resolution errors on Windows
-
-**Symptom:** Commands fail with "path not found" on Windows
-
-**Diagnosis:**
-```bash
-# Check for mixed path separators
-grep -r "\\/" .claude/get-shit-done/  # Mixed separators
-
-# Check path format in commands
-cat .claude/get-shit-done/commands/gsd/new-project.md
-```
-
-**Solutions:**
-
-1. **GSD handles automatically:**
-   - All GSD code uses `path.join()` for cross-platform compatibility
-   - If errors persist, it's likely external to GSD
-
-2. **Check project paths:**
    ```bash
-   # Ensure project paths don't have special characters
-   # Windows doesn't handle: < > : " | ? *
-   ```
-
-3. **Use forward slashes in config:**
-   ```json
-   // .planning/config.json
-   {
-     "paths": {
-       "planning": ".planning",  // Use forward slashes
-       "phases": ".planning/phases"
-     }
-   }
-   ```
-
-**Root Cause:**
-- Windows uses backslashes, POSIX uses forward slashes
-- Some tools don't handle mixed separators
-- Special characters in paths
-
-**Prevention:**
-- GSD handles path normalization automatically
-- Avoid special characters in project paths
-- Use forward slashes in configuration files
-
-#### Agent delegation failures
-
-**Symptom:** Agent fails to spawn sub-agents
-
-**Diagnosis:**
-```bash
-# Check agent configuration
-cat .claude/agents/gsd-executor.md
-
-# Check Claude Code agent runtime status
-# (No public API - check Claude Code logs)
-```
-
-**Solutions:**
-
-1. **Verify native agent support:**
-   ```bash
-   /gsd:verify-installation
-   # Should show: ✓ Native agent support available
-   ```
-
-2. **Check Claude Code version:**
-   ```bash
-   claude --version
-   # Requires v1.0.0+ for agent delegation
-   ```
-
-3. **Reduce agent depth:**
-   - If agent chain is very deep (>3 levels)
-   - Claude Code may timeout
-   - Break into smaller tasks
-
-**Root Cause:**
-- Claude Code version too old
-- Agent recursion too deep
-- Claude API timeout
-
-**Prevention:**
-- Keep Claude Code updated
-- Limit agent delegation depth
-- Use `/gsd:verify-installation` to check support
-
-### Copilot CLI Issues
-
-#### GitHub authentication required
-
-**Symptom:** Commands fail with authentication errors
-
-**Diagnosis:**
-```bash
-# Check GitHub CLI authentication
-gh auth status
-
-# Expected output:
-# ✓ Logged in to github.com as USERNAME
-# ✓ Git operations for github.com configured
-```
-
-**Solutions:**
-
-1. **Authenticate GitHub CLI:**
-   ```bash
-   gh auth login
-   # Follow interactive prompts
-   ```
-
-2. **Refresh token:**
-   ```bash
-   gh auth refresh
-   ```
-
-3. **Check scopes:**
-   ```bash
-   gh auth status
-   # Ensure required scopes are granted:
-   # - repo (for repository access)
-   # - read:org (for org features)
-   ```
-
-**Root Cause:**
-- Not authenticated with GitHub CLI
-- Token expired
-- Insufficient scopes
-
-**Prevention:**
-- Run `gh auth login` during initial setup
-- Use `gh auth refresh` periodically
-- Grant all requested scopes during auth
-
-#### Skill refresh needed
-
-**Symptom:** Newly installed skills not recognized
-
-**Diagnosis:**
-```bash
-# Check skills are installed
-ls .github/skills/get-shit-done/
-
-# Check GitHub CLI extensions
-gh extension list
-```
-
-**Solutions:**
-
-1. **Reload skills:**
-   ```bash
-   gh copilot reload
-   ```
-
-2. **Restart GitHub CLI:**
-   ```bash
-   # Exit and restart CLI session
-   ```
-
-3. **Reinstall Copilot extension:**
-   ```bash
-   gh extension remove github/gh-copilot
-   gh extension install github/gh-copilot
-   ```
-
-**Root Cause:**
-- Copilot CLI skill cache not refreshed
-- GitHub CLI extension issue
-
-**Prevention:**
-- Run `gh copilot reload` after installing skills
-- Keep GitHub CLI updated (`gh upgrade`)
-
-#### Custom agent not recognized
-
-**Symptom:** GSD agents not found by Copilot CLI
-
-**Diagnosis:**
-```bash
-# Check agents directory
-ls -la .github/agents/
-
-# Verify agent file format
-head -20 .github/agents/gsd-executor.md
-```
-
-**Solutions:**
-
-1. **Verify agent structure:**
-   ```bash
-   # Agents must have proper frontmatter
-   cat .github/agents/gsd-executor.md
-   # Should start with:
-   # ---
-   # name: gsd-executor
-   # description: ...
-   # ---
-   ```
-
-2. **Reload GitHub Copilot:**
-   ```bash
-   gh copilot reload
-   ```
-
-3. **Check Copilot version:**
-   ```bash
-   gh extension list
-   # Ensure github/gh-copilot is latest version
+   # Create Claude directory structure
+   mkdir -p ~/.claude/skills ~/.claude/agents
    
-   gh extension upgrade github/gh-copilot
+   # Then install with explicit flag
+   npx get-shit-done-multi --claude --global
    ```
 
-**Root Cause:**
-- Incorrect agent file format
-- Agent cache not refreshed
-- Copilot CLI version too old
+### 4. Error: Existing installation conflict
 
-**Prevention:**
-- Don't manually modify agent files
-- Run `gh copilot reload` after installation
-- Keep Copilot CLI extension updated
+**Problem:**
 
-### Codex CLI Issues
+```plaintext
 
-#### Skill registration
+Warning: Existing GSD installation found at ~/.claude/get-shit-done/
+Current version: v2.0.0
+This installation will overwrite existing files.
 
-**Symptom:** Skills installed but not available
-
-**Diagnosis:**
-```bash
-# Check skills directory
-ls -la .codex/skills/get-shit-done/
-
-# Check prompts directory
-ls -la .codex/prompts/
-
-# Check Codex CLI skills list
-codex skills list
 ```
+
+**Symptoms:**
+
+- Pre-flight validation warns about existing files
+- Installer prompts for confirmation
+- Unsure whether to proceed
+
+**Cause:**
+
+- Previous GSD installation exists
+- Upgrading from older version
+- Interrupted previous installation
 
 **Solutions:**
 
-1. **Reload skills:**
+1. **Continue to upgrade (recommended):**
+
    ```bash
-   codex skills reload
+   # Installer will overwrite old files with new versions
+   # This is the normal upgrade path
+   npx get-shit-done-multi
    ```
 
-2. **Verify skill structure:**
-   ```bash
-   # Check skill manifest exists
-   cat .codex/skills/get-shit-done/skill.yaml
-   ```
+1. **Uninstall first, then reinstall:**
 
-3. **Regenerate prompts:**
    ```bash
-   # Remove old prompts
-   rm -rf .codex/prompts/*
+   # Remove old installation
+   rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
    
-   # Reinstall to regenerate
-   npx get-shit-done-multi --codex
+   # Fresh install
+   npx get-shit-done-multi
    ```
 
-**Root Cause:**
-- Skill registry not refreshed
-- Missing or malformed skill manifest
-- Prompts not generated
+   See [How to Uninstall](how-to-uninstall.md) for complete removal instructions.
 
-**Prevention:**
-- Run `codex skills reload` after installation
-- Don't manually modify skill manifests
-- Verify prompts exist in `.codex/prompts/`
+3. **Install to different location:**
 
-#### Prompt directory setup
+   ```bash
+   # Keep global installation, add local
+   npx get-shit-done-multi --local
+   ```
 
-**Symptom:** Prompts not found or empty directory
+### 5. Error: Path resolution failed (Windows)
 
-**Diagnosis:**
-```bash
-# Check prompts directory
-ls -la .codex/prompts/
+**Problem:**
 
-# Check prompt file content
-cat .codex/prompts/new-project.txt
+```plaintext
+Error: Invalid path: C:\Users\You\.claude\skills\gsd-new-project
+Path contains reserved name or invalid characters
 ```
+
+**Symptoms:**
+
+- Installation fails on Windows
+- Path-related errors
+- Files created in wrong locations
+
+**Cause:**
+
+- Windows path separators (`\` vs `/`)
+- Windows reserved names (CON, PRN, AUX, NUL, etc.)
+- Long path names exceeding Windows limits
 
 **Solutions:**
 
-1. **Create prompts directory:**
+1. **Use forward slashes in custom paths:**
+
    ```bash
-   mkdir -p .codex/prompts
+   # Windows accepts forward slashes
+   npx get-shit-done-multi --local
    ```
 
-2. **Reinstall to regenerate prompts:**
-   ```bash
-   npx get-shit-done-multi --codex
+2. **Avoid Windows reserved names:**
+   - Don't name folders: CON, PRN, AUX, NUL, COM1-9, LPT1-9
+   - Don't use trailing dots in folder names
+   - Avoid special characters: `< > : " | ? *`
+
+3. **Enable long path support (Windows 10+):**
+
+   ```powershell
+   # Run as Administrator
+   New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+     -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
    ```
 
-3. **Verify Codex CLI config:**
+1. **Install to shorter path:**
+
    ```bash
-   codex config list
-   # Check prompts_dir setting
+   # Use shorter installation path
+   cd C:\code\project
+   npx get-shit-done-multi --local
    ```
 
-**Root Cause:**
-- Prompts directory not created
-- Installation didn't complete
-- Codex CLI misconfigured
+### 6. Error: Symlink permission prompt
 
-**Prevention:**
-- Let installer create directory automatically
-- Don't manually create `.codex/` structure
-- Run `/gsd:verify-installation` after setup
+**Problem:**
 
-#### OpenAI API configuration
-
-**Symptom:** "API key not configured" or "401 Unauthorized"
-
-**Diagnosis:**
-```bash
-# Check environment variable
-echo $OPENAI_API_KEY
-
-# Check Codex CLI configuration
-codex config list
-
-# Test API connection
-codex auth status
+```plaintext
+Warning: Target path contains symlink: ~/.claude -> /external/.claude
+Continue installation? (y/n)
 ```
+
+**Symptoms:**
+
+- Interactive prompt about symlinks during installation
+- Uncertain whether symlink is safe
+- Installation paused waiting for input
+
+**Cause:**
+
+- Target path is or contains a symbolic link
+- Security check to prevent following malicious symlinks
+- Common when using external drives or custom setups
 
 **Solutions:**
 
-1. **Set API key via environment:**
+1. **Approve if symlink is intentional:**
+
    ```bash
-   export OPENAI_API_KEY="your-api-key-here"
+   # If you created the symlink, it's safe to continue
+   # Type 'y' and press Enter
+   ```
+
+1. **Reject and use non-symlinked path:**
+
+   ```bash
+   # Type 'n' to cancel
+   # Then install to direct path:
+   npx get-shit-done-multi --local
+
+   ```
+
+## Post-Installation Issues
+
+### 7. Installation succeeds but commands not working
+
+**Problem:**
+
+```plaintext
+# After installation, trying to use GSD:
+/gsd-plan-phase
+Error: Command not recognized
+```
+
+**Symptoms:**
+
+- Installation reports success
+- `/gsd-*` commands not recognized by AI assistant
+- No errors during installation
+- Files exist in correct location
+
+**Cause:**
+
+- Platform hasn't reloaded skills from disk
+- Skills cache is stale
+- Wrong installation location for platform config
+- Platform not running or not configured correctly
+
+**Solutions:**
+
+1. **Restart your AI platform:**
+   - **Claude Desktop:** Quit and relaunch app
+   - **VS Code (Copilot):** Reload window (`Cmd+Shift+P` → "Reload Window")
+   - **Terminal (Codex):** Start new terminal session
+
+2. **Verify installation location matches platform config:**
+
+   ```bash
+   # Check where files were installed
+   npx get-shit-done-multi --version
    
-   # Make permanent (add to shell profile)
-   echo 'export OPENAI_API_KEY="your-api-key"' >> ~/.bashrc
-   source ~/.bashrc
+   # Check where platform expects skills
+   # Claude: ~/.claude/skills/ or .claude/skills/
+   # Copilot: ~/.copilot/skills/ or .github/skills/
+   # Codex: ~/.codex/skills/ or .codex/skills/
    ```
 
-2. **Set API key via Codex CLI:**
+3. **Verify files exist:**
+
    ```bash
-   codex config set api_key "your-api-key-here"
+   # List installed skills
+   ls -la ~/.claude/skills/gsd-*/
+   ls -la ~/.copilot/skills/gsd-*/
+   ls -la ~/.codex/skills/gsd-*/
    ```
 
-3. **Verify key is valid:**
-   ```bash
-   curl https://api.openai.com/v1/models \
-     -H "Authorization: Bearer $OPENAI_API_KEY"
-   ```
+   If files are missing, reinstall.
 
-**Root Cause:**
-- API key not set
-- API key invalid or revoked
-- Environment variable not exported
+1. **Check platform-specific requirements:**
+   - **Claude:** Ensure `claude` binary is installed and Claude Code integration is enabled
+   - **Copilot:** Ensure `copilot` binary is installed and working
+   - **Codex:** Ensure `codex` binary is installed and configured
 
-**Prevention:**
-- Set API key during Codex CLI setup
-- Add to shell profile for persistence
-- Verify key works before using GSD
+### 8. Update detection not working
 
-## Agent Issues
+**Problem:**
 
-### Agent timeout
+```plaintext
+# Running --version shows nothing
+npx get-shit-done-multi --version
 
-**Symptom:** Agent invocation hangs or times out
-
-**Diagnosis:**
-```bash
-# Check which CLI you're using
-/gsd:verify-installation
-
-# Test agent directly (example for executor)
-# Via CLI command interface
+GSD Installer v2.0.1
+No installations found.
 ```
 
-**Solutions by CLI:**
+**Symptoms:**
 
-**Claude Code:**
-```bash
-# 1. Check Claude API status
-# Visit: status.anthropic.com
+- `--version` doesn't show installed versions
+- Installer doesn't detect existing installation
+- Upgrade prompts don't appear
+- Files exist but not detected
 
-# 2. Check internet connection
-ping anthropic.com
+**Cause:**
 
-# 3. Reduce prompt size
-# Use .gsdignore to exclude large directories
-
-# 4. Verify authentication
-claude whoami
-```
-
-**Copilot CLI:**
-```bash
-# 1. Check GitHub status
-# Visit: githubstatus.com
-
-# 2. Check authentication
-gh auth status
-
-# 3. Check rate limits
-gh api rate_limit
-
-# 4. Retry
-# Transient API issues usually resolve quickly
-```
-
-**Codex CLI:**
-```bash
-# 1. Check OpenAI status
-# Visit: status.openai.com
-
-# 2. Check API key
-codex auth status
-
-# 3. Try different model
-# Edit .codex/config.yaml
-# model: gpt-4-turbo  # Faster than gpt-4
-
-# 4. Reduce timeout
-codex config set timeout 30
-```
-
-**Root Cause:**
-- API service degradation
-- Network connectivity issues
-- Large prompts causing timeout
-- Rate limiting
-
-**Prevention:**
-- Monitor service status pages
-- Use `.gsdignore` to limit context size
-- Configure appropriate timeouts
-- Implement retry logic (GSD does this automatically)
-
-### Agent produces incorrect output
-
-**Symptom:** Agent completes but output is wrong
-
-**Diagnosis:**
-```bash
-# Check agent logs (if available)
-ls .planning/command-recordings/
-
-# Review last command recording
-cat .planning/command-recordings/latest.json
-
-# Check agent prompt
-# (Varies by CLI)
-```
+- Missing `.gsd-install-manifest.json` file
+- Corrupted manifest file
+- Manifest in wrong location
+- Permission issues reading manifest
 
 **Solutions:**
 
-1. **Verify agent configuration:**
+1. **Check manifest exists:**
+
    ```bash
-   # Check agent file hasn't been modified
-   git diff .claude/agents/gsd-planner.md
-   git diff .github/agents/gsd-planner.md
-   git diff .codex/skills/get-shit-done/agents/gsd-planner.md
+   cat ~/.claude/get-shit-done/.gsd-install-manifest.json
+   cat .github/get-shit-done/.gsd-install-manifest.json
+   cat ~/.codex/get-shit-done/.gsd-install-manifest.json
    ```
 
-2. **Reinstall if modified:**
+2. **Verify manifest format:**
+
    ```bash
-   npx get-shit-done-multi --claude --force  # Overwrites existing
+   # Check if JSON is valid
+   cat ~/.claude/get-shit-done/.gsd-install-manifest.json | python -m json.tool
    ```
 
-3. **Check input quality:**
-   - Vague requirements produce vague plans
-   - Provide specific, detailed requirements
-   - Review PROJECT.md and REQUIREMENTS.md
+   If error, manifest is corrupted.
 
-4. **Try different CLI:**
+1. **Reinstall to regenerate manifest:**
+
    ```bash
-   # Different models may produce better results
-   # Claude Code → GPT-4 (Copilot) → GPT-4/o1 (Codex)
+   # Reinstall (overwrites and creates new manifest)
+   npx get-shit-done-multi --claude --global
    ```
 
-**Root Cause:**
-- Insufficient or vague input
-- Modified agent configuration
-- Model limitations for specific task
-- Bug in agent prompt
+4. **Check file permissions:**
 
-**Prevention:**
-- Provide detailed requirements upfront
-- Don't manually modify agent files
-- Use appropriate CLI for task complexity
-- Report consistent issues as bugs
-
-## State Management Issues
-
-### Concurrent CLI usage conflicts
-
-**Symptom:** "Directory lock timeout" or state corruption
-
-**Diagnosis:**
-```bash
-# Check for lock directory
-ls -la .planning/.lock
-
-# Check lock age
-stat .planning/.lock
-
-# Check which CLI created lock
-cat .planning/.meta.json | grep lastCLI
-```
-
-**Solutions:**
-
-1. **Wait for lock to release:**
-   - GSD uses 10-second timeout by default
-   - Other CLI operation may be in progress
-
-2. **Remove stale lock:**
    ```bash
-   # Only if you're certain no CLI is running
-   rm -rf .planning/.lock
-   ```
-
-3. **Check for zombie processes:**
-   ```bash
-   # macOS/Linux
-   ps aux | grep -E "(claude|gh|codex)"
+   # Ensure manifest is readable
+   ls -la ~/.claude/get-shit-done/.gsd-install-manifest.json
    
-   # Kill if necessary
-   kill -9 <PID>
+   # Fix permissions if needed
+   chmod 644 ~/.claude/get-shit-done/.gsd-install-manifest.json
    ```
 
-**Root Cause:**
-- Two CLIs trying to modify state simultaneously
-- CLI crashed while holding lock
-- Lock timeout too short for operation
+## Upgrade Issues
 
-**Prevention:**
-- Let one CLI complete before switching
-- GSD handles locking automatically
-- Don't force-kill CLI processes
+### 9. Upgrade fails but installation still works
 
-### `.planning/` directory corruption
+**Problem:**
 
-**Symptom:** Invalid JSON or missing STATE.md file
-
-**Diagnosis:**
-```bash
-# Check STATE.md exists and is valid
-cat .planning/STATE.md
-
-# Check for JSON parse errors
-node -e "console.log(JSON.parse(require('fs').readFileSync('.planning/.session.json')))"
-
-# Run state validation
-/gsd:verify-installation
-# Look for state validation errors
+```plaintext
+Error: Failed to update ~/.claude/skills/gsd-plan-phase/SKILL.md
+Installation may be incomplete
 ```
+
+**Symptoms:**
+
+- Upgrade shows errors
+- Some files updated, some not
+- Mixed versions across files
+- Old version still partially working
+
+**Cause:**
+
+- File in use (locked by running process)
+- Partial permission issues
+- Disk full during upgrade
+- Interrupted upgrade (network issue, crash)
 
 **Solutions:**
 
-1. **Restore from backup:**
+1. **Close all AI platform instances:**
+
    ```bash
-   # Check if backup exists
-   ls .planning/.backup/
+   # Make sure no process is using GSD files
+   # Then retry upgrade
+   npx get-shit-done-multi
+   ```
+
+2. **Force reinstall:**
+
+   ```bash
+   # Remove existing installation
+   rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
    
-   # Restore latest backup
-   cp .planning/.backup/STATE.md.* .planning/STATE.md
+   # Fresh install
+   npx get-shit-done-multi --claude --global
    ```
 
-2. **Recreate STATE.md:**
+1. **Check for file locks:**
+
    ```bash
-   # If no backup, recreate from scratch
-   /gsd:new-project
-   # This initializes new .planning/ directory
+   # macOS/Linux: Check for processes using files
+   lsof | grep get-shit-done
+   
+   # Kill any processes holding locks
    ```
 
-3. **Use state repair tool:**
-   ```bash
-   # GSD includes state validator
-   node lib-ghcc/state/state-validator.js \
-     --dir .planning \
-     --repair \
-     --auto-fix
-   ```
+### 10. Upgrade changes break my workflow
 
-**Root Cause:**
-- Disk full during write operation
-- Process killed during state update
-- Manual editing of state files
-- Filesystem corruption
+**Problem:**
 
-**Prevention:**
-- Never manually edit `.planning/` files
-- Let GSD handle all state modifications
-- Ensure sufficient disk space
-- Use version control for state files
+```pl
 
-### State migration failures
+# After upgrading to v3.0.0
 
-**Symptom:** "Migration failed" when upgrading GSD
-
-**Diagnosis:**
-```bash
-# Check current state version
-cat .planning/.meta.json | grep version
-
-# Check for migration errors
-cat .planning/.backup/migration.log 2>/dev/null
+Error: /gsd-plan-milestone no longer exists
+Use /gsd-plan-phase instead
 ```
+
+**Symptoms:**
+
+- Commands renamed or removed
+- Workflow behaves differently
+- Breaking changes not anticipated
+- Need to revert to old version
+
+**Cause:**
+
+- Major version upgrade with breaking changes
+- Didn't read CHANGELOG before upgrading
+- Assumed backwards compatibility
 
 **Solutions:**
 
-1. **Restore pre-migration backup:**
+1. **Read CHANGELOG for migration guide:**
+
    ```bash
-   # Automatic backup created before migration
-   ls .planning/.backup/pre-migration-*
+   # Check what changed
+   npx get-shit-done-multi --changelog
+   ```
+
+1. **Adapt workflow to new version:**
+   - Learn new command names
+   - Update documentation
+   - Inform team members
+
+2. **Downgrade if necessary:**
+
+   ```bash
+   # Uninstall current version
+   rm -rf ~/.claude/skills/gsd-* ~/.claude/agents/gsd-* ~/.claude/get-shit-done/
    
-   # Restore if needed
-   cp -r .planning/.backup/pre-migration-*/* .planning/
+   # Install specific older version
+   npx get-shit-done-multi@2.5.0
    ```
 
-2. **Manual migration:**
-   ```bash
-   # Run migration tool directly
-   node lib-ghcc/state/state-manager.js migrate \
-     --from <old-version> \
-     --to <new-version>
-   ```
+   See [How to Upgrade](how-to-upgrade.md) for downgrade details.
 
-3. **Fresh start:**
-   ```bash
-   # Last resort: backup .planning/ and recreate
-   mv .planning .planning.old
-   /gsd:new-project
-   # Manually copy important data from .planning.old
-   ```
+## Runtime Issues
 
-**Root Cause:**
-- Breaking changes in state format
-- Migration script bug
-- Corrupted state before migration
+### 11. Error: Git identity not preserved in commits
 
-**Prevention:**
-- Always backup `.planning/` before upgrading
-- GSD creates automatic backups during migration
-- Test upgrades in separate branch first
+**Problem:**
 
-## Advanced Troubleshooting
+```plaintext
 
-### Enable debug logging
+# After GSD makes commits
 
-```bash
-# Set debug environment variable
-export GSD_DEBUG=1
+git log --oneline
+a1b2c3d GSD Agent <noreply@gsd.dev>
 
-# Run command with debug output
-/gsd:new-project
-
-# Debug logs written to:
-.planning/debug.log
 ```
 
-### Collect diagnostic information
+**Symptoms:**
 
-```bash
-# Run full diagnostic report
-/gsd:verify-installation > diagnostic-report.txt
+- Commits show wrong author name/email
+- User identity overridden by agent
+- Git history attributes work to wrong person
 
-# Include system information
-echo "--- System Info ---" >> diagnostic-report.txt
-uname -a >> diagnostic-report.txt
-node --version >> diagnostic-report.txt
-npm --version >> diagnostic-report.txt
+**Cause:**
 
-# Include CLI versions
-echo "--- CLI Versions ---" >> diagnostic-report.txt
-claude --version 2>&1 >> diagnostic-report.txt
-gh --version 2>&1 >> diagnostic-report.txt
-codex --version 2>&1 >> diagnostic-report.txt
+- Git identity helpers not loaded
+- Environment variables not set
+- Git config missing user.name/user.email
+
+**Solutions:**
+
+1. **Set git config globally:**
+
+   ```bash
+   git config --global user.name "Your Name"
+   git config --global user.email "your.email@example.com"
+   ```
+
+1. **Set git config locally (per-project):**
+
+   ```bash
+   cd /path/to/project
+   git config user.name "Your Name"
+   git config user.email "your.email@example.com"
+   ```
+
+3. **Verify git identity helpers are working:**
+
+   ```bash
+   # Check if helpers are loaded
+   cat .github/get-shit-done/workflows/git-identity-helpers.sh
+   ```
+
+1. **Amend recent commits if needed:**
+
+   ```bash
+   # Fix last commit
+   git commit --amend --author="Your Name <your.email@example.com>" --no-edit
+   
+   # Fix last N commits
+   git rebase -i HEAD~N -x "git commit --amend --author='Your Name <your.email@example.com>' --no-edit"
+   ```
+
+### 12. Error: Planning directory structure issues
+
+**Problem:**
+
+```plaintext
+
+Error: .planning/phases/01-phase-name/01-01-PLAN.md not found
+Cannot execute plan
 ```
 
-### Check known issues
+**Symptoms:**
 
-Before reporting issues:
+- GSD commands fail to find planning files
+- Directory structure doesn't match expected format
+- Phase/plan numbering incorrect
 
-1. **Check CHANGELOG.md** for known issues in current version
-2. **Search GitHub issues:** (When repo is public)
-3. **Check CLI status pages:**
-   - Claude: [status.anthropic.com](https://status.anthropic.com/)
-   - GitHub: [githubstatus.com](https://www.githubstatus.com/)
-   - OpenAI: [status.openai.com](https://status.openai.com/)
+**Cause:**
+
+- Manual file creation with wrong naming
+- Directory structure doesn't follow conventions
+- Files moved or renamed outside GSD workflow
+
+**Solutions:**
+
+1. **Use GSD commands to create structure:**
+
+   ```bash
+   # Don't manually create planning files
+   # Use GSD commands instead:
+   /gsd-new-project
+   /gsd-add-phase
+   /gsd-plan-phase 1
+   ```
+
+1. **Verify directory structure:**
+
+   ```bash
+   # Check structure matches expected format
+   tree .planning/
+   ```
+
+   Should show:
+
+   ```
+
+   .planning/
+   ├── ROADMAP.md
+   ├── REQUIREMENTS.md
+   ├── STATE.md
+   └── phases/
+       └── 01-phase-name/
+           ├── 01-01-PLAN.md
+           ├── 01-01-SUMMARY.md
+           └── 01-01-CONTEXT.md
+   ```
+
+3. **Regenerate from roadmap:**
+
+   ```bash
+   # If structure is broken, regenerate
+   /gsd-new-project
+   ```
+
+## Network and Package Issues
+
+### 13. Error: npm package not found
+
+**Problem:**
+
+```plaintext
+npx get-shit-done-multi
+npm ERR! 404 Not Found - GET https://registry.npmjs.org/get-shit-done-multi
+```
+
+**Symptoms:**
+
+- `npx` command fails
+- Package not found on npm registry
+- Cannot download or install
+
+**Cause:**
+
+- Package name misspelled
+- Package not published yet
+- npm registry connection issues
+- Corporate firewall blocking npm
+
+**Solutions:**
+
+1. **Verify package name:**
+
+   ```bash
+   # Correct package name
+   npx get-shit-done-multi
+   
+   # Common typos to avoid:
+   # get-shit-done (without -multi)
+   # gsd-multi
+   # get-shit-done-cli
+   ```
+
+2. **Check npm registry connection:**
+
+   ```bash
+   # Test npm connection
+   npm ping
+   
+   # Check registry URL
+   npm config get registry
+   ```
+
+1. **Use different registry if behind corporate firewall:**
+
+   ```bash
+   # Use public registry
+   npm config set registry https://registry.npmjs.org/
+   
+   # Then retry
+   npx get-shit-done-multi
+   ```
+
+### 14. Error: Node.js version too old
+
+**Problem:**
+
+```plaintext
+
+Error: This package requires Node.js version 20 or higher
+Current version: v18.12.0
+```
+
+**Symptoms:**
+
+- Installation fails immediately
+- Version check error
+- Package won't run
+
+**Cause:**
+
+- Node.js version older than v20
+- Using system Node.js instead of updated version
+
+**Solutions:**
+
+1. **Upgrade Node.js:**
+
+   ```bash
+   # Using nvm (recommended)
+   nvm install 20
+   nvm use 20
+   
+   # Using Homebrew (macOS)
+   brew upgrade node
+   
+   # Using apt (Ubuntu/Debian)
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   ```
+
+1. **Verify Node.js version:**
+
+   ```bash
+   node --version  # Should show v20.0.0 or higher
+   ```
+
+3. **Use npx with specific Node version (nvm):**
+
+   ```bash
+   nvm exec 20 npx get-shit-done-multi
+   ```
 
 ## Getting Help
 
-If issues persist after following this guide:
+If none of these solutions work:
 
-1. **Run full verification:**
-   ```bash
-   /gsd:verify-installation
-   ```
+### 1. Check Error Log
 
-2. **Review setup guides:**
-   - [Claude Code Setup](setup-claude-code.md)
-   - [Copilot CLI Setup](setup-copilot-cli.md)
-   - [Codex CLI Setup](setup-codex-cli.md)
+GSD creates an error log when installation fails:
 
-3. **Check implementation differences:**
-   - [Implementation Differences](implementation-differences.md)
+```bash
+# Check for error log
+cat .gsd-error.log
+cat ~/.gsd-error.log
+```
 
-4. **Review migration guide:**
-   - [Migration Guide](migration-guide.md)
+This contains detailed error information.
 
-## Reference
+### 2. Gather Information
 
-- **Setup Guides:** [setup-claude-code.md](setup-claude-code.md), [setup-copilot-cli.md](setup-copilot-cli.md), [setup-codex-cli.md](setup-codex-cli.md)
-- **Implementation Differences:** [implementation-differences.md](implementation-differences.md)
-- **CLI Comparison:** [cli-comparison.md](cli-comparison.md)
-- **Migration Guide:** [migration-guide.md](migration-guide.md)
+Before asking for help, collect:
+
+- **Error message:** Full output (copy-paste)
+- **Environment:**
+
+  ```bash
+  node --version
+  npm --version
+  uname -a  # OS information
+  ```
+
+- **Installation command:** Exact command you ran
+- **Installation location:** Where you tried to install
+- **Manifest file:** If it exists
+
+  ```bash
+  cat ~/.claude/get-shit-done/.gsd-install-manifest.json
+  ```
+
+### 3. Open GitHub Issue
+
+Visit the GitHub repository and create an issue:
+
+1. **Title:** Brief description (e.g., "Installation fails with EACCES on macOS")
+2. **Description:** Include all information from step 2
+3. **Steps to reproduce:** Exact commands that cause the error
+4. **Expected behavior:** What should happen
+5. **Actual behavior:** What actually happens
+
+### 4. Check Existing Issues
+
+Before opening new issue, search existing issues:
+
+- Someone may have already reported the same problem
+- Solution may already exist in comments
+
+## Next Steps
+
+- **Fresh installation:** See [How to Install](how-to-install.md)
+- **Upgrade existing installation:** See [How to Upgrade](how-to-upgrade.md)
+- **Remove GSD:** See [How to Uninstall](how-to-uninstall.md)
+- **Understand what's installed:** See [What Gets Installed](what-gets-installed.md)

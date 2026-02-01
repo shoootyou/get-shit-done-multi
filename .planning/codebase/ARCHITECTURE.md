@@ -1,220 +1,312 @@
 # Architecture
 
-**Analysis Date:** 2026-01-20
+**Analysis Date:** 2026-02-01
 
 **Scope:**
-- Source files: 55 files
-- Primary language: JavaScript (100% of implementation code)
-- LOC: 9,610 lines
-- Test files: 2 files
+- Source files: 137 files
+- Primary language: JavaScript (ESM, Node.js)
+- LOC: ~7,500 lines (bin/lib), ~5,500 lines total in installer
 
 ## Pattern Overview
 
-**Overall:** Orchestrator-Agent with Multi-CLI Adapter Pattern
+**Overall:** Modular Multi-Platform Installer with Adapter Pattern
 
 **Key Characteristics:**
-- Orchestrators delegate to specialized agents (gsd-executor, gsd-planner, gsd-verifier, etc.)
-- Multi-CLI adapters abstract differences between Claude, Copilot, and Codex CLIs
-- Command system dynamically loads markdown-defined commands at runtime
-- State management provides concurrent-safe project tracking
-- Workflow-driven execution using markdown templates
+- Platform adapter pattern for cross-platform skill/agent deployment
+- Orchestrator-based installation with atomic transactions
+- Layered validation (preflight → runtime → post-install)
+- Template-driven content transformation with variable substitution
+- Migration and version management system
 
 ## Layers
 
-**Installation Layer:**
-- Purpose: Installs GSD system to target CLI environments
-- Location: `bin/install.js`
-- Contains: CLI detection, adapter selection, file copying/conversion
-- Depends on: Adapters, Path utilities, Upgrade utilities
-- Used by: npm install process, user installation
+**CLI Layer:**
+- Purpose: Command-line interface and interactive mode
+- Location: `bin/lib/cli/`
+- Contains: Argument parsing, prompts, progress display, logging
+- Depends on: Installer orchestrator, platform adapters, validation layer
+- Used by: Entry point (`bin/install.js`)
 
-**Command Layer:**
-- Purpose: Exposes user-facing commands through CLI interfaces
-- Location: `commands/gsd/`
-- Contains: 29 markdown command definitions with frontmatter + prompt
-- Depends on: Command system, Workflows, Templates
-- Used by: gsd-cli.js entry point
+**Platform Abstraction Layer:**
+- Purpose: Platform-specific transformations and validation
+- Location: `bin/lib/platforms/`
+- Contains: Adapter registry, platform adapters (Claude/Copilot/Codex), validators, serializers
+- Depends on: Shared base classes, field validators
+- Used by: Installer orchestrator, skill/agent installers
 
-**Orchestration Layer:**
-- Purpose: Coordinates multi-agent workflows with CLI abstraction
-- Location: `bin/lib/orchestration/`
-- Contains: Agent invocation, performance tracking, capability matrix, result validation
-- Depends on: Agent registry, CLI detection, State management
-- Used by: Commands, Workflows
+**Installation Orchestration Layer:**
+- Purpose: Coordinates file operations and installation workflow
+- Location: `bin/lib/installer/`
+- Contains: Main orchestrator, skill installer, agent installer, shared installer, platform instructions
+- Depends on: Platform adapters, file operations, template renderer, manifest writer
+- Used by: Installation core (`bin/lib/cli/installation-core.js`)
 
-**Command System Layer:**
-- Purpose: Dynamic command discovery and execution
-- Location: `bin/lib/command-system/`
-- Contains: Loader, registry, executor, parser, help generator, error handler
-- Depends on: CLI detection, Adapters
-- Used by: gsd-cli.js
+**Validation Layer:**
+- Purpose: Pre-install checks and runtime validation
+- Location: `bin/lib/validation/`, `bin/lib/preflight/`
+- Contains: Path validators, permission checks, disk space checks, error formatters
+- Depends on: File operations, error types
+- Used by: Orchestrator, installation loop
 
-**Adapter Layer:**
-- Purpose: Abstracts differences between Claude, Copilot, and Codex CLIs
-- Location: `bin/lib/adapters/`
-- Contains: claude.js, copilot.js, codex.js, shared utilities (path-rewriter, format-converter)
-- Depends on: Path utilities
-- Used by: Installation, Command system, Orchestration
+**File I/O Layer:**
+- Purpose: File system operations with error handling
+- Location: `bin/lib/io/`, `bin/lib/paths/`
+- Contains: File operations, path resolution, symlink handling
+- Depends on: fs-extra, error types
+- Used by: All layers requiring file operations
 
-**State Management Layer:**
-- Purpose: Provides concurrent-safe project state tracking
-- Location: `lib-ghcc/`
-- Contains: StateManager, SessionManager, DirectoryLock, StateValidator, UsageTracker, StateMigrations
-- Depends on: File system
-- Used by: Orchestration layer, Commands
+**Version & Migration Layer:**
+- Purpose: Version detection, comparison, and migration orchestration
+- Location: `bin/lib/version/`, `bin/lib/migration/`
+- Contains: Version detector, migration manager, backup manager, manifest reader/writer
+- Depends on: File operations, platform paths
+- Used by: Orchestrator, installation loop
 
-**Verification Layer:**
-- Purpose: Validates installations and command execution
-- Location: `lib-ghcc/verification/`
-- Contains: CLI detector, agent verifier, command verifier, diagnostic runner
-- Depends on: Adapters, Command system
-- Used by: Installation, Development testing
+**Manifest & Metadata Layer:**
+- Purpose: Installation tracking and state management
+- Location: `bin/lib/manifests/`
+- Contains: Schema, reader, writer, repair
+- Depends on: File operations, Joi validation
+- Used by: Orchestrator, version checker, migration manager
 
-**Content Layer:**
-- Purpose: Provides templates, workflows, references, and agent definitions
-- Location: `get-shit-done/`, `agents/`
-- Contains: Workflows (15), Templates (18), References, Agent definitions (11), Skills
-- Depends on: None (pure content)
-- Used by: Commands, Orchestration, Agents
+**Template Processing Layer:**
+- Purpose: Template variable substitution and frontmatter transformation
+- Location: `bin/lib/templates/`
+- Contains: Template renderer, variable replacement
+- Depends on: File operations
+- Used by: Installer orchestrator, agent/skill installers
 
 ## Data Flow
 
-**Command Execution Flow:**
+**Installation Flow (CLI Mode):**
 
-1. User invokes command: `gsd-cli gsd:new-project`
-2. `bin/gsd-cli.js` entry point loads command system
-3. Command loader reads `commands/gsd/new-project.md`
-4. Executor detects current CLI (Claude/Copilot/Codex)
-5. Command prompt + context references sent to CLI
-6. Command orchestrates workflow (may spawn agents)
-7. Results validated and recorded in state
+1. **Entry Point** (`bin/install.js`):
+   - Parse CLI flags with Commander
+   - Validate arguments (custom path, platform conflicts)
+   - Detect old versions and trigger migration if needed
+   - Route to interactive or direct installation
 
-**Agent Invocation Flow:**
+2. **Pre-Flight Validation** (`bin/lib/preflight/pre-flight-validator.js`):
+   - Check disk space (with 50% buffer)
+   - Validate templates exist
+   - Check write permissions
+   - Validate all target paths (8-layer security check)
+   - Detect symlinks and warn
 
-1. Orchestrator calls `invokeAgent(agentName, prompt, options)`
-2. Directory lock acquired for concurrent safety
-3. CLI detected and agent metadata loaded from registry
-4. Agent capability checked for current CLI
-5. Agent prompt sent to CLI with performance tracking
-6. Result validated and returned to orchestrator
-7. State management records execution
+3. **Installation Loop** (`bin/lib/cli/install-loop.js`):
+   - Iterate over selected platforms
+   - Call installation orchestrator for each platform
 
-**Installation Flow:**
+4. **Orchestrator** (`bin/lib/installer/orchestrator.js`):
+   - Resolve target directory (global/local/custom)
+   - Check for old version and migrate if needed
+   - Validate version (prevent downgrades, warn on major updates)
+   - Prepare template variables (PLATFORM_ROOT, COMMAND_PREFIX, VERSION)
+   - Install skills → agents → shared → platform instructions
+   - Generate and write installation manifest
 
-1. User runs `npm install -g get-shit-done-cc`
-2. `bin/install.js` entry point runs
-3. CLI detection identifies available CLIs
-4. User selects CLI(s) and scope (global/local)
-5. Adapter converts content for target CLI
-6. Files copied to target CLI directories
-7. Verification tests confirm installation
+5. **Component Installation** (skills, agents, shared, instructions):
+   - Read template files
+   - Replace template variables (`{{VARIABLE}}`)
+   - Transform frontmatter (platform-specific)
+   - Validate frontmatter against platform schema
+   - Write to target directory
 
-**State Management:**
+6. **Post-Installation**:
+   - Write manifest (`.gsd-install-manifest.json`)
+   - Display success message and next steps
 
-- Project state stored in `.planning/` directory
-- DirectoryLock prevents concurrent write conflicts
-- StateManager provides atomic operations
-- SessionManager tracks command execution history
-- StateMigrations handle version upgrades
+**Migration Flow:**
+
+1. Detect old version (v1.x) in target directory
+2. Prompt user for migration confirmation
+3. Create backup directory with timestamp
+4. Validate backup space
+5. Copy old files to backup
+6. Remove old installation
+7. Proceed with v2.0.0 installation
+
+**Interactive Mode Flow:**
+
+1. Display intro with @clack/prompts
+2. Detect platform CLIs (binary-detector)
+3. Find existing installations with version status
+4. Prompt for platform selection (multi-select)
+5. Prompt for scope (global/local)
+6. Hand off to installation loop (same as CLI mode)
 
 ## Key Abstractions
 
-**Command Definition:**
-- Purpose: Declarative command specification
-- Examples: `commands/gsd/new-project.md`, `commands/gsd/execute-phase.md`
-- Pattern: YAML frontmatter + markdown prompt
-- Frontmatter: name, description, allowed-tools, argument-hint
-- Body: objective, execution_context, process steps
+**PlatformAdapter (Base Class):**
+- Purpose: Interface for platform-specific transformations
+- Examples: `bin/lib/platforms/claude/adapter.js`, `bin/lib/platforms/copilot/adapter.js`, `bin/lib/platforms/codex/adapter.js`
+- Pattern: Abstract base class with template methods
+- Methods:
+  - `getFileExtension()` - Returns `.md` for Claude, `.agent.md` for Copilot/Codex
+  - `getCommandPrefix()` - Returns `/gsd-` for Claude, `$gsd-` for Copilot/Codex
+  - `transformTools(tools)` - Converts tool list to platform format
+  - `transformFrontmatter(content)` - Transforms agent frontmatter
+  - `getTargetDir(isGlobal)` - Returns installation directory
+  - `getInstructionsPath(isGlobal)` - Returns path to PLATFORM.md file
 
-**Agent Definition:**
-- Purpose: Specialized autonomous execution unit
-- Examples: `agents/gsd-executor.md`, `agents/gsd-planner.md`, `agents/gsd-verifier.md`
-- Pattern: YAML frontmatter + role/process instructions
-- Spawned by: Task tool invocations from orchestrators
-- Returns: Structured output to spawning orchestrator
+**AdapterRegistry (Singleton):**
+- Purpose: Central registry for platform adapters
+- Location: `bin/lib/platforms/registry.js`
+- Pattern: Registry/Factory pattern
+- Initialized with all three platform adapters on construction
+- Used throughout codebase for adapter lookup
 
-**Workflow:**
-- Purpose: Reusable orchestration logic
-- Examples: `get-shit-done/workflows/map-codebase.md`, `get-shit-done/workflows/execute-phase.md`
-- Pattern: Step-by-step process documentation
-- Referenced by: Commands via @-references
+**BaseValidator (Base Class):**
+- Purpose: Frontmatter validation for skills
+- Examples: `bin/lib/platforms/claude/validator.js`, `bin/lib/platforms/copilot/validator.js`
+- Pattern: Template Method pattern with hook methods
+- Methods:
+  - `validate(frontmatter, context)` - Main validation entry point
+  - `validateRequiredFields()` - Common required field validation
+  - `validateOptionalFields()` - Platform-specific optional fields (hook)
+  - `validateUnknownFields()` - Platform-specific unknown field warnings (hook)
 
-**Adapter:**
-- Purpose: CLI-specific implementation abstraction
-- Examples: `bin/lib/adapters/claude.js`, `bin/lib/adapters/copilot.js`
-- Pattern: getTargetDirs(), convertContent(), installFiles()
-- Enables: Single codebase supporting multiple CLIs
+**Manifest Schema:**
+- Purpose: Installation metadata tracking
+- Location: `bin/lib/manifests/schema.js`
+- Pattern: Data Transfer Object with Joi validation
+- Fields:
+  - `gsd_version` - Installed version (e.g., "2.0.0")
+  - `platform` - Platform name (claude/copilot/codex)
+  - `scope` - Installation scope (global/local)
+  - `installed_at` - ISO timestamp
+  - `files` - Array of relative file paths
 
-**State Module:**
-- Purpose: Isolated state management concern
-- Examples: `lib-ghcc/state-manager.js`, `lib-ghcc/directory-lock.js`
-- Pattern: ES6 classes with clear interfaces
-- Integration: Single entry point via `state-integration.js`
+**Template Variables:**
+- Purpose: Platform-agnostic template content
+- Pattern: Mustache-style variable substitution (`{{VARIABLE}}`)
+- Variables:
+  - `{{PLATFORM_ROOT}}` - Path reference (.claude/.github/.codex)
+  - `{{COMMAND_PREFIX}}` - Command prefix (/gsd- or $gsd-)
+  - `{{VERSION}}` - Current GSD version
+  - `{{PLATFORM_NAME}}` - Platform name (claude/copilot/codex)
 
 ## Entry Points
 
-**NPM Installation:**
+**CLI Entry Point:**
 - Location: `bin/install.js`
-- Triggers: `npm install -g get-shit-done-cc` or `npx get-shit-done-cc`
-- Responsibilities: CLI detection, user prompts, adapter selection, file installation
+- Triggers: `npx get-shit-done-multi [flags]`
+- Responsibilities:
+  - Parse command-line arguments
+  - Validate flags and custom paths
+  - Check for updates (--check-updates)
+  - Detect and migrate old versions
+  - Route to interactive or direct installation mode
 
-**GSD CLI:**
-- Location: `bin/gsd-cli.js`
-- Triggers: Direct invocation via `gsd-cli <command>`
-- Responsibilities: Command loading, argument parsing, command execution
+**Interactive Entry Point:**
+- Location: `bin/lib/cli/interactive.js`
+- Triggers: Running without flags (TTY detected)
+- Responsibilities:
+  - Display beautiful prompts with @clack/prompts
+  - Detect platform CLIs
+  - Discover existing installations with version status
+  - Collect platform and scope selections
+  - Hand off to installation loop
 
-**Test Suites:**
-- Location: `bin/test-command-system.js`, `bin/test-state-management.js`, `bin/test-cross-cli-state.js`
-- Triggers: Manual execution during development
-- Responsibilities: Validation of command system, state management, cross-CLI behavior
-
-**Documentation Generators:**
-- Location: `bin/doc-generator/*.js`
-- Triggers: `npm run docs:generate`
-- Responsibilities: Generate CLI comparison docs, capability matrix, extract capabilities
+**Installation Orchestrator:**
+- Location: `bin/lib/installer/orchestrator.js`
+- Triggers: Called by installation loop for each platform
+- Responsibilities:
+  - Symlink detection and confirmation
+  - Old version migration
+  - Version validation (downgrade prevention)
+  - Template variable preparation
+  - Sequential component installation (skills → agents → shared → instructions)
+  - Manifest generation
 
 ## Error Handling
 
-**Strategy:** Graceful degradation with CLI fallback
+**Strategy:** Layered error handling with custom error types
 
 **Patterns:**
-- CommandError class for command-specific failures
-- formatError() for user-friendly error messages
-- degradeGracefully() suggests alternatives when features unavailable
-- CLI-specific fallback via CLIFallback class
-- Verification layer validates installations and provides diagnostics
-- Result validation ensures agent outputs match expectations
+
+**InstallError (Custom Error Class):**
+- Location: `bin/lib/errors/install-error.js`
+- Purpose: Structured errors with exit codes
+- Exit codes:
+  - 1: GENERIC_ERROR
+  - 2: INVALID_ARGS
+  - 3: MISSING_TEMPLATES
+  - 4: PERMISSION_DENIED
+  - 5: INSUFFICIENT_SPACE
+  - 6: INVALID_PATH
+
+**ValidationError (Custom Error Class):**
+- Location: `bin/lib/platforms/_shared/validation-error.js`
+- Purpose: Frontmatter validation failures
+- Contains: field name, validation reason, file path, platform
+
+**Error Logging:**
+- Location: `bin/lib/validation/error-logger.js`
+- Pattern: File-based error logging for debugging
+- Logged to: `.planning/errors/install-error-[timestamp].json`
+- Contains: Error details, stack trace, installation context
+
+**Pre-flight Validation:**
+- Location: `bin/lib/preflight/pre-flight-validator.js`
+- Pattern: Collect all validation errors, display grouped report
+- Validation order: disk space → templates → permissions → paths → symlinks
+- Fails fast on prerequisites (templates missing)
+
+**Runtime Error Handling:**
+- Pattern: Try-catch at orchestrator level
+- User-facing: Friendly error messages via error-formatter
+- Debug: Detailed error logs to .planning/errors/
+- Recovery: Atomic installations (all-or-nothing per platform)
 
 ## Cross-Cutting Concerns
 
-**Logging:** Console-based with color coding (cyan, green, yellow, dim, reset)
+**Logging:**
+- Location: `bin/lib/cli/logger.js`
+- Pattern: Structured logging with chalk colors
+- Functions:
+  - `logger.info()`, `logger.success()`, `logger.warn()`, `logger.error()`
+  - `logger.blockTitle()` - Bordered titles
+  - `logger.simpleSubtitle()` - Section headers
+  - `logger.listItem()` - Bulleted list items
+  - `logger.verboseInProgress()`, `logger.verboseComplete()` - Verbose mode output
 
-**Validation:** 
-- Command frontmatter validation via verifier
-- State validation via StateValidator
-- Result validation via ResultValidator
-- Planning directory validation via validate-planning-dir.js
+**Validation:**
+- Path validation: 8-layer security checks (traversal, null bytes, special chars, etc.)
+- Frontmatter validation: Platform-specific validators with base validator
+- Version validation: Semantic version comparison, downgrade prevention
+- Custom path validation: Prevent multiple platforms to same directory
 
-**Authentication:** Not applicable (CLI tool)
+**Progress Display:**
+- Location: `bin/lib/cli/progress.js`
+- Pattern: cli-progress bars for non-verbose mode
+- Modes:
+  - Verbose: File-by-file output
+  - Non-verbose: Progress bars with completion lines
 
-**CLI Detection:**
-- Runtime detection via `detectCLI()` in `bin/lib/detect.js`
-- Checks environment markers: CLAUDE_CODE, GITHUB_COPILOT, CODEX_CLI
-- Installation-time detection via `detectInstalledCLIs()`
-- Adapter selection based on detected CLI
+**Symlink Handling:**
+- Location: `bin/lib/paths/symlink-resolver.js`
+- Pattern: Single-level symlink resolution with user confirmation
+- Behavior: Detect symlinks, warn user, get confirmation before writing
 
-**Performance Tracking:**
-- PerformanceTracker monitors agent execution time
-- Performance marks and measures via Node perf_hooks
-- Usage tracking via UsageTracker
-- Session history via SessionManager
+**Transaction Safety:**
+- Pattern: Per-platform atomic installations
+- Approach: Install all components or fail entirely
+- Rollback: Not implemented (user must manually clean up on failure)
+- Migration: Backup old version before upgrade
 
-**Concurrency Control:**
-- DirectoryLock prevents concurrent writes to .planning/
-- File-based locking with retry mechanism
-- Lock acquisition timeout handling
-- Automatic cleanup on process exit
+**Version Management:**
+- Semantic versioning with semver library
+- Version comparison: `bin/lib/version/version-checker.js`
+- Old version detection: Pattern-based detection of v1.x installations
+- Manifest-based tracking: Each installation tracked in `.gsd-install-manifest.json`
+
+**Security:**
+- Path validation at multiple layers (input, pre-flight, runtime)
+- Template variable sanitization (no user-controlled variables)
+- Symlink detection and confirmation
+- Permission checks before file operations
 
 ---
 
-*Architecture analysis: 2026-01-20*
+*Architecture analysis: 2026-02-01*

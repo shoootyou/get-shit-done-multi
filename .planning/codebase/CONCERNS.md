@@ -1,222 +1,690 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-01-20
+**Analysis Date:** 2026-02-01
 
 **Analysis Scope:**
-- Files scanned: 55 source files
-- TODO/FIXME found: 0 instances
-- Large files (>500 LOC): 2 files
+- Files scanned: 97 source files, 25 test files
+- TODO/FIXME found: 1 instance (resolved comment)
+- Large files (>300 LOC): 9 files
+- Lines of code: 12,372 total (7,500 source + 4,872 tests)
+- Platform code: 2,292 lines across 3 platforms
 
-## Tech Debt
+**v2.0 Release Status:**
+- ✅ Production-ready npm package (339KB)
+- ✅ Multi-platform support (Claude, Copilot, Codex)
+- ✅ Comprehensive test coverage (25 test files)
+- ✅ Security-focused validation and transactions
+- ✅ Automated NPM publishing workflow
+- ✅ Zero npm audit vulnerabilities
 
-**Massive install.js file:**
-- Issue: `bin/install.js` contains 1,170 lines of mixed concerns (CLI detection, interactive prompts, file copying, validation, error handling)
-- Files: `bin/install.js`
-- Impact: Difficult to maintain, test, and modify installation logic. High cognitive load for contributors. Changes risk breaking multiple installation paths.
-- Fix approach: Refactor into separate modules: `lib/installer/prompt.js`, `lib/installer/file-ops.js`, `lib/installer/validation.js`, `lib/installer/statusline.js`. Keep `install.js` as thin orchestrator.
+## Executive Summary
 
-**Complex conditional logic in install.js:**
-- Issue: Lines 1126-1170 contain deeply nested if-else chains with 10+ `process.exit(1)` calls for flag validation
-- Files: `bin/install.js` (lines 1126-1170)
-- Impact: Hard to test all code paths, easy to introduce logic errors when adding new flags. Exit calls scattered throughout make graceful error handling impossible.
-- Fix approach: Extract validation to `validateFlags()` function that returns error objects instead of calling `process.exit()`. Use lookup table or validation rules array instead of nested conditionals.
+**Overall Assessment:** Production-ready with minimal technical debt.
 
-**Sync file operations in critical paths:**
-- Issue: 21 instances of `fs.readFileSync`/`fs.writeFileSync` in install script and utilities
-- Files: `bin/install.js`, `bin/lib/adapters/*.js`
-- Impact: Blocks Node.js event loop during file I/O. Degrades performance on slow filesystems. Makes concurrent operations impossible.
-- Fix approach: Already partially addressed - `lib-ghcc/state-io.js` provides async patterns. Migrate remaining sync operations to use `fs.promises` API.
+The v2.0 release represents a mature, well-architected codebase with strong security practices, comprehensive testing, and clear separation of concerns. Most identified issues are low-priority maintenance concerns rather than critical problems.
 
-**Limited structured logging:**
-- Issue: 362 console.log/error/warn calls scattered throughout codebase without log levels, contexts, or structured data
-- Files: All modules
-- Impact: Difficult to debug production issues, no ability to filter logs by severity, can't parse logs programmatically
-- Fix approach: Introduce lightweight logger (e.g., `lib-ghcc/logger.js`) with levels (DEBUG, INFO, WARN, ERROR) and optional JSON output mode. Migrate console.* calls incrementally.
-
-## Known Bugs
-
-**Session expiry edge case:**
-- Symptoms: `SessionManager` marks sessions as stale after 24 hours but doesn't clean up expired session files
-- Files: `lib-ghcc/session-manager.js` (lines 92-100)
-- Trigger: Long-running projects with infrequent CLI usage accumulate expired session files in `.planning/`
-- Workaround: Manually delete `.planning/.session.json` if experiencing state issues
-- Fix: Add `cleanupExpiredSessions()` method to remove stale files during `readSession()` or on state initialization
-
-**Lock directory not cleaned on process kill:**
-- Symptoms: If CLI process is killed (SIGKILL) during state write, `.planning/.lock` directory remains and blocks future operations
-- Files: `lib-ghcc/directory-lock.js` (lines 66-98)
-- Trigger: User kills process with `kill -9` or IDE termination during operation
-- Workaround: Manual removal of `.planning/.lock` directory
-- Fix: Add lock staleness detection (check lock age, clean up locks older than 5 minutes). Document manual recovery in error message.
-
-## Security Considerations
-
-**Restrictive file permissions:**
-- Risk: State files created with 0o600 permissions (owner-only read/write) may cause issues in team environments or CI/CD
-- Files: `lib-ghcc/state-io.js` (line 45)
-- Current mitigation: Permission mode is explicit and documented in code comments
-- Recommendations: Add configuration option to allow more permissive modes (0o644) for shared environments. Document security implications in README.
-
-**No input sanitization in install.js:**
-- Risk: `--config-dir` flag accepts arbitrary paths without validation. Could write to unintended directories if combined with malicious npm scripts.
-- Files: `bin/install.js` (lines 49-66)
-- Current mitigation: None explicit
-- Recommendations: Validate config-dir path is within user home directory or current project. Reject absolute paths to system directories. Add path traversal checks (`../` sequences).
-
-**Temp file predictability:**
-- Risk: Temp files use `${process.pid}.${Date.now()}.${Math.random()}` but Math.random() is not cryptographically secure
-- Files: `lib-ghcc/state-io.js` (line 34)
-- Current mitigation: PID and timestamp provide sufficient uniqueness for intended use case (preventing file conflicts, not security)
-- Recommendations: Document that temp file names are not security-critical. If needed, migrate to `crypto.randomBytes()` for unpredictable suffixes.
-
-## Performance Bottlenecks
-
-**Synchronous file operations during install:**
-- Problem: Install script performs multiple sync file reads/writes in sequence
-- Files: `bin/install.js`
-- Cause: Using `fs.readFileSync`/`fs.writeFileSync` instead of async operations
-- Improvement path: Parallelize independent file operations using `Promise.all()`. Use async file APIs for non-blocking I/O. Estimated improvement: 40-60% faster install on slow disks.
-
-**No caching in StateManager:**
-- Problem: Every `readState()` call performs file I/O even if state hasn't changed
-- Files: `lib-ghcc/state-manager.js`
-- Cause: No in-memory cache or mtime-based change detection
-- Improvement path: Add optional in-memory cache with configurable TTL. Check file mtime before reading. Profile to confirm if optimization is needed (may be premature).
-
-**Large string concatenation in doc generators:**
-- Problem: Doc generators build large strings using `+=` in loops
-- Files: `bin/doc-generator/generate-comparison.js` (340 lines), `bin/doc-generator/generate-matrix.js` (159 lines)
-- Cause: Not using array join pattern for efficient string building
-- Improvement path: Refactor to use array accumulation and final `.join('')`. Minor impact but follows JS best practices.
-
-## Fragile Areas
-
-**State migration system:**
-- Files: `lib-ghcc/state-migrations.js` (174 lines)
-- Why fragile: Schema changes require careful version increments. Missing migration breaks existing projects. No rollback mechanism.
-- Safe modification: Always add migrations, never modify existing ones. Test migrations with real `.planning/` directories from older versions. Add migration validation in CI.
-- Test coverage: No automated tests for migration paths
-
-**Multi-CLI state coordination:**
-- Files: `lib-ghcc/directory-lock.js`, `lib-ghcc/state-io.js`, `lib-ghcc/state-validator.js`
-- Why fragile: Race conditions possible if locking fails. Filesystem atomicity assumptions may not hold on network filesystems (NFS, SMB).
-- Safe modification: Never bypass `withLock()` when writing state. Test on network filesystems if deploying in team environments. Document filesystem requirements.
-- Test coverage: Manual testing only, no automated concurrency tests
-
-**CLI adapter abstraction:**
-- Files: `bin/lib/adapters/claude.js` (152 lines), `bin/lib/adapters/copilot.js` (204 lines), `bin/lib/adapters/codex.js` (204 lines)
-- Why fragile: Each adapter has slightly different path conventions and config locations. Adding new features requires updating all three adapters consistently.
-- Safe modification: Keep changes symmetric across all three adapters. Run `test-cross-cli-state.js` after modifications. Consider extracting shared logic to `bin/lib/adapters/shared/`.
-- Test coverage: Integration tests exist (`test-cross-cli-state.js`) but limited coverage
-
-**Path rewriting for multi-CLI support:**
-- Files: `bin/lib/adapters/shared/path-rewriter.js`
-- Why fragile: Regex-based path replacement. Edge cases with unusual directory structures. Must handle relative paths, absolute paths, and tilde expansion.
-- Safe modification: Add test cases for new path patterns before modifying. Use path normalization before regex matching.
-- Test coverage: No automated tests
-
-## Scaling Limits
-
-**Single-threaded state operations:**
-- Current capacity: Works well for single developer, occasional multi-CLI usage
-- Limit: Lock contention if >5 concurrent CLI processes accessing same `.planning/` directory
-- Scaling path: Current design is intentionally simple for target use case. If team usage grows, consider external locking service (Redis, etcd) or shard state by phase.
-
-**In-memory metrics storage:**
-- Current capacity: Performance metrics stored in Map with no size limits
-- Limit: Unbounded growth if agent executions never clear metrics
-- Scaling path: Add metrics rotation (keep last 1000 entries) or time-based expiry. Flush to disk periodically instead of accumulating in memory.
-
-**Documentation generation performance:**
-- Current capacity: Doc generators parse and process entire codebase
-- Limit: Slow on large repositories (>1000 files)
-- Scaling path: Add incremental generation (only regenerate changed sections). Cache parsed AST/comments. Consider moving to build-time generation instead of runtime.
-
-## Dependencies at Risk
-
-**Zero runtime dependencies:**
-- Risk: Intentional design to avoid npm dependency tree bloat, but limits access to well-tested libraries
-- Impact: Re-implementing features like structured logging, better locking primitives, or JSON schema validation
-- Migration plan: Current approach is working well. If adding dependencies, prefer lightweight, stable packages with minimal sub-dependencies. Consider optional dependencies for enhanced features.
-
-**Node.js version requirement:**
-- Risk: Requires Node.js >=16.7.0 (specified in package.json). Older LTS versions not supported.
-- Impact: Users on older Node versions cannot install
-- Migration plan: Current requirement is reasonable (16.7.0 released July 2021). Consider testing on Node 18 LTS and 20 LTS explicitly. Document tested versions in README.
-
-**File system atomicity assumptions:**
-- Risk: Code assumes POSIX filesystem semantics (atomic rename, mkdir atomicity). May not hold on all platforms.
-- Impact: State corruption possible on Windows SMB shares, network drives, or virtualized filesystems
-- Migration plan: Add filesystem detection and warn users on non-POSIX filesystems. Provide alternative locking strategy for Windows network shares.
-
-## Missing Critical Features
-
-**Backup and recovery:**
-- Problem: No automated backup of `.planning/` state before migrations or destructive operations
-- Blocks: Recovery from migration failures, accidental state corruption, testing state changes safely
-- Priority: Medium - Current manual recovery works but is error-prone
-
-**State validation on every operation:**
-- Problem: `StateValidator` exists but isn't automatically invoked on CLI operations
-- Blocks: Early detection of state corruption, automatic repair of common issues
-- Priority: Low - Users can manually run validation, automatic validation adds overhead
-
-**Multi-user conflict resolution:**
-- Problem: Lock-based approach prevents concurrent modifications but provides no merge strategy for divergent changes
-- Blocks: Team workflows where multiple developers work on different phases simultaneously
-- Priority: Low - Current use case is solo developers, teams use sequential phase completion
-
-**Rollback mechanism:**
-- Problem: No way to undo completed phase or revert state to previous version
-- Blocks: Recovering from incorrect phase execution, iterating on phase definitions
-- Priority: Medium - Git history provides some safety but state is separate
-
-## Test Coverage Gaps
-
-**State synchronization edge cases:**
-- What's not tested: Concurrent writes from multiple processes, filesystem errors mid-write, corrupt JSON recovery
-- Files: `lib-ghcc/state-io.js`, `lib-ghcc/directory-lock.js`, `lib-ghcc/state-manager.js`
-- Risk: Silent data corruption, lock deadlocks, state inconsistency across CLIs
-- Priority: High - Core functionality with complex failure modes
-
-**Install script error paths:**
-- What's not tested: Missing directory permissions, disk full, invalid user input, interrupted installation
-- Files: `bin/install.js`
-- Risk: Poor error messages, incomplete installations, corrupted config files
-- Priority: Medium - Manual testing covers happy path, but error cases are untested
-
-**CLI adapter equivalence:**
-- What's not tested: All three adapters produce identical results for same operations
-- Files: `bin/lib/adapters/*.js`
-- Risk: Inconsistent behavior across Claude Code, Copilot CLI, and Codex CLI
-- Priority: High - Cross-CLI consistency is core value proposition
-- Note: `test-cross-cli-state.js` exists but has limited coverage (2 test scenarios)
-
-**Migration paths:**
-- What's not tested: Upgrading from each previous version to current version, missing version field, corrupted migration state
-- Files: `lib-ghcc/state-migrations.js`
-- Risk: Breaking existing user projects during package updates
-- Priority: High - Migrations are one-way and irreversible
-
-**Path rewriting edge cases:**
-- What's not tested: Windows paths, UNC paths, symlinks, path traversal, non-ASCII characters
-- Files: `bin/lib/adapters/shared/path-rewriter.js`
-- Risk: Incorrect file paths in generated configs, cross-platform compatibility issues
-- Priority: Medium - Most users on macOS/Linux, but Windows support is advertised
-
-**Doc generator correctness:**
-- What's not tested: Generated markdown is valid, comparisons are accurate, version stamps are applied correctly
-- Files: `bin/doc-generator/*.js` (340-290 lines each)
-- Risk: Incorrect documentation published to npm, misleading CLI comparison table
-- Priority: Low - Documentation errors are non-breaking and easily fixed
-
-**Performance tracker accuracy:**
-- What's not tested: Measurement precision under load, metric persistence across sessions, edge cases (zero duration, missing end mark)
-- Files: `bin/lib/orchestration/performance-tracker.js` (201 lines), `bin/lib/orchestration/performance-tracker.test.js` (198 lines)
-- Risk: Inaccurate performance metrics, misleading benchmarks
-- Priority: Low - Metrics are informational, not critical to functionality
-- Note: Tests exist but don't cover error cases
+**Priority Breakdown:**
+- **High Priority:** 0 issues
+- **Medium Priority:** 2 issues (scalability planning, test coverage improvement)
+- **Low Priority:** 8 issues (code quality refinements, documentation gaps)
 
 ---
 
-*Concerns audit: 2026-01-20*
+## Medium Priority Concerns
+
+### 1. Platform Scalability Planning
+
+**Issue:** Adding a 4th platform requires manual code changes across multiple files
+
+**Current Implementation:**
+Platform support is hardcoded in several locations:
+- `bin/lib/platforms/registry.js` - Manual registration of each platform
+- `bin/lib/version/old-version-detector.js` (line 208) - Hardcoded platform array
+- Platform-specific directories: `bin/lib/platforms/claude/`, `copilot/`, `codex/`
+
+**Code Example:**
+```javascript
+// bin/lib/platforms/registry.js
+_initialize() {
+  this.register('claude', new ClaudeAdapter());
+  this.register('copilot', new CopilotAdapter());
+  this.register('codex', new CodexAdapter());
+}
+```
+
+**Files Requiring Changes:**
+- `bin/lib/platforms/registry.js` - Add adapter import and registration
+- Create new directory: `bin/lib/platforms/[new-platform]/`
+- Implement 5 files: `adapter.js`, `validator.js`, `cleaner.js`, `serializer.js`, `*.test.js`
+- Update `bin/lib/platforms/platform-names.js` - Display name mapping
+- Update `bin/lib/platforms/platform-paths.js` - Path configuration
+- Update `bin/lib/platforms/instruction-paths.js` - Instruction file paths
+
+**Current Platform Code Size:**
+- 2,292 lines total across 3 platforms
+- ~764 lines per platform average
+- Each platform: 4 modules (adapter, validator, cleaner, serializer)
+
+**Impact:** Medium - Adding platforms is possible but requires code changes in 6+ files
+
+**Scalability Limit:** 
+- Works well for 3-5 platforms
+- Beyond 5 platforms, consider plugin architecture
+
+**Recommendation:**
+For v2.1 or when adding 4th platform:
+1. Create platform plugin interface (similar to current adapters but discoverable)
+2. Move platform configs to JSON/YAML files
+3. Auto-discover platforms from `bin/lib/platforms/*/config.json`
+4. Reduce new platform work to: create directory, implement adapter, add config
+
+**Fix Approach:**
+```javascript
+// Future: bin/lib/platforms/config.json per platform
+{
+  "name": "cursor",
+  "displayName": "Cursor Editor",
+  "paths": { "global": ".cursor", "local": ".cursor" },
+  "instructionFile": "cursor-instructions.md"
+}
+```
+
+**Priority:** Medium - Not urgent for 3 platforms, but plan before adding 4th
+
+---
+
+### 2. Test Coverage Branch Threshold
+
+**Issue:** Branch coverage set to 50% (temporarily lowered during development)
+
+**File:** `vitest.config.js`
+```javascript
+coverage: {
+  thresholds: {
+    statements: 70,
+    branches: 50,     // ← Lowered temporarily for Phase 2
+    functions: 70,
+    lines: 70
+  }
+}
+```
+
+**Current State:**
+- 25 test files covering 97 source files
+- Test ratio: 25.8% (good for CLI tool)
+- Comment indicates temporary reduction from higher threshold
+
+**Coverage Distribution:**
+- ✅ Integration tests: 9 files (migration, validation, installation)
+- ✅ Unit tests: 11 files (validators, serializers, detectors)
+- ✅ Version tests: 5 files (version detection, manifest reading)
+- ⚠️ Update system: No dedicated tests (8 files in `bin/lib/updater/`)
+- ⚠️ CLI utilities: No tests (logger, banner, progress)
+
+**Impact:** Medium - Branch coverage gaps could hide edge cases
+
+**Untested Modules:**
+- `bin/lib/updater/check-update.js` - Update checking logic
+- `bin/lib/updater/update-messages.js` - Update messaging
+- `bin/lib/cli/logger.js` (303 lines) - Logging utilities
+- `bin/lib/cli/banner-manager.js` - Banner display
+- `bin/lib/cli/progress.js` - Progress indicators
+
+**Analysis:**
+- CLI output utilities (logger, banner, progress) don't need unit tests
+- Update system (8 files) would benefit from integration tests
+- Core business logic (validation, migration, installation) is well-tested
+
+**Recommendation:**
+1. Increase branch threshold to 70% in next minor release (v2.1)
+2. Add integration tests for update detection workflow
+3. Keep CLI utilities untested (visual/cosmetic code)
+
+**Fix Approach:**
+```javascript
+// tests/integration/update-system.test.js
+describe('Update Detection', () => {
+  it('detects version from npm registry', async () => { });
+  it('compares local vs remote versions', async () => { });
+  it('handles registry unavailable gracefully', async () => { });
+});
+```
+
+**Priority:** Medium - Plan improvement for v2.1, not blocking for production use
+
+---
+
+## Low Priority Concerns
+
+### 3. Async Error Handling Pattern
+
+**Issue:** Only 4 catch blocks across 77 async functions (5% error handling)
+
+**Analysis:**
+- **Async functions:** 77 functions
+- **Catch blocks:** 4 explicit catch blocks
+- **Pattern:** Errors bubble to top-level handlers
+
+**Top-Level Error Handlers:**
+- `bin/install.js` - 8 error handlers with proper exit codes
+- `bin/lib/errors/install-error.js` - Structured error class
+- `bin/lib/errors/directory-error.js` - Directory-specific errors
+
+**Files with Unprotected Async:**
+- `bin/lib/platforms/binary-detector.js` - Binary detection via exec
+- `bin/lib/io/file-operations.js` - File system operations
+- `bin/lib/installer/orchestrator.js` - Installation orchestration
+- `bin/lib/migration/backup-manager.js` - Backup operations
+
+**Current Mitigation:**
+```javascript
+// bin/install.js - Top-level handler
+try {
+  await executeInstallationLoop(platforms, scope, pkg.version, options);
+} catch (error) {
+  if (error instanceof InstallError) {
+    process.exit(error.code);
+  }
+  process.exit(EXIT_CODES.GENERAL_ERROR);
+}
+```
+
+**Impact:** Low - Current pattern works, errors propagate correctly
+
+**Trade-offs:**
+- ✅ Cleaner code (no try-catch noise)
+- ✅ Centralized error handling
+- ❌ Less granular error context
+- ❌ Harder to add recovery logic mid-stream
+
+**Recommendation:** Keep current pattern, add try-catch only where recovery is needed
+
+**Priority:** Low - Functional and tested, improvement is optional
+
+---
+
+### 4. Process.exit() in Library Code
+
+**Issue:** Library modules call process.exit() directly (reduces reusability)
+
+**Files with process.exit:**
+- `bin/lib/cli/install-loop.js` (line 32)
+- `bin/lib/cli/interactive.js` (lines 56, 81, 86, 175, 228)
+- `bin/lib/installer/orchestrator.js` (lines 87, 91, 247)
+
+**Example:**
+```javascript
+// bin/lib/installer/orchestrator.js:87
+if (!migrationResult.success) {
+  if (migrationResult.error === 'User declined') {
+    logger.info('Installation cancelled.', 2);
+    process.exit(0);  // ← Direct exit
+  }
+}
+```
+
+**Impact:** Low - Makes library less testable, but this is a CLI tool
+
+**Current Mitigation:**
+- Test suite (25 files) works around this with mocking
+- Exit codes properly defined in `bin/lib/errors/install-error.js`
+- Main entry point `bin/install.js` handles errors appropriately
+
+**Trade-off Analysis:**
+- CLI tools commonly use process.exit() for user-facing control flow
+- Extracting as library would require refactoring to use error returns
+- Current usage is intentional (user cancellation, migration decline)
+
+**Recommendation:** 
+- Keep current pattern for v2.x (CLI-first design)
+- If library reuse becomes priority, refactor to return error objects
+
+**Priority:** Low - Acceptable for CLI tool, only matters if extracting library
+
+---
+
+### 5. Large Orchestration Files
+
+**Issue:** Three orchestration files exceed 300 lines
+
+**Files:**
+- `bin/lib/preflight/pre-flight-validator.js` (369 lines) - Pre-flight validation
+- `bin/lib/installer/orchestrator.js` (354 lines) - Installation orchestration
+- `bin/lib/cli/logger.js` (303 lines) - Logging utilities
+
+**Analysis:**
+
+**Pre-flight Validator (369 lines):**
+- Sequential validation steps (disk, templates, permissions, paths)
+- Well-commented with clear sections
+- Complexity justified by orchestration responsibility
+
+**Installer Orchestrator (354 lines):**
+- Coordinates 5 installation modules (agents, skills, shared, instructions, manifest)
+- Handles symlink detection, version validation, migration orchestration
+- Functions are cohesive units (20-40 lines each)
+
+**Logger (303 lines):**
+- Pure utility functions (9 public functions)
+- Low cyclomatic complexity despite line count
+- No state or complex logic
+
+**Impact:** Low - Files are readable and well-structured
+
+**Refactoring Options:**
+1. Extract sub-orchestrators (overkill for current complexity)
+2. Split logger into multiple files (unnecessary, functions are cohesive)
+3. Keep as-is (recommended)
+
+**Recommendation:** No action needed - size reflects legitimate orchestration complexity
+
+**Priority:** Low - Not a problem, well-organized despite size
+
+---
+
+### 6. Test File Size
+
+**Issue:** Several test files exceed 300 lines
+
+**Files:**
+- `tests/integration/migration-flow.test.js` (405 lines) - Migration scenarios
+- `tests/integration/platform-instructions.test.js` (404 lines) - Instruction file handling
+- `tests/unit/old-version-detector.test.js` (326 lines) - Version detection
+- `tests/unit/migration-manager.test.js` (318 lines) - Migration management
+- `tests/unit/platforms/copilot/serializer.test.js` (302 lines) - Serialization
+- `tests/unit/platforms/codex/serializer.test.js` (294 lines) - Serialization
+
+**Analysis:**
+Test files should be comprehensive. Size indicates thorough coverage:
+- Migration tests cover 6+ scenarios (fresh install, update, downgrade, etc.)
+- Serializer tests cover all frontmatter field combinations
+- Well-structured with `describe` blocks and clear test names
+
+**Impact:** None - Large test files indicate good coverage
+
+**Recommendation:** Keep as-is - comprehensive testing is valuable
+
+**Priority:** Low - Not a concern, indicates quality
+
+---
+
+### 7. Console.log Usage in Production
+
+**Issue:** Direct console calls instead of logger abstraction in some files
+
+**Files:**
+- `bin/lib/updater/update-messages.js` - 7 console.log calls
+- `bin/lib/cli/banner-manager.js` - 8 console.log calls
+- `bin/lib/version/installation-finder.js` - 3 console.log calls
+
+**Logger Module:** `bin/lib/cli/logger.js` exists (303 lines, 9 functions)
+
+**Analysis:**
+Most console calls are intentional for user-facing output:
+- Banner display (ASCII art, version info)
+- Update messages (formatted blocks)
+- Installation finder (verbose mode output)
+
+**Impact:** Minimal - Appropriate for CLI tool
+
+**Trade-off:**
+- ✅ Direct console.log is simpler for formatted output
+- ✅ Logger is used for semantic messages (info, success, error, warn)
+- ❌ Inconsistent API (mix of logger.* and console.log)
+
+**Recommendation:** 
+Document convention: Use logger for semantic messages, console for formatted output
+
+**Priority:** Very Low - Current usage is appropriate
+
+---
+
+### 8. Dependency Update Available
+
+**Issue:** @clack/prompts has major version update available (0.11.0 → 1.0.0)
+
+**Current:** `@clack/prompts@0.11.0`
+**Latest:** `@clack/prompts@1.0.0`
+
+**Impact:** Very Low - Current version works, update is optional
+
+**Analysis:**
+- Only 1 of 17 dependencies has update
+- No breaking changes expected (prompts library)
+- No security vulnerabilities (npm audit clean)
+
+**Recommendation:** 
+Update in v2.1 after verifying no breaking changes
+
+**Priority:** Very Low - Optional enhancement
+
+---
+
+### 9. Magic Numbers in Code
+
+**Issue:** Some numeric literals lack named constants
+
+**Examples:**
+- `bin/lib/platforms/binary-detector.js` (line 19): `timeout: 2000` - Binary detection timeout
+- `bin/lib/cli/logger.js` (line 146): `width = 50` - Default separator width
+- `bin/lib/validation/path-validator.js` (line 133): `component.substring(0, 50)` - Error message truncation
+- `bin/lib/preflight/pre-flight-validator.js` (line 81): `templateSize * 1.5` - 50% disk space buffer
+
+**Impact:** Very Low - Numbers are well-documented in comments
+
+**Current State:**
+All magic numbers have clear context:
+```javascript
+// 50% buffer (per CONTEXT.md)
+const requiredBytes = Math.ceil(templateSize * 1.5);
+```
+
+**Recommendation:** 
+Extract to constants only if values are reused or likely to change
+
+**Priority:** Very Low - Acceptable as-is
+
+---
+
+### 10. Backup Directory Accumulation
+
+**Issue:** Migration backups accumulate without automatic cleanup
+
+**Location:** `.gsd-backup/YYYY-MM-DD-HHMM/`
+**Created by:** `bin/lib/migration/backup-manager.js`
+
+**Current State:**
+- Backups created on v1.x → v2.0 migration
+- No cleanup mechanism
+- Each backup ~1MB typically
+
+**Impact:** Low - Minimal disk usage, user can manually delete
+
+**Recommendation:**
+For v2.1:
+1. Add cleanup utility: `/gsd-cleanup-backups --older-than 30d`
+2. Document manual cleanup in README
+3. Warn after 10+ backups
+
+**Priority:** Low - Acceptable for v2.0
+
+---
+
+## Security Audit
+
+### Path Traversal Protection ✅
+
+**Implementation:** 8-layer defense-in-depth validation
+
+**File:** `bin/lib/validation/path-validator.js`
+
+**Layers:**
+1. URL decode (catches %2e%2e%2f attacks)
+2. Null byte check (catches \x00 injection)
+3. Path normalization (resolves ., .., //)
+4. Traversal check (rejects remaining ..)
+5. Containment check (ensures path within base)
+6. Allowlist check (.claude, .github, .codex only)
+7. Length validation (OS limits)
+8. Component validation (Windows reserved names)
+
+**Write-time validation:**
+```javascript
+// bin/lib/io/file-operations.js:59-88
+// Defense in depth: validate path before write
+const baseDir = filePath.startsWith(homeDir) ? homeDir : process.cwd();
+validatePath(baseDir, relativePath);
+```
+
+**Assessment:** Excellent security posture
+
+---
+
+### Symlink Security ✅
+
+**Implementation:** Single-level symlink resolution with chain detection
+
+**File:** `bin/lib/paths/symlink-resolver.js`
+
+**Protection:**
+- Detects broken symlinks (target doesn't exist)
+- Prevents symlink chains (target is also symlink)
+- Validates target is real file/directory
+- User confirmation required before installing to symlink
+
+**Assessment:** Properly secured
+
+---
+
+### Command Injection Protection ✅
+
+**Binary Detection:** `bin/lib/platforms/binary-detector.js`
+
+**Code:**
+```javascript
+const checkCmd = process.platform === 'win32' 
+  ? `where ${binary}` 
+  : `which ${binary}`;
+await execAsync(checkCmd, { timeout: 2000 });
+```
+
+**Security Analysis:**
+- ✅ Binary name is from hardcoded array ('claude', 'copilot', 'codex')
+- ✅ No user input in command construction
+- ✅ 2-second timeout prevents hanging
+- ✅ All errors caught and handled
+
+**Assessment:** Safe from injection
+
+---
+
+### Dependency Security ✅
+
+**npm audit:** 0 vulnerabilities
+
+**Dependencies (17 total):**
+- **CLI:** @clack/prompts, chalk, commander, cli-progress
+- **Utilities:** fs-extra, js-yaml, gray-matter, sanitize-filename
+- **Security:** joi (validation), semver (version parsing)
+- **Dev:** vitest, markdownlint-cli2
+
+**Analysis:**
+- All dependencies from reputable sources
+- No deprecated packages
+- Recent updates (chalk@5.6.2, commander@14.0.3)
+- Security-focused libs (joi, sanitize-filename)
+
+**Assessment:** Clean and well-maintained
+
+---
+
+### File Operations Security ✅
+
+**Implementation:** Safe async operations with error handling
+
+**Patterns Used:**
+- ✅ `fs-extra` (safe async methods)
+- ✅ `fs/promises` (modern async API)
+- ❌ No `fs.sync` blocking calls
+- ❌ No unsafe deletion (`rimraf`, `unlinkSync`)
+
+**Write Safety:** `bin/lib/io/file-operations.js`
+- Path validation before write (lines 59-88)
+- Permission error handling
+- Disk space error handling
+- Directory creation with `ensureDir`
+
+**Assessment:** Secure file operations
+
+---
+
+## Scalability Assessment
+
+### Template Growth
+
+**Current State:**
+- 29 skill templates
+- 11 agent templates
+- Package size: 339KB
+
+**Scalability:**
+- ✅ Linear growth (each skill ~5-10KB)
+- ✅ 100 skills → ~500KB (still acceptable)
+- ⚠️ 500+ skills → Consider skill packs
+
+**Recommendation:** No action needed for foreseeable future
+
+---
+
+### Platform Support
+
+**Current:** 3 platforms (Claude, Copilot, Codex)
+**Code per platform:** ~764 lines average
+
+**Scaling Limit Analysis:**
+- **3-5 platforms:** Current architecture works well
+- **6-10 platforms:** Consider plugin system
+- **10+ platforms:** Requires plugin architecture
+
+**Bottlenecks:**
+1. Manual registration in `registry.js`
+2. Hardcoded platform detection
+3. Per-platform test suites
+
+**Recommendation:** 
+Plan plugin architecture before adding 4th platform (see Concern #1)
+
+---
+
+### Installation Performance
+
+**Current Metrics:**
+- Template size: <1MB per platform
+- Installation time: <5 seconds
+- Validation: Sequential, fast (<1 second)
+
+**Scalability:**
+- ✅ I/O bound (not CPU bound)
+- ✅ Parallel platform installation (multi-platform flag)
+- ✅ Disk space check with buffer
+
+**Bottlenecks:** None identified
+
+**Recommendation:** No performance concerns
+
+---
+
+## Maintenance Risk Assessment
+
+### Documentation Drift Risk: **Low**
+
+**Documentation:**
+- 13 documentation files
+- Real code examples with source citations
+- Quick start guide
+- Platform comparison tables
+
+**Mitigation:**
+- Examples cite source files (easy to verify)
+- Integration tests catch API changes
+- Skills have `argument-hint` for self-documentation
+
+---
+
+### Platform API Changes Risk: **Medium**
+
+**Issue:** Claude/Copilot/Codex may change frontmatter schemas
+
+**Current Mitigation:**
+- Platform validators check frontmatter (`validator.js` per platform)
+- Serializers handle platform-specific formats
+- Unknown fields generate warnings (not errors)
+
+**Recommendation:**
+Monitor platform changelogs for breaking changes
+
+---
+
+### Template Maintenance Risk: **Low**
+
+**Current State:**
+- 40 templates (29 skills + 11 agents)
+- Variable substitution system
+- Centralized in `templates/` directory
+
+**Mitigation:**
+- Single source of truth (templates/)
+- Variable replacement ({{PLATFORM_ROOT}}, etc.)
+- Validation on install
+
+---
+
+## Technical Debt Summary
+
+**Overall Assessment:** Minimal technical debt, production-ready
+
+**Debt by Category:**
+
+**Code Quality: Low**
+- Async error handling could be more explicit (acceptable pattern)
+- Process.exit() in library code (intentional for CLI)
+- Large orchestration files (justified complexity)
+
+**Testing: Low**
+- Branch coverage at 50% (planned improvement to 70%)
+- Update system lacks tests (8 files)
+- CLI utilities untested (visual code, acceptable)
+
+**Architecture: Medium**
+- Platform scalability requires planning (before 4th platform)
+- No plugin system (acceptable for 3 platforms)
+
+**Maintenance: Low**
+- Console.log vs logger.* inconsistency (minor)
+- Magic numbers without constants (well-documented)
+- Backup cleanup manual (acceptable)
+
+**Security: None**
+- Zero vulnerabilities
+- Defense-in-depth path validation
+- Symlink chain protection
+- No command injection risks
+
+---
+
+## Recommendations for v2.1
+
+**High Value, Low Effort:**
+1. Increase branch coverage threshold to 70%
+2. Add integration tests for update system
+3. Update @clack/prompts to 1.0.0
+4. Add backup cleanup utility
+
+**Medium Value, Medium Effort:**
+5. Design plugin architecture for platforms (before adding 4th)
+6. Document console.log vs logger.* convention
+
+**Low Priority:**
+7. Extract magic numbers to constants (optional)
+8. Add try-catch to high-risk async functions (optional)
+
+---
+
+## Future Risks to Monitor
+
+**Platform API Changes:**
+Monitor for frontmatter schema changes in Claude/Copilot/Codex
+
+**Dependency Updates:**
+Watch for breaking changes in @clack/prompts 1.x
+
+**Template Growth:**
+If skills exceed 100, consider skill packs or lazy loading
+
+**Community Contributions:**
+As project grows, establish contribution guidelines for new platforms/skills
+
+---
+
+*Concerns audit: 2026-02-01*
+*Post v2.0 Release Production Assessment*

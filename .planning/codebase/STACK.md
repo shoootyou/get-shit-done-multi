@@ -1,93 +1,166 @@
 # Technology Stack
 
-**Analysis Date:** 2026-01-20
+**Analysis Date:** 2025-02-01
 
 **Codebase Size:**
-- Files analyzed: 55 files
-- Lines of code: 9,610 lines (excluding node_modules, build artifacts)
+- Files analyzed: 109 files (bin, scripts, templates)
+- Source files: 69 JS files in `bin/lib/`
+- Test files: 25 test files
+- Template files: 95 markdown files
+- Lines of code: 40,171 lines total (bin + templates + scripts)
 
 ## Languages
 
 **Primary:**
-- JavaScript (ES Modules) 100% - All source code
+- JavaScript ES Modules - 100% of codebase
+- Node.js native modules (fs, path, os, child_process)
 
-**Secondary:**
-- Markdown - Documentation, agent definitions, command specifications, workflow templates
+**Configuration:**
+- JSON - Package manifests, template versioning, GSD manifests
+- Markdown - Agent templates, skill definitions, documentation
+- YAML - Frontmatter for agent metadata, dependabot config
 
 ## Runtime
 
 **Environment:**
-- Node.js >=16.7.0 (specified in package.json engines)
+- Node.js 20+ (LTS until October 2026)
+- ECMAScript Modules (ESM) - `"type": "module"` in package.json
+- Shebang for CLI: `#!/usr/bin/env node`
 
 **Package Manager:**
-- npm (package manager)
-- Lockfile: present (`package-lock.json` v3)
+- npm (package-lock.json present)
+- Lockfile version: npm v9+ format
 
 ## Frameworks
 
 **Core:**
-- None - Pure Node.js with ES Modules
-- Built-in Node.js modules used extensively (fs, path, child_process, util)
+- None - Pure Node.js application
+- Module system: Native ES Modules (import/export)
 
 **Testing:**
-- Custom test runners - `bin/test-command-system.js`, `bin/test-cross-cli-state.js`, `bin/test-state-management.js`
-- No external test framework (uses native Node.js assertions)
+- Vitest 4.0.18 - Test runner and framework
+- @vitest/ui 4.0.18 - Browser-based test UI
+- v8 coverage provider
 
 **Build/Dev:**
-- None - No build step required (pure JavaScript)
-- npm scripts for documentation generation and validation
+- No build step - direct JavaScript execution
+- No transpilation - native ES modules
+- No bundling - distributed as source
 
 ## Key Dependencies
 
 **Critical:**
-- `simple-git` ^3.30.0 - Git operations for state management and version control
-- `ignore` ^7.0.5 - .gitignore-style pattern matching for file exclusion
+- `gray-matter@4.0.3` - Parse/stringify YAML frontmatter in agent templates
+- `fs-extra@11.3.3` - Enhanced filesystem operations (pathExists, ensureDir, copy, remove)
+- `commander@14.0.2` - CLI argument parsing and command framework
+- `@clack/prompts@0.11.0` - Beautiful interactive terminal prompts
+- `chalk@5.6.2` - Terminal string styling and colors (ESM)
 
 **Infrastructure:**
-- No additional runtime dependencies
-- Zero external framework dependencies for core functionality
-- Minimal dependency footprint (2 production dependencies)
+- `js-yaml@4.1.1` - YAML parsing for frontmatter serialization
+- `sanitize-filename@1.6.3` - Safe filename generation
+- `semver@7.7.3` - Version comparison for update detection
+- `cli-progress@3.12.0` - Progress bars for installation
+
+**Validation:**
+- `joi@18.0.2` - Schema validation for frontmatter fields
+  - Used in `bin/lib/platforms/_shared/field-validators.js`
+
+**Development:**
+- `@babel/parser@7.28.6` - AST parsing for validation tests
+- `@babel/traverse@7.28.6` - AST traversal for code analysis in tests
+- `@inquirer/prompts@8.2.0` - Alternative prompts (not currently used)
+- `open@11.0.0` - Open URLs/files from CLI (test utility)
+- `markdownlint-cli2@0.20.0` - Markdown linting
 
 ## Configuration
 
 **Environment:**
-- Environment variables used for CLI detection:
-  - `CLAUDE_CODE` / `CLAUDE_CLI` - Detect Claude Code environment
-  - `GITHUB_COPILOT_CLI` / `COPILOT_CLI` - Detect GitHub Copilot CLI environment
-  - `CODEX_CLI` - Detect Codex CLI environment
-  - `CLAUDE_CONFIG_DIR` - Override default Claude config directory
-  - `DEBUG` - Enable debug logging
-- File-based configuration:
-  - `.planning/config.json` - GSD runtime configuration
-  - `.planning/.meta.json` - State version tracking
-  - `.planning/usage.json` - Usage tracking and cost monitoring
-  - `.planning/.session.json` - Session management
+- No environment variables required for installer operation
+- No .env files used
+- Platform detection via `which`/`where` commands
 
 **Build:**
-- No build configuration files (no TypeScript, Babel, webpack, etc.)
-- Package scripts for documentation automation:
-  - `docs:generate` - Generate comparison and matrix docs
-  - `docs:validate` - Validate documentation consistency
-  - `docs:stamp` - Add version stamps to docs
-  - `install-hooks` - Install git hooks
+- `vitest.config.js` - Test configuration with coverage thresholds
+  - 70% statements, 50% branches, 70% functions, 70% lines
+  - v8 coverage provider
+  - Node environment with process isolation
+  - 30s test timeout for integration tests
+
+**Entry Point:**
+- `bin/install.js` - Main CLI entry point
+- Executable: `npx get-shit-done-multi`
+- Binary name: `get-shit-done-multi`
+
+**Package Distribution:**
+- Files published: `bin/`, `templates/`, `docs/` (per `package.json` files field)
+- Main entry: `index.js` (placeholder - bin is the actual entry)
+- Binary: `get-shit-done-multi` → `bin/install.js`
+- No build artifacts - source code distributed directly
 
 ## Platform Requirements
 
 **Development:**
-- Node.js >=16.7.0
-- Git (for version control features)
-- One of: Claude Code, GitHub Copilot CLI, or Codex CLI
-- Operating System: Mac, Windows, or Linux (cross-platform)
+- Node.js 20.0.0 or higher (specified in engines)
+- npm for dependency management
+- Git for version detection and manifest management
 
 **Production:**
-- NPM registry for distribution (published as `get-shit-done-cc`)
-- Installed via `npx get-shit-done-cc`
-- Deploys files to CLI-specific config directories:
-  - Claude: `~/Library/Application Support/Claude/.agent/get-shit-done` (macOS)
-  - Copilot: `~/.copilot/skills/get-shit-done`
-  - Codex: `~/.codex/skills/get-shit-done`
-  - Local: `.claude`, `.github/skills/get-shit-done`, `.codex/skills`
+- Deployment target: NPM registry
+- Package name: `get-shit-done-multi`
+- Version: 2.0.0 (current stable)
+- Installation: `npx get-shit-done-multi`
+- Beta channel: `npx get-shit-done-multi@beta`
+- Installs to AI assistant config directories:
+  - Claude Code: `~/.claude/get-shit-done/` (global), `.claude/get-shit-done/` (local)
+  - GitHub Copilot CLI: `~/.github/get-shit-done/` (global), `.github/get-shit-done/` (local)
+  - Codex CLI: `~/.codex/get-shit-done/` (global), `.codex/get-shit-done/` (local)
+- No server deployment - CLI tool only
+
+**Platform Support:**
+- Cross-platform: macOS, Linux, Windows
+- Platform detection: `os.platform()` for Windows-specific behavior
+- Path handling: Native Node.js `path` module (cross-platform)
+- Binary detection: `which` (Unix) / `where` (Windows)
+
+## Special Considerations
+
+**ESM-Only:**
+- All imports use `.js` extension explicitly
+- `import.meta.url` for `__dirname` equivalent
+- Top-level await supported
+- No CommonJS interop required
+
+**Filesystem Operations:**
+- Heavy use of fs-extra for atomic operations
+- Symlink resolution for custom paths
+- Path validation and security checks
+- Permission checking before writes
+
+**Template System:**
+- Markdown templates with YAML frontmatter
+- Gray-matter for parsing/stringifying
+- Platform-specific transformations (Claude/Copilot/Codex)
+- Version tracking in `versions.json`
+
+## NPM Scripts
+
+**Testing:**
+- `npm test` - Run all tests with Vitest
+- `npm run test:watch` - Watch mode for development
+- `npm run test:ui` - Interactive browser-based test UI
+- `npm run test:coverage` - Generate coverage report
+- `npm run test:validation` - Run skill validation tests only
+
+**Linting:**
+- `npm run lint:md` - Check markdown files with markdownlint-cli2
+- `npm run lint:md:fix` - Auto-fix markdown issues
+
+**Publishing:**
+- `npm run publish-pre` - Pre-release publishing script (bash)
+  - Located at `scripts/publish-pre.sh`
+  - Handles version validation and NPM publishing
 
 ---
 
-*Stack analysis: 2026-01-20*
+*Stack analysis: 2025-02-01*

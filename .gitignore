@@ -1,8 +1,6 @@
 node_modules/
-package-lock.json
 .DS_Store
 TO-DOS.md
-CLAUDE.md
 /research.claude/
 
 # Planning folder and files
@@ -11,10 +9,51 @@ CLAUDE.md
 .planning/debug
 .planning/VERIFICATION.md
 
-# Personal scripts
-.scripts
+# Planning history
+.planning
 
 # Docker sandbox directories
 .sandbox-home/
 .sandbox-cache/
 .sandbox-rw/
+
+# Tests folders
+test-output
+
+# # Clean GSD Github installation
+# .github/skills/gsd-*
+# .github/agents/gsd-*
+# .github/get-shit-done
+# .github/ISSUE_TEMPLATE/gsd-*
+# .github/skills/get-shit-done/SKILL.md
+
+# # Clean GSD Claude Installation
+# .claude/skills/gsd-*
+# .claude/agents/gsd-*
+# .claude/get-shit-done
+# .claude/ISSUE_TEMPLATE/gsd-*
+# .claude/skills/get-shit-done/SKILL.md
+
+# # Clean GSD Codex Installation
+# .codex/skills/gsd-*
+# .codex/agents/gsd-*
+# .codex/get-shit-done
+# .codex/ISSUE_TEMPLATE/gsd-*
+# .codex/skills/get-shit-done/agents/gsd-*
+# .codex/skills/get-shit-done/SKILL.md
+
+# GSD migration backup (created during upgrade from old structure)
+.old-gsd-system/
+
+# GSD backup folders
+.gsd-backup
+
+# Test coverage output
+coverage/
+*.lcov
+
+# Local packs
+*.tgz
+
+# Other installations
+templates/skills/skill-creator/*

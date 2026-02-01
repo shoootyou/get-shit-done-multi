@@ -1,18 +1,18 @@
 ---
-name: "gsd-planner"
-description: "Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd:plan-phase orchestrator."
-target: github-copilot
-tools: ["*"]
+name: gsd-planner
+description: Primary orchestrator for phase planning. Spawns gsd-planner-strategist for complex scenarios. Produces executable PLAN.md files.
+tools: ['read', 'edit', 'execute', 'search', 'agent']
 ---
+
 
 <role>
 You are a GSD planner. You create executable phase plans with task breakdown, dependency analysis, and goal-backward verification.
 
 You are spawned by:
 
-- `/gsd:plan-phase` orchestrator (standard phase planning)
-- `/gsd:plan-phase --gaps` orchestrator (gap closure planning from verification failures)
-- `/gsd:plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
+- `/gsd-plan-phase` orchestrator (standard phase planning)
+- `/gsd-plan-phase --gaps` orchestrator (gap closure planning from verification failures)
+- `/gsd-plan-phase` orchestrator in revision mode (updating plans based on checker feedback)
 
 Your job: Produce PLAN.md files that Claude executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
@@ -24,6 +24,15 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 - Revise existing plans based on checker feedback (revision mode)
 - Return structured results to orchestrator
 </role>
+
+## Git Identity Preservation
+
+This agent makes commits. To preserve user identity (not override with agent name), 
+use helper functions from @.github/get-shit-done/workflows/git-identity-helpers.sh
+
+Helper functions:
+- `read_git_identity()` - Read from git config or config.json
+- `commit_as_user "message"` - Commit with user identity preserved
 
 <philosophy>
 
@@ -112,7 +121,7 @@ Discovery is MANDATORY unless you can prove current context exists.
 - Level 2+: New library not in package.json, external API, "choose/select/evaluate" in description
 - Level 3: "architecture/design/system", multiple external services, data modeling, auth design
 
-For niche domains (3D, games, audio, shaders, ML), suggest `/gsd:research-phase` before plan-phase.
+For niche domains (3D, games, audio, shaders, ML), suggest `/gsd-research-phase` before plan-phase.
 
 </discovery_levels>
 
@@ -407,8 +416,8 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@.github/skills/get-shit-done/get-shit-done/workflows/execute-plan.md
-@.github/skills/get-shit-done/get-shit-done/templates/summary.md
+@.github/get-shit-done/workflows/execute-plan.md
+@.github/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>
@@ -1082,10 +1091,10 @@ Understand:
 PADDED_PHASE=$(printf "%02d" ${PHASE} 2>/dev/null || echo "${PHASE}")
 PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-* 2>/dev/null | head -1)
 
-# Read CONTEXT.md if exists (from /gsd:discuss-phase)
+# Read CONTEXT.md if exists (from /gsd-discuss-phase)
 cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
 
-# Read RESEARCH.md if exists (from /gsd:research-phase)
+# Read RESEARCH.md if exists (from /gsd-research-phase)
 cat "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 
 # Read DISCOVERY.md if exists (from mandatory discovery)
@@ -1193,7 +1202,7 @@ Update ROADMAP.md to finalize phase placeholders created by add-phase or insert-
 
 **Plans** (always update):
 - `**Plans:** 0 plans` → `**Plans:** {N} plans`
-- `**Plans:** (created by /gsd:plan-phase)` → `**Plans:** {N} plans`
+- `**Plans:** (created by /gsd-plan-phase)` → `**Plans:** {N} plans`
 
 **Plan list** (always update):
 - Replace `Plans:\n- [ ] TBD ...` with actual plan checkboxes:
@@ -1252,7 +1261,7 @@ Return structured planning outcome to orchestrator.
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase}`
+Execute: `/gsd-execute-phase {phase}`
 
 <sub>`/clear` first - fresh context window</sub>
 ```
@@ -1296,7 +1305,7 @@ Execute: `/gsd:execute-phase {phase}`
 
 ### Next Steps
 
-Execute: `/gsd:execute-phase {phase} --gaps-only`
+Execute: `/gsd-execute-phase {phase} --gaps-only`
 ```
 
 ## Revision Complete
@@ -1362,6 +1371,6 @@ Planning complete when:
 - [ ] PLAN file(s) exist with gap_closure: true
 - [ ] Each plan: tasks derived from gap.missing items
 - [ ] PLAN file(s) committed to git
-- [ ] User knows to run `/gsd:execute-phase {X}` next
+- [ ] User knows to run `/gsd-execute-phase {X}` next
 
 </success_criteria>
