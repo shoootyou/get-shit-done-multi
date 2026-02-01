@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { ensureDirectory, writeFile, pathExists } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
-import { renderTemplate, findUnknownVariables, replaceVariables } from '../serialization/template-renderer.js';
+import { renderTemplate, findUnknownVariables, replaceVariables } from '../templates/template-renderer.js';
 import * as logger from '../cli/logger.js';
 
 /**

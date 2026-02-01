@@ -3,7 +3,7 @@
 import { readFile, writeFile, rename, unlink } from 'fs/promises';
 import { pathExists } from 'fs-extra';
 import { join } from 'path';
-import { replaceVariables } from '../serialization/template-renderer.js';
+import { replaceVariables } from '../templates/template-renderer.js';
 import { verboseInProgress, verboseComplete } from '../cli/logger.js';
 
 /**

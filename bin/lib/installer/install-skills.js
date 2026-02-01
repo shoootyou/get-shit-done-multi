@@ -1,7 +1,7 @@
 import { join, basename, dirname } from 'path';
 import { ensureDirectory, pathExists, copyDirectory, writeFile } from '../io/file-operations.js';
 import { readdir, readFile } from 'fs/promises';
-import { findUnknownVariables, replaceVariables } from '../serialization/template-renderer.js';
+import { findUnknownVariables, replaceVariables } from '../templates/template-renderer.js';
 import { cleanFrontmatter as cleanClaudeFrontmatter } from '../serialization/claude-cleaner.js';
 import { cleanFrontmatter as cleanCopilotFrontmatter } from '../serialization/copilot-cleaner.js';
 import { cleanFrontmatter as cleanCodexFrontmatter } from '../serialization/codex-cleaner.js';
