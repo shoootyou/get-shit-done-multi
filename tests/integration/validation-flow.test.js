@@ -27,7 +27,7 @@ describe('Phase 5 Integration: Validation + Manifest', () => {
     await mkdir(join(templatesDir, 'skills', 'gsd-test'), { recursive: true });
     await writeFile(
       join(templatesDir, 'skills', 'gsd-test', 'SKILL.md'),
-      '---\nname: test\n---\nTest skill',
+      '---\nname: test\ndescription: Test skill for validation\n---\nTest skill',
       'utf8'
     );
     await writeFile(
@@ -37,6 +37,13 @@ describe('Phase 5 Integration: Validation + Manifest', () => {
     );
     await mkdir(join(templatesDir, 'agents'), { recursive: true });
     await mkdir(join(templatesDir, 'get-shit-done'), { recursive: true });
+    
+    // Create required AGENTS.md file
+    await writeFile(
+      join(templatesDir, 'AGENTS.md'),
+      '# Available Agents\n\nTest agents list',
+      'utf8'
+    );
   });
   
   afterEach(async () => {

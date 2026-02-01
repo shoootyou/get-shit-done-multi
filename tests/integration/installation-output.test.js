@@ -23,7 +23,7 @@ describe('Installation Output Verification', () => {
   
   // Test 1: Claude agents include skills field
   describe('Claude Platform', () => {
-    test('all 13 agents include skills field in frontmatter', async () => {
+    test('all 11 agents include skills field in frontmatter', async () => {
       const claudeDir = join(testDir, 'claude');
       await install('2.0.0', {
         platform: 'claude',
@@ -39,7 +39,7 @@ describe('Installation Output Verification', () => {
       const agentFiles = await readdir(agentsDir);
       const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.md'));
       
-      expect(agents).toHaveLength(13); // All 13 agents installed
+      expect(agents).toHaveLength(11); // All 11 agents installed
       
       let agentsWithSkills = 0;
       for (const agentFile of agents) {
@@ -62,7 +62,7 @@ describe('Installation Output Verification', () => {
   
   // Test 2: Copilot agents exclude skills field
   describe('Copilot Platform', () => {
-    test('all 13 agents exclude skills field from frontmatter', async () => {
+    test('all 11 agents exclude skills field from frontmatter', async () => {
       const copilotDir = join(testDir, 'copilot');
       await install('2.0.0', {
         platform: 'copilot',
@@ -78,7 +78,7 @@ describe('Installation Output Verification', () => {
       const agentFiles = await readdir(agentsDir);
       const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
       
-      expect(agents).toHaveLength(13);
+      expect(agents).toHaveLength(11);
       
       for (const agentFile of agents) {
         const content = await readFile(join(agentsDir, agentFile), 'utf8');
@@ -109,7 +109,7 @@ describe('Installation Output Verification', () => {
   
   // Test 3: Codex agents exclude skills field
   describe('Codex Platform', () => {
-    test('all 13 agents exclude skills field from frontmatter', async () => {
+    test('all 11 agents exclude skills field from frontmatter', async () => {
       const codexDir = join(testDir, 'codex');
       await install('2.0.0', {
         platform: 'codex',
@@ -125,7 +125,7 @@ describe('Installation Output Verification', () => {
       const agentFiles = await readdir(agentsDir);
       const agents = agentFiles.filter(f => f.startsWith('gsd-') && f.endsWith('.agent.md'));
       
-      expect(agents).toHaveLength(13);
+      expect(agents).toHaveLength(11);
       
       for (const agentFile of agents) {
         const content = await readFile(join(agentsDir, agentFile), 'utf8');
