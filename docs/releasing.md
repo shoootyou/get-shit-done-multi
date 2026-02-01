@@ -2,26 +2,31 @@
 
 ## Overview
 
-The `get-shit-done-multi` package uses two separate GitHub Actions workflows for publishing to NPM:
+The `get-shit-done-multi` package uses two different approaches for publishing to NPM:
 
-- **Main Branch Workflow** (`publish-main.yml`) - For stable releases (admin-only)
-- **Dev Branch Workflow** (`publish-dev.yml`) - For pre-releases and development versions
-
-Both workflows follow the same 15-step validation pipeline but differ in version format requirements and NPM dist-tags.
+- **Stable Releases** - Automated GitHub Actions workflow using OIDC trusted publishers (main branch, admin-only)
+- **Pre-Releases** - Local script for fast validation and optional publishing
 
 ## Prerequisites
 
-Before publishing:
+**For Stable Releases:**
+- Admin access to repository required
+- NPM package configured for GitHub OIDC trusted publishers (see [OIDC Setup](#oidc-setup))
+- GitHub environment "prod" configured (optional: with approval rules)
 
-- **NPM_TOKEN** must be configured in GitHub repository secrets (see [NPM Token Setup](#npm-token-setup))
-- **Admin access** required for main branch releases
-- **Write access** required for dev branch releases
+**For Pre-Releases:**
+- NPM authentication configured locally (`npm login` or `.npmrc`)
+- Write access to repository (optional, for git operations)
+
+**General:**
 - Package must pass all tests
 - Package must have a `files` field in `package.json`
 
+---
+
 ## Stable Releases (Main Branch)
 
-Use this workflow to publish production-ready stable versions from the `main` branch.
+Use the GitHub Actions workflow to publish production-ready stable versions from the `main` branch.
 
 ### Step-by-Step Instructions
 
@@ -60,38 +65,89 @@ The workflow executes these steps in order:
 
 Steps 1-10 are "safe" - they can fail without side effects. After step 11, the tag is created and cannot be easily undone.
 
-## Pre-Releases (Dev Branch)
+### Key Features
 
-Use this workflow to publish beta, alpha, or release candidate versions from the `dev` branch.
+- **OIDC Authentication**: Uses GitHub's OpenID Connect for secure, tokenless authentication
+- **Provenance**: Publishes with `--provenance` flag for supply chain security
+- **Environment Protection**: Uses GitHub environment "prod" (can configure approval rules)
+- **No Secrets Required**: No NPM_TOKEN needed, eliminating token rotation and compromise risks
+
+---
+
+## Pre-Releases (Local Script)
+
+Use the local script `publish-pre.sh` for fast validation and optional publishing of pre-release versions.
+
+### Why Local?
+
+- ⚡ **Faster**: No CI wait time, instant feedback
+- 🔍 **Safe**: Dry-run by default prevents accidental publishes
+- 🛠️ **Flexible**: Test locally before committing
+- 🎯 **Simple**: One command for complete validation
+
+### Quick Start
+
+**Dry-run validation only** (recommended first):
+```bash
+npm run publish-pre 2.0.0-beta.1
+```
+
+**Validate and publish** (after dry-run succeeds):
+```bash
+npm run publish-pre 2.0.0-beta.1 --publish
+```
 
 ### Step-by-Step Instructions
 
-1. Navigate to the repository on GitHub
-2. Click on **Actions** tab
-3. Select **"Publish to NPM (Dev Branch)"** from the workflow list
-4. Click **"Run workflow"** button (top right)
-5. Select branch: **`dev`**
-6. Enter version in format `X.Y.Z-prerelease` or `X.Y.Z`
+1. Ensure you're authenticated to NPM:
+   ```bash
+   npm login
+   ```
+
+2. Choose your version:
    - Pre-release: `2.0.0-beta.1`, `1.9.2-alpha.1`, `2.1.0-rc.1`
-   - Stable: `1.9.1`, `2.0.0` (publishes with `latest` tag)
-   - Version must be higher than current `package.json` version
-7. Click **"Run workflow"** button to start
-8. Wait for workflow completion (typically 2-3 minutes)
-9. Verify success:
+   - Stable: `1.9.1`, `2.0.0` (will use `latest` dist-tag)
+
+3. Run validation (dry-run):
+   ```bash
+   npm run publish-pre 2.0.0-beta.1
+   ```
+
+4. Review output and verify all checks pass
+
+5. If validation succeeds, publish:
+   ```bash
+   npm run publish-pre 2.0.0-beta.1 --publish
+   ```
+
+6. Verify success:
    - For pre-release: `npm view get-shit-done-multi@beta`
    - For stable: Check [NPM package page](https://www.npmjs.com/package/get-shit-done-multi)
-   - Check [GitHub Releases](https://github.com/shoootyou/get-shit-done-multi/releases)
 
-### Pre-release vs Stable on Dev Branch
+### What Happens During Pre-Release
 
-The dev branch workflow automatically determines the dist-tag based on version format:
+The script executes these steps in order:
+
+1. ✅ Validates version format (`X.Y.Z` or `X.Y.Z-prerelease`)
+2. ✅ Checks tag doesn't already exist
+3. ✅ Validates version is >= current version
+4. ✅ Verifies `package.json` has `files` field
+5. ✅ Updates `package.json` version (ephemeral, restored after)
+6. ✅ Runs tests (`npm test`)
+7. ✅ Creates and tests tarball installation in temp directory
+8. ✅ Dry-run publish validation (`npm publish --dry-run`)
+9. 📦 **If --publish flag:** Publishes to NPM with appropriate dist-tag
+
+### Dist-Tag Selection
+
+The script automatically determines the dist-tag:
 
 | Version Format | Example | NPM Dist-Tag | Install Command |
 |----------------|---------|--------------|-----------------|
 | `X.Y.Z-suffix` | `2.0.0-beta.1` | `beta` | `npm install get-shit-done-multi@beta` |
 | `X.Y.Z` | `1.9.1` | `latest` | `npm install get-shit-done-multi` |
 
-**When to use pre-release versions:**
+### When to Use Pre-release Versions
 - Testing breaking changes before stable release
 - Gathering feedback on new features
 - Release candidates before major versions
@@ -172,22 +228,30 @@ Follow [Semantic Versioning (semver.org)](https://semver.org/) guidelines:
 **Cause:** Build script encountered errors.
 
 **Solutions:**
-1. Review build output in workflow logs
+1. Review build output in workflow logs or local script output
 2. Test build locally:
    ```bash
    npm run build
    ```
-3. Fix build errors and re-run workflow
+3. Fix build errors and re-run workflow/script
 
-#### "NPM_TOKEN invalid" or "Authentication error"
+#### "Authentication error" or "OIDC authentication failed"
 
-**Cause:** NPM token is missing, expired, or has insufficient permissions.
+**Cause (Stable Releases):** OIDC trusted publisher not configured or misconfigured.
 
 **Solutions:**
-1. Verify token exists: GitHub → Settings → Secrets → Actions → `NPM_TOKEN`
-2. Verify token hasn't expired (check NPM access tokens page)
-3. Regenerate token with publish permissions (see [NPM Token Setup](#npm-token-setup))
-4. Update GitHub secret with new token
+1. Verify trusted publisher exists on npmjs.com package settings
+2. Check repository owner/name match exactly
+3. Verify workflow name is `publish-main.yml`
+4. Check environment name (`prod`) if configured
+5. See [OIDC Setup](#oidc-setup) for detailed instructions
+
+**Cause (Pre-Releases):** Not authenticated to NPM locally.
+
+**Solutions:**
+1. Run `npm login` to authenticate
+2. Verify `~/.npmrc` has valid authentication token
+3. Check token hasn't expired (regenerate if needed)
 
 #### "Package scope must be public" or "Payment required"
 
@@ -233,55 +297,107 @@ Follow [Semantic Versioning (semver.org)](https://semver.org/) guidelines:
 
 **Prevention:** The workflow validates extensively before creating tags to minimize this scenario.
 
-## NPM Token Setup
+---
 
-Maintainers need to create an NPM access token and add it to GitHub repository secrets.
+## OIDC Setup
 
-### Creating NPM Access Token
+The stable release workflow uses GitHub's OpenID Connect (OIDC) for secure, tokenless authentication to NPM.
+
+### Benefits of OIDC
+
+- ✅ **No Tokens**: Eliminates long-lived secrets and token rotation
+- ✅ **More Secure**: No risk of token compromise or leak
+- ✅ **Automatic**: GitHub generates short-lived tokens per workflow run
+- ✅ **Provenance**: Built-in supply chain security with npm provenance
+
+### Setting Up NPM Trusted Publishers
+
+This is a **one-time setup** for repository maintainers.
+
+1. **Log in to npmjs.com**
+   - Go to [npmjs.com](https://www.npmjs.com/)
+   - Sign in with your account
+
+2. **Navigate to Package Settings**
+   - Go to your package: `get-shit-done-multi`
+   - Click **Settings** tab
+
+3. **Configure Publishing**
+   - Scroll to **Publishing access** section
+   - Click **Add trusted publisher**
+
+4. **Add GitHub Actions Publisher**
+   - **Provider**: Select **GitHub Actions**
+   - **Repository owner**: `shoootyou` (or your org/username)
+   - **Repository name**: `get-shit-done-multi`
+   - **Workflow name**: `publish-main.yml`
+   - **Environment**: `prod` (optional but recommended)
+   - Click **Add**
+
+5. **Verify Setup**
+   - You should see the publisher listed under "Trusted publishers"
+   - No additional secrets needed in GitHub
+
+### GitHub Environment Setup (Optional)
+
+For additional security, configure the "prod" environment:
+
+1. Go to repository **Settings** → **Environments**
+2. Click **New environment**
+3. Name: `prod`
+4. Configure protection rules (optional):
+   - **Required reviewers**: Add maintainers for approval requirement
+   - **Wait timer**: Add delay before deployment (e.g., 5 minutes)
+   - **Deployment branches**: Restrict to `main` branch only
+5. Click **Save protection rules**
+
+### Troubleshooting OIDC
+
+If publishing fails with authentication error:
+
+1. Verify trusted publisher is configured correctly on npmjs.com
+2. Check workflow file has `id-token: write` permission (already configured)
+3. Verify repository owner and name match exactly
+4. Check environment name matches (`prod`) if configured
+5. Review [npm documentation](https://docs.npmjs.com/trusted-publishers) for updates
+
+---
+
+## NPM Authentication for Pre-Releases
+
+For the local pre-release script, you need NPM authentication configured locally.
+
+### Option 1: npm login (Recommended)
+
+```bash
+npm login
+```
+
+Follow the prompts to authenticate. This creates a token in your `~/.npmrc` file.
+
+### Option 2: Manual .npmrc Configuration
+
+If you prefer token-based auth:
+
+1. Generate NPM access token (see NPM Token section below if needed)
+2. Add to `~/.npmrc`:
+   ```
+   //registry.npmjs.org/:_authToken=YOUR_TOKEN_HERE
+   ```
+
+### NPM Token for Local Development
+
+If you need to generate a token for local use:
 
 1. Log in to [npmjs.com](https://www.npmjs.com/)
-2. Click on your profile → **Access Tokens**
-3. Click **Generate New Token**
-4. Choose token type:
-   - **Granular Access Token** (recommended for security)
-   - **Classic Automation Token** (simpler, less restrictive)
+2. Profile → **Access Tokens** → **Generate New Token**
+3. Choose **Granular Access Token**:
+   - Name: `Local Development - get-shit-done-multi`
+   - Expiration: **30 days** or **90 days**
+   - Packages: **Read and write** on `get-shit-done-multi`
+4. Copy token and add to `~/.npmrc` (see above)
 
-#### Granular Access Token (Recommended)
-
-1. Name: `GitHub Actions - get-shit-done-multi`
-2. Expiration: **1 year** (recommended, set calendar reminder to rotate)
-3. Packages and scopes:
-   - Permissions: **Read and write**
-   - Packages: Select **`get-shit-done-multi`**
-4. Organizations: (leave default if not org-scoped)
-5. IP allowlist: (optional, leave empty for GitHub Actions)
-6. Click **Generate Token**
-
-#### Classic Automation Token
-
-1. Name: `GitHub Actions - get-shit-done-multi`
-2. Type: **Automation**
-3. Click **Generate Token**
-
-**⚠️ Important:** Copy the token immediately - you won't be able to see it again.
-
-### Adding Token to GitHub Secrets
-
-1. Go to repository on GitHub
-2. Click **Settings** tab
-3. Navigate to **Secrets and variables** → **Actions**
-4. Click **New repository secret**
-5. Name: `NPM_TOKEN`
-6. Secret: Paste the NPM token
-7. Click **Add secret**
-
-### Token Rotation Schedule
-
-- **Recommended:** Rotate tokens annually
-- Set calendar reminder for 2 weeks before expiration
-- Generate new token before old one expires
-- Update GitHub secret immediately
-- Test with dry-run: trigger workflow but it will validate token
+⚠️ **Never commit tokens to git or share them publicly**
 
 ### Verifying Token Permissions
 
