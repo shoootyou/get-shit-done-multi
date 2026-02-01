@@ -1,0 +1,81 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        run: npm test
+        
+      - name: Build if build script exists
+        run: |
+          if jq -e '.scripts.build' package.json > /dev/null; then
+            echo "Build script found, running build..."
+            npm run build
+          else
+            echo "No build script found, skipping build step"
+          fi
+          
+      - name: Create and validate tarball
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Creating tarball..."
+          npm pack
+          TARBALL=$(ls *.tgz)
+          echo "✓ Created: $TARBALL"
+          echo ""
+          
+          echo "Testing tarball installation..."
+          TEST_DIR=$(mktemp -d)
+          cd "$TEST_DIR"
+          npm install "$OLDPWD/$TARBALL" --verbose
+          
+          echo ""
+          echo "Verifying installation..."
+          if [ ! -d "node_modules/get-shit-done-multi" ]; then
+            echo "❌ Installation failed - package not found in node_modules"
+            exit 1
+          fi
+          
+          echo "✓ Tarball installs successfully"
+          echo ""
+          
+          cd "$OLDPWD"
+          rm -rf "$TEST_DIR"
+          rm -f "$TARBALL"
+          echo "✓ Cleanup complete"
+          
+      - name: Validation summary
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Pull Request Validation Passed"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "✓ All tests passed"
+          echo "✓ Tarball creation successful"
+          echo "✓ Tarball installation verified"
+          echo ""
+          echo "This PR is ready for review."
