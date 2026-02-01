@@ -4,7 +4,7 @@ import { join } from 'path';
 import { mkdtemp } from 'fs/promises';
 import { homedir } from 'os';
 import { install } from '../../bin/lib/installer/orchestrator.js';
-import { ClaudeAdapter } from '../../bin/lib/platforms/claude-adapter.js';
+import { ClaudeAdapter } from '../../bin/lib/platforms/claude/adapter.js';
 
 describe('Phase 5 Integration: Validation + Manifest', () => {
   let testDir;

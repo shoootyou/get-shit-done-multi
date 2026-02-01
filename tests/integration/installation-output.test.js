@@ -4,9 +4,9 @@ import { mkdtemp, rm, readFile, readdir } from 'fs/promises';
 import { tmpdir, homedir } from 'os';
 import matter from 'gray-matter';
 import { install } from '../../bin/lib/installer/orchestrator.js';
-import { ClaudeAdapter } from '../../bin/lib/platforms/claude-adapter.js';
-import { CopilotAdapter } from '../../bin/lib/platforms/copilot-adapter.js';
-import { CodexAdapter } from '../../bin/lib/platforms/codex-adapter.js';
+import { ClaudeAdapter } from '../../bin/lib/platforms/claude/adapter.js';
+import { CopilotAdapter } from '../../bin/lib/platforms/copilot/adapter.js';
+import { CodexAdapter } from '../../bin/lib/platforms/codex/adapter.js';
 
 describe('Installation Output Verification', () => {
   let testDir;

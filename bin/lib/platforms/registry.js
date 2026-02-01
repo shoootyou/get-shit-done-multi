@@ -1,6 +1,6 @@
-import { ClaudeAdapter } from './claude-adapter.js';
-import { CopilotAdapter } from './copilot-adapter.js';
-import { CodexAdapter } from './codex-adapter.js';
+import { ClaudeAdapter } from './claude/adapter.js';
+import { CopilotAdapter } from './copilot/adapter.js';
+import { CodexAdapter } from './codex/adapter.js';
 
 /**
  * Registry for platform adapters

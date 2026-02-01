@@ -1,34 +1,28 @@
 /**
- * Custom YAML frontmatter serializer with platform-specific formatting
+ * Copilot-specific YAML frontmatter serializer
  * 
- * Why custom: js-yaml's flowLevel option is all-or-nothing. We need:
+ * Copilot formatting rules:
  * - Root-level objects in block style
- * - Arrays in flow style (Copilot/Codex) or block style (Claude)
+ * - Arrays in flow style (single-line with brackets)
  * - Nested objects in block style
  * - Omit empty arrays
  * - Special character handling in tool names
  * 
- * @module frontmatter-serializer
+ * @module copilot-serializer
  */
 
 /**
- * Serialize frontmatter data to YAML string with platform-specific formatting
+ * Serialize frontmatter data to YAML string with Copilot-specific formatting
  * 
  * @param {Object} data - Frontmatter data object
- * @param {string} platform - Platform name ('copilot', 'codex', 'claude')
  * @returns {string} YAML string (without --- delimiters)
  * 
  * @example
- * // Copilot/Codex (single-line arrays)
- * serializeFrontmatter({tools: ['read', 'write']}, 'copilot')
+ * // Copilot (single-line arrays)
+ * serializeFrontmatter({tools: ['read', 'write']})
  * // => "tools: ['read', 'write']"
- * 
- * @example
- * // Claude (multi-line arrays)
- * serializeFrontmatter({skills: ['gsd-help', 'gsd-verify']}, 'claude')
- * // => "skills:\n  - gsd-help\n  - gsd-verify"
  */
-export function serializeFrontmatter(data, platform) {
+export function serializeFrontmatter(data) {
   const lines = [];
   
   // Field ordering: standard fields first, then others
@@ -54,11 +48,11 @@ export function serializeFrontmatter(data, platform) {
     
     // Format by type
     if (Array.isArray(value)) {
-      lines.push(formatArray(key, value, platform));
+      lines.push(formatArray(key, value));
     } else if (typeof value === 'object' && value !== null) {
-      lines.push(formatObject(key, value, platform));
+      lines.push(formatObject(key, value));
     } else {
-      lines.push(formatScalar(key, value, platform));
+      lines.push(formatScalar(key, value));
     }
   }
   
@@ -66,23 +60,16 @@ export function serializeFrontmatter(data, platform) {
 }
 
 /**
- * Format array field with platform-specific style
+ * Format array field with Copilot flow style (single-line)
  * 
  * @param {string} key - Field name
  * @param {Array} value - Array value
- * @param {string} platform - Platform name
  * @returns {string} Formatted YAML
  * 
  * @private
  */
-function formatArray(key, value, platform) {
-  // Claude uses multi-line block style
-  if (platform === 'claude') {
-    const items = value.map(item => `  - ${item}`).join('\n');
-    return `${key}:\n${items}`;
-  }
-  
-  // Copilot/Codex use single-line flow style
+function formatArray(key, value) {
+  // Copilot uses single-line flow style
   // Wrap items in single quotes to handle special characters
   const items = value.map(item => `'${item}'`).join(', ');
   return `${key}: [${items}]`;
@@ -93,12 +80,11 @@ function formatArray(key, value, platform) {
  * 
  * @param {string} key - Field name
  * @param {Object} value - Object value
- * @param {string} platform - Platform name
  * @returns {string} Formatted YAML
  * 
  * @private
  */
-function formatObject(key, value, platform) {
+function formatObject(key, value) {
   const lines = [`${key}:`];
   
   for (const [subKey, subValue] of Object.entries(value)) {
@@ -111,10 +97,10 @@ function formatObject(key, value, platform) {
       lines.push(`  ${subKey}:`);
       for (const [nestedKey, nestedValue] of Object.entries(subValue)) {
         if (nestedValue === undefined) continue;
-        lines.push(`    ${nestedKey}: ${formatValue(nestedValue, nestedKey, platform)}`);
+        lines.push(`    ${nestedKey}: ${formatValue(nestedValue, nestedKey)}`);
       }
     } else {
-      lines.push(`  ${subKey}: ${formatValue(subValue, subKey, platform)}`);
+      lines.push(`  ${subKey}: ${formatValue(subValue, subKey)}`);
     }
   }
   
@@ -126,13 +112,12 @@ function formatObject(key, value, platform) {
  * 
  * @param {string} key - Field name
  * @param {*} value - Scalar value
- * @param {string} platform - Platform name
  * @returns {string} Formatted YAML
  * 
  * @private
  */
-function formatScalar(key, value, platform) {
-  return `${key}: ${formatValue(value, key, platform)}`;
+function formatScalar(key, value) {
+  return `${key}: ${formatValue(value, key)}`;
 }
 
 /**
@@ -140,12 +125,11 @@ function formatScalar(key, value, platform) {
  * 
  * @param {*} value - Value to format
  * @param {string} [fieldName] - Optional field name for context-aware formatting
- * @param {string} [platform] - Optional platform name for platform-specific formatting
  * @returns {string} Formatted value
  * 
  * @private
  */
-function formatValue(value, fieldName, platform) {
+function formatValue(value, fieldName) {
   // Null
   if (value === null) {
     return 'null';
@@ -163,11 +147,6 @@ function formatValue(value, fieldName, platform) {
   
   // String handling
   if (typeof value === 'string') {
-    // Codex-specific: Always quote argument-hint and description with double quotes
-    if (platform === 'codex' && (fieldName === 'argument-hint' || fieldName === 'description')) {
-      return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-    }
-    
     // Always quote strings that look like dates or versions to prevent YAML parsing
     // Examples: 2026-01-28, 2026-01-28T12:00:00Z, 2.0.0, 1.2.3
     if (/^\d{4}-\d{2}-\d{2}/.test(value) || /^\d+\.\d+(\.\d+)?$/.test(value)) {

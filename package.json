@@ -38,6 +38,7 @@
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:validation": "vitest run tests/integration/skill-validation.test.js",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.planning\" \"#templates\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\" \"#.planning\" \"#templates\""
   },
@@ -59,6 +60,7 @@
     "commander": "^14.0.2",
     "fs-extra": "^11.3.3",
     "gray-matter": "^4.0.3",
+    "joi": "^18.0.2",
     "js-yaml": "^4.1.1",
     "sanitize-filename": "^1.6.3",
     "semver": "^7.7.3"
