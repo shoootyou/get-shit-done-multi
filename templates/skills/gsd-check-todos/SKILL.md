@@ -1,7 +1,7 @@
 ---
 name: gsd-check-todos
 description: List pending todos and select one to work on
-allowed-tools: Read, Edit, Bash, Grep, Task
+allowed-tools: Read, Write, Bash, Glob, AskUserQuestion
 argument-hint: [area]
 ---
 
@@ -171,6 +171,17 @@ Update STATE.md "### Pending Todos" section if exists.
 
 <step name="git_commit">
 If todo was moved to done/, commit the change:
+
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo moved (not committed - commit_docs: false)"
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/todos/done/[filename]

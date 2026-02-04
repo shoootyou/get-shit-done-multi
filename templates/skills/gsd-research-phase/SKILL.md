@@ -1,8 +1,13 @@
 ---
 name: gsd-research-phase
-description: Research implementation approach for phase before planning
-allowed-tools: Task, Read, Edit, Bash
+description: Research how to implement a phase (standalone - usually use {{COMMAND_PREFIX}}plan-phase instead)
+argument-hint: "[phase]"
+allowed-tools:
+  - Read
+  - Bash
+  - Task
 ---
+
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
 
@@ -25,6 +30,24 @@ Normalize phase input in step 1 before any directory lookups.
 </context>
 
 <process>
+
+## 0. Resolve Model Profile
+
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-phase-researcher | opus | sonnet | haiku |
+
+Store resolved model for use in Task calls below.
 
 ## 1. Normalize and Validate Phase
 
@@ -58,13 +81,13 @@ ls .planning/phases/${PHASE}-*/RESEARCH.md 2>/dev/null
 ```bash
 grep -A20 "Phase ${PHASE}:" .planning/ROADMAP.md
 cat .planning/REQUIREMENTS.md 2>/dev/null
-cat .planning/phases/${PHASE}-*/${PHASE}-CONTEXT.md 2>/dev/null
+cat .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
 grep -A30 "### Decisions Made" .planning/STATE.md 2>/dev/null
 ```
 
 Present summary with phase description, requirements, prior decisions.
 
-## 4. Spawn gsd-researcher Agent
+## 4. Spawn gsd-phase-researcher Agent
 
 Research modes: ecosystem (default), feasibility, implementation, comparison.
 
@@ -125,8 +148,9 @@ Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 
 ```
 Task(
-  prompt=filled_prompt,
-  subagent_type="gsd-phase-researcher",
+  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
+  subagent_type="general-purpose",
+  model="{researcher_model}",
   description="Research Phase {phase}"
 )
 ```
@@ -158,8 +182,9 @@ Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 
 ```
 Task(
-  prompt=continuation_prompt,
-  subagent_type="gsd-phase-researcher",
+  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
+  subagent_type="general-purpose",
+  model="{researcher_model}",
   description="Continue research Phase {phase}"
 )
 ```

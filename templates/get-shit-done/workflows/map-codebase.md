@@ -22,7 +22,25 @@ Documents are reference material for Claude when planning/executing. Always incl
 
 <process>
 
-<step name="check_existing" priority="first">
+<step name="resolve_model_profile" priority="first">
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-codebase-mapper | sonnet | haiku | haiku |
+
+Store resolved model for use in Task calls below.
+</step>
+
+<step name="check_existing">
 Check if .planning/codebase/ already exists:
 
 ```bash
@@ -67,77 +85,13 @@ mkdir -p .planning/codebase
 - TESTING.md (from quality mapper)
 - CONCERNS.md (from concerns mapper)
 
-Continue to check_config.
-</step>
-
-<step name="check_config">
-Check for optional exclusion config file:
-
-```bash
-# Check for optional exclusion config
-if [ -f .planning/map-config.json ]; then
-  echo "Found custom exclusion config: .planning/map-config.json"
-  cat .planning/map-config.json
-else
-  echo "No custom config - using defaults (.claude, .github, .codex, node_modules, .git, dist, build, out, target, coverage)"
-fi
-```
-
-**Config file format (.planning/map-config.json):**
-```json
-{
-  "exclude": [
-    "additional-pattern",
-    "vendor/",
-    "*.generated.*"
-  ]
-}
-```
-
-Continue to build_exclusion_list.
-</step>
-
-<step name="build_exclusion_list">
-Build explicit exclusion list to pass to each agent spawn.
-
-**Purpose:** Create a single source of truth for exclusions that agents will use in all tool calls. This prevents agents from scanning infrastructure directories (.github, .claude, .codex).
-
-```bash
-# Build complete exclusion list
-EXCLUDE_DIRS=".claude,.github,.codex,node_modules,.git,dist,build,out,target,coverage"
-
-# Add .gitignore patterns
-if [ -f .gitignore ]; then
-  GITIGNORE_PATTERNS=$(grep -v '^#' .gitignore | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
-  if [ -n "$GITIGNORE_PATTERNS" ]; then
-    EXCLUDE_DIRS="${EXCLUDE_DIRS},${GITIGNORE_PATTERNS}"
-  fi
-fi
-
-# Add custom patterns from map-config.json
-if [ -f .planning/map-config.json ]; then
-  CUSTOM_PATTERNS=$(cat .planning/map-config.json | grep -oP '"exclude":\s*\[\s*\K[^\]]+' | tr -d '"' | tr -d ' ')
-  if [ -n "$CUSTOM_PATTERNS" ]; then
-    EXCLUDE_DIRS="${EXCLUDE_DIRS},${CUSTOM_PATTERNS}"
-  fi
-fi
-
-echo "Exclusion list built: ${EXCLUDE_DIRS}"
-```
-
-**What happens:**
-- Starts with default infrastructure patterns
-- Adds .gitignore patterns if file exists
-- Adds custom patterns from .planning/map-config.json if file exists
-- Stores in EXCLUDE_DIRS variable for use in spawn_agents step
-
 Continue to spawn_agents.
 </step>
 
 <step name="spawn_agents">
 Spawn 4 parallel gsd-codebase-mapper agents.
 
-Use Task tool with `subagent_type="gsd-codebase-mapper"` and `run_in_background=true` for parallel execution.
+Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
 **CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent writes documents directly.
 
@@ -146,6 +100,7 @@ Use Task tool with `subagent_type="gsd-codebase-mapper"` and `run_in_background=
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase tech stack"
 ```
@@ -160,13 +115,6 @@ Write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
 
-**EXCLUDE these directories:** ${EXCLUDE_DIRS}
-
-When using tools:
-- Grep tool: Use path parameter to exclude these directories
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Use find/grep with -not -path patterns for each excluded dir
-
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
@@ -175,6 +123,7 @@ Explore thoroughly. Write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase architecture"
 ```
@@ -189,13 +138,6 @@ Write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
 
-**EXCLUDE these directories:** ${EXCLUDE_DIRS}
-
-When using tools:
-- Grep tool: Use path parameter to exclude these directories
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Use find/grep with -not -path patterns for each excluded dir
-
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
@@ -204,6 +146,7 @@ Explore thoroughly. Write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase conventions"
 ```
@@ -218,13 +161,6 @@ Write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
 
-**EXCLUDE these directories:** ${EXCLUDE_DIRS}
-
-When using tools:
-- Grep tool: Use path parameter to exclude these directories
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Use find/grep with -not -path patterns for each excluded dir
-
 Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
@@ -233,6 +169,7 @@ Explore thoroughly. Write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase concerns"
 ```
@@ -245,13 +182,6 @@ Analyze this codebase for technical debt, known issues, and areas of concern.
 
 Write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
-
-**EXCLUDE these directories:** ${EXCLUDE_DIRS}
-
-When using tools:
-- Grep tool: Use path parameter to exclude these directories
-- Glob tool: Verify results don't include excluded paths
-- Bash tool: Use find/grep with -not -path patterns for each excluded dir
 
 Explore thoroughly. Write document directly using template. Return confirmation only.
 ```
@@ -289,9 +219,6 @@ Verify all documents created successfully:
 ```bash
 ls -la .planning/codebase/
 wc -l .planning/codebase/*.md
-
-# Extract codebase metrics from STRUCTURE.md
-grep -A 10 "Codebase Metrics" .planning/codebase/STRUCTURE.md 2>/dev/null || echo "Metrics not found in STRUCTURE.md"
 ```
 
 **Verification checklist:**
@@ -305,6 +232,17 @@ Continue to commit_codebase_map.
 
 <step name="commit_codebase_map">
 Commit the codebase map:
+
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/codebase/*.md
@@ -338,12 +276,7 @@ wc -l .planning/codebase/*.md
 ```
 Codebase mapping complete.
 
-**Codebase Metrics:**
-- Files analyzed: [N] files
-- Lines of code: [N] lines
-- Test files: [N] files
-
-**Documents created** (.planning/codebase/):
+Created .planning/codebase/:
 - STACK.md ([N] lines) - Technologies and dependencies
 - ARCHITECTURE.md ([N] lines) - System design and patterns
 - STRUCTURE.md ([N] lines) - Directory layout and organization
@@ -352,12 +285,6 @@ Codebase mapping complete.
 - INTEGRATIONS.md ([N] lines) - External services and APIs
 - CONCERNS.md ([N] lines) - Technical debt and issues
 
-**Excluded from analysis:**
-Infrastructure: .claude, .github, .codex, node_modules, .git
-Build artifacts: dist, build, out, target, coverage
-
-Metrics reflect application code only (infrastructure excluded)
-
 
 ---
 
@@ -365,17 +292,16 @@ Metrics reflect application code only (infrastructure excluded)
 
 **Initialize project** — use codebase context for planning
 
-`{{COMMAND_PREFIX}}new-project`
+`/{{COMMAND_PREFIX}}new-project`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- Re-run mapping: `{{COMMAND_PREFIX}}map-codebase`
+- Re-run mapping: `/{{COMMAND_PREFIX}}map-codebase`
 - Review specific file: `cat .planning/codebase/STACK.md`
 - Edit any document before proceeding
-- **Customize exclusions:** Create `.planning/map-config.json` with additional patterns
 
 ---
 ```

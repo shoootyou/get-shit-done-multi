@@ -14,8 +14,8 @@ Phase number: $ARGUMENTS (required)
 ```
 Error: Phase number required.
 
-Usage: {{COMMAND_PREFIX}}list-phase-assumptions [phase-number]
-Example: {{COMMAND_PREFIX}}list-phase-assumptions 3
+Usage: /{{COMMAND_PREFIX}}list-phase-assumptions [phase-number]
+Example: /{{COMMAND_PREFIX}}list-phase-assumptions 3
 ```
 
 Exit workflow.
@@ -132,7 +132,7 @@ Wait for user response.
 Acknowledge the corrections:
 
 ```
-Got it. Key corrections:
+Key corrections:
 - [correction 1]
 - [correction 2]
 
@@ -142,7 +142,7 @@ This changes my understanding significantly. [Summarize new understanding]
 **If user confirms assumptions:**
 
 ```
-Great, assumptions validated.
+Assumptions validated.
 ```
 
 Continue to offer_next.
@@ -153,8 +153,8 @@ Present next steps:
 
 ```
 What's next?
-1. Discuss context ({{COMMAND_PREFIX}}discuss-phase ${PHASE}) - Let me ask you questions to build comprehensive context
-2. Plan this phase ({{COMMAND_PREFIX}}plan-phase ${PHASE}) - Create detailed execution plans
+1. Discuss context (/{{COMMAND_PREFIX}}discuss-phase ${PHASE}) - Let me ask you questions to build comprehensive context
+2. Plan this phase (/{{COMMAND_PREFIX}}plan-phase ${PHASE}) - Create detailed execution plans
 3. Re-examine assumptions - I'll analyze again with your corrections
 4. Done for now
 ```

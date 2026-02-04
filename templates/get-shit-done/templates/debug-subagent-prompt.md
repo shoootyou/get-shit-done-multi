@@ -51,7 +51,7 @@ Create: .planning/debug/{slug}.md
 
 ## Usage
 
-**From {{COMMAND_PREFIX}}debug:**
+**From /{{COMMAND_PREFIX}}debug:**
 ```python
 Task(
   prompt=filled_template,

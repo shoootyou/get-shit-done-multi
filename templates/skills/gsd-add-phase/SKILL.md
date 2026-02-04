@@ -1,8 +1,8 @@
 ---
 name: gsd-add-phase
-description: Add new integer phase to end of current milestone in roadmap
-allowed-tools: Read, Edit, Bash
-argument-hint: '[description]'
+description: Add phase to end of current milestone in roadmap
+argument-hint: "<description>"
+allowed-tools: Read, Write, Bash
 ---
 
 <objective>
@@ -93,7 +93,7 @@ Convert the phase description to a kebab-case slug:
 # "Add authentication" → "add-authentication"
 # "Fix critical performance issues" → "fix-critical-performance-issues"
 
-slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s|-$||')
+slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 ```
 
 Phase directory name: `{two-digit-phase}-{slug}`
@@ -201,4 +201,4 @@ Phase addition is complete when:
 - [ ] New phase appears at end of current milestone
 - [ ] Next phase number calculated correctly (ignoring decimals)
 - [ ] User informed of next steps
-  </success_criteria>
+      </success_criteria>

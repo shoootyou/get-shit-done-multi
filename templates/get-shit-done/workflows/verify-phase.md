@@ -18,9 +18,8 @@ Then verify each level against the actual codebase.
 </core_principle>
 
 <required_reading>
-**Load these references:**
-- {{PLATFORM_ROOT}}/get-shit-done/references/verification-patterns.md (detection patterns)
-- {{PLATFORM_ROOT}}/get-shit-done/templates/verification-report.md (output format)
+@{{PLATFORM_ROOT}}/get-shit-done/references/verification-patterns.md
+@{{PLATFORM_ROOT}}/get-shit-done/templates/verification-report.md
 </required_reading>
 
 <process>
@@ -582,12 +581,6 @@ See {{PLATFORM_ROOT}}/get-shit-done/templates/verification-report.md for complet
 
 {If passed:}
 All must-haves verified. Phase goal achieved. Ready to proceed.
-
-### Next Steps
-
-With phase complete, consider:
-1. `{{COMMAND_PREFIX}}verify-milestone` - Verify entire milestone is complete
-2. `{{COMMAND_PREFIX}}archive-milestone` - Archive completed milestone for clean slate
 
 {If gaps_found:}
 ### Gaps Found

@@ -119,7 +119,7 @@ Load and validate:
 ```
 Phase [X] not found in roadmap.
 
-Use {{COMMAND_PREFIX}}progress to see available phases.
+Use /{{COMMAND_PREFIX}}progress to see available phases.
 ```
 Exit workflow.
 
@@ -132,7 +132,7 @@ Check if CONTEXT.md already exists:
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
 PADDED_PHASE=$(printf "%02d" ${PHASE})
-ls .planning/phases/${PADDED_PHASE}-*/CONTEXT.md .planning/phases/${PADDED_PHASE}-*/${PADDED_PHASE}-CONTEXT.md .planning/phases/${PHASE}-*/CONTEXT.md .planning/phases/${PHASE}-*/${PHASE}-CONTEXT.md 2>/dev/null
+ls .planning/phases/${PADDED_PHASE}-*/*-CONTEXT.md .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
 ```
 
 **If exists:**
@@ -376,14 +376,14 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 
-`{{COMMAND_PREFIX}}plan-phase ${PHASE}`
+`/{{COMMAND_PREFIX}}plan-phase ${PHASE}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `{{COMMAND_PREFIX}}plan-phase ${PHASE} --skip-research` — plan without research
+- `/{{COMMAND_PREFIX}}plan-phase ${PHASE} --skip-research` — plan without research
 - Review/edit CONTEXT.md before continuing
 
 ---
@@ -392,6 +392,17 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 <step name="git_commit">
 Commit phase context:
+
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add "${PHASE_DIR}/${PADDED_PHASE}-CONTEXT.md"

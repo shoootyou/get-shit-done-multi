@@ -8,11 +8,32 @@ The orchestrator's job is coordination, not execution. Each subagent loads the f
 
 <required_reading>
 Read STATE.md before any operation to load project context.
+Read config.json for planning behavior settings.
 </required_reading>
 
 <process>
 
-<step name="load_project_state" priority="first">
+<step name="resolve_model_profile" priority="first">
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-executor | opus | sonnet | sonnet |
+| gsd-verifier | sonnet | sonnet | haiku |
+| general-purpose | — | — | — |
+
+Store resolved models for use in Task calls below.
+</step>
+
+<step name="load_project_state">
 Before any operation, read project state:
 
 ```bash
@@ -33,6 +54,92 @@ Options:
 ```
 
 **If .planning/ doesn't exist:** Error - project not initialized.
+
+**Load planning config:**
+
+```bash
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+Store `COMMIT_PLANNING_DOCS` for use in git operations.
+
+**Load git branching config:**
+
+```bash
+# Get branching strategy (default: none)
+BRANCHING_STRATEGY=$(cat .planning/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
+
+# Get templates
+PHASE_BRANCH_TEMPLATE=$(cat .planning/config.json 2>/dev/null | grep -o '"phase_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "gsd/phase-{phase}-{slug}")
+MILESTONE_BRANCH_TEMPLATE=$(cat .planning/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "gsd/{milestone}-{slug}")
+```
+
+Store `BRANCHING_STRATEGY` and templates for use in branch creation step.
+</step>
+
+<step name="handle_branching">
+Create or switch to appropriate branch based on branching strategy.
+
+**Skip if strategy is "none":**
+
+```bash
+if [ "$BRANCHING_STRATEGY" = "none" ]; then
+  # No branching, continue on current branch
+  exit 0
+fi
+```
+
+**For "phase" strategy — create phase branch:**
+
+```bash
+if [ "$BRANCHING_STRATEGY" = "phase" ]; then
+  # Get phase name from directory (e.g., "03-authentication" → "authentication")
+  PHASE_NAME=$(basename "$PHASE_DIR" | sed 's/^[0-9]*-//')
+
+  # Create slug from phase name
+  PHASE_SLUG=$(echo "$PHASE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+
+  # Apply template
+  BRANCH_NAME=$(echo "$PHASE_BRANCH_TEMPLATE" | sed "s/{phase}/$PADDED_PHASE/g" | sed "s/{slug}/$PHASE_SLUG/g")
+
+  # Create or switch to branch
+  git checkout -b "$BRANCH_NAME" 2>/dev/null || git checkout "$BRANCH_NAME"
+
+  echo "Branch: $BRANCH_NAME (phase branching)"
+fi
+```
+
+**For "milestone" strategy — create/switch to milestone branch:**
+
+```bash
+if [ "$BRANCHING_STRATEGY" = "milestone" ]; then
+  # Get current milestone info from ROADMAP.md
+  MILESTONE_VERSION=$(grep -oE 'v[0-9]+\.[0-9]+' .planning/ROADMAP.md | head -1 || echo "v1.0")
+  MILESTONE_NAME=$(grep -A1 "## .*$MILESTONE_VERSION" .planning/ROADMAP.md | tail -1 | sed 's/.*- //' | cut -d'(' -f1 | tr -d ' ' || echo "milestone")
+
+  # Create slug
+  MILESTONE_SLUG=$(echo "$MILESTONE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+
+  # Apply template
+  BRANCH_NAME=$(echo "$MILESTONE_BRANCH_TEMPLATE" | sed "s/{milestone}/$MILESTONE_VERSION/g" | sed "s/{slug}/$MILESTONE_SLUG/g")
+
+  # Create or switch to branch (same branch for all phases in milestone)
+  git checkout -b "$BRANCH_NAME" 2>/dev/null || git checkout "$BRANCH_NAME"
+
+  echo "Branch: $BRANCH_NAME (milestone branching)"
+fi
+```
+
+**Report branch status:**
+
+```
+Branching: {strategy} → {branch_name}
+```
+
+**Note:** All subsequent plan commits go to this branch. User handles merging based on their workflow.
 </step>
 
 <step name="validate_phase">
@@ -109,7 +216,7 @@ waves = {
 }
 ```
 
-**No dependency analysis needed.** Wave numbers are pre-computed during `{{COMMAND_PREFIX}}plan-phase`.
+**No dependency analysis needed.** Wave numbers are pre-computed during `/{{COMMAND_PREFIX}}plan-phase`.
 
 Report wave structure with context:
 ```
@@ -158,9 +265,18 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    - Bad: "Executing terrain generation plan"
    - Good: "Procedural terrain generator using Perlin noise — creates height maps, biome zones, and collision meshes. Required before vehicle physics can interact with ground."
 
-2. **Spawn all autonomous agents in wave simultaneously:**
+2. **Read files and spawn all autonomous agents in wave simultaneously:**
 
-   Use Task tool with multiple parallel calls. Each agent gets prompt from subagent-task-prompt template:
+   Before spawning, read file contents. The `@` syntax does not work across Task() boundaries - content must be inlined.
+
+   ```bash
+   # Read each plan in the wave
+   PLAN_CONTENT=$(cat "{plan_path}")
+   STATE_CONTENT=$(cat .planning/STATE.md)
+   CONFIG_CONTENT=$(cat .planning/config.json 2>/dev/null)
+   ```
+
+   Use Task tool with multiple parallel calls. Each agent gets prompt with inlined content:
 
    ```
    <objective>
@@ -177,9 +293,14 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    </execution_context>
 
    <context>
-   Plan: @{plan_path}
-   Project state: @.planning/STATE.md
-   Config: @.planning/config.json (if exists)
+   Plan:
+   {plan_content}
+
+   Project state:
+   {state_content}
+
+   Config (if exists):
+   {config_content}
    </context>
 
    <success_criteria>
@@ -248,7 +369,7 @@ Plans with `autonomous: false` require user interaction.
 
 1. **Spawn agent for checkpoint plan:**
    ```
-   Task(prompt="{subagent-task-prompt}", subagent_type="general-purpose")
+   Task(prompt="{subagent-task-prompt}", subagent_type="gsd-executor", model="{executor_model}")
    ```
 
 2. **Agent runs until checkpoint:**
@@ -287,7 +408,8 @@ Plans with `autonomous: false` require user interaction.
    ```
    Task(
      prompt=filled_continuation_template,
-     subagent_type="general-purpose"
+     subagent_type="gsd-executor",
+     model="{executor_model}"
    )
    ```
 
@@ -363,7 +485,8 @@ Phase goal: {goal from ROADMAP.md}
 
 Check must_haves against actual codebase. Create VERIFICATION.md.
 Verify what actually exists in the code.",
-  subagent_type="gsd-verifier"
+  subagent_type="gsd-verifier",
+  model="{verifier_model}"
 )
 ```
 
@@ -379,7 +502,7 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 |--------|--------|
 | `passed` | Continue to update_roadmap |
 | `human_needed` | Present items to user, get approval or feedback |
-| `gaps_found` | Present gap summary, offer `{{COMMAND_PREFIX}}plan-phase {phase} --gaps` |
+| `gaps_found` | Present gap summary, offer `/{{COMMAND_PREFIX}}plan-phase {phase} --gaps` |
 
 **If passed:**
 
@@ -426,7 +549,7 @@ Present gaps and offer next command:
 
 **Plan gap closure** — create additional plans to complete the phase
 
-`{{COMMAND_PREFIX}}plan-phase {X} --gaps`
+`/{{COMMAND_PREFIX}}plan-phase {X} --gaps`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -434,13 +557,13 @@ Present gaps and offer next command:
 
 **Also available:**
 - `cat {phase_dir}/{phase}-VERIFICATION.md` — see full report
-- `{{COMMAND_PREFIX}}verify-work {X}` — manual testing before planning
+- `/{{COMMAND_PREFIX}}verify-work {X}` — manual testing before planning
 ```
 
-User runs `{{COMMAND_PREFIX}}plan-phase {X} --gaps` which:
+User runs `/{{COMMAND_PREFIX}}plan-phase {X} --gaps` which:
 1. Reads VERIFICATION.md gaps
 2. Creates additional plans (04, 05, etc.) with `gap_closure: true` to close gaps
-3. User then runs `{{COMMAND_PREFIX}}execute-phase {X} --gaps-only`
+3. User then runs `/{{COMMAND_PREFIX}}execute-phase {X} --gaps-only`
 4. Execute-phase runs only gap closure plans (04-05)
 5. Verifier runs again after new plans complete
 
@@ -455,6 +578,17 @@ Update ROADMAP.md to reflect phase completion:
 # Update completion date
 # Update status
 ```
+
+**Check planning config:**
+
+If `COMMIT_PLANNING_DOCS=false` (set in load_project_state):
+- Skip all git operations for .planning/ files
+- Planning docs exist locally but are gitignored
+- Log: "Skipping planning docs commit (commit_docs: false)"
+- Proceed to offer_next step
+
+If `COMMIT_PLANNING_DOCS=true` (default):
+- Continue with git operations below
 
 Commit phase completion (roadmap, state, verification):
 ```bash
@@ -473,7 +607,7 @@ Present next steps based on milestone status:
 
 **Phase {X+1}: {Name}** — {Goal}
 
-`{{COMMAND_PREFIX}}plan-phase {X+1}`
+`/{{COMMAND_PREFIX}}plan-phase {X+1}`
 
 <sub>`/clear` first for fresh context</sub>
 ```
@@ -484,31 +618,16 @@ MILESTONE COMPLETE!
 
 All {N} phases executed.
 
-`{{COMMAND_PREFIX}}complete-milestone`
+`/{{COMMAND_PREFIX}}complete-milestone`
 ```
 </step>
 
 </process>
 
 <context_efficiency>
-**Why this works:**
-
-Orchestrator context usage: ~10-15%
-- Read plan frontmatter (small)
-- Analyze dependencies (logic, no heavy reads)
-- Fill template strings
-- Spawn Task calls
-- Collect results
-
-Each subagent: Fresh 200k context
-- Loads full execute-plan workflow
-- Loads templates, references
-- Executes plan with full capacity
-- Creates SUMMARY, commits
-
-**No polling.** Task tool blocks until completion. No TaskOutput loops.
-
-**No context bleed.** Orchestrator never reads workflow internals. Just paths and results.
+Orchestrator: ~10-15% context (frontmatter, spawning, results).
+Subagents: Fresh 200k each (full workflow + execution).
+No polling (Task blocks). No context bleed.
 </context_efficiency>
 
 <failure_handling>
@@ -539,7 +658,7 @@ Each subagent: Fresh 200k context
 
 If phase execution was interrupted (context limit, user exit, error):
 
-1. Run `{{COMMAND_PREFIX}}execute-phase {phase}` again
+1. Run `/{{COMMAND_PREFIX}}execute-phase {phase}` again
 2. discover_plans finds completed SUMMARYs
 3. Skips completed plans
 4. Resumes from first incomplete plan

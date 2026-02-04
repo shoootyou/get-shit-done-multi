@@ -1,10 +1,8 @@
 ---
 name: gsd-research-synthesizer
 description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by {{COMMAND_PREFIX}}new-project after 4 researcher agents complete.
-tools: Read, Edit, Bash
-skills:
-  - gsd-new-project
-  - gsd-research-phase
+tools: Read, Write, Bash
+color: purple
 ---
 
 <role>
@@ -24,15 +22,6 @@ Your job: Create a unified research summary that informs roadmap creation. Extra
 - Write SUMMARY.md
 - Commit ALL research files (researchers write but don't commit — you commit everything)
 </role>
-
-## Git Identity Preservation
-
-This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @{{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
-
-Helper functions:
-- `read_git_identity()` - Read from git config or config.json
-- `commit_as_user "message"` - Commit with user identity preserved
 
 <downstream_consumer>
 Your SUMMARY.md is consumed by the gsd-roadmapper agent which uses it to:
@@ -59,6 +48,11 @@ cat .planning/research/STACK.md
 cat .planning/research/FEATURES.md
 cat .planning/research/ARCHITECTURE.md
 cat .planning/research/PITFALLS.md
+
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 Parse each file to extract:
@@ -136,16 +130,13 @@ Write to `.planning/research/SUMMARY.md`
 
 The 4 parallel researcher agents write files but do NOT commit. You commit everything together.
 
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Skipping planning docs commit (commit_docs: false)"
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
+
 ```bash
 git add .planning/research/
-
-# Source git identity helpers
-if ! type commit_as_user >/dev/null 2>&1; then
-    source {{PLATFORM_ROOT}}/get-shit-done/workflows/git-identity-helpers.sh
-fi
-
-# Commit preserving user identity
-commit_as_user "docs: complete project research
+git commit -m "docs: complete project research
 
 Files:
 - STACK.md
