@@ -1,7 +1,7 @@
 ---
 name: gsd-insert-phase
 description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
-allowed-tools: Read, Edit, Bash
+allowed-tools: Read, Write, Bash
 argument-hint: '[after_phase] [description]'
 ---
 
@@ -222,4 +222,4 @@ Phase insertion is complete when:
 - [ ] STATE.md updated with roadmap evolution note
 - [ ] Decimal number calculated correctly (based on existing decimals)
 - [ ] User informed of next steps and dependency implications
-  </success_criteria>
+      </success_criteria>

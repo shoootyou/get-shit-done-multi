@@ -1,5 +1,7 @@
 # What is GSD?
 
+> This documentation provides an overview of GSD concepts. For the complete, authoritative GSD documentation including latest developments, visit [get-shit-done](https://github.com/glittercowboy/get-shit-done).
+
 **Get Shit Done (GSD)** is a spec-driven development workflow for AI coding assistants. It provides structured skills
 and agents that guide AI through project planning, implementation, and verification.
 
@@ -103,6 +105,10 @@ GSD Multi supports three AI platforms:
 - **Codex CLI** - OpenAI Codex interface
 
 All platforms provide the same GSD workflow. Choose based on your AI assistant preference.
+
+**About GSD Multi:**
+
+GSD Multi is a template installer that deploys GSD skills and agents to multiple platforms. Starting v2.0.0, this repository focuses solely on multi-platform deployment—all new capabilities are developed in the [original get-shit-done repository](https://github.com/glittercowboy/get-shit-done) and synced here.
 
 ## Next Steps
 

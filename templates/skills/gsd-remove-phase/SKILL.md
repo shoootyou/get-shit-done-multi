@@ -1,8 +1,8 @@
 ---
 name: gsd-remove-phase
 description: Remove a future phase from roadmap and renumber subsequent phases
-allowed-tools: Read, Edit, Bash, Grep
-argument-hint: [phase]
+argument-hint: <phase-number>
+allowed-tools: Read, Write, Bash, Glob
 ---
 
 <objective>
@@ -248,6 +248,17 @@ Update any internal references to reflect new numbering.
 <step name="commit">
 Stage and commit the removal:
 
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
+
 ```bash
 git add .planning/
 git commit -m "chore: remove phase {target} ({original-phase-name})"
@@ -266,7 +277,7 @@ Changes:
 - Deleted: .planning/phases/{target}-{slug}/
 - Renumbered: Phases {first-renumbered}-{last-old} → {first-renumbered-1}-{last-new}
 - Updated: ROADMAP.md, STATE.md
-- Committed: chore: remove phase {target} ({original-phase-name})
+- Committed: chore: remove phase {target} ({original-name})
 
 Current roadmap: {total-remaining} phases
 Current position: Phase {current} of {new-total}
