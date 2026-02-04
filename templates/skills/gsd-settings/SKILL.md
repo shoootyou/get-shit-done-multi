@@ -1,10 +1,7 @@
 ---
 name: gsd-settings
 description: Configure GSD workflow toggles and model profile
-allowed-tools:
-  - Read
-  - Write
-  - AskUserQuestion
+allowed-tools: Read, Write, AskUserQuestion
 ---
 
 <objective>

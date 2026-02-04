@@ -2,14 +2,7 @@
 name: gsd-verify-work
 description: Validate built features through conversational UAT
 argument-hint: "[phase number, e.g., '4']"
-allowed-tools:
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - Edit
-  - Write
-  - Task
+allowed-tools: Read, Bash, Glob, Grep, Edit, Write, Task
 ---
 
 <objective>
