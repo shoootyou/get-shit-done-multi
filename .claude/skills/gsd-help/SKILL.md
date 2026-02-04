@@ -1,7 +1,6 @@
 ---
 name: gsd-help
 description: Show available GSD commands and usage guide
-allowed-tools: Read
 ---
 
 
@@ -14,7 +13,7 @@ Output ONLY the reference content below. Do NOT add:
 - Git status or file context
 - Next-step suggestions
 - Any commentary beyond the reference
-</objective>
+  </objective>
 
 <reference>
 # GSD Command Reference
@@ -29,16 +28,10 @@ Output ONLY the reference content below. Do NOT add:
 
 ## Staying Updated
 
-GSD evolves fast. Check for updates periodically:
-
-```
-/gsd-whats-new
-```
-
-Shows what changed since your installed version. Update with:
+GSD evolves fast. Update periodically:
 
 ```bash
-npx get-shit-done-multi@latest
+npx get-shit-done-cc@latest
 ```
 
 ## Core Workflow
@@ -130,6 +123,21 @@ Execute all plans in a phase.
 - Updates REQUIREMENTS.md, ROADMAP.md, STATE.md
 
 Usage: `/gsd-execute-phase 5`
+
+### Quick Mode
+
+**`/gsd-quick`**
+Execute small, ad-hoc tasks with GSD guarantees but skip optional agents.
+
+Quick mode uses the same system with a shorter path:
+- Spawns planner + executor (skips researcher, checker, verifier)
+- Quick tasks live in `.planning/quick/` separate from planned phases
+- Updates STATE.md tracking (not ROADMAP.md)
+
+Use when you know exactly what to do and the task is small enough to not need research or verification.
+
+Usage: `/gsd-quick`
+Result: Creates `.planning/quick/NNN-slug/PLAN.md`, `.planning/quick/NNN-slug/SUMMARY.md`
 
 ### Roadmap Management
 
@@ -261,20 +269,83 @@ List pending todos and select one to work on.
 Usage: `/gsd-check-todos`
 Usage: `/gsd-check-todos api`
 
+### User Acceptance Testing
+
+**`/gsd-verify-work [phase]`**
+Validate built features through conversational UAT.
+
+- Extracts testable deliverables from SUMMARY.md files
+- Presents tests one at a time (yes/no responses)
+- Automatically diagnoses failures and creates fix plans
+- Ready for re-execution if issues found
+
+Usage: `/gsd-verify-work 3`
+
+### Milestone Auditing
+
+**`/gsd-audit-milestone [version]`**
+Audit milestone completion against original intent.
+
+- Reads all phase VERIFICATION.md files
+- Checks requirements coverage
+- Spawns integration checker for cross-phase wiring
+- Creates MILESTONE-AUDIT.md with gaps and tech debt
+
+Usage: `/gsd-audit-milestone`
+
+**`/gsd-plan-milestone-gaps`**
+Create phases to close gaps identified by audit.
+
+- Reads MILESTONE-AUDIT.md and groups gaps into phases
+- Prioritizes by requirement priority (must/should/nice)
+- Adds gap closure phases to ROADMAP.md
+- Ready for `/gsd-plan-phase` on new phases
+
+Usage: `/gsd-plan-milestone-gaps`
+
+### Configuration
+
+**`/gsd-settings`**
+Configure workflow toggles and model profile interactively.
+
+- Toggle researcher, plan checker, verifier agents
+- Select model profile (quality/balanced/budget)
+- Updates `.planning/config.json`
+
+Usage: `/gsd-settings`
+
+**`/gsd-set-profile <profile>`**
+Quick switch model profile for GSD agents.
+
+- `quality` — Opus everywhere except verification
+- `balanced` — Opus for planning, Sonnet for execution (default)
+- `budget` — Sonnet for writing, Haiku for research/verification
+
+Usage: `/gsd-set-profile budget`
+
 ### Utility Commands
 
 **`/gsd-help`**
 Show this command reference.
 
-**`/gsd-whats-new`**
-See what's changed since your installed version.
+**`/gsd-update`**
+Update GSD to latest version with changelog preview.
 
 - Shows installed vs latest version comparison
 - Displays changelog entries for versions you've missed
 - Highlights breaking changes
-- Provides update instructions when behind
+- Confirms before running install
+- Better than raw `npx get-shit-done-cc`
 
-Usage: `/gsd-whats-new`
+Usage: `/gsd-update`
+
+**`/gsd-join-discord`**
+Join the GSD Discord community.
+
+- Get help, share what you're building, stay updated
+- Connect with other GSD users
+
+Usage: `/gsd-join-discord`
 
 ## Files & Structure
 
@@ -323,6 +394,33 @@ Set during `/gsd-new-project`:
 - Only stops for critical checkpoints
 
 Change anytime by editing `.planning/config.json`
+
+## Planning Configuration
+
+Configure how planning artifacts are managed in `.planning/config.json`:
+
+**`planning.commit_docs`** (default: `true`)
+- `true`: Planning artifacts committed to git (standard workflow)
+- `false`: Planning artifacts kept local-only, not committed
+
+When `commit_docs: false`:
+- Add `.planning/` to your `.gitignore`
+- Useful for OSS contributions, client projects, or keeping planning private
+- All planning files still work normally, just not tracked in git
+
+**`planning.search_gitignored`** (default: `false`)
+- `true`: Add `--no-ignore` to broad ripgrep searches
+- Only needed when `.planning/` is gitignored and you want project-wide searches to include it
+
+Example config:
+```json
+{
+  "planning": {
+    "commit_docs": false,
+    "search_gitignored": true
+  }
+}
+```
 
 ## Common Workflows
 
@@ -382,4 +480,4 @@ Change anytime by editing `.planning/config.json`
 - Read `.planning/STATE.md` for current context
 - Check `.planning/ROADMAP.md` for phase status
 - Run `/gsd-progress` to check where you're up to
-</reference>
+  </reference>

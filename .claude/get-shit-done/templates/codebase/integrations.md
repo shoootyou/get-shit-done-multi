@@ -205,7 +205,7 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 
 **CI Pipeline:**
 - GitHub Actions - Tests and type checking
-  - Workflows: .claude/workflows/ci.yml
+  - Workflows: .github/workflows/ci.yml
   - Secrets: None needed (public repo tests only)
 
 ## Environment Configuration

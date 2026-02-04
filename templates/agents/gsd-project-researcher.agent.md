@@ -1,10 +1,8 @@
 ---
 name: gsd-project-researcher
 description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by {{COMMAND_PREFIX}}new-project or {{COMMAND_PREFIX}}new-milestone orchestrators.
-tools: Read, Edit, Bash, Grep
-skills:
-  - gsd-new-milestone
-  - gsd-new-project
+tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
+color: cyan
 ---
 
 <role>
@@ -202,12 +200,12 @@ For finding what exists, community patterns, real-world usage.
 - "Common mistakes with Z"
 - Ecosystem surveys
 
-**Query templates (use current year):**
+**Query templates:**
 ```
 Ecosystem discovery:
-- "[technology] best practices 2025"
-- "[technology] recommended libraries 2025"
-- "[technology] vs [alternative] 2025"
+- "[technology] best practices [current year]"
+- "[technology] recommended libraries [current year]"
+- "[technology] vs [alternative] [current year]"
 
 Pattern discovery:
 - "how to build [type of thing] with [technology]"
@@ -221,7 +219,7 @@ Problem discovery:
 ```
 
 **Best practices:**
-- Include current year for freshness
+- Always include the current year (check today's date) for freshness
 - Use multiple query variations
 - Cross-verify findings with authoritative sources
 - Mark WebSearch-only findings as LOW confidence

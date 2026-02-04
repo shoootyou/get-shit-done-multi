@@ -1,7 +1,7 @@
 ---
 name: gsd-progress
 description: Check project progress, show context, and route to next action (execute or plan)
-allowed-tools: Read, Bash, Task
+allowed-tools: Read, Bash, Grep, Glob, SlashCommand
 ---
 
 
@@ -16,6 +16,12 @@ Provides situational awareness before continuing work.
 
 <step name="verify">
 **Verify planning structure exists:**
+
+Use Bash (not Glob) to check—Glob respects .gitignore but .planning/ is often gitignored:
+
+```bash
+test -d .planning && echo "exists" || echo "missing"
+```
 
 If no `.planning/` directory:
 
@@ -42,6 +48,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `$gsd-new-project`.
 - Read `.planning/STATE.md` for living memory (position, decisions, issues)
 - Read `.planning/ROADMAP.md` for phase structure and objectives
 - Read `.planning/PROJECT.md` for current state (What This Is, Core Value, Requirements)
+- Read `.planning/config.json` for settings (model_profile, workflow toggles)
   </step>
 
 <step name="recent">
@@ -70,6 +77,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `$gsd-new-project`.
 # [Project Name]
 
 **Progress:** [████████░░] 8/10 plans complete
+**Profile:** [quality/balanced/budget]
 
 ## Recent Work
 - [Phase X, Plan Y]: [what was accomplished - 1 line]
@@ -129,12 +137,12 @@ Track:
 
 **Step 2: Route based on counts**
 
-| Condition                       | Meaning                 | Action            |
-| ------------------------------- | ----------------------- | ----------------- |
-| uat_with_gaps > 0               | UAT gaps need fix plans | Go to **Route E** |
-| summaries < plans               | Unexecuted plans exist  | Go to **Route A** |
-| summaries = plans AND plans > 0 | Phase complete          | Go to Step 3      |
-| plans = 0                       | Phase not yet planned   | Go to **Route B** |
+| Condition | Meaning | Action |
+|-----------|---------|--------|
+| uat_with_gaps > 0 | UAT gaps need fix plans | Go to **Route E** |
+| summaries < plans | Unexecuted plans exist | Go to **Route A** |
+| summaries = plans AND plans > 0 | Phase complete | Go to Step 3 |
+| plans = 0 | Phase not yet planned | Go to **Route B** |
 
 ---
 
@@ -242,8 +250,8 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route based on milestone status:**
 
-| Condition                     | Meaning            | Action            |
-| ----------------------------- | ------------------ | ----------------- |
+| Condition | Meaning | Action |
+|-----------|---------|--------|
 | current phase < highest phase | More phases remain | Go to **Route C** |
 | current phase = highest phase | Milestone complete | Go to **Route D** |
 
@@ -349,4 +357,4 @@ Ready to plan the next milestone.
 - [ ] Smart routing: $gsd-execute-phase if plans exist, $gsd-plan-phase if not
 - [ ] User confirms before any action
 - [ ] Seamless handoff to appropriate gsd command
-  </success_criteria>
+      </success_criteria>

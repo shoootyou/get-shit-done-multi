@@ -4,11 +4,32 @@ Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
 
 <required_reading>
 Read STATE.md before any operation to load project context.
+Read config.json for planning behavior settings.
+
+@.github/get-shit-done/references/git-integration.md
 </required_reading>
 
 <process>
 
-<step name="load_project_state" priority="first">
+<step name="resolve_model_profile" priority="first">
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-executor | opus | sonnet | sonnet |
+
+Store resolved model for use in Task calls below.
+</step>
+
+<step name="load_project_state">
 Before any operation, read project state:
 
 ```bash
@@ -34,6 +55,17 @@ Options:
 **If .planning/ doesn't exist:** Error - project not initialized.
 
 This ensures every execution has full project context.
+
+**Load planning config:**
+
+```bash
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+Store `COMMIT_PLANNING_DOCS` for use in git operations.
 </step>
 
 <step name="identify_plan">
@@ -184,19 +216,7 @@ Tasks 2-5: Main context (need decision from checkpoint 1)
 No segmentation benefit - execute entirely in main
 ```
 
-**4. Why this works:**
-
-**Segmentation benefits:**
-
-- Fresh context for each autonomous segment (0% start every time)
-- Main context only for checkpoints (~10-20% total)
-- Can handle 10+ task plans if properly segmented
-- Quality impossible to degrade in autonomous segments
-
-**When segmentation provides no benefit:**
-
-- Checkpoint is decision/human-action and following tasks depend on outcome
-- Better to execute sequentially in main than break flow
+**4. Why segment:** Fresh context per subagent preserves peak quality. Main context stays lean (~15% usage).
 
 **5. Implementation:**
 
@@ -205,7 +225,7 @@ No segmentation benefit - execute entirely in main
 ```
 1. Run init_agent_tracking step first (see step below)
 
-2. Use Task tool with subagent_type="gsd-executor":
+2. Use Task tool with subagent_type="gsd-executor" and model="{executor_model}":
 
    Prompt: "Execute plan at .planning/phases/{phase}-{plan}-PLAN.md
 
@@ -357,7 +377,7 @@ For Pattern A (fully autonomous) and Pattern C (decision-dependent), skip this s
 
    B. If routing = Subagent:
       ```
-      Spawn Task tool with subagent_type="gsd-executor":
+      Spawn Task tool with subagent_type="gsd-executor" and model="{executor_model}":
 
       Prompt: "Execute tasks [task numbers/names] from plan at [plan path].
 
@@ -501,18 +521,7 @@ Committing...
 
 ````
 
-**Benefits of this pattern:**
-- Main context usage: ~20% (just orchestration + checkpoints)
-- Subagent 1: Fresh 0-30% (tasks 1-3)
-- Subagent 2: Fresh 0-30% (tasks 5-6)
-- Subagent 3: Fresh 0-20% (task 8)
-- All autonomous work: Peak quality
-- Can handle large plans with many tasks if properly segmented
-
-**When NOT to use segmentation:**
-- Plan has decision/human-action checkpoints that affect following tasks
-- Following tasks depend on checkpoint outcome
-- Better to execute in main sequentially in those cases
+**Benefit:** Each subagent starts fresh (~20-30% context), enabling larger plans without quality degradation.
 </step>
 
 <step name="load_prompt">
@@ -1036,13 +1045,6 @@ Store in array or list for SUMMARY generation:
 TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 ```
 
-**Atomic commit benefits:**
-- Each task independently revertable
-- Git bisect finds exact failing task
-- Git blame traces line to specific task context
-- Clear history for Claude in future sessions
-- Better observability for AI-automated workflow
-
 </task_commit>
 
 <step name="checkpoint_protocol">
@@ -1511,6 +1513,17 @@ Commit execution metadata (SUMMARY + STATE + ROADMAP):
 **Note:** All task code has already been committed during execution (one commit per task).
 PLAN.md was already committed during plan-phase. This final commit captures execution results only.
 
+**Check planning config:**
+
+If `COMMIT_PLANNING_DOCS=false` (set in load_project_state):
+- Skip all git operations for .planning/ files
+- Planning docs exist locally but are gitignored
+- Log: "Skipping planning docs commit (commit_docs: false)"
+- Proceed to next step
+
+If `COMMIT_PLANNING_DOCS=true` (default):
+- Continue with git operations below
+
 **1. Stage execution artifacts:**
 
 ```bash
@@ -1574,7 +1587,7 @@ lmn012o feat(08-02): create user registration endpoint
 
 Each task has its own commit, followed by one metadata commit documenting plan completion.
 
-For commit message conventions, see .github/get-shit-done/references/git-integration.md
+See `git-integration.md` (loaded via required_reading) for commit message conventions.
 </step>
 
 <step name="update_codebase_map">

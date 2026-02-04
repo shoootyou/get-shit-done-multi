@@ -1,7 +1,7 @@
 ---
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
-allowed-tools: Read, Bash, Edit
+allowed-tools: Read, Bash, Write, AskUserQuestion, SlashCommand
 ---
 
 

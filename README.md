@@ -10,6 +10,11 @@
 
 **Supported Platforms:** Claude Code · GitHub Copilot CLI · Codex CLI
 
+
+> **📦 Template System** — Starting v2.0.0, this repository serves as a multi-platform template installer. 
+> 
+> For the primary GSD development and in-depth documentation, see [get-shit-done](https://github.com/glittercowboy/get-shit-done).
+
 </div>
 
 ## What It Does
@@ -146,7 +151,9 @@ This project (GSD Multi) is a multi-platform fork of the original
 
 **Key Differences:**
 
-- Original: Claude-only with direct .md skills
-- GSD Multi: Multi-platform support (Claude, Copilot, Codex) using templating system
+- Original: Primary GSD development, Claude-only, source of all capabilities
+- GSD Multi: Multi-platform template installer (Claude, Copilot, Codex) — syncs from original
+
+**Starting v2.0.0:** This repository functions as a template synchronization system. All new capabilities, skills, and agents are developed in the original get-shit-done repository and synced here for multi-platform deployment.
 
 Both projects are MIT licensed. See [LICENSE](LICENSE) for details.

@@ -1,255 +1,173 @@
 ---
 name: gsd-update
-description: Update GSD installation to latest version from npm
-allowed-tools: Read, Bash
+description: Update GSD to latest version with changelog display
 ---
 
 
 <objective>
-Check current GSD version, compare with latest available on npm, and update if needed.
+Check for GSD updates, install if available, and display what changed.
 
-Purpose: Keep GSD up-to-date with latest features and bug fixes.
-Output: Version comparison, changelog, and updated installation.
+Provides a better update experience than raw `npx get-shit-done-cc` by showing version diff and changelog entries.
 </objective>
-
-<execution_context>
-@.codex/get-shit-done/.gsd-install-manifest.json
-@.codex/get-shit-done/CHANGELOG.md
-</execution_context>
 
 <process>
 
-<step name="detect_platform">
-Detect which platform is being used based on manifest file:
+<step name="get_installed_version">
+Read installed version:
 
 ```bash
-# Check for manifest file to detect installation
-if [ -f "./.codex/get-shit-done/.gsd-install-manifest.json" ]; then
-  MANIFEST_FILE="./.codex/get-shit-done/.gsd-install-manifest.json"
-  SCOPE="local"
-elif [ -f "${HOME}/.codex/get-shit-done/.gsd-install-manifest.json" ]; then
-  MANIFEST_FILE="${HOME}/.codex/get-shit-done/.gsd-install-manifest.json"
-  SCOPE="global"
-else
-  echo "Error: GSD installation not found"
-  echo "No manifest file at .codex/get-shit-done/.gsd-install-manifest.json"
-  echo ""
-  echo "Run installation first: npx get-shit-done-multi --codex"
-  exit 1
-fi
-
-# Extract platform from manifest
-PLATFORM=$(cat "${MANIFEST_FILE}" | grep -o '"platform"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-
-# Determine install command
-if [ "${SCOPE}" = "global" ]; then
-  INSTALL_CMD="npx get-shit-done-multi@latest --${PLATFORM} --global"
-else
-  INSTALL_CMD="npx get-shit-done-multi@latest --${PLATFORM} --local"
-fi
-
-echo "Platform detected: ${PLATFORM} (${SCOPE})"
-echo "Manifest file: ${MANIFEST_FILE}"
+cat .codex/get-shit-done/VERSION 2>/dev/null
 ```
+
+**If VERSION file missing:**
+```
+## GSD Update
+
+**Installed version:** Unknown
+
+Your installation doesn't include version tracking.
+
+Running fresh install...
+```
+
+Proceed to install step (treat as version 0.0.0 for comparison).
 </step>
 
-<step name="check_current_version">
-Read current installed version from manifest:
+<step name="check_latest_version">
+Check npm for latest version:
 
 ```bash
-if [ -f "${MANIFEST_FILE}" ]; then
-  CURRENT_VERSION=$(cat "${MANIFEST_FILE}" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-  echo "Current version: ${CURRENT_VERSION}"
-else
-  echo "Error: Manifest file not found at ${MANIFEST_FILE}"
-  exit 1
-fi
+npm view get-shit-done-cc version 2>/dev/null
 ```
-</step>
 
-<step name="check_npm_versions">
-Check available versions on npm:
-
-```bash
-echo ""
-echo "Checking npm registry..."
-
-# Get latest version from npm
-LATEST_VERSION=$(npm view get-shit-done-multi version 2>/dev/null)
-
-if [ -z "${LATEST_VERSION}" ]; then
-  echo "Error: Could not fetch version info from npm"
-  echo "Check your internet connection"
-  exit 1
-fi
-
-echo "Latest version: ${LATEST_VERSION}"
-echo ""
-
-# Get recent versions (last 5)
-echo "Recent versions available:"
-npm view get-shit-done-multi versions --json 2>/dev/null | \
-  jq -r '.[-5:] | reverse | .[]' 2>/dev/null || \
-  echo "  (Could not fetch version list)"
-echo ""
+**If npm check fails:**
 ```
+Couldn't check for updates (offline or npm unavailable).
+
+To update manually: `npx get-shit-done-cc --global`
+```
+
+STOP here if npm unavailable.
 </step>
 
 <step name="compare_versions">
-Compare current vs latest:
+Compare installed vs latest:
 
-```bash
-if [ "${CURRENT_VERSION}" = "${LATEST_VERSION}" ]; then
-  echo "✓ You're running the latest version (${CURRENT_VERSION})"
-  echo ""
-  echo "No update needed."
-  exit 0
-fi
-
-# Simple version comparison (works for semantic versions)
-if [ "${CURRENT_VERSION}" != "unknown" ]; then
-  echo "📦 Update available: ${CURRENT_VERSION} → ${LATEST_VERSION}"
-else
-  echo "📦 Latest version available: ${LATEST_VERSION}"
-fi
-echo ""
+**If installed == latest:**
 ```
+## GSD Update
+
+**Installed:** X.Y.Z
+**Latest:** X.Y.Z
+
+You're already on the latest version.
+```
+
+STOP here if already up to date.
+
+**If installed > latest:**
+```
+## GSD Update
+
+**Installed:** X.Y.Z
+**Latest:** A.B.C
+
+You're ahead of the latest release (development version?).
+```
+
+STOP here if ahead.
 </step>
 
-<step name="display_changelog">
-Display recent changes:
+<step name="show_changes_and_confirm">
+**If update available**, fetch and show what's new BEFORE updating:
 
-```bash
-echo "=== Recent Changes ==="
-echo ""
+1. Fetch changelog (same as fetch_changelog step)
+2. Extract entries between installed and latest versions
+3. Display preview and ask for confirmation:
 
-# CHANGELOG is in get-shit-done directory (same as manifest)
-CHANGELOG_FILE="${MANIFEST_FILE%/*}/CHANGELOG.md"
-
-if [ -f "${CHANGELOG_FILE}" ]; then
-  # Show latest version changes (top section)
-  awk '/^## \[/{p++} p==1' "${CHANGELOG_FILE}" | head -30
-else
-  echo "(CHANGELOG.md not available locally)"
-  echo "View at: https://github.com/shoootyou/get-shit-done-multi/blob/main/CHANGELOG.md"
-fi
-
-echo ""
 ```
-</step>
+## GSD Update Available
 
-<step name="confirm_update">
-Ask for update confirmation:
+**Installed:** 1.5.10
+**Latest:** 1.5.15
 
-```bash
-echo "Update command: ${INSTALL_CMD}"
-echo ""
-echo "This will:"
-echo "  1. Download latest version from npm"
-echo "  2. Regenerate platform-specific skills and agents"
-echo "  3. Update all GSD files in place"
-echo ""
-read -p "Proceed with update? (y/n): " CONFIRM
+### What's New
+────────────────────────────────────────────────────────────
 
-if [ "${CONFIRM}" != "y" ] && [ "${CONFIRM}" != "Y" ]; then
-  echo "Update cancelled"
-  echo ""
-  echo "To update later, run: ${INSTALL_CMD}"
-  exit 0
-fi
+## [1.5.15] - 2026-01-20
+
+### Added
+- Feature X
+
+## [1.5.14] - 2026-01-18
+
+### Fixed
+- Bug fix Y
+
+────────────────────────────────────────────────────────────
+
+⚠️  **Note:** The installer performs a clean install of GSD folders:
+- `~/.claude/commands/gsd/` will be wiped and replaced
+- `.codex/get-shit-done/` will be wiped and replaced
+- `~/.claude/agents/gsd-*` files will be replaced
+
+Your custom files in other locations are preserved:
+- Custom commands in `~/.claude/commands/your-stuff/` ✓
+- Custom agents not prefixed with `gsd-` ✓
+- Custom hooks ✓
+- Your CLAUDE.md files ✓
+
+If you've modified any GSD files directly, back them up first.
 ```
+
+Use AskUserQuestion:
+- Question: "Proceed with update?"
+- Options:
+  - "Yes, update now"
+  - "No, cancel"
+
+**If user cancels:** STOP here.
 </step>
 
 <step name="run_update">
-Execute npm installation:
+Run the update:
 
 ```bash
-echo ""
-echo "Running update..."
-echo "Command: ${INSTALL_CMD}"
-echo ""
+npx get-shit-done-cc --global
+```
 
-# Run the installation command
-eval "${INSTALL_CMD}"
+Capture output. If install fails, show error and STOP.
 
-UPDATE_EXIT_CODE=$?
+Clear the update cache so statusline indicator disappears:
 
-if [ ${UPDATE_EXIT_CODE} -ne 0 ]; then
-  echo ""
-  echo "✗ Update failed with exit code ${UPDATE_EXIT_CODE}"
-  echo ""
-  echo "Try running manually: ${INSTALL_CMD}"
-  exit 1
-fi
+```bash
+rm -f ~/.claude/cache/gsd-update-check.json
 ```
 </step>
 
-<step name="verify_update">
-Verify the update succeeded:
-
-```bash
-echo ""
-echo "Verifying update..."
-
-# Read new version from manifest
-if [ -f "${MANIFEST_FILE}" ]; then
-  NEW_VERSION=$(cat "${MANIFEST_FILE}" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-  
-  if [ "${NEW_VERSION}" = "${LATEST_VERSION}" ]; then
-    echo "✓ Successfully updated to ${NEW_VERSION}"
-  else
-    echo "⚠ Version mismatch:"
-    echo "  Expected: ${LATEST_VERSION}"
-    echo "  Installed: ${NEW_VERSION}"
-  fi
-else
-  echo "⚠ Could not verify version (manifest file not found)"
-  NEW_VERSION="${LATEST_VERSION}"
-fi
-```
-</step>
-
-<step name="present_summary">
-Show update summary:
+<step name="display_result">
+Format completion message (changelog was already shown in confirmation step):
 
 ```
-## GSD UPDATE COMPLETE
+╔═══════════════════════════════════════════════════════════╗
+║  GSD Updated: v1.5.10 → v1.5.15                           ║
+╚═══════════════════════════════════════════════════════════╝
 
-**Previous version:** ${CURRENT_VERSION}
-**New version:** ${NEW_VERSION}
+⚠️  Restart Claude Code to pick up the new commands.
 
-✓ Downloaded from npm
-✓ Skills and agents regenerated
-✓ Installation verified
-
-### Next Steps
-
-1. Test a command to ensure everything works:
-   $gsd-help
-
-2. Review changelog for new features and changes
-
-3. If using Claude Code, restart to reload commands
-
-### Resources
-
-- Changelog: ${CHANGELOG_FILE}
-- Manifest: ${MANIFEST_FILE}
-- Issues: https://github.com/shoootyou/get-shit-done-multi/issues
-- Docs: https://github.com/shoootyou/get-shit-done-multi/blob/main/README.md
-
----
-
-**Having issues?** Run $gsd-verify-installation for diagnostics.
+[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
 ```
 </step>
 
 </process>
 
-<anti_patterns>
-- Don't try to update via git (use npm package)
-- Don't modify manifest file manually
-- Don't skip version check (always compare first)
-- Don't assume update succeeded without verification
-- Don't mix --global and --local scopes (use same scope as current installation)
-</anti_patterns>
+<success_criteria>
+- [ ] Installed version read correctly
+- [ ] Latest version checked via npm
+- [ ] Update skipped if already current
+- [ ] Changelog fetched and displayed BEFORE update
+- [ ] Clean install warning shown
+- [ ] User confirmation obtained
+- [ ] Update executed successfully
+- [ ] Restart reminder shown
+</success_criteria>
