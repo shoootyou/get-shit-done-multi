@@ -1,5 +1,7 @@
 # GSD Documentation
 
+> **Note:** GSD Multi is a multi-platform installer that deploys GSD to Claude, Copilot, and Codex. For comprehensive GSD methodology documentation, visit the [original get-shit-done repository](https://github.com/glittercowboy/get-shit-done).
+
 Complete documentation for the get-shit-done-multi package.
 
 ## Getting Started
@@ -52,7 +54,8 @@ See [CHANGELOG.md](../CHANGELOG.md) for version history and release notes.
 
 - **GitHub Issues:** https://github.com/shoootyou/get-shit-done-multi/issues
 - **Discussions:** https://github.com/shoootyou/get-shit-done-multi/discussions
-- **Fork Information:** Forked from v1.6.4 of [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done)
+- **Primary GSD Repository:** https://github.com/glittercowboy/get-shit-done (source of all capabilities)
+- **Fork Information:** Template system forked from v1.6.4 and syncs from original
 
 ## Quick Links
 
