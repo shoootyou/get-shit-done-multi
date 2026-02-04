@@ -213,7 +213,7 @@ Agents only diagnose—plan-phase --gaps handles fixes (no fix application).
 
 **Agent times out:**
 - Check DEBUG-{slug}.md for partial progress
-- Can resume with /{{COMMAND_PREFIX}}debug
+- Can resume with {{COMMAND_PREFIX}}debug
 
 **All agents fail:**
 - Something systemic (permissions, git, etc.)

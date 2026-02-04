@@ -49,7 +49,7 @@ Orchestrators resolve model before spawning:
 
 ## Switching Profiles
 
-Runtime: `/{{COMMAND_PREFIX}}set-profile <profile>`
+Runtime: `{{COMMAND_PREFIX}}set-profile <profile>`
 
 Per-project default: Set in `.planning/config.json`:
 ```json

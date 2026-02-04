@@ -292,14 +292,14 @@ Created .planning/codebase/:
 
 **Initialize project** — use codebase context for planning
 
-`/{{COMMAND_PREFIX}}new-project`
+`{{COMMAND_PREFIX}}new-project`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- Re-run mapping: `/{{COMMAND_PREFIX}}map-codebase`
+- Re-run mapping: `{{COMMAND_PREFIX}}map-codebase`
 - Review specific file: `cat .planning/codebase/STACK.md`
 - Edit any document before proceeding
 

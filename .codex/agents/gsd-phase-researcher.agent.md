@@ -1,7 +1,8 @@
 ---
 name: gsd-phase-researcher
 description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by $gsd-plan-phase orchestrator.
-tools: ['read', 'edit', 'execute', 'search']
+tools: ['read', 'edit', 'execute', 'search', 'search', 'websearch', 'webfetch', 'mcp__context7__*']
+color: cyan
 ---
 
 
@@ -22,15 +23,6 @@ Your job: Answer "What do I need to know to PLAN this phase well?" Produce a sin
 - Write RESEARCH.md with sections the planner expects
 - Return structured result to orchestrator
 </role>
-
-## Git Identity Preservation
-
-This agent makes commits. To preserve user identity (not override with agent name), 
-use helper functions from @.codex/get-shit-done/workflows/git-identity-helpers.sh
-
-Helper functions:
-- `read_git_identity()` - Read from git config or config.json
-- `commit_as_user "message"` - Commit with user identity preserved
 
 <upstream_input>
 **CONTEXT.md** (if exists) — User decisions from `$gsd-discuss-phase`
@@ -166,11 +158,11 @@ For finding what exists, community patterns, real-world usage.
 - "How do people solve Y?"
 - "Common mistakes with Z"
 
-**Query templates (use current year):**
+**Query templates:**
 ```
 Stack discovery:
-- "[technology] best practices 2025"
-- "[technology] recommended libraries 2025"
+- "[technology] best practices [current year]"
+- "[technology] recommended libraries [current year]"
 
 Pattern discovery:
 - "how to build [type of thing] with [technology]"
@@ -182,7 +174,7 @@ Problem discovery:
 ```
 
 **Best practices:**
-- Include current year for freshness
+- Always include the current year (check today's date) for freshness
 - Use multiple query variations
 - Cross-verify findings with authoritative sources
 - Mark WebSearch-only findings as LOW confidence
@@ -454,11 +446,16 @@ Orchestrator provides:
 
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
-PADDED_PHASE=$(printf "%02d" ${PHASE} 2>/dev/null || echo "${PHASE}")
-PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-* 2>/dev/null | head -1)
+PADDED_PHASE=$(printf "%02d" $PHASE 2>/dev/null || echo "$PHASE")
+PHASE_DIR=$(ls -d .planning/phases/$PADDED_PHASE-* .planning/phases/$PHASE-* 2>/dev/null | head -1)
 
 # Read CONTEXT.md if exists (from $gsd-discuss-phase)
-cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
+cat "$PHASE_DIR"/*-CONTEXT.md 2>/dev/null
+
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If CONTEXT.md exists**, it contains user decisions that MUST constrain your research:
@@ -529,24 +526,21 @@ Run through verification protocol checklist:
 
 Use the output format template. Populate all sections with verified findings.
 
-Write to: `${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md`
+Write to: `$PHASE_DIR/$PADDED_PHASE-RESEARCH.md`
 
 Where `PHASE_DIR` is the full path (e.g., `.planning/phases/01-foundation`)
 
 ## Step 6: Commit Research
 
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Skipping planning docs commit (commit_docs: false)"
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
+
 ```bash
-git add "${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md"
+git add "$PHASE_DIR/$PADDED_PHASE-RESEARCH.md"
+git commit -m "docs($PHASE): research phase domain
 
-# Source git identity helpers
-if ! type commit_as_user >/dev/null 2>&1; then
-    source .codex/get-shit-done/workflows/git-identity-helpers.sh
-fi
-
-# Commit preserving user identity
-commit_as_user "docs(${PHASE}): research phase domain
-
-Phase ${PHASE}: ${PHASE_NAME}
+Phase $PHASE: $PHASE_NAME
 - Standard stack identified
 - Architecture patterns documented
 - Pitfalls catalogued"
@@ -576,7 +570,7 @@ When research finishes successfully:
 
 ### File Created
 
-`${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md`
+`$PHASE_DIR/$PADDED_PHASE-RESEARCH.md`
 
 ### Confidence Assessment
 

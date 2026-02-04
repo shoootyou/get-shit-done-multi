@@ -4,7 +4,7 @@ Template for `.planning/phases/XX-name/DISCOVERY.md` - shallow research for libr
 
 **Purpose:** Answer "which library/option should we use" questions during mandatory discovery in plan-phase.
 
-For deep ecosystem research ("how do experts build this"), use `/{{COMMAND_PREFIX}}research-phase` which produces RESEARCH.md.
+For deep ecosystem research ("how do experts build this"), use `{{COMMAND_PREFIX}}research-phase` which produces RESEARCH.md.
 
 ---
 
@@ -142,5 +142,5 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 - Niche/complex domains (3D, games, audio, shaders)
 - Need ecosystem knowledge, not just library choice
 - "How do experts build this" questions
-- Use `/{{COMMAND_PREFIX}}research-phase` for these
+- Use `{{COMMAND_PREFIX}}research-phase` for these
 </guidelines>
