@@ -10,9 +10,12 @@
 
 **Supported Platforms:** Claude Code · GitHub Copilot CLI · Codex CLI
 
-</div>
 
-> **📦 Template System** — Starting v2.0.0, this repository serves as a multi-platform template installer. For the primary GSD development and in-depth documentation, see [get-shit-done](https://github.com/glittercowboy/get-shit-done).
+> **📦 Template System** — Starting v2.0.0, this repository serves as a multi-platform template installer. 
+> 
+> For the primary GSD development and in-depth documentation, see [get-shit-done](https://github.com/glittercowboy/get-shit-done).
+
+</div>
 
 ## What It Does
 
