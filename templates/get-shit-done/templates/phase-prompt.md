@@ -268,7 +268,7 @@ TDD features get dedicated plans with `type: tdd`.
 → Yes: Create a TDD plan
 → No: Standard task in standard plan
 
-See `~/.claude/get-shit-done/references/tdd.md` for TDD plan structure.
+See `{{PLATFORM_ROOT}}/get-shit-done/references/tdd.md` for TDD plan structure.
 
 ---
 
@@ -497,7 +497,7 @@ user_setup:
 
 **Result:** Execute-plan generates `{phase}-USER-SETUP.md` with checklist for the user.
 
-See `~/.claude/get-shit-done/templates/user-setup.md` for full schema and examples
+See `{{PLATFORM_ROOT}}/get-shit-done/templates/user-setup.md` for full schema and examples
 
 ---
 
@@ -564,4 +564,4 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 5. Gaps found → fix plans created → execute → re-verify
 6. All must_haves pass → phase complete
 
-See `~/.claude/get-shit-done/workflows/verify-phase.md` for verification logic.
+See `{{PLATFORM_ROOT}}/get-shit-done/workflows/verify-phase.md` for verification logic.

@@ -18,7 +18,7 @@ Resolve model for:
 @{{PLATFORM_ROOT}}/get-shit-done/references/phase-argument-parsing.md
 
 ```bash
-PHASE_INFO=$(node ~/.claude/get-shit-done/bin/gsd-tools.js roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js roadmap get-phase "${PHASE}")
 ```
 
 If `found` is false: Error and exit.
@@ -39,7 +39,7 @@ echo "$PHASE_INFO" | jq -r '.section'
 cat .planning/REQUIREMENTS.md 2>/dev/null
 cat .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
 # Decisions from state-snapshot (structured JSON)
-node ~/.claude/get-shit-done/bin/gsd-tools.js state-snapshot | jq '.decisions'
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js state-snapshot | jq '.decisions'
 ```
 
 ## Step 4: Spawn Researcher

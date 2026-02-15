@@ -229,12 +229,12 @@ get-shit-done/
 ## Special Directories
 
 **get-shit-done/**
-- Purpose: Resources installed to ~/.claude/
+- Purpose: Resources installed to {{PLATFORM_ROOT}}/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
 **commands/**
-- Purpose: Slash commands installed to ~/.claude/commands/
+- Purpose: Slash commands installed to {{PLATFORM_ROOT}}/commands/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
