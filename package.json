@@ -1,6 +1,6 @@
 {
   "name": "get-shit-done-multi",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Multi-platform workflow system for AI-assisted development. Structured planning, execution, and verification across Claude, Copilot, and Codex.",
   "keywords": [
     "claude",
