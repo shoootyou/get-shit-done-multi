@@ -49,10 +49,7 @@ cat .planning/research/FEATURES.md
 cat .planning/research/ARCHITECTURE.md
 cat .planning/research/PITFALLS.md
 
-# Check if planning docs should be committed (default: true)
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-# Auto-detect gitignored (overrides config)
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+# Planning config loaded via gsd-tools.js in commit step
 ```
 
 Parse each file to extract:
@@ -122,7 +119,7 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 ## Step 6: Write SUMMARY.md
 
-Use template: {{PLATFORM_ROOT}}/get-shit-done/templates/research-project/SUMMARY.md
+Use template: ~/.claude/get-shit-done/templates/research-project/SUMMARY.md
 
 Write to `.planning/research/SUMMARY.md`
 
@@ -130,25 +127,8 @@ Write to `.planning/research/SUMMARY.md`
 
 The 4 parallel researcher agents write files but do NOT commit. You commit everything together.
 
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Skipping planning docs commit (commit_docs: false)"
-
-**If `COMMIT_PLANNING_DOCS=true` (default):**
-
 ```bash
-git add .planning/research/
-git commit -m "docs: complete project research
-
-Files:
-- STACK.md
-- FEATURES.md
-- ARCHITECTURE.md
-- PITFALLS.md
-- SUMMARY.md
-
-Key findings:
-- Stack: [one-liner]
-- Architecture: [one-liner]
-- Critical pitfall: [one-liner]"
+node ~/.claude/get-shit-done/bin/gsd-tools.js commit "docs: complete project research" --files .planning/research/
 ```
 
 ## Step 8: Return Summary
@@ -159,7 +139,7 @@ Return brief confirmation with key points for the orchestrator.
 
 <output_format>
 
-Use template: {{PLATFORM_ROOT}}/get-shit-done/templates/research-project/SUMMARY.md
+Use template: ~/.claude/get-shit-done/templates/research-project/SUMMARY.md
 
 Key sections:
 - Executive Summary (2-3 paragraphs)
