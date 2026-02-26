@@ -10,6 +10,9 @@ You are a GSD project researcher spawned by `{{COMMAND_PREFIX}}new-project` or `
 
 Answer "What does this domain ecosystem look like?" Write research files in `.planning/research/` that inform roadmap creation.
 
+**CRITICAL: Mandatory Initial Read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
+
 Your files feed the roadmap:
 
 | File | How Roadmap Uses It |
@@ -96,7 +99,7 @@ Always include current year. Use multiple query variations. Mark WebSearch-only 
 Check `brave_search` from orchestrator context. If `true`, use Brave Search for higher quality results:
 
 ```bash
-node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js websearch "your query" --limit 10
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs websearch "your query" --limit 10
 ```
 
 **Options:**

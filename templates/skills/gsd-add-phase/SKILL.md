@@ -16,10 +16,14 @@ Routes to the add-phase workflow which handles:
 </objective>
 
 <execution_context>
-@.planning/ROADMAP.md
-@.planning/STATE.md
 @{{PLATFORM_ROOT}}/get-shit-done/workflows/add-phase.md
 </execution_context>
+
+<context>
+Arguments: $ARGUMENTS (phase description)
+
+Roadmap and state are resolved in-workflow via `init phase-op` and targeted tool calls.
+</context>
 
 <process>
 **Follow the add-phase workflow** from `@{{PLATFORM_ROOT}}/get-shit-done/workflows/add-phase.md`.

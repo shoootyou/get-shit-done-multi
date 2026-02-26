@@ -27,12 +27,12 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved | head -5
 ## 0. Initialize Context
 
 ```bash
-INIT=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js state load)
+INIT=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs state load)
 ```
 
 Extract `commit_docs` from init JSON. Resolve debugger model:
 ```bash
-DEBUGGER_MODEL=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js resolve-model gsd-debugger --raw)
+DEBUGGER_MODEL=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-debugger --raw)
 ```
 
 ## 1. Check Active Sessions
@@ -106,6 +106,9 @@ Task(
 **If `## CHECKPOINT REACHED`:**
 - Present checkpoint details to user
 - Get user response
+- If checkpoint type is `human-verify`:
+  - If user confirms fixed: continue so agent can finalize/resolve/archive
+  - If user reports issues: continue so agent returns to investigation/fixing
 - Spawn continuation agent (see step 5)
 
 **If `## INVESTIGATION INCONCLUSIVE`:**
@@ -125,7 +128,9 @@ Continue debugging {slug}. Evidence is in the debug file.
 </objective>
 
 <prior_state>
-Debug file: @.planning/debug/{slug}.md
+<files_to_read>
+- .planning/debug/{slug}.md (Debug session state)
+</files_to_read>
 </prior_state>
 
 <checkpoint_response>

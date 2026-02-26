@@ -123,7 +123,7 @@ If found, delete them — phase is complete, handoffs are stale.
 **Delegate ROADMAP.md and STATE.md updates to gsd-tools:**
 
 ```bash
-TRANSITION=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js phase complete "${current_phase}")
+TRANSITION=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs phase complete "${current_phase}")
 ```
 
 The CLI handles:
@@ -238,7 +238,7 @@ After (Phase 2 shipped JWT auth, discovered rate limiting needed):
 Verify the updates are correct by reading STATE.md. If the progress bar needs updating, use:
 
 ```bash
-PROGRESS=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js progress bar --raw)
+PROGRESS=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs progress bar --raw)
 ```
 
 Update the progress bar line in STATE.md with the result.
@@ -347,7 +347,7 @@ The `next_phase` and `next_phase_name` fields give you the next phase details.
 
 If you need additional context, use:
 ```bash
-ROADMAP=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js roadmap analyze)
+ROADMAP=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs roadmap analyze)
 ```
 
 This returns all phases with goals, disk status, and completion info.
@@ -378,7 +378,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke SlashCommand("{{COMMAND_PREFIX}}plan-phase [X+1]")
+Exit skill and invoke SlashCommand("{{COMMAND_PREFIX}}plan-phase [X+1] --auto")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -390,7 +390,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke SlashCommand("{{COMMAND_PREFIX}}discuss-phase [X+1]")
+Exit skill and invoke SlashCommand("{{COMMAND_PREFIX}}discuss-phase [X+1] --auto")
 
 </if>
 
@@ -450,6 +450,11 @@ Exit skill and invoke SlashCommand("{{COMMAND_PREFIX}}discuss-phase [X+1]")
 ---
 
 **Route B: Milestone complete (all phases done)**
+
+**Clear auto-advance** — milestone boundary is the natural stopping point:
+```bash
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs config-set workflow.auto_advance false
+```
 
 <if mode="yolo">
 

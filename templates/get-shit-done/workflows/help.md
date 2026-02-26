@@ -99,6 +99,8 @@ Create detailed execution plan for a specific phase.
 Usage: `{{COMMAND_PREFIX}}plan-phase 1`
 Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
 
+**PRD Express Path:** Pass `--prd path/to/requirements.md` to skip discuss-phase entirely. Your PRD becomes locked decisions in CONTEXT.md. Useful when you already have clear acceptance criteria.
+
 ### Execution
 
 **`{{COMMAND_PREFIX}}execute-phase <phase-number>`**
@@ -312,6 +314,16 @@ Usage: `{{COMMAND_PREFIX}}set-profile budget`
 
 ### Utility Commands
 
+**`{{COMMAND_PREFIX}}cleanup`**
+Archive accumulated phase directories from completed milestones.
+
+- Identifies phases from completed milestones still in `.planning/phases/`
+- Shows dry-run summary before moving anything
+- Moves phase dirs to `.planning/milestones/v{X.Y}-phases/`
+- Use after multiple milestones to reduce `.planning/phases/` clutter
+
+Usage: `{{COMMAND_PREFIX}}cleanup`
+
 **`{{COMMAND_PREFIX}}help`**
 Show this command reference.
 
@@ -341,12 +353,19 @@ Usage: `{{COMMAND_PREFIX}}join-discord`
 ├── PROJECT.md            # Project vision
 ├── ROADMAP.md            # Current phase breakdown
 ├── STATE.md              # Project memory & context
+├── RETROSPECTIVE.md      # Living retrospective (updated per milestone)
 ├── config.json           # Workflow mode & gates
 ├── todos/                # Captured ideas and tasks
 │   ├── pending/          # Todos waiting to be worked on
 │   └── done/             # Completed todos
 ├── debug/                # Active debug sessions
 │   └── resolved/         # Archived resolved issues
+├── milestones/
+│   ├── v1.0-ROADMAP.md       # Archived roadmap snapshot
+│   ├── v1.0-REQUIREMENTS.md  # Archived requirements
+│   └── v1.0-phases/          # Archived phase dirs (via {{COMMAND_PREFIX}}cleanup or --archive-phases)
+│       ├── 01-foundation/
+│       └── 02-core-features/
 ├── codebase/             # Codebase map (brownfield projects)
 │   ├── STACK.md          # Languages, frameworks, dependencies
 │   ├── ARCHITECTURE.md   # Patterns, layers, data flow

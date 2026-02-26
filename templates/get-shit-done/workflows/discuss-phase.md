@@ -107,11 +107,13 @@ Phase: "API documentation"
 
 <process>
 
+**Express path available:** If you already have a PRD or acceptance criteria document, use `{{COMMAND_PREFIX}}plan-phase {phase} --prd path/to/prd.md` to skip this discussion and go straight to planning.
+
 <step name="initialize" priority="first">
 Phase number from argument (required).
 
 ```bash
-INIT=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js init phase-op "${PHASE}")
+INIT=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE}")
 ```
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`.
@@ -147,7 +149,23 @@ If "Update": Load existing, continue to analyze_phase
 If "View": Display CONTEXT.md, then offer update/skip
 If "Skip": Exit workflow
 
-**If doesn't exist:** Continue to analyze_phase.
+**If doesn't exist:**
+
+Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
+
+Use AskUserQuestion:
+- header: "Plans exist"
+- question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
+- options:
+  - "Continue and replan after" — Capture context, then run {{COMMAND_PREFIX}}plan-phase {X} to replan
+  - "View existing plans" — Show plans before deciding
+  - "Cancel" — Skip discuss-phase
+
+If "Continue and replan after": Continue to analyze_phase.
+If "View existing plans": Display plan files, then offer "Continue" / "Cancel".
+If "Cancel": Exit workflow.
+
+**If `has_plans` is false:** Continue to analyze_phase.
 </step>
 
 <step name="analyze_phase">
@@ -190,9 +208,10 @@ We'll clarify HOW to implement this.
 **Then use AskUserQuestion (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
-- options: Generate 3-4 phase-specific gray areas, each formatted as:
+- options: Generate 3-4 phase-specific gray areas, each with:
   - "[Specific area]" (label) — concrete, not generic
   - [1-2 questions this covers] (description)
+  - **Highlight the recommended choice with brief explanation why**
 
 **Do NOT include a "skip" or "you decide" option.** User ran this command to discuss — give them real choices.
 
@@ -242,7 +261,7 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
 2. **Ask 4 questions using AskUserQuestion:**
    - header: "[Area]" (max 12 chars — abbreviate if needed)
    - question: Specific decision for this area
-   - options: 2-3 concrete choices (AskUserQuestion adds "Other" automatically)
+   - options: 2-3 concrete choices (AskUserQuestion adds "Other" automatically), with the recommended choice highlighted and brief explanation why
    - Include "You decide" as an option when reasonable — captures Claude discretion
 
 3. **After 4 questions, check:**
@@ -254,10 +273,17 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    If "Next area" → proceed to next selected area
    If "Other" (free text) → interpret intent: continuation phrases ("chat more", "keep going", "yes", "more") map to "More questions"; advancement phrases ("done", "move on", "next", "skip") map to "Next area". If ambiguous, ask: "Continue with more questions about [area], or move to the next area?"
 
-4. **After all areas complete:**
-   - header: "Done"
-   - question: "That covers [list areas]. Ready to create context?"
-   - options: "Create context" / "Revisit an area"
+4. **After all initially-selected areas complete:**
+   - Summarize what was captured from the discussion so far
+   - AskUserQuestion:
+     - header: "Done"
+     - question: "We've discussed [list areas]. Which gray areas remain unclear?"
+     - options: "Explore more gray areas" / "I'm ready for context"
+   - If "Explore more gray areas":
+     - Identify 2-4 additional gray areas based on what was learned
+     - Return to present_gray_areas logic with these new areas
+     - Loop: discuss new areas, then prompt again
+   - If "I'm ready for context": Proceed to write_context
 
 **Question design:**
 - Options should be concrete, not abstract ("Cards" not "Option A")
@@ -389,7 +415,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 Commit phase context (uses `commit_docs` from init internally):
 
 ```bash
-node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
 
 Confirm: "Committed: docs(${padded_phase}): capture phase context"
@@ -399,7 +425,7 @@ Confirm: "Committed: docs(${padded_phase}): capture phase context"
 Update STATE.md with session info:
 
 ```bash
-node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js state record-session \
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs state record-session \
   --stopped-at "Phase ${PHASE} context gathered" \
   --resume-file "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
@@ -407,7 +433,7 @@ node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js state record-session \
 Commit STATE.md:
 
 ```bash
-node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
 ```
 </step>
 
@@ -417,8 +443,13 @@ Check for auto-advance trigger:
 1. Parse `--auto` flag from $ARGUMENTS
 2. Read `workflow.auto_advance` from config:
    ```bash
-   AUTO_CFG=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.js config get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CFG=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
+
+**If `--auto` flag present AND `AUTO_CFG` is not true:** Persist auto-advance to config (handles direct `--auto` usage without new-project):
+```bash
+node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs config-set workflow.auto_advance true
+```
 
 **If `--auto` flag present OR `AUTO_CFG` is true:**
 
@@ -431,23 +462,65 @@ Display banner:
 Context captured. Spawning plan-phase...
 ```
 
-Spawn plan-phase as Task:
+Spawn plan-phase as Task with direct workflow file reference (do NOT use Skill tool — Skills don't resolve inside Task subagents):
 ```
 Task(
-  prompt="Run {{COMMAND_PREFIX}}plan-phase ${PHASE} --auto",
+  prompt="
+    <objective>
+    You are the plan-phase orchestrator. Create executable plans for Phase ${PHASE}: ${PHASE_NAME}, then auto-advance to execution.
+    </objective>
+
+    <execution_context>
+    @{{PLATFORM_ROOT}}/get-shit-done/workflows/plan-phase.md
+    @{{PLATFORM_ROOT}}/get-shit-done/references/ui-brand.md
+    @{{PLATFORM_ROOT}}/get-shit-done/references/model-profile-resolution.md
+    </execution_context>
+
+    <arguments>
+    PHASE=${PHASE}
+    ARGUMENTS='${PHASE} --auto'
+    </arguments>
+
+    <instructions>
+    1. Read plan-phase.md from execution_context for your complete workflow
+    2. Follow ALL steps: initialize, validate, load context, research, plan, verify, auto-advance
+    3. When spawning agents (gsd-phase-researcher, gsd-planner, gsd-plan-checker), use Task with specified subagent_type and model
+    4. For step 14 (auto-advance to execute): spawn execute-phase as a Task with DIRECT file reference — tell it to read execute-phase.md. Include @file refs to execute-phase.md, checkpoints.md, tdd.md, model-profile-resolution.md. Pass --no-transition flag so execute-phase returns results instead of chaining further.
+    5. Do NOT use the Skill tool or {{COMMAND_PREFIX}} commands. Read workflow .md files directly.
+    6. Return: PHASE COMPLETE (full pipeline success), PLANNING COMPLETE (planning done but execute failed/skipped), PLANNING INCONCLUSIVE, or GAPS FOUND
+    </instructions>
+  ",
   subagent_type="general-purpose",
   description="Plan Phase ${PHASE}"
 )
 ```
 
 **Handle plan-phase return:**
-- **PLANNING COMPLETE** → Plan-phase handles chaining to execute-phase (via its own auto_advance step)
-- **PLANNING INCONCLUSIVE / CHECKPOINT** → Display result, stop chain:
+- **PHASE COMPLETE** → Full chain succeeded. Display:
+  ```
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GSD ► PHASE ${PHASE} COMPLETE
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Auto-advance pipeline finished: discuss → plan → execute
+
+  Next: {{COMMAND_PREFIX}}discuss-phase ${NEXT_PHASE} --auto
+  <sub>/clear first → fresh context window</sub>
+  ```
+- **PLANNING COMPLETE** → Planning done, execution didn't complete:
+  ```
+  Auto-advance partial: Planning complete, execution did not finish.
+  Continue: {{COMMAND_PREFIX}}execute-phase ${PHASE}
+  ```
+- **PLANNING INCONCLUSIVE / CHECKPOINT** → Stop chain:
   ```
   Auto-advance stopped: Planning needs input.
-
-  Review the output above and continue manually:
-  {{COMMAND_PREFIX}}plan-phase ${PHASE}
+  Continue: {{COMMAND_PREFIX}}plan-phase ${PHASE}
+  ```
+- **GAPS FOUND** → Stop chain:
+  ```
+  Auto-advance stopped: Gaps found during execution.
+  Continue: {{COMMAND_PREFIX}}plan-phase ${PHASE} --gaps
   ```
 
 **If neither `--auto` nor config enabled:**
