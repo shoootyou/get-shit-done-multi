@@ -1,8 +1,8 @@
 ---
 name: gsd-complete-milestone
 description: Archive completed milestone and prepare for next version
-allowed-tools: Read, Write, Bash
 argument-hint: <version>
+allowed-tools: Read, Write, Bash
 ---
 
 <objective>
@@ -35,7 +35,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 
 **Follow complete-milestone.md workflow:**
 
-1. **Check for audit:**
+0. **Check for audit:**
 
    - Look for `.planning/v{{version}}-MILESTONE-AUDIT.md`
    - If missing or stale: recommend `{{COMMAND_PREFIX}}audit-milestone` first
@@ -57,53 +57,53 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
    ✓ Milestone audit passed. Proceeding with completion.
    ```
 
-2. **Verify readiness:**
+1. **Verify readiness:**
 
    - Check all phases in milestone have completed plans (SUMMARY.md exists)
    - Present milestone scope and stats
    - Wait for confirmation
 
-3. **Gather stats:**
+2. **Gather stats:**
 
    - Count phases, plans, tasks
    - Calculate git range, file changes, LOC
    - Extract timeline from git log
    - Present summary, confirm
 
-4. **Extract accomplishments:**
+3. **Extract accomplishments:**
 
    - Read all phase SUMMARY.md files in milestone range
    - Extract 4-6 key accomplishments
    - Present for approval
 
-5. **Archive milestone:**
+4. **Archive milestone:**
 
    - Create `.planning/milestones/v{{version}}-ROADMAP.md`
    - Extract full phase details from ROADMAP.md
    - Fill milestone-archive.md template
    - Update ROADMAP.md to one-line summary with link
 
-6. **Archive requirements:**
+5. **Archive requirements:**
 
    - Create `.planning/milestones/v{{version}}-REQUIREMENTS.md`
    - Mark all v1 requirements as complete (checkboxes checked)
    - Note requirement outcomes (validated, adjusted, dropped)
    - Delete `.planning/REQUIREMENTS.md` (fresh one created for next milestone)
 
-7. **Update PROJECT.md:**
+6. **Update PROJECT.md:**
 
    - Add "Current State" section with shipped version
    - Add "Next Milestone Goals" section
    - Archive previous content in `<details>` (if v1.1+)
 
-8. **Commit and tag:**
+7. **Commit and tag:**
 
    - Stage: MILESTONES.md, PROJECT.md, ROADMAP.md, STATE.md, archive files
    - Commit: `chore: archive v{{version}} milestone`
    - Tag: `git tag -a v{{version}} -m "[milestone summary]"`
    - Ask about pushing tag
 
-9. **Offer next steps:**
+8. **Offer next steps:**
    - `{{COMMAND_PREFIX}}new-milestone` — start next milestone (questioning → research → requirements → roadmap)
 
 </process>

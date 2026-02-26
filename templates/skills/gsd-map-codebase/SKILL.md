@@ -1,7 +1,7 @@
 ---
 name: gsd-map-codebase
-description: Analyze codebase with parallel mapper agents to produce structured documentation
-argument-hint: [area]
+description: Analyze codebase with parallel mapper agents to produce .planning codebase documents
+argument-hint: "[optional: specific area to map, e.g., 'api' or 'auth']"
 allowed-tools: Read, Bash, Glob, Grep, Write, Task
 ---
 
