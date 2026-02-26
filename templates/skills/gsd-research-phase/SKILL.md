@@ -1,6 +1,6 @@
 ---
 name: gsd-research-phase
-description: Research how to implement a phase (standalone - usually use plan-phase instead)
+description: Research how to implement a phase (standalone - usually use COMMAND PREFIX plan-phase instead)
 argument-hint: "[phase]"
 allowed-tools: Read, Bash, Task
 ---
@@ -28,40 +28,26 @@ Normalize phase input in step 1 before any directory lookups.
 
 <process>
 
-## 0. Resolve Model Profile
-
-Read model profile for agent spawning:
+## 0. Initialize Context
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+INIT=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs init phase-op "$ARGUMENTS")
 ```
 
-Default to "balanced" if not set.
+Extract from init JSON: `phase_dir`, `phase_number`, `phase_name`, `phase_found`, `commit_docs`, `has_research`, `state_path`, `requirements_path`, `context_path`, `research_path`.
 
-**Model lookup table:**
+Resolve researcher model:
+```bash
+RESEARCHER_MODEL=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-phase-researcher --raw)
+```
 
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-phase-researcher | opus | sonnet | haiku |
-
-Store resolved model for use in Task calls below.
-
-## 1. Normalize and Validate Phase
+## 1. Validate Phase
 
 ```bash
-# Normalize phase number (8 → 08, but preserve decimals like 2.1 → 02.1)
-if [[ "$ARGUMENTS" =~ ^[0-9]+$ ]]; then
-  PHASE=$(printf "%02d" "$ARGUMENTS")
-elif [[ "$ARGUMENTS" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-  PHASE=$(printf "%02d.%s" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
-else
-  PHASE="$ARGUMENTS"
-fi
-
-grep -A5 "Phase ${PHASE}:" .planning/ROADMAP.md 2>/dev/null
+PHASE_INFO=$(node {{PLATFORM_ROOT}}/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${phase_number}")
 ```
 
-**If not found:** Error and exit. **If found:** Extract phase number, name, description.
+**If `found` is false:** Error and exit. **If `found` is true:** Extract `phase_number`, `phase_name`, `goal` from JSON.
 
 ## 2. Check Existing Research
 
@@ -75,14 +61,12 @@ ls .planning/phases/${PHASE}-*/RESEARCH.md 2>/dev/null
 
 ## 3. Gather Phase Context
 
-```bash
-grep -A20 "Phase ${PHASE}:" .planning/ROADMAP.md
-cat .planning/REQUIREMENTS.md 2>/dev/null
-cat .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
-grep -A30 "### Decisions Made" .planning/STATE.md 2>/dev/null
-```
+Use paths from INIT (do not inline file contents in orchestrator context):
+- `requirements_path`
+- `context_path`
+- `state_path`
 
-Present summary with phase description, requirements, prior decisions.
+Present summary with phase description and what files the researcher will load.
 
 ## 4. Spawn gsd-phase-researcher Agent
 
@@ -111,12 +95,15 @@ Research implementation approach for Phase {phase_number}: {phase_name}
 Mode: ecosystem
 </objective>
 
-<context>
+<files_to_read>
+- {requirements_path} (Requirements)
+- {context_path} (Phase context from discuss-phase, if exists)
+- {state_path} (Prior project decisions and blockers)
+</files_to_read>
+
+<additional_context>
 **Phase description:** {phase_description}
-**Requirements:** {requirements_list}
-**Prior decisions:** {decisions_if_any}
-**Phase context:** {context_md_content}
-</context>
+</additional_context>
 
 <downstream_consumer>
 Your RESEARCH.md will be loaded by `{{COMMAND_PREFIX}}plan-phase` which uses specific sections:
@@ -145,7 +132,7 @@ Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 
 ```
 Task(
-  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
+  prompt="First, read {{PLATFORM_ROOT}}/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
   subagent_type="general-purpose",
   model="{researcher_model}",
   description="Research Phase {phase}"
@@ -168,7 +155,9 @@ Continue research for Phase {phase_number}: {phase_name}
 </objective>
 
 <prior_state>
-Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+<files_to_read>
+- .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md (Existing research)
+</files_to_read>
 </prior_state>
 
 <checkpoint_response>
@@ -179,7 +168,7 @@ Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 
 ```
 Task(
-  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
+  prompt="First, read {{PLATFORM_ROOT}}/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
   subagent_type="general-purpose",
   model="{researcher_model}",
   description="Continue research Phase {phase}"
