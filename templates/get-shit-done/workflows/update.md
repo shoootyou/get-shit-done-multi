@@ -14,8 +14,8 @@ Detect whether GSD is installed locally or globally by checking both locations a
 ```bash
 # Check local first (takes priority only if valid)
 # Paths templated at install time for runtime compatibility
-LOCAL_VERSION_FILE="./.claude/get-shit-done/VERSION"
-LOCAL_MARKER_FILE="./.claude/get-shit-done/workflows/update.md"
+LOCAL_VERSION_FILE="{{PLATFORM_ROOT}}/get-shit-done/VERSION"
+LOCAL_MARKER_FILE="{{PLATFORM_ROOT}}/get-shit-done/workflows/update.md"
 GLOBAL_VERSION_FILE="$HOME/.claude/get-shit-done/VERSION"
 GLOBAL_MARKER_FILE="$HOME/.claude/get-shit-done/workflows/update.md"
 
@@ -127,7 +127,7 @@ Exit.
 - `get-shit-done/` will be wiped and replaced
 - `agents/gsd-*` files will be replaced
 
-(Paths are relative to your install location: `{{PLATFORM_ROOT}}/` for global, `./.claude/` for local)
+(Paths are relative to your install location: `{{PLATFORM_ROOT}}/` for global, `{{PLATFORM_ROOT}}/` for local)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -166,7 +166,7 @@ Clear the update cache so statusline indicator disappears:
 
 **If LOCAL install:**
 ```bash
-rm -f ./.claude/cache/gsd-update-check.json
+rm -f {{PLATFORM_ROOT}}/cache/gsd-update-check.json
 ```
 
 **If GLOBAL install:**

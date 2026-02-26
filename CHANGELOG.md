@@ -17,6 +17,14 @@ This CHANGELOG documents the fork development journey from v1.7.0 onward.
 
 ---
 
+## [2.0.2] - 2026-02-26
+
+### Changed
+
+- **Skills & Agents**: Synced with [get-shit-done v1.21.0](https://github.com/gsd-build/get-shit-done/releases/tag/v1.21.0)
+
+---
+
 ## [2.0.1] - 2025-01-31
 
 ### Changed
