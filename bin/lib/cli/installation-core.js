@@ -125,16 +125,5 @@ export async function installPlatforms(platform, scope, appVersion, options = {}
  */
 export function getScriptDir(importMetaUrl) {
   const __filename = fileURLToPath(importMetaUrl);
-  const __dirname = dirname(__filename);
-
-  // If called from bin/install.js, return bin/
-  // If called from bin/lib/cli/interactive.js, go up to bin/
-  if (__dirname.endsWith('/bin')) {
-    return __dirname;
-  } else if (__dirname.endsWith('/bin/lib/cli')) {
-    return join(__dirname, '../..');
-  }
-
-  // Fallback: return as-is
-  return __dirname;
+  return dirname(__filename);
 }

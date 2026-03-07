@@ -1,6 +1,5 @@
 import * as p from '@clack/prompts';
 import { detectBinaries } from '../platforms/binary-detector.js';
-import { getScriptDir } from './installation-core.js';
 import * as logger from './logger.js';
 import { platformNames } from '../platforms/platform-names.js';
 import { executeInstallationLoop } from './install-loop.js';
@@ -36,7 +35,7 @@ export async function runInteractive(appVersion, options = {}) {
   const { platforms, scope } = await promptSelections(detected, appVersion, options);
 
   // Hand off to shared installation core (same path as CLI mode)
-  const scriptDir = getScriptDir(import.meta.url);
+  const scriptDir = options.scriptDir;
 
   // Close the lateral line with step message
   p.log.success('Installation starting...');

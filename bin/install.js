@@ -116,6 +116,7 @@ async function main() {
   // Execute interactive mode
   if (isInteractive) {
     await runInteractive(pkg.version, {
+      scriptDir: __dirname,
       verbose: options.verbose || false,
       customPath: options.customPath || null
     });
