@@ -17,6 +17,24 @@
 
 </div>
 
+## 🎉 Mission Accomplished — This Fork is Now Archived
+
+Good news: this fork did its job! GitHub Copilot support has been officially merged into the upstream repository via [PR #911](https://github.com/gsd-build/get-shit-done/pull/911), which was the main reason this fork existed in the first place.
+
+On top of that, the `/gsd-autonomous` command — which lets you advance directly through available phases without manual intervention — is also now part of the official release.
+
+**We recommend switching to the official repo:** [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done)
+
+If you're using GitHub Copilot, you can get up and running with just:
+
+```bash
+npx get-shit-done-cc@latest --copilot
+```
+
+This repository will no longer receive active updates. Thanks for being part of the ride! 🚀
+
+---
+
 ## What It Does
 
 Get Shit Done Multi (GSD Multi) is a template-based installer that deploys working AI assistant skills and agents to
